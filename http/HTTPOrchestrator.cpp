@@ -28,7 +28,18 @@
 #include <sys/socket.h>
 #include <sys/stat.h>
 #include <sys/time.h>
-#include <sys/unistd.h>
+
+#ifdef __linux__
+# include <unistd.h>
+#elif __APPLE__
+# include <unistd.h>
+#elif _WIN32
+# include <sys/unistd.h>
+#else
+# error Unknown plateform
+#endif
+
+
 #include <util/Optional.hpp>
 #include <cstring>
 #include <iostream>

@@ -15,12 +15,6 @@
 
 #include <iostream>
 
-class IOptionValidator;
-
-#if 1
-#include <util/options/OptionValidator.hpp>
-#endif
-
 class Option
 {
 	private:
