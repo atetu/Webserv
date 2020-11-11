@@ -39,7 +39,6 @@
 # error Unknown plateform
 #endif
 
-
 #include <util/Optional.hpp>
 #include <cstring>
 #include <iostream>
@@ -47,8 +46,8 @@
 #include <map>
 #include <string>
 #include <sys/types.h>
-       #include <sys/stat.h>
-       #include <fcntl.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 
 class HttpResponse;
 
@@ -290,7 +289,9 @@ HTTPOrchestrator::start()
 								{
 									std::cout << file << std::endl;
 
-									DIR *dir = ::opendir(cli->parser.path() == "/" ? "." : file.c_str());
+									std::string directory = cli->parser.path() == "/" ? "." : file;
+
+									DIR *dir = ::opendir(directory.c_str());
 									std::cout << dir << std::endl;
 
 									std::string listing = "";
@@ -299,8 +300,10 @@ HTTPOrchestrator::start()
 									while ((entry = ::readdir(dir)))
 									{
 										std::string lfile(entry->d_name);
+										std::string absolute = directory + "/" + lfile;
 
-										if (DT_DIR == entry->d_type) {
+										if (::stat(absolute.c_str(), &st) != -1 && S_ISDIR(st.st_mode))
+										{
 											lfile += '/';
 										}
 
