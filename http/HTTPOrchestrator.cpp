@@ -33,7 +33,7 @@
 # include <unistd.h>
 #elif __APPLE__
 # include <unistd.h>
-#elif _WIN32
+#elif __CYGWIN__
 # include <sys/unistd.h>
 #else
 # error Unknown plateform

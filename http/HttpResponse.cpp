@@ -18,8 +18,7 @@
 # include <sys/socket.h>
 # include <unistd.h>
 # define MSG_NOSIGNAL 0
-
-#elif _WIN32
+#elif __CYGWIN__
 # include <cygwin/socket.h>
 # include <sys/unistd.h>
 #else
