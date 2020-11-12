@@ -6,7 +6,7 @@
 /*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/28 19:29:18 by ecaceres          #+#    #+#             */
-/*   Updated: 2020/11/11 16:33:55 by alicetetu        ###   ########.fr       */
+/*   Updated: 2020/11/12 18:12:52 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 # define OPTION_HPP_
 
 #include <iostream>
+#include <exception>
 
 class Option
 {
@@ -27,72 +28,20 @@ class Option
 
 	public:
 		Option();
+		Option(char _m_short, std::string _m_long, std::string _m_description,
+			bool _m_hasValue, std::string _m_valueName, std::string _m_value);
 		Option(const Option &other);
 
-		virtual
-		~Option();
+		virtual	~Option();
 
-		Option&
-		operator=(const Option &other);
+		void addValue(void);
+		void addConfigFile(std::string str)
+		
+		Option& operator=(const Option &other);
+
+		class IllegalArgumentException : public std::exception
+			{
+				virtual const char* what() const throw();
+			};	
 };
-
-// ./webserv --check --config-file ./x.json
-
-
-/**
- * webserv v01
- * 
- * -h	--help			: no value : display this help message
- * -c	--check			: no value : only check the config file
- * -f	--config file	: <file>   : specify the config file
- * 
- * 
- * */
-
-/**
- *
- * main:
- * 
- * - = short
- * -- = long
- * 
- * if (str startWith -)
- * 
- * Option helpOption('h', "help", "display this help message");
- * Option checkOption('c', "check", "only check the config file");
- * Option configFileOption('f', "config-file", "specify the config file", "file");
- * 
- * // c (...)
- * // c (..., valueName)
- * 
- * OptionParser parser(std::list(&checkOption, &configFileOption, ...))
- * 
- * try {
- * 		parser.parse(argc, argv);
- * } catch (...) {
- * 		std::cerr << failed to parse;
- * 		::exit(1);
- * }
- * 
- * std::string configFile = "./conf.json";
- * 
- * if(parser.has(configFileOption)) {
- * 		configFile = configFileOption.value();
- * }
- * 
- * if (file does not exists (configFile)) {
- * 		std::cerr << config file not found,
- * 		exit(1);
- * }
- * 
- * if (parser.isPresent(checkOption)) {
- * 		// CHECK CONFIG FILE
- * 		::exit(0);
- * }
- * 
- * // Bind JSON to CPP
- * // Start orchestrator
- * 
- */
-
 #endif /* OPTION_HPP_ */
