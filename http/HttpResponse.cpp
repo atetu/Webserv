@@ -13,16 +13,18 @@
 #ifdef __linux__
 # include <sys/socket.h>
 # include <unistd.h>
-# define MSG_NOSIGNAL 0
 #elif __APPLE__
 # include <sys/socket.h>
 # include <unistd.h>
-# define MSG_NOSIGNAL 0
 #elif __CYGWIN__
 # include <cygwin/socket.h>
 # include <sys/unistd.h>
 #else
 # error Unknown plateform
+#endif
+
+#ifndef MSG_NOSIGNAL
+# define MSG_NOSIGNAL 0
 #endif
 
 
