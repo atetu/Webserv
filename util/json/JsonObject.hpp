@@ -104,6 +104,30 @@ class JsonObject :
 			return (it->second);
 		}
 
+		inline iterator
+		begin()
+		{
+			return (m_value.begin());
+		}
+
+		inline iterator
+		end()
+		{
+			return (m_value.end());
+		}
+
+		inline const_iterator
+		begin() const
+		{
+			return (m_value.begin());
+		}
+
+		inline const_iterator
+		end() const
+		{
+			return (m_value.end());
+		}
+
 		virtual void
 		clear(void)
 		{

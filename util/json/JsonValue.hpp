@@ -43,14 +43,43 @@ class JsonValue
 		virtual const Type
 		type() const = 0;
 
+		const std::string&
+		typeString() const
+		{
+			static std::string strings[TYPE__SIZE] = {
+				[TYPE_ARRAY] = "ARRAY",
+				[TYPE_OBJECT] = "OBJECT",
+				[TYPE_STRING] = "STRING",
+				[TYPE_NUMBER] = "NUMBER",
+				[TYPE_DECIMAL] = "DECIMAL",
+				[TYPE_BOOLEAN] = "BOOLEAN",
+				[TYPE_NULL] = "NULL" };
+
+			return (strings[type()]);
+		}
+
 		virtual const std::string
 		toJsonString() const = 0;
 
 		template<typename T>
-			bool
+			inline bool
 			instanceOf() const
 			{
-				return (!!dynamic_cast<const T*>(this));
+				return (!!cast<T>());
+			}
+
+		template<typename T>
+			inline T*
+			cast()
+			{
+				return (dynamic_cast<T*>(this));
+			}
+
+		template<typename T>
+			inline const T*
+			cast() const
+			{
+				return (dynamic_cast<const T*>(this));
 			}
 };
 

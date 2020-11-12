@@ -133,7 +133,7 @@ HTTPOrchestrator::start()
 	prepare();
 
 	MimeRegistry mimeRegistry;
-	mimeRegistry.loadFromFile("mime.map");
+	mimeRegistry.loadFromFile("mime.json");
 
 	fd_set fds;
 
