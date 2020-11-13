@@ -10,6 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+#include <http/HTTP.hpp>
 #include <http/HTTPHeaderFields.hpp>
 #include <util/Convert.hpp>
 #include <string>
@@ -270,4 +271,21 @@ HTTPHeaderFields::const_iterator
 HTTPHeaderFields::end(void) const
 {
 	return (m_storage.end());
+}
+
+std::string
+HTTPHeaderFields::format(void) const
+{
+	std::string str;
+
+	const_iterator it = begin();
+	const_iterator ite = end();
+
+	while (it != ite)
+	{
+		str += it->first + std::string(": ") + it->second + HTTP::CRLF;
+		it++;
+	}
+
+	return (str);
 }

@@ -26,7 +26,7 @@ FIX_HEADERS_DIR			= .
 FIX_LIBRARIES_DIR		= .
 
 TARGET					= webserv
-SOURCES					= ./util/options/OptionParser.cpp ./util/options/Option.cpp ./util/unit/DataSize.cpp ./util/unit/DataUnit.cpp ./util/Closable.cpp ./util/Logger.cpp ./config/Configuration.cpp ./config/block/ServerBlock.cpp ./config/block/LocationBlock.cpp ./config/block/CGI.cpp ./io/Socket.cpp ./io/SocketServer.cpp ./webserv.cpp ./server/WebServer.cpp ./http/HTTPMethod.cpp ./http/HTTPOrchestrator.cpp ./http/HTTPServer.cpp ./http/HTTPHeaderFields.cpp ./http/HttpResponse.cpp ./http/HTTP.cpp ./http/mime/MimeRegistry.cpp ./http/mime/Mime.cpp ./http/HTTPDate.cpp ./http/HttpRequestParser.cpp ./http/HTTPStatus.cpp ./http/HTTPVersion.cpp ./http/HttpRequest.cpp ./exception/Exception.cpp ./exception/IOException.cpp ./exception/IllegalArgumentException.cpp
+SOURCES					= ./config/block/CGI.cpp ./config/block/LocationBlock.cpp ./config/block/ServerBlock.cpp ./config/Configuration.cpp ./exception/Exception.cpp ./exception/IllegalArgumentException.cpp ./exception/IllegalStateException.cpp ./exception/IOException.cpp ./exception/NoSuchElementException.cpp ./exception/NullPointerException.cpp ./exception/RuntimeException.cpp ./http/HTTP.cpp ./http/HTTPDate.cpp ./http/HTTPHeaderFields.cpp ./http/HTTPMethod.cpp ./http/HTTPOrchestrator.cpp ./http/HttpRequest.cpp ./http/HttpRequestParser.cpp ./http/HttpResponse.cpp ./http/HTTPServer.cpp ./http/HTTPStatus.cpp ./http/HTTPVersion.cpp ./http/mime/Mime.cpp ./http/mime/MimeRegistry.cpp ./io/FileDescriptorWrapper.cpp ./io/Socket.cpp ./io/SocketServer.cpp ./server/WebServer.cpp ./util/Closable.cpp ./util/json/JsonArray.cpp ./util/json/JsonBoolean.cpp ./util/json/JsonEnumValues.cpp ./util/json/JsonException.cpp ./util/json/JsonLocation.cpp ./util/json/JsonNull.cpp ./util/json/JsonObject.cpp ./util/json/JsonParseException.cpp ./util/json/JsonParser.cpp ./util/json/JsonReader.cpp ./util/json/JsonTokenizer.cpp ./util/json/JsonUtils.cpp ./util/json/JsonValue.cpp ./util/Logger.cpp ./util/Objects.cpp ./util/options/Option.cpp ./util/options/OptionParser.cpp ./util/unit/DataSize.cpp ./util/unit/DataUnit.cpp ./webserv.cpp
 HEADERS					= 
 LIBRARIES				= 
 LIBRARIES_BIN			= 
@@ -36,10 +36,10 @@ OBJECTS					= $(SOURCES:.cpp=.o)
 COMPILER				= g++
 
 FRAMEWORKS				= 
-FLAGS					= -g3 # -fsanitize=address
+FLAGS					= -std=c++98 -g3 # -fsanitize=address
 TARGET_REQUIRED_FLAGS	= -I.
 
-TOOL_BASE64_DECODE		= base64 -D
+TOOL_BASE64_DECODE		= base64 -d
 
 MAKE_PREFIX				= "$(COLOR_LIGHT_MAGENTA)[$(COLOR_LIGHT_GREEN) make: $(TARGET) $(COLOR_LIGHT_MAGENTA)]"
 

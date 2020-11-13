@@ -16,9 +16,12 @@
 #include <http/HTTPHeaderFields.hpp>
 #include <http/HTTPStatus.hpp>
 #include <http/HTTPVersion.hpp>
-#include <util/Byte.hpp>
 #include <sys/types.h>
+#include <util/Byte.hpp>
+#include <cstddef>
 #include <string>
+
+class FileDescriptorWrapper;
 
 # define AWAITING_BUFFER_SIZE 512
 
@@ -53,8 +56,8 @@ class HttpResponse
 				virtual
 				~IBody();
 
-				virtual ssize_t
-				write(int fd) = 0;
+				virtual bool
+				write(FileDescriptorWrapper &fd) = 0;
 		};
 
 		class FileBody :
@@ -62,8 +65,6 @@ class HttpResponse
 		{
 			private:
 				int m_fd;
-				size_t m_size;
-				byte m_buffer[AWAITING_BUFFER_SIZE];
 
 			public:
 				FileBody(int fd);
@@ -71,8 +72,8 @@ class HttpResponse
 				virtual
 				~FileBody();
 
-				virtual ssize_t
-				write(int fd);
+				virtual bool
+				write(FileDescriptorWrapper &fd);
 		};
 
 		class StringBody :
@@ -80,7 +81,7 @@ class HttpResponse
 		{
 			private:
 				std::string m_string;
-				std::size_t m_index;
+				bool m_sent;
 
 			public:
 				StringBody(std::string string);
@@ -88,17 +89,16 @@ class HttpResponse
 				virtual
 				~StringBody();
 
-				virtual ssize_t
-				write(int fd);
+				virtual bool
+				write(FileDescriptorWrapper &fd);
 		};
 
 		enum State
 		{
 			NONE = 0,
-			STATUS_LINE,
 			HEADERS,
-			EMPTY_LINE,
 			BODY,
+			FLUSHING,
 			FINISHED,
 		};
 
@@ -115,8 +115,8 @@ class HttpResponse
 		virtual
 		~HttpResponse();
 
-		ssize_t
-		write(int fd);
+		bool
+		write(FileDescriptorWrapper &fd);
 };
 
 #endif /* SRC_HTTP_HTTPRESPONSE_HPP_ */

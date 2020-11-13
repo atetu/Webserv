@@ -15,6 +15,7 @@
 
 #include <config/Configuration.hpp>
 #include <http/HTTPServer.hpp>
+#include <sys/select.h>
 #include <vector>
 
 class HTTPOrchestrator
@@ -25,6 +26,9 @@ class HTTPOrchestrator
 	private:
 		Configuration m_configuration;
 		std::vector<HTTPServer> m_servers;
+		fd_set m_fds;
+		int m_highestFd;
+		int m_fdCount;
 
 		HTTPOrchestrator(const Configuration &configuration, const std::vector<HTTPServer> &servers);
 
@@ -38,6 +42,12 @@ class HTTPOrchestrator
 
 		void
 		unprepare(void);
+
+		void
+		setFd(int fd);
+
+		void
+		clearFd(int fd);
 
 	public:
 		void

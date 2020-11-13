@@ -10,6 +10,8 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+#include <io/FileDescriptorWrapper.hpp>
+
 #ifdef __linux__
 # include <sys/socket.h>
 # include <unistd.h>
@@ -22,11 +24,6 @@
 #else
 # error Unknown plateform
 #endif
-
-#ifndef MSG_NOSIGNAL
-# define MSG_NOSIGNAL 0
-#endif
-
 
 #include <exception/IOException.hpp>
 #include <http/HttpResponse.hpp>
@@ -98,52 +95,47 @@ HttpResponse::IBody::~IBody()
 }
 
 HttpResponse::FileBody::FileBody(int fd) :
-		m_fd(fd),
-		m_size(0)
+		m_fd(fd)
 {
 }
 
 HttpResponse::FileBody::~FileBody()
 {
-	::close(m_fd);
+	if (m_fd != -1)
+		::close(m_fd);
+	std::cout << "~ closed fd #" << m_fd << std::endl;
 }
 
-ssize_t
-HttpResponse::FileBody::write(int fd)
+bool
+HttpResponse::FileBody::write(FileDescriptorWrapper &fd)
 {
-	if (m_size == 0)
-	{
-		ssize_t r = ::read(m_fd, m_buffer, sizeof(m_buffer));
-		if (r > 0)
-			m_size = r;
+	if (m_fd == -1)
+		return (1);
 
-		if (r == -1)
-			throw IOException("read");
-	}
+	size_t capacity = fd.getReadBufferCapacity();
 
-	ssize_t sent = ::send(fd, m_buffer, m_size, MSG_NOSIGNAL);
-	if (sent > 0)
+	if (capacity)
 	{
-		if (m_size != sent) {
-			::memmove(m_buffer, m_buffer + sent, size_t(m_size - sent));
+		char buffer[capacity];
+		ssize_t r = ::read(m_fd, buffer, capacity);
+
+		if (r == 0)
+		{
+			std::cout << "closed fd #" << m_fd << std::endl;
+			::close(m_fd);
+			m_fd = -1;
 		}
 
-		m_size -= sent;
+		if (r >= 0)
+			fd.store(buffer, capacity, m_fd == -1);
 	}
 
-	if (sent == -1)
-	{
-		std::cout << IOException("sent", errno).what() << std::endl;
-		std::cout << "sent: " << sent << std::endl;
-		std::cout << "m_size: " << m_size << std::endl;
-	}
-
-	return (sent);
+	return (m_fd == -1);
 }
 
 HttpResponse::StringBody::StringBody(std::string string) :
 		m_string(string),
-		m_index(0)
+		m_sent(false)
 {
 }
 
@@ -151,17 +143,16 @@ HttpResponse::StringBody::~StringBody()
 {
 }
 
-ssize_t
-HttpResponse::StringBody::write(int fd)
+bool
+HttpResponse::StringBody::write(FileDescriptorWrapper &fd)
 {
-	ssize_t r = send(fd, m_string.c_str() + m_index, m_string.size() - m_index, 0);
-
-	if (r > 0)
+	if (!m_sent)
 	{
-		m_index += r;
+		fd.store(m_string, true);
+		m_sent = true;
 	}
 
-	return (r);
+	return (1);
 }
 
 HttpResponse::HttpResponse(const HTTPVersion &version, const HTTPStatus &status, HTTPHeaderFields headers, IBody *body) :
@@ -179,62 +170,48 @@ HttpResponse::~HttpResponse()
 		delete m_body;
 }
 
-ssize_t
-HttpResponse::write(int fd)
+bool
+HttpResponse::write(FileDescriptorWrapper &fd)
 {
 	std::string str;
 	HTTPHeaderFields::const_iterator it;
 	HTTPHeaderFields::const_iterator ite;
 
 	if (m_state == NONE)
-		m_state = STATUS_LINE;
+		m_state = HEADERS;
+
+//	std::cout << (int)fd << ": " << m_state << std::endl;
 
 	switch (m_state)
 	{
-		case STATUS_LINE:
-			m_state = HEADERS;
-			str = m_statusLine.format() + HTTP::CRLF;
-			return (::send(fd, str.c_str(), str.length(), 0));
-			break;
-
 		case HEADERS:
-			m_state = EMPTY_LINE;
+			fd.store(m_statusLine.format());
+			fd.store(HTTP::CRLF);
+			fd.store(m_headers.format());
+			fd.store(HTTP::CRLF);
 
-			it = m_headers.begin();
-			ite = m_headers.end();
+			if (m_body)
+				m_state = BODY;
+			else
+				m_state = FLUSHING;
 
-			while (it != ite)
-			{
-				str += it->first + std::string(": ") + it->second + HTTP::CRLF;
-				it++;
-			}
-
-			return (::send(fd, str.c_str(), str.length(), 0));
-			break;
-
-		case EMPTY_LINE:
-			m_state = BODY;
-
-			str = HTTP::CRLF;
-
-			return (::send(fd, str.c_str(), str.length(), 0));
 			break;
 
 		case BODY:
-			if (m_body)
-				return (m_body->write(fd));
+			if (m_body && m_body->write(fd))
+				m_state = FLUSHING;
 
-			m_state = FINISHED;
-			return (0);
 			break;
 
-		case FINISHED:
-			return (0);
+		case FLUSHING:
+			if (fd.flushWithSend() < 0 || fd.getWriteBufferSize() == 0)
+				m_state = FINISHED;
+
 			break;
 
 		default:
 			break;
 	}
 
-	return (-1);
+	return (m_state == FINISHED);
 }

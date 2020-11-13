@@ -145,6 +145,9 @@ class HTTPHeaderFields
 		const_iterator
 		end(void) const;
 
+		std::string
+		format(void) const;
+
 	public:
 		static const std::string ACCEPT_CHARSETS;
 		static const std::string ACCEPT_LANGUAGE;

@@ -11,7 +11,6 @@
 /* ************************************************************************** */
 
 #include <config/block/ServerBlock.hpp>
-#include <sys/stat.h>
 #include <dirent.h>
 #include <exception/IOException.hpp>
 #include <http/HttpRequestParser.hpp>
@@ -21,20 +20,27 @@
 #include <http/HTTPStatus.hpp>
 #include <http/HTTPVersion.hpp>
 #include <http/mime/MimeRegistry.hpp>
+#include <io/FileDescriptorWrapper.hpp>
 #include <io/SocketServer.hpp>
-#include <sys/select.h>
 #include <sys/errno.h>
 #include <sys/select.h>
 #include <sys/socket.h>
-#include <sys/stat.h>
 #include <sys/time.h>
+
+class FileDescriptorWrapper;
 
 #ifdef __linux__
 # include <unistd.h>
+#include <sys/stat.h>
 #elif __APPLE__
 # include <unistd.h>
+#include <sys/stat.h>
 #elif __CYGWIN__
 # include <sys/unistd.h>
+#include <cygwin/stat.h>
+#include <sys/_default_fcntl.h>
+#include <sys/_timeval.h>
+#include <sys/dirent.h>
 #else
 # error Unknown plateform
 #endif
@@ -49,27 +55,6 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
-class HttpResponse;
-
-typedef enum
-{
-	CS_CONNECTED = 1,
-	CS_HEADER,
-	CS_BODY,
-	CS_ERROR
-} client_status;
-
-typedef struct
-{
-		client_status status;
-		std::string line;
-		HttpRequestParser parser;
-		bool header_read;
-		unsigned long last_action;
-		HTTPServer *httpServer;
-		HttpResponse *response;
-} client;
-
 unsigned long
 seconds()
 {
@@ -82,8 +67,12 @@ seconds()
 
 HTTPOrchestrator::HTTPOrchestrator(const Configuration &configuration, const std::vector<HTTPServer> &servers) :
 		m_configuration(configuration),
-		m_servers(servers)
+		m_servers(servers),
+		m_fds(),
+		m_highestFd(0),
+		m_fdCount(0)
 {
+	FD_ZERO(&m_fds);
 }
 
 HTTPOrchestrator::~HTTPOrchestrator()
@@ -128,6 +117,38 @@ HTTPOrchestrator::unprepare(void)
 }
 
 void
+HTTPOrchestrator::setFd(int fd)
+{
+	FD_SET(fd, &m_fds);
+	++m_fdCount;
+
+	std::cout << "setFd(" << fd << " / " << m_fdCount << ")" << std::endl;
+
+	if (fd > m_highestFd)
+		m_highestFd = fd;
+}
+
+void
+HTTPOrchestrator::clearFd(int fd)
+{
+	FD_CLR(fd, &m_fds);
+	--m_fdCount;
+
+	std::cout << "clearFd(" << fd << " / " << m_fdCount << ")" << std::endl;
+
+	if (fd == m_highestFd)
+		m_highestFd--;
+}
+
+typedef struct
+{
+		FileDescriptorWrapper *fd;
+		HttpRequestParser parser;
+		unsigned long last_action;
+		HttpResponse *response;
+} client;
+
+void
 HTTPOrchestrator::start()
 {
 	prepare();
@@ -135,84 +156,58 @@ HTTPOrchestrator::start()
 	MimeRegistry mimeRegistry;
 	mimeRegistry.loadFromFile("mime.json");
 
-	fd_set fds;
-
-	FD_ZERO(&fds);
-
-	int highest = 0;
-	iterator it = m_servers.begin();
-	while (it != m_servers.end())
-	{
-		int fd = it->serverSocket().fd();
-		std::cout << "server: " << fd << std::endl;
-
-		FD_SET(fd, &fds);
-
-		if (fd > highest)
-			highest = fd;
-
-		it++;
-	}
+	for (iterator it = m_servers.begin(); it != m_servers.end(); it++)
+		setFd(it->serverSocket().fd());
 
 	fd_set read_fds;
 	fd_set write_fds;
 
-	std::cout << highest << std::endl;
-
-	int startAt = highest + 1;
+	int startAt = m_highestFd + 1;
 
 	std::map<int, client*> clients;
 
 	while (1)
 	{
-		read_fds = fds;
-		write_fds = fds;
+		read_fds = m_fds;
+		write_fds = m_fds;
 
-		if (::select(highest + 1, &read_fds, &write_fds, NULL, NULL) == -1)
+		if (::select(m_highestFd + 1, &read_fds, &write_fds, NULL, NULL) == -1)
 			throw IOException("select", errno);
 
-		it = m_servers.begin();
-		while (it != m_servers.end())
+		for (iterator it = m_servers.begin(); it != m_servers.end(); it++)
 		{
-			int server_fd = it->serverSocket().fd();
+			int serverFd = it->serverSocket().fd();
 
-			if (FD_ISSET(server_fd, &read_fds))
+			if (FD_ISSET(serverFd, &read_fds))
 			{
 				try
 				{
-					int socket_fd = ::accept(server_fd, NULL, NULL);
+					int socketFd = ::accept(serverFd, NULL, NULL);
 
-					std::cout << "connected(" << socket_fd << ")" << std::endl;
+					std::cout << "connected(" << socketFd << ")" << std::endl;
 
-					if (::fcntl(socket_fd, F_SETFL, O_NONBLOCK) == -1)
-						throw IOException("fcntl", errno);
-
-					if (socket_fd > highest)
-						highest = socket_fd;
-
-					FD_SET(socket_fd, &fds);
+					setFd(socketFd);
 
 					client *c = new client();
-//					c->status = CS_CONNECTED;
+					c->response = NULL;
 					c->last_action = seconds();
-					c->header_read = false;
+					c->fd = FileDescriptorWrapper::wrap(socketFd);
+					c->fd->setNonBlock();
 
-					clients[socket_fd] = c;
+					clients[socketFd] = c;
 				}
 				catch (Exception &e)
 				{
 					std::cout << e.what() << std::endl;
 				}
 			}
-
-			it++;
 		}
 
 		unsigned long now = seconds();
 
-		for (int fd = startAt; fd <= highest; fd++)
+		for (int fd = startAt; fd <= m_highestFd; fd++)
 		{
-			if (!FD_ISSET(fd, &fds))
+			if (!FD_ISSET(fd, &m_fds))
 				continue;
 
 			std::map<int, client*>::iterator it = clients.find(fd);
@@ -221,8 +216,9 @@ HTTPOrchestrator::start()
 			{
 				std::cout << "orphane: " << fd << std::endl;
 				::close(fd);
-				FD_CLR(fd, &fds);
 				clients.erase(it);
+
+				clearFd(fd);
 				continue;
 			}
 
@@ -235,20 +231,18 @@ HTTPOrchestrator::start()
 			{
 				std::cout << "timeout: " << fd << std::endl;
 				::close(fd);
-				FD_CLR(fd, &fds);
+				delete cli->fd;
+				delete cli->response;
 				delete cli;
 				clients.erase(it);
 
-				if (fd == highest)
-					highest--;
-
+				clearFd(fd);
 				continue;
 			}
 
-			if (canRead && !cli->header_read)
+			if (canRead && !cli->response)
 			{
-				char c;
-				if (::recv(fd, &c, 1, 0) > 0)
+				if (cli->fd->getReadBufferSize() != 0 || cli->fd->fillWithReceive() > 0)
 				{
 //					if (c == '\n')
 //						std::cout << "\\n\n";
@@ -258,10 +252,13 @@ HTTPOrchestrator::start()
 //						std::cout << c;
 //					std::cout << std::flush;
 
-					if (c)
+					char c;
+//					std::cout << (cli->fd->consume(&c) ? "true" : "false") << (int)c << std::endl;
+
+					while (cli->fd->consume(&c))
 					{
 						cli->parser.consume(c);
-						if (cli->parser.state() == HttpRequestParser::S_END && !cli->response)
+						if (cli->parser.state() == HttpRequestParser::S_END)
 						{
 							std::string file = cli->parser.path().substr(1);
 
@@ -277,7 +274,9 @@ HTTPOrchestrator::start()
 								header.contentType("text/html");
 								header.contentLength(8);
 								std::cout << "GET " + cli->parser.path() + " -> 404" << std::endl;
-								close(ffd);
+
+								if (ffd != -1)
+									::close(ffd);
 
 								cli->response = new HttpResponse(HTTPVersion::HTTP_1_1, *HTTPStatus::OK, header, new HttpResponse::StringBody("not found"));
 							}
@@ -287,12 +286,15 @@ HTTPOrchestrator::start()
 
 								if (S_ISDIR(st.st_mode))
 								{
-									std::cout << file << std::endl;
+									if (ffd != -1)
+										::close(ffd);
+
+//									std::cout << file << std::endl;
 
 									std::string directory = cli->parser.path() == "/" ? "." : file;
 
 									DIR *dir = ::opendir(directory.c_str());
-									std::cout << dir << std::endl;
+//									std::cout << dir << std::endl;
 
 									std::string listing = "";
 
@@ -325,6 +327,8 @@ HTTPOrchestrator::start()
 									cli->response = new HttpResponse(HTTPVersion::HTTP_1_1, *HTTPStatus::OK, header, new HttpResponse::FileBody(ffd));
 								}
 							}
+
+							break;
 						}
 					}
 				}
@@ -335,21 +339,21 @@ HTTPOrchestrator::start()
 			{
 				if (cli->response)
 				{
-					if (cli->response->write(fd) >= 0) // TODO Add windows support
+					if (!cli->response->write(*(cli->fd))) // TODO Add windows support
 					{
 						cli->last_action = seconds();
 					}
 					else
 					{
-						std::cout << "closing: " << ::strerror(errno) << std::endl;
+						std::cout << "closing(" << fd << "): " << ::strerror(errno) << std::endl;
 						::close(fd);
-						FD_CLR(fd, &fds);
+						delete cli->fd;
 						delete cli->response;
 						delete cli;
 						clients.erase(it);
 
-						if (fd == highest)
-							highest--;
+						clearFd(fd);
+						continue;
 					}
 				}
 //				send(fd, "Hello\n", 6, 0);
@@ -358,14 +362,9 @@ HTTPOrchestrator::start()
 		}
 	}
 
-	it = m_servers.begin();
-	while (it != m_servers.end())
-	{
-		int fd = it->serverSocket().fd();
-		::close(fd);
-
-		it++;
-	}
+	/* Should not happen. */
+	for (iterator it = m_servers.begin(); it != m_servers.end(); it++) // TODO Handle exit
+		::close(it->serverSocket().fd());
 }
 
 HTTPOrchestrator
