@@ -49,7 +49,10 @@ void Option::addValue(void)
 void Option::addConfigFile(std::string str)
 {
 	if (m_valueName.compare("") == 0)
-		m_valueName = str;
+	{
+		m_value = str;
+		m_hasValue = true;
+	}
 	else
 		throw IllegalArgumentException();
 }
@@ -62,6 +65,16 @@ std::string Option::getMLong(void)
 std::string Option::getMShort(void)
 {
 	return (m_short);
+}
+
+std::string Option::getValue(void)
+{
+	return (m_value);
+}
+
+bool Option::hasValue(void)
+{
+	return (m_hasValue);
 }
 
 const char *Option::IllegalArgumentException::what() const throw()

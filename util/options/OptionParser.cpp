@@ -6,7 +6,7 @@
 /*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/28 19:36:56 by ecaceres          #+#    #+#             */
-/*   Updated: 2020/11/13 12:11:42 by alicetetu        ###   ########.fr       */
+/*   Updated: 2020/11/13 15:32:57 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,7 +72,7 @@ int OptionParser::whichOption(const char *str, const char *str2)
 			(*it)->addValue();
 			return (checkConfigFile(str_obj, str_obj2, is_sec, it));
 		}
-		else
+		else if ((((*it)->getMShort()).compare("-f")) == 0)
 			(*it)->addConfigFile(str_obj);
 	}
 	return (0);

@@ -6,7 +6,7 @@
 /*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/28 19:29:18 by ecaceres          #+#    #+#             */
-/*   Updated: 2020/11/13 11:14:10 by alicetetu        ###   ########.fr       */
+/*   Updated: 2020/11/13 14:41:47 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,6 +37,8 @@ class Option
 		void addConfigFile(std::string str);
 		std::string getMLong();
 		std::string getMShort();
+		std::string getValue();
+		bool hasValue(void);
 		
 		Option& operator=(const Option &other);
 
