@@ -23,14 +23,13 @@ m_value("")
 {
 }
 
-Option::Option(char _m_short, std::string _m_long, std::string _m_description,
-	bool _m_hasValue, std::string _m_valueName, std::string _m_value) :
-m_short(_m_short),
-m_long(_m_long),
-m_description(_m_description),
-m_hasValue(_m_hasValue),
-m_valueName(_m_valueName),
-m_value(_m_value)
+Option::Option(std::string shortArg, std::string longArg, std::string description, bool hasValue, std::string valueName, std::string value) :
+m_short(shortArg),
+m_long(longArg),
+m_description(description),
+m_hasValue(hasValue),
+m_valueName(valueName),
+m_value(value)
 {
 }
 
@@ -53,6 +52,16 @@ void Option::addConfigFile(std::string str)
 		m_valueName = str;
 	else
 		throw IllegalArgumentException();
+}
+
+std::string Option::getMLong(void)
+{
+	return (m_long);
+}
+
+std::string Option::getMShort(void)
+{
+	return (m_short);
 }
 
 const char *Option::IllegalArgumentException::what() const throw()

@@ -6,7 +6,7 @@
 /*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/28 19:36:56 by ecaceres          #+#    #+#             */
-/*   Updated: 2020/11/12 18:17:03 by alicetetu        ###   ########.fr       */
+/*   Updated: 2020/11/13 12:09:51 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 
 #include <iostream>
 #include <string>
+#include <list>
 #include <exception>
 
 //#include <util/options/Option.hpp>
@@ -23,8 +24,7 @@ class OptionParser
 {
 	public:
 		OptionParser();
-		OptionParser(Option *_helpOption, Option *_checkOption,
-			Option *_configFileOption);
+		OptionParser(std::list<Option*> lst);
 		OptionParser(const OptionParser &other);
 
 		virtual
@@ -34,9 +34,8 @@ class OptionParser
 		operator=(const OptionParser &other);
 
 		void parse(int argc, char **argv);
-		void longOption(const char *str);
-		void shortOption(const char *str);
-		void configFileOption(const char *str);
+		int whichOption(const char *str, const char *str2);
+		int checkConfigFile(std::string str_obj, std::string str_obj2, int is_sec, std::list<Option*>::iterator it);
 	
 	class IllegalArgumentException : public std::exception
 	{
@@ -44,9 +43,10 @@ class OptionParser
 	};	
 	
 	private:
-		Option *m_helpOption;
-		Option *m_checkOption;
-		Option *m_configFileOption;
+		std::list<Option*> m_lst;
+		// Option *m_helpOption;
+		// Option *m_checkOption;
+		// Option *m_configFileOption;
 };
 
 #endif /* OPTIONPARSER_HPP_ */

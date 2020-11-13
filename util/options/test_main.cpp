@@ -1,5 +1,6 @@
 #include "OptionParser.hpp"
 #include "Option.hpp"
+#include <list>
 
 // ./webserv --check --config-file ./x.json
 
@@ -17,14 +18,18 @@
  int main(int argc, char **argv)
  {
 	 
-	Option helpOption('h', "help", "display this help message", false, "", "");
-	Option checkOption('c', "check", "only check the config file", false, "", "");
-	Option configFileOption('f', "config-file", "specify the config file", false, "", "");
+	Option helpOption("-h", "--help", "display this help message", false, "", "");
+	Option checkOption("-c", "--check", "only check the config file", false, "", "");
+	Option configFileOption("-f", "--config-file", "specify the config file", false, "", "");
  
 // c (...)
  // c (..., valueName)
- 
- 	OptionParser parser(&helpOption, &checkOption, &configFileOption);
+
+	std::list<Option*> lst;
+	lst.push_back(&helpOption);
+ 	lst.push_back(&checkOption);
+	lst.push_back(&configFileOption);
+ 	OptionParser parser(lst);
 	
 	try 
 	{
