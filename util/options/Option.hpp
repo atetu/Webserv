@@ -6,7 +6,7 @@
 /*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/28 19:29:18 by ecaceres          #+#    #+#             */
-/*   Updated: 2020/11/14 12:44:48 by alicetetu        ###   ########.fr       */
+/*   Updated: 2020/11/16 16:26:57 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 # define OPTION_HPP_
 
 #include <iostream>
-#include <exception>
+
 
 class Option
 {
@@ -35,7 +35,6 @@ class Option
 
 		virtual	~Option();
 
-		void addValue(void);
 		void addConfigFile(std::string str);
 		std::string getLongStart();
 		std::string getShortStart();
@@ -47,10 +46,5 @@ class Option
 		bool hasValue(void);
 		
 		Option& operator=(const Option &other);
-
-		class IllegalArgumentException : public std::exception
-			{
-				virtual const char* what() const throw();
-			};	
 };
 #endif /* OPTION_HPP_ */

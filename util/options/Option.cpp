@@ -12,6 +12,7 @@
 
 //#include <util/options/Option.hpp>
 #include "Option.hpp"
+#include "ParserIllegalArgumentException.hpp"
 
 Option::Option() :
 m_shortStart(""),
@@ -39,16 +40,38 @@ m_value(value)
 
 Option::~Option()
 {
-
 }
 
-void Option::addValue(void)
+Option::Option(const Option &other):
+m_shortStart(other.m_shortStart),
+m_longStart(other.m_longStart),
+m_short(other.m_short),
+m_long(other.m_long),
+m_description(other.m_description),
+m_hasValue(other.m_hasValue),
+m_valueName(other.m_valueName),
+m_value(other.m_value)
+{	
+}
+
+Option &
+Option::operator=(const Option &other)
 {
-	if (!(m_hasValue))
-		m_hasValue = true;
-	else
-		throw IllegalArgumentException();
+	if (this != &other)
+	{
+		m_shortStart = other.m_shortStart;
+		m_longStart = other.m_longStart;
+		m_short = other.m_short;
+		m_long = other.m_long;
+		m_description = other.m_description;
+		m_hasValue = other.m_hasValue;
+		m_valueName = other.m_valueName;
+		m_value = other.m_value;
+	}
+
+	return (*this);
 }
+
 
 void Option::addConfigFile(std::string str)
 {
@@ -58,7 +81,7 @@ void Option::addConfigFile(std::string str)
 		m_hasValue = true;
 	}
 	else
-		throw IllegalArgumentException();
+		throw ParserIllegalArgumentException("Wrong arguments: Only one config file needed.\n");
 }
 
 std::string Option::getLongStart(void)
@@ -94,9 +117,4 @@ bool Option::hasValue(void)
 std::string Option::getDescription(void)
 {
 	return (m_description);
-}
-
-const char *Option::IllegalArgumentException::what() const throw()
-{
-	return ("Error: Wrong arguments\n");
 }
