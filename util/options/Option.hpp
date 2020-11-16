@@ -6,7 +6,7 @@
 /*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/28 19:29:18 by ecaceres          #+#    #+#             */
-/*   Updated: 2020/11/13 14:41:47 by alicetetu        ###   ########.fr       */
+/*   Updated: 2020/11/14 12:44:48 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,9 @@
 class Option
 {
 	private:
-		std::string m_short;
+		std::string m_shortStart;
+		std::string m_longStart;
+		char m_short;
 		std::string m_long;
 		std::string m_description;
 		bool m_hasValue;
@@ -28,16 +30,20 @@ class Option
 
 	public:
 		Option();
-		Option(std::string shortArg, std::string longArg, std::string description, bool hasValue, std::string valueName, std::string value);
+		Option(std::string shortStart, std::string longStart, char shortArg, std::string longArg, std::string description, bool hasValue, std::string valueName, std::string value);
 		Option(const Option &other);
 
 		virtual	~Option();
 
 		void addValue(void);
 		void addConfigFile(std::string str);
-		std::string getMLong();
-		std::string getMShort();
+		std::string getLongStart();
+		std::string getShortStart();
+		std::string getLongArg();
+		char getShortArg();
 		std::string getValue();
+		std::string getDescription(void);
+		
 		bool hasValue(void);
 		
 		Option& operator=(const Option &other);

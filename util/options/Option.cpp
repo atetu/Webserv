@@ -14,6 +14,8 @@
 #include "Option.hpp"
 
 Option::Option() :
+m_shortStart(""),
+m_longStart(""),
 m_short(0),
 m_long(""),
 m_description(""),
@@ -23,7 +25,9 @@ m_value("")
 {
 }
 
-Option::Option(std::string shortArg, std::string longArg, std::string description, bool hasValue, std::string valueName, std::string value) :
+Option::Option(std::string shortStart, std::string longStart, char shortArg, std::string longArg, std::string description, bool hasValue, std::string valueName, std::string value) :
+m_shortStart(shortStart),
+m_longStart(longStart),
 m_short(shortArg),
 m_long(longArg),
 m_description(description),
@@ -57,12 +61,22 @@ void Option::addConfigFile(std::string str)
 		throw IllegalArgumentException();
 }
 
-std::string Option::getMLong(void)
+std::string Option::getLongStart(void)
+{
+	return (m_longStart);
+}
+
+std::string Option::getShortStart(void)
+{
+	return (m_shortStart);
+}
+
+std::string Option::getLongArg(void)
 {
 	return (m_long);
 }
 
-std::string Option::getMShort(void)
+char Option::getShortArg(void)
 {
 	return (m_short);
 }
@@ -75,6 +89,11 @@ std::string Option::getValue(void)
 bool Option::hasValue(void)
 {
 	return (m_hasValue);
+}
+
+std::string Option::getDescription(void)
+{
+	return (m_description);
 }
 
 const char *Option::IllegalArgumentException::what() const throw()
