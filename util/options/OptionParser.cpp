@@ -6,7 +6,7 @@
 /*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/28 19:36:56 by ecaceres          #+#    #+#             */
-/*   Updated: 2020/11/16 11:01:56 by alicetetu        ###   ########.fr       */
+/*   Updated: 2020/11/16 11:52:23 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,11 +69,17 @@ int OptionParser::whichOption(const char *str, const char *str2)
 			{				
 				if (((((*it)->getLongStart()).compare(str_obj.substr(0, 2))) == 0)
 					&& ((((*it)->getLongArg()).compare(str_obj.substr(2, std::string::npos))) == 0))
-					return (checkConfigFile(str_obj, str_obj2, is_sec, it));
+					return (checkConfigFile(str_obj2, is_sec, it));
+				else if (((((*it)->getLongStart()).compare(str_obj.substr(0, 2))) == 0)
+					&& (((((*it)->getLongArg()) + "=").compare(str_obj.substr(2, 12))) == 0))
+				{
+					checkConfigFile(str_obj.substr(14, std::string::npos), 1, it);
+					return(0);
+				}
 				else if (((((*it)->getShortStart()).compare(str_obj.substr(0, 1))) == 0)
 					&& ((((*it)->getShortArg()) == str_obj.c_str()[1]))
 					&& (str_obj.c_str()[2]) == 0)
-					return (checkConfigFile(str_obj, str_obj2, is_sec, it));
+					return (checkConfigFile(str_obj2, is_sec, it));
 				else if (((((*it)->getShortStart()).compare(str_obj.substr(0, 1))) == 0)
 					&& ((((*it)->getShortArg()) == str_obj.c_str()[1]))
 					&& (str_obj.c_str()[2]) != 0)
@@ -90,7 +96,7 @@ int OptionParser::whichOption(const char *str, const char *str2)
 	return(0);
 }
 
-int OptionParser::checkConfigFile(std::string str_obj, std::string str_obj2, int is_sec, std::list<Option*>::iterator it)
+int OptionParser::checkConfigFile(std::string str_obj2, int is_sec, std::list<Option*>::iterator it)
 {
 	if ((*it)->hasValue())
 	{
