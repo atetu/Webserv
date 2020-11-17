@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ParserIllegalArgumentException.hpp                 :+:      :+:    :+:   */
+/*   ParserException.hpp                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -10,32 +10,32 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef PARSERILLEGALARGUMENTEXCEPTION_HPP_
-# define PARSERILLEGALARGUMENTEXCEPTION_HPP_
+#ifndef PARSEREXCEPTION_HPP_
+# define PARSEREXCEPTION_HPP_
 
 #include <string>
 # include <exception>
 
-class ParserIllegalArgumentException :
+class ParserException :
 		public std::exception
 {	
 	private:
 		std::string m_message;
 	
 	public:
-		ParserIllegalArgumentException(void);
-		ParserIllegalArgumentException(std::string message);
-		ParserIllegalArgumentException(const ParserIllegalArgumentException &other);
+		ParserException(void);
+		ParserException(std::string message);
+		ParserException(const ParserException &other);
 
 		virtual
-		~ParserIllegalArgumentException() throw ();
+		~ParserException() throw ();
 
-		ParserIllegalArgumentException&
-		operator=(const ParserIllegalArgumentException &other);
+		ParserException&
+		operator=(const ParserException &other);
 
 		const std::string& message() const;
 
 		const char* what() const throw ();
 };
 
-#endif /* PARSERILLEGALARGUMENTEXCEPTION_HPP_ */
+#endif /* ParserException_HPP_ */

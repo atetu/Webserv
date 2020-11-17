@@ -6,14 +6,14 @@
 /*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/28 19:36:56 by ecaceres          #+#    #+#             */
-/*   Updated: 2020/11/16 17:18:53 by alicetetu        ###   ########.fr       */
+/*   Updated: 2020/11/17 09:38:57 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 //#include <util/options/OptionParser.hpp>
 
 #include "OptionParser.hpp"
-#include "ParserIllegalArgumentException.hpp"
+#include "ParserException.hpp"
 
 OptionParser::OptionParser() :
 m_lst(0), //est ce qu'une liste peut etre nulle?
@@ -21,8 +21,7 @@ m_optionMap(0)
 {
 }
 
-OptionParser::OptionParser(std::list<Option*> lst, std::map<char,
-std::string> *optionMap) :
+OptionParser::OptionParser(std::list<Option*> lst, std::map<char, std::string> *optionMap) :
 m_lst(lst),
 m_optionMap(optionMap)
 {
@@ -56,7 +55,7 @@ void OptionParser::parse(int argc, char **argv)
 	char *sec;
 
 	if (argc == 1)
-		throw ParserIllegalArgumentException("Not enough arguments\n");
+		throw ParserException("Not enough arguments\n");
 	else
 	{
 		for (int i = 1; i < argc; i++)
@@ -151,8 +150,8 @@ const std::list<Option*>::iterator &it)
 			return (1);
 		}
 		else
-			throw ParserIllegalArgumentException
-			("Config file required when using the config-file option\n");
+			throw ParserException
+			("Config file required when using the config-file option");
 	}
 	else
 		(*m_optionMap)[(*it)->getShortArg()] = "";		
@@ -184,7 +183,7 @@ int OptionParser::multipleShortOptions(const std::string &str_obj,
 			}
 		}
 		else
-			throw ParserIllegalArgumentException
+			throw ParserException
 			("Error: \"" + str_obj + "\" not recognized as an argument\n");
 	}
 	return (0);
@@ -203,7 +202,7 @@ const std::list<Option*>::iterator &it_end)
 			if (it_hasValue == it_end)
 				it_hasValue = it2;
 			else
-				throw ParserIllegalArgumentException
+				throw ParserException
 				("Error: each option should be used only once\n");
 		}
 		return (1);
@@ -250,7 +249,7 @@ int OptionParser::fillConfigFileWithSecondArg(const std::list<Option*>::iterator
 		return (1);
 	}
 	else
-		throw ParserIllegalArgumentException
+		throw ParserException
 			("Config file required when using the config-file option\n");
 	return (0);
 }
