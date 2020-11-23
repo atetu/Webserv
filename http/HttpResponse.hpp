@@ -16,12 +16,11 @@
 #include <http/HTTPHeaderFields.hpp>
 #include <http/HTTPStatus.hpp>
 #include <http/HTTPVersion.hpp>
+#include <io/FileDescriptorWrapper.hpp>
 #include <sys/types.h>
 #include <util/Byte.hpp>
 #include <cstddef>
 #include <string>
-
-class FileDescriptorWrapper;
 
 # define AWAITING_BUFFER_SIZE 512
 
@@ -64,7 +63,7 @@ class HttpResponse
 				public IBody
 		{
 			private:
-				int m_fd;
+				FileDescriptorWrapper m_fd;
 
 			public:
 				FileBody(int fd);

@@ -110,6 +110,8 @@ FileDescriptorWrapper::fillWithRead(void)
 			m_read_buffer += static_cast<char*>(rbuffer);
 		}
 
+		m_finishing = r == 0;
+
 		return (r);
 	}
 
@@ -131,6 +133,8 @@ FileDescriptorWrapper::fillWithReceive(void)
 			rbuffer[r] = '\0';
 			m_read_buffer += static_cast<char*>(rbuffer);
 		}
+
+		m_finishing = r == 0;
 
 		return (r);
 	}
@@ -221,6 +225,18 @@ size_t
 FileDescriptorWrapper::getWriteBufferCapacity(void) const
 {
 	return (capacityFor(m_write_buffer));
+}
+
+bool
+FileDescriptorWrapper::isFinishing(void)
+{
+	return (m_finishing);
+}
+
+bool
+FileDescriptorWrapper::isDone(void)
+{
+	return (m_finishing && m_write_buffer.empty() && m_read_buffer.empty());
 }
 
 FileDescriptorWrapper*

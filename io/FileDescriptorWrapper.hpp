@@ -91,6 +91,12 @@ class FileDescriptorWrapper
 		size_t
 		getWriteBufferCapacity(void) const;
 
+		bool
+		isFinishing(void);
+
+		bool
+		isDone(void);
+
 	public:
 		static FileDescriptorWrapper*
 		wrap(int fd);

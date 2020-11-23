@@ -26,6 +26,7 @@
 #include <sys/select.h>
 #include <sys/socket.h>
 #include <sys/time.h>
+#include <set>
 
 class FileDescriptorWrapper;
 
@@ -82,8 +83,8 @@ HTTPOrchestrator::~HTTPOrchestrator()
 void
 HTTPOrchestrator::prepare(void)
 {
-	iterator it = m_servers.begin();
-	iterator ite = m_servers.end();
+	server_iterator it = m_servers.begin();
+	server_iterator ite = m_servers.end();
 
 	while (it != ite)
 	{
@@ -105,8 +106,8 @@ HTTPOrchestrator::prepare(void)
 void
 HTTPOrchestrator::unprepare(void)
 {
-	iterator it = m_servers.begin();
-	iterator ite = m_servers.end();
+	server_iterator it = m_servers.begin();
+	server_iterator ite = m_servers.end();
 
 	while (it != ite)
 	{
@@ -156,214 +157,268 @@ HTTPOrchestrator::start()
 	MimeRegistry mimeRegistry;
 	mimeRegistry.loadFromFile("mime.json");
 
-	for (iterator it = m_servers.begin(); it != m_servers.end(); it++)
-		setFd(it->serverSocket().fd());
+	fd_set readFdSet;
+	fd_set writeFdSet;
 
-	fd_set read_fds;
-	fd_set write_fds;
+	std::map<int, HTTPServer*> serverFds;
+	std::map<int, FileDescriptorWrapper*> fileReadFds;
+	std::map<int, client*> clientFds;
+	std::map<int, FileDescriptorWrapper*> fileWriteFds;
 
-	int startAt = m_highestFd + 1;
+	for (server_iterator it = m_servers.begin(); it != m_servers.end(); it++)
+	{
+		int fd = it->serverSocket().fd();
 
-	std::map<int, client*> clients;
+		setFd(fd);
+		serverFds.insert(serverFds.end(), std::make_pair(fd, (HTTPServer*)0 /* TODO: Use better storage */));
+	}
 
 	while (1)
 	{
-		read_fds = m_fds;
-		write_fds = m_fds;
+		readFdSet = m_fds;
+		writeFdSet = m_fds;
 
-		if (::select(m_highestFd + 1, &read_fds, &write_fds, NULL, NULL) == -1)
+		if (::select(m_highestFd + 1, &readFdSet, &writeFdSet, NULL, NULL) == -1)
 			throw IOException("select", errno);
 
-		for (iterator it = m_servers.begin(); it != m_servers.end(); it++)
 		{
-			int serverFd = it->serverSocket().fd();
+			typedef std::map<int, HTTPServer*>::iterator iterator;
 
-			if (FD_ISSET(serverFd, &read_fds))
+			for (iterator it = serverFds.begin(); it != serverFds.end(); it++)
 			{
-				try
+				int fd = it->first;
+
+				if (FD_ISSET(fd, &readFdSet))
 				{
-					int socketFd = ::accept(serverFd, NULL, NULL);
+					try
+					{
+						int accepted = ::accept(fd, NULL, NULL);
+						setFd(accepted);
 
-					std::cout << "connected(" << socketFd << ")" << std::endl;
+						client *c = new client();
+						c->response = NULL;
+						c->last_action = seconds();
+						c->fd = FileDescriptorWrapper::wrap(accepted);
+						c->fd->setNonBlock();
 
-					setFd(socketFd);
-
-					client *c = new client();
-					c->response = NULL;
-					c->last_action = seconds();
-					c->fd = FileDescriptorWrapper::wrap(socketFd);
-					c->fd->setNonBlock();
-
-					clients[socketFd] = c;
-				}
-				catch (Exception &e)
-				{
-					std::cout << e.what() << std::endl;
+						clientFds[accepted] = c;
+					}
+					catch (Exception &e)
+					{
+						std::cout << e.what() << std::endl;
+					}
 				}
 			}
 		}
 
-		unsigned long now = seconds();
-
-		for (int fd = startAt; fd <= m_highestFd; fd++)
 		{
-			if (!FD_ISSET(fd, &m_fds))
-				continue;
+			typedef std::map<int, FileDescriptorWrapper*>::iterator iterator;
 
-			std::map<int, client*>::iterator it = clients.find(fd);
+			std::set<int> fdToRemove;
 
-			if (it == clients.end())
+			for (iterator it = fileReadFds.begin(); it != fileReadFds.end(); it++)
 			{
-				std::cout << "orphane: " << fd << std::endl;
-				::close(fd);
-				clients.erase(it);
+				int fd = it->first;
 
-				clearFd(fd);
-				continue;
-			}
-
-			bool canRead = FD_ISSET(fd, &read_fds);
-			bool canWrite = FD_ISSET(fd, &write_fds);
-
-			client *cli = it->second;
-
-			if (cli->last_action + 5 < now)
-			{
-				std::cout << "timeout: " << fd << std::endl;
-				::close(fd);
-				delete cli->fd;
-				delete cli->response;
-				delete cli;
-				clients.erase(it);
-
-				clearFd(fd);
-				continue;
-			}
-
-			if (canRead && !cli->response)
-			{
-				if (cli->fd->getReadBufferSize() != 0 || cli->fd->fillWithReceive() > 0)
+				if (FD_ISSET(fd, &readFdSet))
 				{
-//					if (c == '\n')
-//						std::cout << "\\n\n";
-//					else if (c == '\r')
-//						std::cout << "\\r";
-//					else
-//						std::cout << c;
-//					std::cout << std::flush;
+					FileDescriptorWrapper *fdWrapper = it->second;
 
-					char c;
-//					std::cout << (cli->fd->consume(&c) ? "true" : "false") << (int)c << std::endl;
-
-					while (cli->fd->consume(&c))
+					if (fdWrapper->fillWithRead() == -1 || fdWrapper->isDone())
 					{
-						cli->parser.consume(c);
-						if (cli->parser.state() == HttpRequestParser::S_END)
+						std::cout << "fd-read :: remove(" << fd << "): " << ::strerror(errno) << std::endl;
+						fdToRemove.insert(fdToRemove.end(), fd);
+					}
+				}
+			}
+
+			for (std::set<int>::iterator it = fdToRemove.begin(); it != fdToRemove.end(); it++)
+			{
+				iterator found = fileReadFds.find(*it);
+
+				if (found != fileReadFds.end())
+					fileReadFds.erase(found);
+			}
+		}
+
+		{
+			typedef std::map<int, client*>::iterator iterator;
+
+			std::set<int> fdToRemove;
+
+			for (iterator it = clientFds.begin(); it != clientFds.end(); it++)
+			{
+				unsigned long now = seconds();
+				int fd = it->first;
+
+				bool canRead = FD_ISSET(fd, &readFdSet);
+				bool canWrite = FD_ISSET(fd, &writeFdSet);
+
+				client *cli = it->second;
+
+				if (canRead && !cli->response)
+				{
+					if (cli->fd->getReadBufferSize() != 0 || cli->fd->fillWithReceive() > 0)
+					{
+						char c;
+
+						while (cli->fd->consume(&c))
 						{
-							std::string file = cli->parser.path().substr(1);
-
-							int ffd = ::open(("." + cli->parser.path()).c_str(), O_RDONLY);
-
-							HTTPHeaderFields header;
-							header.date();
-							header.set("Server", "webserv");
-
-							struct stat st;
-							if (ffd == -1 || ::stat(("." + cli->parser.path()).c_str(), &st) == -1)
+							cli->parser.consume(c);
+							if (cli->parser.state() == HttpRequestParser::S_END)
 							{
-								header.contentType("text/html");
-								header.contentLength(8);
-								std::cout << "GET " + cli->parser.path() + " -> 404" << std::endl;
+								std::string file = cli->parser.path().substr(1);
 
-								if (ffd != -1)
-									::close(ffd);
+								int ffd = ::open(("." + cli->parser.path()).c_str(), O_RDONLY);
 
-								cli->response = new HttpResponse(HTTPVersion::HTTP_1_1, *HTTPStatus::OK, header, new HttpResponse::StringBody("not found"));
-							}
-							else
-							{
-								std::cout << "GET " + cli->parser.path() + " -> 200" << std::endl;
+								HTTPHeaderFields header;
+								header.date();
+								header.set("Server", "webserv");
 
-								if (S_ISDIR(st.st_mode))
+								struct stat st;
+								if (ffd == -1 || ::stat(("." + cli->parser.path()).c_str(), &st) == -1)
 								{
+									header.contentType("text/html");
+									header.contentLength(8);
+									std::cout << "GET " + cli->parser.path() + " -> 404" << std::endl;
+
 									if (ffd != -1)
 										::close(ffd);
 
-//									std::cout << file << std::endl;
+									cli->response = new HttpResponse(HTTPVersion::HTTP_1_1, *HTTPStatus::OK, header, new HttpResponse::StringBody("not found"));
+								}
+								else
+								{
+									std::cout << "GET " + cli->parser.path() + " -> 200" << std::endl;
 
-									std::string directory = cli->parser.path() == "/" ? "." : file;
-
-									DIR *dir = ::opendir(directory.c_str());
-//									std::cout << dir << std::endl;
-
-									std::string listing = "";
-
-									struct dirent *entry;
-									while ((entry = ::readdir(dir)))
+									if (S_ISDIR(st.st_mode))
 									{
-										std::string lfile(entry->d_name);
-										std::string absolute = directory + "/" + lfile;
+										if (ffd != -1)
+											::close(ffd);
 
-										if (::stat(absolute.c_str(), &st) != -1 && S_ISDIR(st.st_mode))
+										std::string directory = cli->parser.path() == "/" ? "." : file;
+
+										DIR *dir = ::opendir(directory.c_str());
+
+										std::string listing = "";
+
+										struct dirent *entry;
+										while ((entry = ::readdir(dir)))
 										{
-											lfile += '/';
+											std::string lfile(entry->d_name);
+											std::string absolute = directory + "/" + lfile;
+
+											if (::stat(absolute.c_str(), &st) != -1 && S_ISDIR(st.st_mode))
+											{
+												lfile += '/';
+											}
+
+											listing += std::string("<a href=\"./") + lfile + "\">" + lfile + "</a><br>";
 										}
 
-										listing += std::string("<a href=\"./") + lfile + "\">" + lfile + "</a><br>";
+										::closedir(dir);
+
+										header.contentType("text/html");
+										header.contentLength(listing.size());
+
+										cli->response = new HttpResponse(HTTPVersion::HTTP_1_1, *HTTPStatus::OK, header, new HttpResponse::StringBody(listing));
 									}
+									else if (S_ISREG(st.st_mode))
+									{
+										header.contentType(mimeRegistry, file.substr(file.rfind(".") + 1));
+										header.contentLength(st.st_size);
 
-									::closedir(dir);
-
-									header.contentType("text/html");
-									header.contentLength(listing.size());
-
-									cli->response = new HttpResponse(HTTPVersion::HTTP_1_1, *HTTPStatus::OK, header, new HttpResponse::StringBody(listing));
+										cli->response = new HttpResponse(HTTPVersion::HTTP_1_1, *HTTPStatus::OK, header, new HttpResponse::FileBody(ffd));
+									}
 								}
-								else if (S_ISREG(st.st_mode))
-								{
-									header.contentType(mimeRegistry, file.substr(file.rfind(".") + 1));
-									header.contentLength(st.st_size);
 
-									cli->response = new HttpResponse(HTTPVersion::HTTP_1_1, *HTTPStatus::OK, header, new HttpResponse::FileBody(ffd));
-								}
+								break;
 							}
-
-							break;
 						}
 					}
 				}
-//				std::cout << "can read(" << fd << ")" << std::endl;
-			}
 
-			if (canWrite)
-			{
-				if (cli->response)
+				if (canWrite)
 				{
-					if (!cli->response->write(*(cli->fd))) // TODO Add windows support
+					if (cli->response)
 					{
-						cli->last_action = seconds();
-					}
-					else
-					{
-						std::cout << "closing(" << fd << "): " << ::strerror(errno) << std::endl;
-						::close(fd);
-						delete cli->fd;
-						delete cli->response;
-						delete cli;
-						clients.erase(it);
+						if (!cli->response->write(*(cli->fd))) // TODO Add windows support
+						{
+							cli->last_action = now;
+						}
+						else
+						{
+							std::cout << "closing(" << fd << "): " << ::strerror(errno) << std::endl;
+							::close(fd);
+							delete cli->fd;
+							delete cli->response;
+							delete cli;
 
-						clearFd(fd);
-						continue;
+							fdToRemove.insert(fdToRemove.end(), fd);
+
+							clearFd(fd);
+							continue;
+						}
 					}
 				}
-//				send(fd, "Hello\n", 6, 0);
-//				std::cout << "can write(" << fd << ")" << std::endl;
+
+				if (cli->last_action + 5 < now)
+				{
+					std::cout << "timeout: " << fd << std::endl;
+					::close(fd);
+					delete cli->fd;
+					delete cli->response;
+					delete cli;
+
+					fdToRemove.insert(fdToRemove.end(), fd);
+
+					clearFd(fd);
+					continue;
+				}
+			}
+
+			for (std::set<int>::iterator it = fdToRemove.begin(); it != fdToRemove.end(); it++)
+			{
+				iterator found = clientFds.find(*it);
+
+				if (found != clientFds.end())
+					clientFds.erase(found);
+			}
+		}
+
+		{
+			typedef std::map<int, FileDescriptorWrapper*>::iterator iterator;
+
+			std::set<int> fdToRemove;
+
+			for (iterator it = fileWriteFds.begin(); it != fileWriteFds.end(); it++)
+			{
+				int fd = it->first;
+
+				if (FD_ISSET(fd, &writeFdSet))
+				{
+					FileDescriptorWrapper *fdWrapper = it->second;
+
+					if (fdWrapper->flushWithWrite() == -1 || fdWrapper->isDone())
+					{
+						std::cout << "fd-write :: remove(" << fd << "): " << ::strerror(errno) << std::endl;
+						fdToRemove.insert(fdToRemove.end(), fd);
+					}
+				}
+			}
+
+			for (std::set<int>::iterator it = fdToRemove.begin(); it != fdToRemove.end(); it++)
+			{
+				iterator found = fileWriteFds.find(*it);
+
+				if (found != fileWriteFds.end())
+					fileWriteFds.erase(found);
 			}
 		}
 	}
 
 	/* Should not happen. */
-	for (iterator it = m_servers.begin(); it != m_servers.end(); it++) // TODO Handle exit
+	for (server_iterator it = m_servers.begin(); it != m_servers.end(); it++) // TODO Handle exit
 		::close(it->serverSocket().fd());
 }
 

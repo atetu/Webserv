@@ -21,7 +21,7 @@
 class HTTPOrchestrator
 {
 	public:
-		typedef std::vector<HTTPServer>::iterator iterator;
+		typedef std::vector<HTTPServer>::iterator server_iterator;
 
 	private:
 		Configuration m_configuration;

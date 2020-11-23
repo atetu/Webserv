@@ -112,7 +112,7 @@ HttpResponse::FileBody::write(FileDescriptorWrapper &fd)
 	if (m_fd == -1)
 		return (1);
 
-	size_t capacity = fd.getReadBufferCapacity();
+	size_t capacity = std::min(m_fd.getReadBufferCapacity(), fd.getReadBufferCapacity());
 
 	if (capacity)
 	{
