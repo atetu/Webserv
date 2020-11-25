@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Logger.hpp                                       :+:      :+:    :+:   */
+/*   LoggerImpl.hpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ecaceres <ecaceres@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -10,41 +10,29 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef SRC_UTIL_LOGGER_HPP_
-# define SRC_UTIL_LOGGER_HPP_
+#ifndef LOGGERIMPL_HPP_
+# define LOGGERIMPL_HPP_
 
-# include <iostream>
-# include <sstream>
-# include <map>
+#include <util/log/Logger.hpp>
+#include <iostream>
+#include <string>
 
-class Logger
+class LoggerImpl :
+		public Logger
 {
-	public:
-		enum Level
-		{
-			LL_TRACE,
-			LL_DEBUG,
-			LL_INFO,
-			LL_WARN,
-			LL_ERROR,
-			LL_FATAL,
-			_LL_SIZE
-		};
-
 	private:
 		static const std::string DEFAULT_TAG;
-		static std::map<std::string, Logger*> INSTANCES;
 
 	private:
 		std::string m_tag;
 
 	public:
-		Logger(void);
-		Logger(const std::string &tag);
-		Logger(const Logger &other);
+		LoggerImpl(void);
+		LoggerImpl(const std::string &tag);
+		LoggerImpl(const LoggerImpl &other);
 
 		virtual
-		~Logger();
+		~LoggerImpl();
 
 		std::ostream&
 		trace() const;
@@ -65,20 +53,10 @@ class Logger
 		fatal() const;
 
 		std::ostream&
-		log(Level level) const;
+		log(LogLevel &level) const;
 
 		const std::string&
 		tag() const;
-
-	public:
-		static Logger&
-		factory(const std::string &tag);
-
-		static std::string
-		levelToString(Level level);
-
-		static void
-		deleteAll(void);
 };
 
-#endif /* SRC_UTIL_LOGGER_HPP_ */
+#endif /* LOGGERIMPL_HPP_ */

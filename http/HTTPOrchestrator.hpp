@@ -17,11 +17,15 @@
 #include <http/HTTPServer.hpp>
 #include <sys/select.h>
 #include <vector>
+#include <util/log/Logger.hpp>
 
 class HTTPOrchestrator
 {
 	public:
 		typedef std::vector<HTTPServer>::iterator server_iterator;
+
+	public:
+		static Logger &LOG;
 
 	private:
 		Configuration m_configuration;

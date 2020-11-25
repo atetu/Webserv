@@ -23,10 +23,11 @@
 #include <io/FileDescriptorWrapper.hpp>
 #include <io/SocketServer.hpp>
 #include <sys/errno.h>
-#include <sys/select.h>
 #include <sys/socket.h>
 #include <sys/time.h>
+#include <util/log/LoggerFactory.hpp>
 #include <set>
+#include <utility>
 
 class FileDescriptorWrapper;
 
@@ -65,6 +66,8 @@ seconds()
 
 	return (val.tv_sec);
 }
+
+Logger &HTTPOrchestrator::LOG = LoggerFactory::get("HTTP Orchestrator");
 
 HTTPOrchestrator::HTTPOrchestrator(const Configuration &configuration, const std::vector<HTTPServer> &servers) :
 		m_configuration(configuration),
@@ -123,7 +126,7 @@ HTTPOrchestrator::setFd(int fd)
 	FD_SET(fd, &m_fds);
 	++m_fdCount;
 
-	std::cout << "setFd(" << fd << " / " << m_fdCount << ")" << std::endl;
+	LOG.debug() << "setFd(" << fd << " / " << m_fdCount << ")" << std::endl;
 
 	if (fd > m_highestFd)
 		m_highestFd = fd;
@@ -135,7 +138,7 @@ HTTPOrchestrator::clearFd(int fd)
 	FD_CLR(fd, &m_fds);
 	--m_fdCount;
 
-	std::cout << "clearFd(" << fd << " / " << m_fdCount << ")" << std::endl;
+	LOG.debug() << "clearFd(" << fd << " / " << m_fdCount << ")" << std::endl;
 
 	if (fd == m_highestFd)
 		m_highestFd--;

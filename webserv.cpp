@@ -13,11 +13,11 @@
 #include <config/block/LocationBlock.hpp>
 #include <config/block/ServerBlock.hpp>
 #include <config/Configuration.hpp>
-#include <signal.h>
 #include <exception/Exception.hpp>
 #include <http/HTTPMethod.hpp>
 #include <http/HTTPOrchestrator.hpp>
 #include <util/ContainerBuilder.hpp>
+#include <util/log/LoggerFactory.hpp>
 #include <util/unit/DataSize.hpp>
 #include <csignal>
 #include <iostream>
@@ -68,6 +68,8 @@ main(int argc, char **argv)
 	}
 
 //	throw IOException("ORCHESTRATOR LOOP HAS BEEN EXITED", errno);
+
+	LoggerFactory::destroy();
 
 	return (0);
 }
