@@ -51,6 +51,9 @@ class ServerBlock
 		ServerBlock&
 		name(std::string name);
 
+		const Optional<std::string>
+		name(void) const;
+
 		ServerBlock&
 		maxBodySize(DataSize maxBodySize);
 

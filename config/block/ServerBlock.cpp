@@ -84,6 +84,12 @@ ServerBlock::name(std::string name)
 	return (*this);
 }
 
+const Optional<std::string>
+ServerBlock::name(void) const
+{
+	return (m_name);
+}
+
 ServerBlock&
 ServerBlock::maxBodySize(DataSize maxBodySize)
 {

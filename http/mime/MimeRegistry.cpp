@@ -12,11 +12,17 @@
 
 #include <http/mime/MimeRegistry.hpp>
 #include <stddef.h>
+#include <util/json/JsonArray.hpp>
 #include <util/json/JsonObject.hpp>
 #include <util/json/JsonReader.hpp>
-#include <fstream>
+#include <util/json/JsonString.hpp>
+#include <util/json/JsonValue.hpp>
+#include <util/log/LoggerFactory.hpp>
+#include <iostream>
+#include <iterator>
 #include <list>
-#include <string>
+
+Logger &MimeRegistry::LOG = LoggerFactory::get("MIME Registry");
 
 MimeRegistry::MimeRegistry(void) :
 		m_mapping(),
@@ -120,7 +126,7 @@ MimeRegistry::findByFileExtension(const std::string &type) const
 }
 
 void
-MimeRegistry::loadFromFile(const std::string &path)
+MimeRegistry::loadFromFile(const std::string &path) throw (IOException)
 {
 	JsonObject *object = JsonReader::fromFile(path).readObject();
 
@@ -131,7 +137,7 @@ MimeRegistry::loadFromFile(const std::string &path)
 
 		if (jsonValue->type() != JsonValue::TYPE_ARRAY)
 		{
-			std::cout << "not an array: " << jsonValue->typeString() << " (key: " << mimeType << ")" << std::endl; // TODO Replace with logger or throw
+			LOG.warn() << "not an array: " << jsonValue->typeString() << " (key: " << mimeType << ")" << std::endl;
 			continue;
 		}
 
@@ -146,7 +152,7 @@ MimeRegistry::loadFromFile(const std::string &path)
 
 			if (jsonValue->type() != JsonValue::TYPE_STRING)
 			{
-				std::cout << "not a string (key: " << it->first << ", index: " << index << ")" << std::endl; // TODO Replace with logger or throw
+				LOG.warn() << "not a string (key: " << it->first << ", index: " << index << ")" << std::endl;
 				continue;
 			}
 
@@ -157,7 +163,7 @@ MimeRegistry::loadFromFile(const std::string &path)
 
 		if (extensions.empty())
 		{
-			std::cout << "no usable data (or empty, key: " << mimeType << ")" << std::endl; // TODO Replace with logger or throw
+			LOG.warn() << "no usable data (or empty, key: " << mimeType << ")" << std::endl;
 			continue;
 		}
 
@@ -165,4 +171,12 @@ MimeRegistry::loadFromFile(const std::string &path)
 	}
 
 	delete object;
+
+	LOG.debug() << "Loaded " << size() << " MIME(s)" << std::endl;
+}
+
+size_t
+MimeRegistry::size()
+{
+	return (m_mapping.size());
 }

@@ -29,7 +29,7 @@ template<typename T>
 			{
 			}
 
-			Optional(T value) :
+			Optional(T &value) :
 					m_present(true),
 					m_value(value)
 			{

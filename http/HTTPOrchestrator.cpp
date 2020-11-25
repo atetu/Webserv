@@ -69,7 +69,7 @@ seconds()
 
 Logger &HTTPOrchestrator::LOG = LoggerFactory::get("HTTP Orchestrator");
 
-HTTPOrchestrator::HTTPOrchestrator(const Configuration &configuration, const std::vector<HTTPServer> &servers) :
+HTTPOrchestrator::HTTPOrchestrator(const Configuration &configuration, const server_container &servers) :
 		m_configuration(configuration),
 		m_servers(servers),
 		m_fds(),
@@ -173,7 +173,7 @@ HTTPOrchestrator::start()
 		int fd = it->serverSocket().fd();
 
 		setFd(fd);
-		serverFds.insert(serverFds.end(), std::make_pair(fd, (HTTPServer*)0 /* TODO: Use better storage */));
+		serverFds.insert(serverFds.end(), std::make_pair(fd, &(*it)));
 	}
 
 	while (1)
@@ -438,10 +438,11 @@ HTTPOrchestrator::create(const Configuration &configuration)
 	while (it != ite)
 	{
 		portToServersMap[it->port().get()].push_back(*it);
+		LOG.debug() << "Mapping port " << it->port().get() << " with server: " << it->name().get() << std::endl;
 		it++;
 	}
 
-	std::vector<HTTPServer> httpServers;
+	server_container httpServers;
 	plsiterator itr = portToServersMap.begin();
 	plsiterator itre = portToServersMap.end();
 

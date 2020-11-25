@@ -16,25 +16,28 @@
 #include <config/Configuration.hpp>
 #include <http/HTTPServer.hpp>
 #include <sys/select.h>
+#include <list>
 #include <vector>
-#include <util/log/Logger.hpp>
+
+class Logger;
 
 class HTTPOrchestrator
 {
 	public:
-		typedef std::vector<HTTPServer>::iterator server_iterator;
+		typedef std::list<HTTPServer> server_container;
+		typedef server_container::iterator server_iterator;
 
 	public:
 		static Logger &LOG;
 
 	private:
-		Configuration m_configuration;
-		std::vector<HTTPServer> m_servers;
+		const Configuration m_configuration;
+		server_container m_servers;
 		fd_set m_fds;
 		int m_highestFd;
 		int m_fdCount;
 
-		HTTPOrchestrator(const Configuration &configuration, const std::vector<HTTPServer> &servers);
+		HTTPOrchestrator(const Configuration &configuration, const server_container &servers);
 
 	public:
 		virtual
