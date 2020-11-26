@@ -10,8 +10,6 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <io/FileDescriptorWrapper.hpp>
-
 #ifdef __linux__
 # include <sys/socket.h>
 # include <unistd.h>
@@ -26,7 +24,7 @@
 #endif
 
 #include <exception/IOException.hpp>
-#include <http/HttpResponse.hpp>
+#include <http/HTTPResponse.hpp>
 #include <http/HTTP.hpp>
 #include <sys/errno.h>
 #include <sys/ioctl.h>
@@ -40,36 +38,36 @@
 #include <sstream>
 #endif
 
-HttpResponse::StatusLine::StatusLine(void) :
+HTTPResponse::StatusLine::StatusLine(void) :
 		m_version(HTTPVersion::HTTP_1_1),
 		m_status()
 {
 }
 
-HttpResponse::StatusLine::StatusLine(const HTTPStatus &status) :
+HTTPResponse::StatusLine::StatusLine(const HTTPStatus &status) :
 		m_version(HTTPVersion::HTTP_1_1),
 		m_status(status)
 {
 }
 
-HttpResponse::StatusLine::StatusLine(const HTTPVersion &version, const HTTPStatus &status) :
+HTTPResponse::StatusLine::StatusLine(const HTTPVersion &version, const HTTPStatus &status) :
 		m_version(version),
 		m_status(status)
 {
 }
 
-HttpResponse::StatusLine::StatusLine(const StatusLine &other) :
+HTTPResponse::StatusLine::StatusLine(const StatusLine &other) :
 		m_version(other.m_version),
 		m_status(other.m_status)
 {
 }
 
-HttpResponse::StatusLine::~StatusLine()
+HTTPResponse::StatusLine::~StatusLine()
 {
 }
 
-HttpResponse::StatusLine&
-HttpResponse::StatusLine::operator =(const StatusLine &other)
+HTTPResponse::StatusLine&
+HTTPResponse::StatusLine::operator =(const StatusLine &other)
 {
 	if (this != &other)
 	{
@@ -81,7 +79,7 @@ HttpResponse::StatusLine::operator =(const StatusLine &other)
 }
 
 std::string
-HttpResponse::StatusLine::format(void) const
+HTTPResponse::StatusLine::format(void) const
 {
 	std::stringstream stream;
 
@@ -90,16 +88,16 @@ HttpResponse::StatusLine::format(void) const
 	return (stream.str());
 }
 
-HttpResponse::IBody::~IBody()
+HTTPResponse::IBody::~IBody()
 {
 }
 
-HttpResponse::FileBody::FileBody(int fd) :
+HTTPResponse::FileBody::FileBody(int fd) :
 		m_fd(fd)
 {
 }
 
-HttpResponse::FileBody::~FileBody()
+HTTPResponse::FileBody::~FileBody()
 {
 	if (m_fd != -1)
 		::close(m_fd);
@@ -107,55 +105,56 @@ HttpResponse::FileBody::~FileBody()
 }
 
 bool
-HttpResponse::FileBody::write(FileDescriptorWrapper &fd)
+HTTPResponse::FileBody::write(IOBuffer &fd)
 {
-	if (m_fd == -1)
-		return (1);
-
-	size_t capacity = std::min(m_fd.getReadBufferCapacity(), fd.getReadBufferCapacity());
-
-	if (capacity)
-	{
-		char buffer[capacity];
-		ssize_t r = ::read(m_fd, buffer, capacity);
-
-		if (r == 0)
-		{
-			std::cout << "closed fd #" << m_fd << std::endl;
-			::close(m_fd);
-			m_fd = -1;
-		}
-
-		if (r >= 0)
-			fd.store(buffer, capacity, m_fd == -1);
-	}
-
-	return (m_fd == -1);
+//	if (m_fd == -1)
+//		return (1);
+//
+//	size_t capacity = std::min(m_fd.capacity(), fd.capacity());
+//
+//	if (capacity)
+//	{
+//		char buffer[capacity];
+//		ssize_t r = ::read(m_fd, buffer, capacity);
+//
+//		if (r == 0)
+//		{
+//			std::cout << "closed fd #" << m_fd << std::endl;
+//			::close(m_fd);
+//			m_fd = -1;
+//		}
+//
+//		if (r >= 0)
+//			fd.store(buffer, capacity, m_fd == -1);
+//	}
+//
+//	return (m_fd == -1);
+	return (-1);
 }
 
-HttpResponse::StringBody::StringBody(std::string string) :
+HTTPResponse::StringBody::StringBody(std::string string) :
 		m_string(string),
 		m_sent(false)
 {
 }
 
-HttpResponse::StringBody::~StringBody()
+HTTPResponse::StringBody::~StringBody()
 {
 }
 
 bool
-HttpResponse::StringBody::write(FileDescriptorWrapper &fd)
+HTTPResponse::StringBody::write(IOBuffer &fd)
 {
 	if (!m_sent)
 	{
-		fd.store(m_string, true);
+		fd.store(m_string);
 		m_sent = true;
 	}
 
 	return (1);
 }
 
-HttpResponse::HttpResponse(const HTTPVersion &version, const HTTPStatus &status, HTTPHeaderFields headers, IBody *body) :
+HTTPResponse::HTTPResponse(const HTTPVersion &version, const HTTPStatus &status, const HTTPHeaderFields &headers, IBody *body) :
 		m_statusLine(version, status),
 		m_headers(headers),
 		m_body(body),
@@ -164,14 +163,14 @@ HttpResponse::HttpResponse(const HTTPVersion &version, const HTTPStatus &status,
 {
 }
 
-HttpResponse::~HttpResponse()
+HTTPResponse::~HTTPResponse()
 {
 	if (m_body)
 		delete m_body;
 }
 
 bool
-HttpResponse::write(FileDescriptorWrapper &fd)
+HTTPResponse::write(IOBuffer &fd)
 {
 	std::string str;
 	HTTPHeaderFields::const_iterator it;
@@ -204,7 +203,7 @@ HttpResponse::write(FileDescriptorWrapper &fd)
 			break;
 
 		case FLUSHING:
-			if (fd.flushWithSend() < 0 || fd.getWriteBufferSize() == 0)
+			if (fd.send() < 0 || fd.capacity() == 0)
 				m_state = FINISHED;
 
 			break;

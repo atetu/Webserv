@@ -11,23 +11,19 @@
 /* ************************************************************************** */
 
 #include <config/block/ServerBlock.hpp>
-#include <dirent.h>
 #include <exception/IOException.hpp>
-#include <http/HttpRequestParser.hpp>
-#include <http/HttpResponse.hpp>
-#include <http/HTTPHeaderFields.hpp>
 #include <http/HTTPOrchestrator.hpp>
-#include <http/HTTPStatus.hpp>
-#include <http/HTTPVersion.hpp>
+#include <http/HTTPRequestParser.hpp>
 #include <http/mime/MimeRegistry.hpp>
-#include <io/FileDescriptorWrapper.hpp>
 #include <io/SocketServer.hpp>
 #include <sys/errno.h>
-#include <sys/socket.h>
 #include <sys/time.h>
+#include <util/buffer/IOBuffer.hpp>
+#include <util/log/Logger.hpp>
 #include <util/log/LoggerFactory.hpp>
-#include <set>
 #include <utility>
+
+class HTTPResponse;
 
 class FileDescriptorWrapper;
 
@@ -147,9 +143,9 @@ HTTPOrchestrator::clearFd(int fd)
 typedef struct
 {
 		FileDescriptorWrapper *fd;
-		HttpRequestParser parser;
+		HTTPRequestParser parser;
 		unsigned long last_action;
-		HttpResponse *response;
+		HTTPResponse *response;
 } client;
 
 void
@@ -164,9 +160,9 @@ HTTPOrchestrator::start()
 	fd_set writeFdSet;
 
 	std::map<int, HTTPServer*> serverFds;
-	std::map<int, FileDescriptorWrapper*> fileReadFds;
+	std::map<int, IOBuffer*> fileReadFds;
 	std::map<int, client*> clientFds;
-	std::map<int, FileDescriptorWrapper*> fileWriteFds;
+	std::map<int, IOBuffer*> fileWriteFds;
 
 	for (server_iterator it = m_servers.begin(); it != m_servers.end(); it++)
 	{
@@ -184,240 +180,240 @@ HTTPOrchestrator::start()
 		if (::select(m_highestFd + 1, &readFdSet, &writeFdSet, NULL, NULL) == -1)
 			throw IOException("select", errno);
 
-		{
-			typedef std::map<int, HTTPServer*>::iterator iterator;
+//		{
+//			typedef std::map<int, HTTPServer*>::iterator iterator;
+//
+//			for (iterator it = serverFds.begin(); it != serverFds.end(); it++)
+//			{
+//				int fd = it->first;
+//
+//				if (FD_ISSET(fd, &readFdSet))
+//				{
+//					try
+//					{
+//						int accepted = ::accept(fd, NULL, NULL);
+//						setFd(accepted);
+//
+//						client *c = new client();
+//						c->response = NULL;
+//						c->last_action = seconds();
+//						c->fd = FileDescriptorWrapper::wrap(accepted);
+//						c->fd->setNonBlock();
+//
+//						clientFds[accepted] = c;
+//					}
+//					catch (Exception &e)
+//					{
+//						std::cout << e.what() << std::endl;
+//					}
+//				}
+//			}
+//		}
 
-			for (iterator it = serverFds.begin(); it != serverFds.end(); it++)
-			{
-				int fd = it->first;
+//		{
+//			typedef std::map<int, FileDescriptorWrapper*>::iterator iterator;
+//
+//			std::set<int> fdToRemove;
+//
+//			for (iterator it = fileReadFds.begin(); it != fileReadFds.end(); it++)
+//			{
+//				int fd = it->first;
+//
+//				if (FD_ISSET(fd, &readFdSet))
+//				{
+//					FileDescriptorWrapper *fdWrapper = it->second;
+//
+//					if (fdWrapper->fillWithRead() == -1 || fdWrapper->isDone())
+//					{
+//						std::cout << "fd-read :: remove(" << fd << "): " << ::strerror(errno) << std::endl;
+//						fdToRemove.insert(fdToRemove.end(), fd);
+//					}
+//				}
+//			}
+//
+//			for (std::set<int>::iterator it = fdToRemove.begin(); it != fdToRemove.end(); it++)
+//			{
+//				iterator found = fileReadFds.find(*it);
+//
+//				if (found != fileReadFds.end())
+//					fileReadFds.erase(found);
+//			}
+//		}
 
-				if (FD_ISSET(fd, &readFdSet))
-				{
-					try
-					{
-						int accepted = ::accept(fd, NULL, NULL);
-						setFd(accepted);
+//		{
+//			typedef std::map<int, client*>::iterator iterator;
+//
+//			std::set<int> fdToRemove;
+//
+//			for (iterator it = clientFds.begin(); it != clientFds.end(); it++)
+//			{
+//				unsigned long now = seconds();
+//				int fd = it->first;
+//
+//				bool canRead = FD_ISSET(fd, &readFdSet);
+//				bool canWrite = FD_ISSET(fd, &writeFdSet);
+//
+//				client *cli = it->second;
+//
+//				if (canRead && !cli->response)
+//				{
+//					if (cli->fd->getReadBufferSize() != 0 || cli->fd->fillWithReceive() > 0)
+//					{
+//						char c;
+//
+//						while (cli->fd->consume(&c))
+//						{
+//							cli->parser.consume(c);
+//							if (cli->parser.state() == HttpRequestParser::S_END)
+//							{
+//								std::string file = cli->parser.path().substr(1);
+//
+//								int ffd = ::open(("." + cli->parser.path()).c_str(), O_RDONLY);
+//
+//								HTTPHeaderFields header;
+//								header.date();
+//								header.set("Server", "webserv");
+//
+//								struct stat st;
+//								if (ffd == -1 || ::stat(("." + cli->parser.path()).c_str(), &st) == -1)
+//								{
+//									header.contentType("text/html");
+//									header.contentLength(8);
+//									std::cout << "GET " + cli->parser.path() + " -> 404" << std::endl;
+//
+//									if (ffd != -1)
+//										::close(ffd);
+//
+//									cli->response = new HTTPResponse(HTTPVersion::HTTP_1_1, *HTTPStatus::OK, header, new HTTPResponse::StringBody("not found"));
+//								}
+//								else
+//								{
+//									std::cout << "GET " + cli->parser.path() + " -> 200" << std::endl;
+//
+//									if (S_ISDIR(st.st_mode))
+//									{
+//										if (ffd != -1)
+//											::close(ffd);
+//
+//										std::string directory = cli->parser.path() == "/" ? "." : file;
+//
+//										DIR *dir = ::opendir(directory.c_str());
+//
+//										std::string listing = "";
+//
+//										struct dirent *entry;
+//										while ((entry = ::readdir(dir)))
+//										{
+//											std::string lfile(entry->d_name);
+//											std::string absolute = directory + "/" + lfile;
+//
+//											if (::stat(absolute.c_str(), &st) != -1 && S_ISDIR(st.st_mode))
+//											{
+//												lfile += '/';
+//											}
+//
+//											listing += std::string("<a href=\"./") + lfile + "\">" + lfile + "</a><br>";
+//										}
+//
+//										::closedir(dir);
+//
+//										header.contentType("text/html");
+//										header.contentLength(listing.size());
+//
+//										cli->response = new HTTPResponse(HTTPVersion::HTTP_1_1, *HTTPStatus::OK, header, new HTTPResponse::StringBody(listing));
+//									}
+//									else if (S_ISREG(st.st_mode))
+//									{
+//										header.contentType(mimeRegistry, file.substr(file.rfind(".") + 1));
+//										header.contentLength(st.st_size);
+//
+//										cli->response = new HTTPResponse(HTTPVersion::HTTP_1_1, *HTTPStatus::OK, header, new HTTPResponse::FileBody(ffd));
+//									}
+//								}
+//
+//								break;
+//							}
+//						}
+//					}
+//				}
+//
+//				if (canWrite)
+//				{
+//					if (cli->response)
+//					{
+//						if (!cli->response->write(*(cli->fd))) // TODO Add windows support
+//						{
+//							cli->last_action = now;
+//						}
+//						else
+//						{
+//							std::cout << "closing(" << fd << "): " << ::strerror(errno) << std::endl;
+//							::close(fd);
+//							delete cli->fd;
+//							delete cli->response;
+//							delete cli;
+//
+//							fdToRemove.insert(fdToRemove.end(), fd);
+//
+//							clearFd(fd);
+//							continue;
+//						}
+//					}
+//				}
+//
+//				if (cli->last_action + 5 < now)
+//				{
+//					std::cout << "timeout: " << fd << std::endl;
+//					::close(fd);
+//					delete cli->fd;
+//					delete cli->response;
+//					delete cli;
+//
+//					fdToRemove.insert(fdToRemove.end(), fd);
+//
+//					clearFd(fd);
+//					continue;
+//				}
+//			}
+//
+//			for (std::set<int>::iterator it = fdToRemove.begin(); it != fdToRemove.end(); it++)
+//			{
+//				iterator found = clientFds.find(*it);
+//
+//				if (found != clientFds.end())
+//					clientFds.erase(found);
+//			}
+//		}
 
-						client *c = new client();
-						c->response = NULL;
-						c->last_action = seconds();
-						c->fd = FileDescriptorWrapper::wrap(accepted);
-						c->fd->setNonBlock();
-
-						clientFds[accepted] = c;
-					}
-					catch (Exception &e)
-					{
-						std::cout << e.what() << std::endl;
-					}
-				}
-			}
-		}
-
-		{
-			typedef std::map<int, FileDescriptorWrapper*>::iterator iterator;
-
-			std::set<int> fdToRemove;
-
-			for (iterator it = fileReadFds.begin(); it != fileReadFds.end(); it++)
-			{
-				int fd = it->first;
-
-				if (FD_ISSET(fd, &readFdSet))
-				{
-					FileDescriptorWrapper *fdWrapper = it->second;
-
-					if (fdWrapper->fillWithRead() == -1 || fdWrapper->isDone())
-					{
-						std::cout << "fd-read :: remove(" << fd << "): " << ::strerror(errno) << std::endl;
-						fdToRemove.insert(fdToRemove.end(), fd);
-					}
-				}
-			}
-
-			for (std::set<int>::iterator it = fdToRemove.begin(); it != fdToRemove.end(); it++)
-			{
-				iterator found = fileReadFds.find(*it);
-
-				if (found != fileReadFds.end())
-					fileReadFds.erase(found);
-			}
-		}
-
-		{
-			typedef std::map<int, client*>::iterator iterator;
-
-			std::set<int> fdToRemove;
-
-			for (iterator it = clientFds.begin(); it != clientFds.end(); it++)
-			{
-				unsigned long now = seconds();
-				int fd = it->first;
-
-				bool canRead = FD_ISSET(fd, &readFdSet);
-				bool canWrite = FD_ISSET(fd, &writeFdSet);
-
-				client *cli = it->second;
-
-				if (canRead && !cli->response)
-				{
-					if (cli->fd->getReadBufferSize() != 0 || cli->fd->fillWithReceive() > 0)
-					{
-						char c;
-
-						while (cli->fd->consume(&c))
-						{
-							cli->parser.consume(c);
-							if (cli->parser.state() == HttpRequestParser::S_END)
-							{
-								std::string file = cli->parser.path().substr(1);
-
-								int ffd = ::open(("." + cli->parser.path()).c_str(), O_RDONLY);
-
-								HTTPHeaderFields header;
-								header.date();
-								header.set("Server", "webserv");
-
-								struct stat st;
-								if (ffd == -1 || ::stat(("." + cli->parser.path()).c_str(), &st) == -1)
-								{
-									header.contentType("text/html");
-									header.contentLength(8);
-									std::cout << "GET " + cli->parser.path() + " -> 404" << std::endl;
-
-									if (ffd != -1)
-										::close(ffd);
-
-									cli->response = new HttpResponse(HTTPVersion::HTTP_1_1, *HTTPStatus::OK, header, new HttpResponse::StringBody("not found"));
-								}
-								else
-								{
-									std::cout << "GET " + cli->parser.path() + " -> 200" << std::endl;
-
-									if (S_ISDIR(st.st_mode))
-									{
-										if (ffd != -1)
-											::close(ffd);
-
-										std::string directory = cli->parser.path() == "/" ? "." : file;
-
-										DIR *dir = ::opendir(directory.c_str());
-
-										std::string listing = "";
-
-										struct dirent *entry;
-										while ((entry = ::readdir(dir)))
-										{
-											std::string lfile(entry->d_name);
-											std::string absolute = directory + "/" + lfile;
-
-											if (::stat(absolute.c_str(), &st) != -1 && S_ISDIR(st.st_mode))
-											{
-												lfile += '/';
-											}
-
-											listing += std::string("<a href=\"./") + lfile + "\">" + lfile + "</a><br>";
-										}
-
-										::closedir(dir);
-
-										header.contentType("text/html");
-										header.contentLength(listing.size());
-
-										cli->response = new HttpResponse(HTTPVersion::HTTP_1_1, *HTTPStatus::OK, header, new HttpResponse::StringBody(listing));
-									}
-									else if (S_ISREG(st.st_mode))
-									{
-										header.contentType(mimeRegistry, file.substr(file.rfind(".") + 1));
-										header.contentLength(st.st_size);
-
-										cli->response = new HttpResponse(HTTPVersion::HTTP_1_1, *HTTPStatus::OK, header, new HttpResponse::FileBody(ffd));
-									}
-								}
-
-								break;
-							}
-						}
-					}
-				}
-
-				if (canWrite)
-				{
-					if (cli->response)
-					{
-						if (!cli->response->write(*(cli->fd))) // TODO Add windows support
-						{
-							cli->last_action = now;
-						}
-						else
-						{
-							std::cout << "closing(" << fd << "): " << ::strerror(errno) << std::endl;
-							::close(fd);
-							delete cli->fd;
-							delete cli->response;
-							delete cli;
-
-							fdToRemove.insert(fdToRemove.end(), fd);
-
-							clearFd(fd);
-							continue;
-						}
-					}
-				}
-
-				if (cli->last_action + 5 < now)
-				{
-					std::cout << "timeout: " << fd << std::endl;
-					::close(fd);
-					delete cli->fd;
-					delete cli->response;
-					delete cli;
-
-					fdToRemove.insert(fdToRemove.end(), fd);
-
-					clearFd(fd);
-					continue;
-				}
-			}
-
-			for (std::set<int>::iterator it = fdToRemove.begin(); it != fdToRemove.end(); it++)
-			{
-				iterator found = clientFds.find(*it);
-
-				if (found != clientFds.end())
-					clientFds.erase(found);
-			}
-		}
-
-		{
-			typedef std::map<int, FileDescriptorWrapper*>::iterator iterator;
-
-			std::set<int> fdToRemove;
-
-			for (iterator it = fileWriteFds.begin(); it != fileWriteFds.end(); it++)
-			{
-				int fd = it->first;
-
-				if (FD_ISSET(fd, &writeFdSet))
-				{
-					FileDescriptorWrapper *fdWrapper = it->second;
-
-					if (fdWrapper->flushWithWrite() == -1 || fdWrapper->isDone())
-					{
-						std::cout << "fd-write :: remove(" << fd << "): " << ::strerror(errno) << std::endl;
-						fdToRemove.insert(fdToRemove.end(), fd);
-					}
-				}
-			}
-
-			for (std::set<int>::iterator it = fdToRemove.begin(); it != fdToRemove.end(); it++)
-			{
-				iterator found = fileWriteFds.find(*it);
-
-				if (found != fileWriteFds.end())
-					fileWriteFds.erase(found);
-			}
-		}
+//		{
+//			typedef std::map<int, FileDescriptorWrapper*>::iterator iterator;
+//
+//			std::set<int> fdToRemove;
+//
+//			for (iterator it = fileWriteFds.begin(); it != fileWriteFds.end(); it++)
+//			{
+//				int fd = it->first;
+//
+//				if (FD_ISSET(fd, &writeFdSet))
+//				{
+//					FileDescriptorWrapper *fdWrapper = it->second;
+//
+//					if (fdWrapper->flushWithWrite() == -1 || fdWrapper->isDone())
+//					{
+//						std::cout << "fd-write :: remove(" << fd << "): " << ::strerror(errno) << std::endl;
+//						fdToRemove.insert(fdToRemove.end(), fd);
+//					}
+//				}
+//			}
+//
+//			for (std::set<int>::iterator it = fdToRemove.begin(); it != fdToRemove.end(); it++)
+//			{
+//				iterator found = fileWriteFds.find(*it);
+//
+//				if (found != fileWriteFds.end())
+//					fileWriteFds.erase(found);
+//			}
+//		}
 	}
 
 	/* Should not happen. */

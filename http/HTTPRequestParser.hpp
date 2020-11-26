@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   HttpRequestParser.hpp                              :+:      :+:    :+:   */
+/*   HTTPRequestParser.hpp                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ecaceres <ecaceres@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -15,7 +15,7 @@
 
 # include <iostream>
 
-class HttpRequestParser
+class HTTPRequestParser
 {
 	public:
 		enum State
@@ -56,7 +56,7 @@ class HttpRequestParser
 		char m_last_char2;
 
 	public:
-		HttpRequestParser();
+		HTTPRequestParser();
 
 		void
 		consume(char c);

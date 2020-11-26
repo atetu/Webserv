@@ -28,8 +28,6 @@
 int
 main(int argc, char **argv)
 {
-	HTTPMethod::loadDefaults();
-
 	Configuration configuration(ContainerBuilder<ServerBlock>() //
 	/**/.add(ServerBlock()
 	/**//**/.port(1502)
@@ -39,12 +37,12 @@ main(int argc, char **argv)
 	/**//**/.root("/var/www/html")
 	/**//**/.locations(ContainerBuilder<LocationBlock>()
 	/**//**//**/.add(LocationBlock()
-	/**//**//**//**/.allowedMethods(ContainerBuilder<std::string>()
+	/**//**//**//**/.methods(ContainerBuilder<std::string>()
 	/**//**//**//**//**/.add("GET")
 	/**//**//**//**//**/.add("HEAD")
 	/**//**//**//**//**/.add("POST")
 	/**//**//**//**//**/.build())
-	/**//**//**//**/.indexFiles(ContainerBuilder<std::string>()
+	/**//**//**//**/.index(ContainerBuilder<std::string>()
 	/**//**//**//**//**/.add("index.html")
 	/**//**//**//**//**/.add("index-default.html")
 	/**//**//**//**//**/.build())

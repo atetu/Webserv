@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   CGI.hpp                                       :+:      :+:    :+:   */
+/*   CGI.hpp                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ecaceres <ecaceres@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -10,22 +10,25 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef SRC_CONFIG_BLOCK_CGI_HPP_
-# define SRC_CONFIG_BLOCK_CGI_HPP_
+#ifndef CGI_HPP_
+# define CGI_HPP_
 
-#include <iostream>
+#include <util/Optional.hpp>
+#include <string>
 
 class CGI
 {
 	public:
 		std::string m_name;
-		std::string m_path;
+		Optional<std::string> m_path;
 
 	public:
 		CGI();
+		CGI(const CGI &other);
+
 		virtual
 		~CGI();
-		CGI(const CGI &other);
+
 		CGI&
 		operator=(const CGI &other);
 };

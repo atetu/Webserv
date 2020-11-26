@@ -16,15 +16,13 @@
 #include <http/HTTPHeaderFields.hpp>
 #include <http/HTTPStatus.hpp>
 #include <http/HTTPVersion.hpp>
-#include <io/FileDescriptorWrapper.hpp>
 #include <sys/types.h>
-#include <util/Byte.hpp>
-#include <cstddef>
+#include <util/buffer/IOBuffer.hpp>
 #include <string>
 
 # define AWAITING_BUFFER_SIZE 512
 
-class HttpResponse
+class HTTPResponse
 {
 	public:
 		class StatusLine
@@ -56,14 +54,14 @@ class HttpResponse
 				~IBody();
 
 				virtual bool
-				write(FileDescriptorWrapper &fd) = 0;
+				write(IOBuffer &fd) = 0;
 		};
 
 		class FileBody :
 				public IBody
 		{
 			private:
-				FileDescriptorWrapper m_fd;
+				IOBuffer m_fd;
 
 			public:
 				FileBody(int fd);
@@ -72,7 +70,7 @@ class HttpResponse
 				~FileBody();
 
 				virtual bool
-				write(FileDescriptorWrapper &fd);
+				write(IOBuffer &fd);
 		};
 
 		class StringBody :
@@ -89,7 +87,7 @@ class HttpResponse
 				~StringBody();
 
 				virtual bool
-				write(FileDescriptorWrapper &fd);
+				write(IOBuffer &fd);
 		};
 
 		enum State
@@ -109,13 +107,20 @@ class HttpResponse
 		ssize_t m_state_index;
 
 	public:
-		HttpResponse(const HTTPVersion &version, const HTTPStatus &status, HTTPHeaderFields headers, IBody *body);
+		HTTPResponse(const HTTPVersion &version, const HTTPStatus &status, const HTTPHeaderFields &headers, IBody *body);
 
 		virtual
-		~HttpResponse();
+		~HTTPResponse();
 
 		bool
-		write(FileDescriptorWrapper &fd);
+		write(IOBuffer &fd);
+
+	public:
+		static inline HTTPResponse*
+		status(HTTPStatus &status)
+		{
+			return (new HTTPResponse(HTTPVersion::HTTP_1_1, status, HTTPHeaderFields(), NULL));
+		}
 };
 
 #endif /* SRC_HTTP_HTTPRESPONSE_HPP_ */

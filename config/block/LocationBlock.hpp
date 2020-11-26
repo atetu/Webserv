@@ -39,7 +39,7 @@ class LocationBlock
 		operator=(const LocationBlock &other);
 
 		LocationBlock&
-		allowedMethods(std::vector<std::string> methods);
+		methods(std::vector<std::string> methods);
 
 		LocationBlock&
 		alias(std::string alias);
@@ -51,7 +51,10 @@ class LocationBlock
 		listing(bool listing);
 
 		LocationBlock&
-		indexFiles(std::vector<std::string> files);
+		index(std::vector<std::string> files);
+
+	public:
+		static LocationBlock DEFAULT;
 };
 
 #endif /* LOCATIONBLOCK_HPP_ */

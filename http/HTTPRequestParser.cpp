@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   HttpRequestParser.cpp                              :+:      :+:    :+:   */
+/*   HTTPRequestParser.cpp                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ecaceres <ecaceres@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -11,11 +11,11 @@
 /* ************************************************************************** */
 
 #include <exception/Exception.hpp>
-#include <http/HttpRequestParser.hpp>
+#include <http/HTTPRequestParser.hpp>
 #include <cctype>
 #include <string>
 
-HttpRequestParser::HttpRequestParser() :
+HTTPRequestParser::HTTPRequestParser() :
 		m_state(S_NOT_STARTED),
 		m_method(),
 		m_path(),
@@ -29,7 +29,7 @@ HttpRequestParser::HttpRequestParser() :
 }
 
 void
-HttpRequestParser::consume(char c)
+HTTPRequestParser::consume(char c)
 {
 	switch (m_state)
 	{
@@ -200,32 +200,32 @@ HttpRequestParser::consume(char c)
 	m_last_char = c;
 }
 
-HttpRequestParser::State
-HttpRequestParser::state() const
+HTTPRequestParser::State
+HTTPRequestParser::state() const
 {
 	return (m_state);
 }
 
 std::string
-HttpRequestParser::method() const
+HTTPRequestParser::method() const
 {
 	return (m_method);
 }
 
 std::string
-HttpRequestParser::path() const
+HTTPRequestParser::path() const
 {
 	return (m_path);
 }
 
 int
-HttpRequestParser::major() const
+HTTPRequestParser::major() const
 {
 	return (m_major);
 }
 
 int
-HttpRequestParser::minor() const
+HTTPRequestParser::minor() const
 {
 	return (m_minor);
 }

@@ -12,6 +12,8 @@
 
 #include <config/block/LocationBlock.hpp>
 
+LocationBlock LocationBlock::DEFAULT;
+
 LocationBlock::LocationBlock(void) :
 		m_path(),
 		m_allowedMethods(),
@@ -63,7 +65,7 @@ LocationBlock::operator =(const LocationBlock &other)
 }
 
 LocationBlock&
-LocationBlock::allowedMethods(std::vector<std::string> methods)
+LocationBlock::methods(std::vector<std::string> methods)
 {
 	m_allowedMethods.set(methods);
 
@@ -95,7 +97,7 @@ LocationBlock::listing(bool listing)
 }
 
 LocationBlock&
-LocationBlock::indexFiles(std::vector<std::string> files)
+LocationBlock::index(std::vector<std::string> files)
 {
 	m_indexFiles.set(files);
 

@@ -10,61 +10,44 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+#include <http/handler/methods/GetHandler.hpp>
+#include <http/handler/methods/DeleteHandler.hpp>
+#include <http/handler/methods/ConnectHandler.hpp>
 #include <http/HTTPMethod.hpp>
 
-std::vector<HTTPMethod> HTTPMethod::s_DEFAULTS;
+#define DEFINE_METHOD(name, handler) ENUM_DEFINE(HTTPMethod, name, HTTPMethod(handler));
+
+DEFINE_METHOD(GET,/*     */new GetHandler());
+DEFINE_METHOD(HEAD,/*    */new GetHandler());
+DEFINE_METHOD(POST,/*    */new GetHandler());
+DEFINE_METHOD(PUT,/*     */new GetHandler());
+DEFINE_METHOD(DELETE,/*  */new DeleteHandler());
+DEFINE_METHOD(CONNECT,/* */new ConnectHandler());
+DEFINE_METHOD(OPTIONS,/* */new GetHandler());
+DEFINE_METHOD(TRACE,/*   */new GetHandler());
 
 HTTPMethod::HTTPMethod(void) :
-		m_name()
+		m_handler()
 {
 }
 
-HTTPMethod::HTTPMethod(const std::string &name) :
-		m_name(name)
+HTTPMethod::HTTPMethod(HTTPMethodHandler *handler) :
+		m_handler(handler)
 {
 }
 
 HTTPMethod::HTTPMethod(const HTTPMethod &other) :
-		m_name(other.m_name)
+		m_handler(other.m_handler)
 {
 }
 
 HTTPMethod&
 HTTPMethod::operator =(const HTTPMethod &other)
 {
+	Enum::operator=(other);
+
 	if (this != &other)
-		m_name = other.m_name;
+		m_handler = other.m_handler;
 
 	return (*this);
-}
-
-const std::string&
-HTTPMethod::name(void) const
-{
-	return (m_name);
-}
-
-void
-HTTPMethod::loadDefaults(void)
-{
-	s_DEFAULTS.push_back(HTTPMethod("GET"));
-	s_DEFAULTS.push_back(HTTPMethod("HEAD"));
-	s_DEFAULTS.push_back(HTTPMethod("POST"));
-	s_DEFAULTS.push_back(HTTPMethod("PUT"));
-	s_DEFAULTS.push_back(HTTPMethod("DELETE"));
-	s_DEFAULTS.push_back(HTTPMethod("CONNECT"));
-	s_DEFAULTS.push_back(HTTPMethod("OPTIONS"));
-	s_DEFAULTS.push_back(HTTPMethod("TRACE"));
-}
-
-const std::vector<HTTPMethod>&
-HTTPMethod::defaults(void)
-{
-	return (s_DEFAULTS);
-}
-
-std::ostream&
-operator <<(std::ostream &stream, const HTTPMethod &method)
-{
-	return (stream << method.name());
 }

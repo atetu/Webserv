@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   HttpRequest.hpp                                    :+:      :+:    :+:   */
+/*   HttpRequest.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ecaceres <ecaceres@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -10,43 +10,20 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef HTTPREQUEST_HPP_
-# define HTTPREQUEST_HPP_
+#include <http/HTTPRequest.hpp>
+#include <sstream>
 
-#include <io/Socket.hpp>
-# include <iostream>
-# include <map>
-
-class HttpRequest
+HTTPRequest::HTTPRequest(const HTTPMethod &method, const URL &url, const HTTPVersion &version, const HTTPHeaderFields &headerFields, RootBlock &rootBlock, ServerBlock &serverBlock, LocationBlock &locationBlock) :
+		m_method(method),
+		m_url(url),
+		m_version(version),
+		m_headerFields(headerFields),
+		m_rootBlock(rootBlock),
+		m_serverBlock(serverBlock),
+		m_locationBlock(locationBlock)
 {
-	private:
-		Socket m_socket;
-		std::string m_raw;
-		std::string m_head;
-		std::map<std::string, std::string> m_headers;
+}
 
-	public:
-		HttpRequest(void);
-		HttpRequest(const Socket &socket);
-		HttpRequest(const HttpRequest &other);
-
-		virtual
-		~HttpRequest(void);
-
-		HttpRequest&
-		operator =(const HttpRequest &other);
-
-		bool
-		read(void);
-
-		bool
-		write(void);
-
-		void
-		setHeader(const std::string &name, const std::string &value);
-
-		bool
-		getHeader(const std::string &name, std::string &value);
-};
-
-#endif /* HTTPREQUEST_HPP_ */
+HTTPRequest::~HTTPRequest(void)
+{
+}

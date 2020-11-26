@@ -58,6 +58,15 @@ template<typename T>
 				return (*this);
 			}
 
+			Optional&
+			operator=(T &value)
+			{
+				m_present = true;
+				m_value = value;
+
+				return (*this);
+			}
+
 			bool
 			present() const
 			{
@@ -131,6 +140,15 @@ template<typename T>
 					return (m_value);
 
 				return (value);
+			}
+
+		public:
+			static Optional<T>
+			onlyIf(bool present, T &value)
+			{
+				if (present)
+					return (Optional());
+				return (Optional(value));
 			}
 	};
 

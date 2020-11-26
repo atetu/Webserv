@@ -13,35 +13,39 @@
 #ifndef HTTPMETHOD_HPP_
 # define HTTPMETHOD_HPP_
 
-# include <iostream>
-# include <vector>
+#include <util/Enum.hpp>
+#include <iostream>
+#include <string>
+#include <vector>
 
-class HTTPMethod
+class HTTPMethodHandler;
+
+class HTTPMethod :
+		public Enum<HTTPMethod>
 {
 	private:
-		std::string m_name;
-
-		static std::vector<HTTPMethod> s_DEFAULTS;
+		HTTPMethodHandler *m_handler;
 
 	public:
 		HTTPMethod(void);
-		HTTPMethod(const std::string &name);
+		HTTPMethod(HTTPMethodHandler *handler);
 		HTTPMethod(const HTTPMethod &other);
 
 		HTTPMethod&
 		operator =(const HTTPMethod &other);
 
-		const std::string&
-		name(void) const;
+		const HTTPMethodHandler&
+		handler(void) const;
 
-		static void
-		loadDefaults(void);
-
-		static const std::vector<HTTPMethod>&
-		defaults(void);
+	public:
+		static HTTPMethod *GET;
+		static HTTPMethod *HEAD;
+		static HTTPMethod *POST;
+		static HTTPMethod *PUT;
+		static HTTPMethod *DELETE;
+		static HTTPMethod *CONNECT;
+		static HTTPMethod *OPTIONS;
+		static HTTPMethod *TRACE;
 };
-
-std::ostream&
-operator <<(std::ostream &stream, const HTTPMethod &method);
 
 #endif /* HTTPMETHOD_HPP_ */
