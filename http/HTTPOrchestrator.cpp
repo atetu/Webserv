@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HTTPOrchestrator.cpp                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ecaceres <ecaceres@student.42.fr>          +#+  +:+       +#+        */
+/*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/28 14:34:10 by ecaceres          #+#    #+#             */
-/*   Updated: 2020/10/28 14:34:10 by ecaceres         ###   ########.fr       */
+/*   Updated: 2020/11/26 16:02:37 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -174,7 +174,7 @@ HTTPOrchestrator::start()
 
 	while (1)
 	{
-		readFdSet = m_fds;
+		readFdSet = m_fds;// la je ne comprends pas
 		writeFdSet = m_fds;
 
 		if (::select(m_highestFd + 1, &readFdSet, &writeFdSet, NULL, NULL) == -1)
@@ -192,13 +192,13 @@ HTTPOrchestrator::start()
 //					try
 //					{
 //						int accepted = ::accept(fd, NULL, NULL);
-//						setFd(accepted);
+//						setFd(accepted);                                            // et la non plus -> ou est read write error?
 //
 //						client *c = new client();
 //						c->response = NULL;
 //						c->last_action = seconds();
 //						c->fd = FileDescriptorWrapper::wrap(accepted);
-//						c->fd->setNonBlock();
+//						c->fd->setNonBlock();                                         //quelle est l'utilite du flag nonblock?
 //
 //						clientFds[accepted] = c;
 //					}
@@ -215,7 +215,7 @@ HTTPOrchestrator::start()
 //
 //			std::set<int> fdToRemove;
 //
-//			for (iterator it = fileReadFds.begin(); it != fileReadFds.end(); it++)
+//			for (iterator it = fileReadFds.begin(); it != fileReadFds.end(); it++)     // la je ne comprends pas trop, pas sense etre vide?
 //			{
 //				int fd = it->first;
 //
@@ -255,7 +255,7 @@ HTTPOrchestrator::start()
 //
 //				client *cli = it->second;
 //
-//				if (canRead && !cli->response)
+//				if (canRead && !cli->response)                                                               // maaloc
 //				{
 //					if (cli->fd->getReadBufferSize() != 0 || cli->fd->fillWithReceive() > 0)
 //					{
@@ -266,7 +266,7 @@ HTTPOrchestrator::start()
 //							cli->parser.consume(c);
 //							if (cli->parser.state() == HttpRequestParser::S_END)
 //							{
-//								std::string file = cli->parser.path().substr(1);
+//								std::string file = cli->parser.path().substr(1);                        // on ne peut pas ouvrir avec le premier slash?
 //
 //								int ffd = ::open(("." + cli->parser.path()).c_str(), O_RDONLY);
 //
@@ -279,7 +279,7 @@ HTTPOrchestrator::start()
 //								{
 //									header.contentType("text/html");
 //									header.contentLength(8);
-//									std::cout << "GET " + cli->parser.path() + " -> 404" << std::endl;
+//									std::cout << "GET " + cli->parser.path() + " -> 404" << std::endl;            // ca correspond a quoi ca? Juste message dans la console?
 //
 //									if (ffd != -1)
 //										::close(ffd);
@@ -324,12 +324,12 @@ HTTPOrchestrator::start()
 //									}
 //									else if (S_ISREG(st.st_mode))
 //									{
-//										header.contentType(mimeRegistry, file.substr(file.rfind(".") + 1));
+//										header.contentType(mimeRegistry, file.substr(file.rfind(".") + 1));   /// ALICE regarde ici
 //										header.contentLength(st.st_size);
 //
 //										cli->response = new HTTPResponse(HTTPVersion::HTTP_1_1, *HTTPStatus::OK, header, new HTTPResponse::FileBody(ffd));
 //									}
-//								}
+//								}                              // il manque les autres types c'est bien cela?
 //
 //								break;
 //							}
@@ -361,7 +361,7 @@ HTTPOrchestrator::start()
 //					}
 //				}
 //
-//				if (cli->last_action + 5 < now)
+//				if (cli->last_action + 5 < now)                                     // explication? 
 //				{
 //					std::cout << "timeout: " << fd << std::endl;
 //					::close(fd);

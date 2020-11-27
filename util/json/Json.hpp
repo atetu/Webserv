@@ -22,5 +22,6 @@
 #include <util/json/JsonString.hpp>
 
 #include <util/json/JsonParser.hpp>
+#include <util/json/JsonReader.hpp>
 
 #endif /* JSON_HPP_ */
