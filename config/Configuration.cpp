@@ -6,15 +6,16 @@
 /*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/28 11:33:47 by ecaceres          #+#    #+#             */
-/*   Updated: 2020/11/27 18:09:28 by alicetetu        ###   ########.fr       */
+/*   Updated: 2020/11/28 18:46:55 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <config/Configuration.hpp>
+#include <sys/errno.h>
 #include <fstream>
 #include <sstream>
+#include <config/Configuration.hpp>
 #include <exception/IOException.hpp>
-#include <sys/errno.h>
+#include <ContainerBuilder.hpp>
 #include <json/Json.hpp>
 
 // Configuration::Configuration() :
@@ -75,7 +76,7 @@ Configuration fromJsonFile(const std::string &path) throw (IOException)
 	{
 		JsonValue *serversJsonValue = root->get("servers");
 
-		if (!serversJsonValue.instanceOf<JsonArray>())
+		if (!serversJsonValue->instanceOf<JsonArray>())
 			throw Exception("Servers list is not an array");
 			
 		JsonArray *servers = serversJsonValue->cast<JsonArray>();
@@ -87,57 +88,59 @@ Configuration fromJsonFile(const std::string &path) throw (IOException)
 		{
 			ServerBlock serverBlock;
 			
-			if (!it->instanceOf<JsonObject>())
+			if (!(*it)->instanceOf<JsonObject>())
 				throw Exception("Server is not an object");
 			
-			JsonObject *server = it->cast<JsonObject>();
+			JsonObject *server = (*it)->cast<JsonObject>();
+			
+			
+			JsonValue *portValue;
 			
 			if (server->has("port"))
 			{
-				JsonValue *portValue = server.get("port");
+				portValue = server->get("port");
 				
 				if (!portValue->instanceOf<JsonNumber>())
 					throw Exception("Server port is not a number");
 				
-				serverBlock.port(portValue->cast<JsonNumber>());
+				serverBlock.port(*(portValue->cast<JsonNumber>())); //est ce que c'est ca?
 			}
 			
 			if (server->has("host"))
 			{
-				JsonValue *hostValue = server.get("host");
+				JsonValue *hostValue = server->get("host");
 				
 				if (!portValue->instanceOf<JsonString>())
 					throw Exception("Server host is not a string");
 				
-				serverBlock.host(portValue->cast<JsonString>());
+				serverBlock.host(*(portValue->cast<JsonString>()));
 			}
-	[
+	
 			
 			if (server->has("name"))
 			{
-				JsonValue *jsonValue = server.get("name");
-				
+				JsonValue *jsonValue = server->get("name");
+				std::list<std::string> serverNames;
 				if (jsonValue->instanceOf<JsonString>())
 				{
-					serverBlock.names(ContainerBuilder<std::string>()
-						.add(jsonValue->cast<JsonString>())
-						.build());
+					serverNames.push_back (*(jsonValue->cast<JsonString>()));
+					serverBlock.names(serverNames);
 				}
 				else if (jsonValue->instanceOf<JsonArray>())
 				{
 					JsonArray *names = jsonValue->cast<JsonArray>();
 					
-					JsonArray::iterator it = names.begin();
-					JsonArray::iterator ite = names.end();
+					JsonArray::iterator it = names->begin();
+					JsonArray::iterator ite = names->end();
 					
-					std::vector<std::string> serverNames;
+				//	std::vector<std::string> serverNames;
 					
 					while (it != ite)
 					{
-						if (!it->instanceOf<JsonString>())
+						if (!(*it)->instanceOf<JsonString>())
 							throw Exception("Server name is not a string value (in array)");
 						
-						serverNames.push_back(it->cast<JsonString>());
+						serverNames.push_back(*((*it)->cast<JsonString>()));
 						
 						it++;
 					}
