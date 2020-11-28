@@ -49,7 +49,6 @@ class FileDescriptorWrapper;
 #include <iterator>
 #include <map>
 #include <string>
-#include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
 
@@ -152,9 +151,6 @@ void
 HTTPOrchestrator::start()
 {
 	prepare();
-
-	MimeRegistry mimeRegistry;
-	mimeRegistry.loadFromFile("mime.json");
 
 	fd_set readFdSet;
 	fd_set writeFdSet;

@@ -13,7 +13,15 @@
 #ifndef HTTPREQUESTPARSER_HPP_
 # define HTTPREQUESTPARSER_HPP_
 
-# include <iostream>
+# include <string>
+
+# ifdef major
+#  undef major
+# endif
+
+# ifdef minor
+#  undef minor
+# endif
 
 class HTTPRequestParser
 {

@@ -28,7 +28,10 @@
 int
 main(int argc, char **argv)
 {
-	Configuration configuration(ContainerBuilder<ServerBlock>() //
+	MimeRegistry mimeRegistry;
+	mimeRegistry.loadFromFile("mime.json");
+
+	Configuration configuration(mimeRegistry, ContainerBuilder<ServerBlock>() //
 	/**/.add(ServerBlock()
 	/**//**/.port(1502)
 	/**//**/.host("127.0.0.1")

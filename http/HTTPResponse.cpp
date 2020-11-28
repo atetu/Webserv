@@ -154,6 +154,15 @@ HTTPResponse::StringBody::write(IOBuffer &fd)
 	return (1);
 }
 
+HTTPResponse::HTTPResponse(const HTTPStatus &status, const HTTPHeaderFields &headers, IBody *body) :
+		m_statusLine(HTTPVersion::HTTP_1_1, status),
+		m_headers(headers),
+		m_body(body),
+		m_state(NONE),
+		m_state_index(-1)
+{
+}
+
 HTTPResponse::HTTPResponse(const HTTPVersion &version, const HTTPStatus &status, const HTTPHeaderFields &headers, IBody *body) :
 		m_statusLine(version, status),
 		m_headers(headers),

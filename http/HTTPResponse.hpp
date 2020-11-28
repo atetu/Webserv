@@ -16,7 +16,6 @@
 #include <http/HTTPHeaderFields.hpp>
 #include <http/HTTPStatus.hpp>
 #include <http/HTTPVersion.hpp>
-#include <sys/types.h>
 #include <util/buffer/IOBuffer.hpp>
 #include <string>
 
@@ -107,6 +106,7 @@ class HTTPResponse
 		ssize_t m_state_index;
 
 	public:
+		HTTPResponse(const HTTPStatus &status, const HTTPHeaderFields &headers, IBody *body);
 		HTTPResponse(const HTTPVersion &version, const HTTPStatus &status, const HTTPHeaderFields &headers, IBody *body);
 
 		virtual

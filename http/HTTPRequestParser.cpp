@@ -12,7 +12,6 @@
 
 #include <exception/Exception.hpp>
 #include <http/HTTPRequestParser.hpp>
-#include <cctype>
 #include <string>
 
 HTTPRequestParser::HTTPRequestParser() :

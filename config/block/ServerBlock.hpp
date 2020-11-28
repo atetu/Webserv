@@ -60,6 +60,12 @@ class ServerBlock
 		ServerBlock&
 		root(std::string root);
 
+		inline const Optional<std::string>&
+		root(void) const
+		{
+			return (m_root);
+		}
+
 		ServerBlock&
 		locations(std::vector<LocationBlock> locations);
 

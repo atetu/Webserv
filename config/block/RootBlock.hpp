@@ -13,12 +13,23 @@
 #ifndef ROOTBLOCK_HPP_
 # define ROOTBLOCK_HPP_
 
+#include <util/Optional.hpp>
+#include <string>
+
 class RootBlock
 {
 	public:
 		RootBlock();
 		virtual
 		~RootBlock();
+
+		inline Optional<std::string>&
+		root(void) const
+		{
+			static Optional<std::string> empty;
+
+			return (empty);
+		}
 };
 
 #endif /* ROOTBLOCK_HPP_ */

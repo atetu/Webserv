@@ -14,6 +14,7 @@
 # define IOBUFFER_HPP_
 
 #include <util/buffer/BaseBuffer.hpp>
+#include <stdlib.h>
 
 class IOBuffer :
 		public BaseBuffer

@@ -57,8 +57,11 @@ class URL
 		const Optional<std::string>&
 		fragment() const;
 
-		URL
-		parse(const std::string &protocol, const std::string host, const std::string &line);
+		bool
+		filename(std::string &out) const;
+
+		bool
+		extension(std::string &out) const;
 };
 
 #endif /* URL_HPP_ */

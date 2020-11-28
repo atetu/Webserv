@@ -47,6 +47,12 @@ class LocationBlock
 		LocationBlock&
 		root(std::string root);
 
+		inline const Optional<std::string>&
+		root(void) const
+		{
+			return (m_root);
+		}
+
 		LocationBlock&
 		listing(bool listing);
 

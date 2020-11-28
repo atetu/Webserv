@@ -14,6 +14,7 @@
 # define CONFIGURATION_HPP_
 
 #include <config/block/ServerBlock.hpp>
+#include <http/mime/MimeRegistry.hpp>
 #include <vector>
 
 class Configuration
@@ -22,11 +23,12 @@ class Configuration
 		typedef std::vector<ServerBlock>::const_iterator siterator;
 
 	private:
+		MimeRegistry m_mimeRegistry;
 		std::vector<ServerBlock> m_servers;
 
 	public:
 		Configuration(void);
-		Configuration(std::vector<ServerBlock> servers);
+		Configuration(const MimeRegistry &mimeRegistry, const std::vector<ServerBlock> &servers);
 		Configuration(const Configuration &other);
 
 		virtual
@@ -34,6 +36,12 @@ class Configuration
 
 		Configuration&
 		operator=(const Configuration &other);
+
+		inline const MimeRegistry&
+		mimeRegistry(void) const
+		{
+			return (m_mimeRegistry);
+		}
 
 		const std::vector<ServerBlock>&
 		servers(void) const;

@@ -13,7 +13,6 @@
 #include <exception/IOException.hpp>
 #include <sys/errno.h>
 #include <sys/socket.h>
-#include <sys/types.h>
 #include <sys/unistd.h>
 #include <util/buffer/IOBuffer.hpp>
 #include <algorithm>

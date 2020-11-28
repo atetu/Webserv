@@ -98,40 +98,35 @@ URL::operator =(const URL &other)
 	return (*this);
 }
 
-URL
-URL::parse(const std::string &protocol, const std::string host, const std::string &line)
+bool
+URL::filename(std::string &out) const
 {
-	int port = 80;
-	std::string path;
+	if (m_path.empty())
+		return (false);
 
-	bool hasQueryParameters = false;
-	bool asKey = false;
-	std::string parameterKey;
-	std::string parameterValue;
-	std::map<std::string, std::string> queryParameters;
+	std::string::size_type lastSlashPos = m_path.rfind("/");
 
-	bool hasFragment = false;
-	std::string fragment;
+	if (lastSlashPos != std::string::npos)
+		out = m_path.substr(lastSlashPos + 1);
+	else
+		out = m_path;
 
-	std::string::const_iterator it = line.begin();
-	std::string::const_iterator ite = line.end();
+	return (true);
+}
 
-	while (it != ite)
-	{
-		char c = *it;
+bool
+URL::extension(std::string &out) const
+{
+	std::string filename;
+	if (!URL::filename(filename))
+		return (false);
 
-		if (hasQueryParameters || c == '?')
-		{
-			if (hasQueryParameters)
-			{
-				parameterKey += c;
-			}
+	std::string::size_type lastDotPos = m_path.rfind(".");
 
-			hasQueryParameters = true;
-		}
+	if (lastDotPos == std::string::npos)
+		return (false);
 
-		it++;
-	}
+	out = filename.substr(lastDotPos + 1);
 
-	return (URL(protocol, host, port, path, Optional<std::map<std::string, std::string> >::onlyIf(hasQueryParameters, queryParameters), Optional<std::string>::onlyIf(hasFragment, fragment)));
+	return (true);
 }

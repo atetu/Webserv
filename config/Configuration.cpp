@@ -13,16 +13,19 @@
 #include <config/Configuration.hpp>
 
 Configuration::Configuration() :
+		m_mimeRegistry(),
 		m_servers()
 {
 }
 
-Configuration::Configuration(std::vector<ServerBlock> servers) :
+Configuration::Configuration(const MimeRegistry &mimeRegistry, const std::vector<ServerBlock> &servers) :
+		m_mimeRegistry(mimeRegistry),
 		m_servers(servers)
 {
 }
 
 Configuration::Configuration(const Configuration &other) :
+		m_mimeRegistry(other.m_mimeRegistry),
 		m_servers(other.m_servers)
 {
 }
