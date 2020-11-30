@@ -12,10 +12,33 @@
 
 #include <config/block/RootBlock.hpp>
 
-RootBlock::RootBlock()
+RootBlock::RootBlock():
+		m_serverBlockList(),
+		m_CGIList()
 {
-	// TODO Auto-generated constructor stub
+}
 
+RootBlock::RootBlock(std::list<ServerBlock> serverBlockList) :
+		m_serverBlockList(serverBlockList),
+		m_CGIList()
+{
+}
+
+RootBlock::RootBlock(const RootBlock &other) :
+		m_serverBlockList(other.m_serverBlockList),
+		m_CGIList(other.m_CGIList)
+{
+}
+
+RootBlock&
+RootBlock::operator =(const RootBlock &other)
+{
+	if (this != &other)
+	{
+		m_serverBlockList = other.m_serverBlockList;
+		m_CGIList = other.m_CGIList;
+	}
+	return (*this);
 }
 
 RootBlock::~RootBlock()
@@ -23,3 +46,16 @@ RootBlock::~RootBlock()
 	// TODO Auto-generated destructor stub
 }
 
+RootBlock &
+RootBlock::server(const std::list<ServerBlock> &serverBlockList)
+{
+	m_serverBlockList = serverBlockList;
+	return (*this);
+}
+
+RootBlock &
+RootBlock::cgi(const std::list<CGI> &CGIList)
+{
+	m_CGIList = CGIList;
+	return (*this);
+}

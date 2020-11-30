@@ -6,7 +6,7 @@
 /*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/28 11:34:45 by ecaceres          #+#    #+#             */
-/*   Updated: 2020/11/29 16:40:48 by alicetetu        ###   ########.fr       */
+/*   Updated: 2020/11/30 16:02:34 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 # define SERVERBLOCK_HPP_
 
 #include <config/block/LocationBlock.hpp>
+#include <config/block/ErrorPageBlock.hpp>
 #include <util/Optional.hpp>
 #include <util/unit/DataSize.hpp>
 #include <iostream>
@@ -28,8 +29,9 @@ class ServerBlock
 	//	Optional<std::string> m_name; // a retirer  si j'ai bien compris
 		Optional<std::list<std::string> > m_names;
 		Optional<DataSize> m_maxBodySize;
-		Optional<std::string> m_root;
+		Optional<std::string> m_root;	
 		Optional<std::vector<LocationBlock> > m_locations;
+		Optional<std::vector<ErrorPageBlock> > m_errors;
 
 	public:
 		ServerBlock();
@@ -64,6 +66,9 @@ class ServerBlock
 
 		ServerBlock&
 		locations(std::vector<LocationBlock> locations);
+
+		ServerBlock&
+		errors(std::vector<ErrorPageBlock> errors);
 
 	public:
 		static const std::string DEFAULT_HOST;

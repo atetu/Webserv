@@ -1,36 +1,42 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   CGI.hpp                                            :+:      :+:    :+:   */
+/*   ErrorPageBlock.hpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2020/10/28 11:34:15 by ecaceres          #+#    #+#             */
-/*   Updated: 2020/11/30 13:51:23 by alicetetu        ###   ########.fr       */
+/*   Created: 2020/11/30 14:26:30 by alicetetu         #+#    #+#             */
+/*   Updated: 2020/11/30 15:40:40 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef CGI_HPP_
-# define CGI_HPP_
+#ifndef ERRORPAGEBLOCK_HPP_
+# define ERRORPAGEBLOCK_HPP_
 
 #include <util/Optional.hpp>
 #include <string>
 
-class CGI
+class ErrorPageBlock
 {
-	public: // pourquoi public?
-		std::string m_name;
-		Optional<std::string> m_path;
+	private:
+		std::string m_path;
+		Optional<int> m_errorCode;
 
 	public:
-		CGI();
-		CGI(const CGI &other);
+		ErrorPageBlock(void);
+		ErrorPageBlock(const ErrorPageBlock &other);
 
 		virtual
-		~CGI();
+		~ErrorPageBlock();
 
-		CGI&
-		operator=(const CGI &other);
+		ErrorPageBlock&
+		operator=(const ErrorPageBlock &other);
+
+		ErrorPageBlock&
+		path(std::string path);
+		
+		ErrorPageBlock&
+		code(int code);
 };
 
-#endif /* SRC_CONFIG_BLOCK_CGI_HPP_ */
+#endif

@@ -6,7 +6,7 @@
 #    By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2019/08/13 15:11:33 by ecaceres          #+#    #+#              #
-#    Updated: 2020/11/27 11:50:13 by alicetetu        ###   ########.fr        #
+#    Updated: 2020/11/30 16:18:47 by alicetetu        ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -26,62 +26,8 @@ FIX_HEADERS_DIR			= .
 FIX_LIBRARIES_DIR		= .
 
 TARGET					= webserv
-SOURCES					= ./config/block/CGI.cpp\
-							./config/block/LocationBlock.cpp\
-							./config/block/ServerBlock.cpp\
-							./config/Configuration.cpp\
-							./exception/Exception.cpp\
-							./exception/IllegalArgumentException.cpp\
-							./exception/IllegalStateException.cpp\
-							./exception/IOException.cpp\
-							./exception/NoSuchElementException.cpp\
-							./exception/NullPointerException.cpp\
-							./exception/RuntimeException.cpp\
-							./http/handler/methods/ConnectHandler.cpp\
-							./http/handler/methods/DeleteHandler.cpp\
-							./http/handler/methods/GetHandler.cpp\
-							./http/HTTP.cpp\
-							./http/HTTPDate.cpp\
-							./http/HTTPHeaderFields.cpp\
-							./http/HTTPMethod.cpp\
-							./http/HTTPOrchestrator.cpp\
-							./http/HttpRequest.cpp\
-							./http/HttpRequestParser.cpp\
-							./http/HttpResponse.cpp\
-							./http/HTTPServer.cpp\
-							./http/HTTPStatus.cpp\
-							./http/HTTPVersion.cpp\
-							./http/mime/Mime.cpp\
-							./http/mime/MimeRegistry.cpp\
-							./io/Socket.cpp\
-							./io/SocketServer.cpp\
-							./server/WebServer.cpp\
-							./util/Closable.cpp\
-							./util/json/JsonArray.cpp\
-							./util/json/JsonBoolean.cpp\
-							./util/json/JsonEnumValues.cpp\
-							./util/json/JsonException.cpp\
-							./util/json/JsonLocation.cpp\
-							./util/json/JsonNull.cpp\
-							./util/json/JsonObject.cpp\
-							./util/json/JsonParseException.cpp\
-							./util/json/JsonParser.cpp\
-							./util/json/JsonReader.cpp\
-							./util/json/JsonTokenizer.cpp\
-							./util/json/JsonUtils.cpp\
-							./util/json/JsonValue.cpp\
-							./util/log/Logger.cpp\
-							./util/log/LoggerFactory.cpp\
-							./util/log/LoggerImpl.cpp\
-							./util/log/LogLevel.cpp\
-							./util/Objects.cpp\
-							./util/options/Option.cpp\
-							./util/options/OptionParser.cpp\
-							./util/options/ParserException.cpp\
-							./util/unit/DataSize.cpp\
-							./util/unit/DataUnit.cpp\
-							./webserv.cpp
-HEADERS					= 
+SOURCES					= ./util/options/OptionParser.cpp ./util/options/Option.cpp ./util/options/ParserException.cpp ./util/unit/DataSize.cpp ./util/unit/DataUnit.cpp ./util/Closable.cpp ./util/Objects.cpp ./util/URL.cpp ./util/json/JsonBoolean.cpp ./util/json/JsonReader.cpp ./util/json/JsonUtils.cpp ./util/json/JsonTokenizer.cpp ./util/json/JsonEnumValues.cpp ./util/json/JsonLocation.cpp ./util/json/JsonNull.cpp ./util/json/JsonParser.cpp ./util/json/JsonException.cpp ./util/json/JsonValue.cpp ./util/json/JsonArray.cpp ./util/json/JsonParseException.cpp ./util/json/JsonObject.cpp ./util/log/LoggerImpl.cpp ./util/log/LoggerFactory.cpp ./util/log/Logger.cpp ./util/log/LogLevel.cpp ./util/buffer/IOBuffer.cpp ./config/Configuration.cpp ./config/block/ErrorPageBlock.cpp ./config/block/RootBlock.cpp ./config/block/ServerBlock.cpp ./config/block/LocationBlock.cpp ./config/block/MimeBlock.cpp ./config/block/CGI.cpp ./io/Socket.cpp ./io/SocketServer.cpp ./webserv.cpp ./server/WebServer.cpp ./http/handler/methods/ConnectHandler.cpp ./http/handler/methods/GetHandler.cpp ./http/handler/methods/DeleteHandler.cpp ./http/HTTPMethod.cpp ./http/HTTPServer.cpp ./http/HTTPHeaderFields.cpp ./http/HTTPResponse.cpp ./http/HTTP.cpp ./http/HTTPClient.cpp ./http/mime/MimeRegistry.cpp ./http/mime/Mime.cpp ./http/HTTPDate.cpp ./http/HTTPStatus.cpp ./http/HTTPVersion.cpp ./http/HTTPRequest.cpp ./exception/IllegalStateException.cpp ./exception/Exception.cpp ./exception/NoSuchElementException.cpp ./exception/RuntimeException.cpp ./exception/IOException.cpp ./exception/NullPointerException.cpp ./exception/IllegalArgumentException.cpp
+HEADERS					= ./os/detect_platform.h
 LIBRARIES				= 
 LIBRARIES_BIN			= 
 
@@ -93,7 +39,7 @@ FRAMEWORKS				=
 FLAGS					= -std=c++98 -g3 # -fsanitize=address
 TARGET_REQUIRED_FLAGS	= -I.
 
-TOOL_BASE64_DECODE		= base64 -d
+TOOL_BASE64_DECODE		= base64 -D
 
 MAKE_PREFIX				= "$(COLOR_LIGHT_MAGENTA)[$(COLOR_LIGHT_GREEN) make: $(TARGET) $(COLOR_LIGHT_MAGENTA)]"
 

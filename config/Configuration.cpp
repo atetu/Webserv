@@ -6,7 +6,7 @@
 /*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/28 11:33:47 by ecaceres          #+#    #+#             */
-/*   Updated: 2020/11/30 12:10:34 by alicetetu        ###   ########.fr       */
+/*   Updated: 2020/11/30 17:29:40 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,6 +59,20 @@ Configuration::~Configuration()
 {
 }
 
+Configuration&
+Configuration::root(RootBlock &rootBlock)
+{
+	m_rootBlock = rootBlock;
+	
+	return (*this);
+}
+
+Configuration&
+Configuration::build()
+{
+	return (*this);
+}
+
 // Configuration&
 // Configuration::operator=(const Configuration &other)
 // {
@@ -83,13 +97,14 @@ Configuration Configuration::setMime()
 Configuration
 Configuration::fromJsonFile(const std::string &path) throw (IOException)
 {
-	std::cout << "ICI\n";
 	JsonObject *object = JsonReader::fromFile(path).readObject();
 
 	if (!object->instanceOf<JsonObject>())
     	throw Exception("Expected JSON Object, but got: " + object->typeString());
     
 	JsonObject *root = object->cast<JsonObject>(); // pourquoi le caster?
+
+	RootBlock rootBlock;
 
 	if (root->has("servers"))
 	{
@@ -102,6 +117,8 @@ Configuration::fromJsonFile(const std::string &path) throw (IOException)
 		
 		JsonArray::iterator it = servers->begin();
 		JsonArray::iterator ite = servers->end();
+		
+		std::list<ServerBlock> serverBlockList;
 		
 		while (it != ite)
 		{
@@ -120,27 +137,6 @@ Configuration::fromJsonFile(const std::string &path) throw (IOException)
 			BIND("host", JsonString, std::string, {
 				serverBlock.host(value);
 			});
-			
-			// if (server->has("port"))
-			// {
-			// 	portValue = server->get("port");
-				
-			// 	if (!portValue->instanceOf<JsonNumber>())
-			// 		throw Exception("Server port is not a number");
-				
-			// 	serverBlock.port(*(portValue->cast<JsonNumber>())); //est ce que c'est ca?
-			// }
-			
-			// if (server->has("host"))
-			// {
-			// 	JsonValue *hostValue = server->get("host");
-				
-			// 	if (!portValue->instanceOf<JsonString>())
-			// 		throw Exception("Server host is not a string");
-				
-			// 	serverBlock.host(*(portValue->cast<JsonString>()));
-			// }
-	
 			
 			if (server->has("name"))
 			{
@@ -182,16 +178,52 @@ Configuration::fromJsonFile(const std::string &path) throw (IOException)
 			});
 			
 
-			// if (server->has("errorPages")) // ou est ce qu' on le case ? on est d'accord que c'est un objet s'il y a des {}? est ce qqu'on peut avoir un iterateur pour parcourir dans ce cas la?
-			// {
-			// 	JsonValue *errorValues = server->get("errorPages");
+			if (server->has("errorPages"))
+			{
+				JsonValue *errorValues = server->get("errorPages");
 
-			// 	if (!errorValues->instanceOf<JsonObject>())
-    		// 		throw Exception("Expected JSON Object, but got: " + object->typeString());
+				if (!errorValues->instanceOf<JsonObject>())
+    				throw Exception("Expected JSON Object, but got: " + object->typeString());
     
-			// 	JsonObject *error = errorValues->cast<JsonObject>(); // pourquoi le caster?
+				JsonObject *error = errorValues->cast<JsonObject>();
+
+				JsonObject::iterator error_it = error->begin();
+				JsonObject::iterator error_ite = error->end();
+				
+				std::vector<std::string> errorNames;
+				std::vector<ErrorPageBlock> errorBlocks;
+				
+				while (error_it != error_ite)
+				{	
+					errorNames.push_back(error_it->first);
+					error_it++;
+				}
+				for (std::vector<std::string>::iterator vec_it = errorNames.begin(); vec_it != errorNames.end() ; ++vec_it)
+				{
+					std::string::const_iterator str_it = (*vec_it).begin();
+   					while (str_it != (*vec_it).end() && std::isdigit(*str_it))
+						++str_it;
+					if (str_it != (*vec_it).end())
+						throw Exception("Number excepted for error key");
+					
+					std::istringstream iss(*vec_it);
+					int n;
+					iss >> n;
+				
+					ErrorPageBlock errorBlockElement;
+					errorBlockElement.code(n);
+					
+					JsonValue *errorFile = error->get(*vec_it);
+					if (!errorFile->instanceOf<JsonString>())
+						throw Exception("Error file is not a string value (in object)");
+				
+					errorBlockElement.path(*(errorFile->cast<JsonString>()));
+
+					errorBlocks.push_back(errorBlockElement);
+				}
+				serverBlock.errors(errorBlocks);
 		
-			// }
+			}
 			
 			BIND("root", JsonString, std::string,   // pas sure vu que c'est apres une virgule
 				{serverBlock.root(value);
@@ -209,12 +241,13 @@ Configuration::fromJsonFile(const std::string &path) throw (IOException)
 				
 				JsonObject::iterator locations_it = locations->begin();
 				JsonObject::iterator locations_ite = locations->end();
+				
 				std::vector<std::string> locationsNames;
 				std::vector<LocationBlock> locationBlocks;
+				
 				while (locations_it != locations_ite)
 				{	
 					locationsNames.push_back(locations_it->first);
-					std::cout << locations_it->first << " = " << locations_it->second << std::endl;
 					locations_it++;
 				}
 				for(std::vector<std::string>::iterator vec_it = locationsNames.begin(); vec_it != locationsNames.end() ; ++vec_it)
@@ -329,14 +362,24 @@ Configuration::fromJsonFile(const std::string &path) throw (IOException)
 					
 					if (LocationObject->has("cgi"))
 					{
+						JsonValue *jsonValue = LocationObject->get("cgi");
+						if (!jsonValue->instanceOf<JsonString>())
+    						throw Exception("Expected JSON String, but got: " + jsonValue->typeString());
+						LocationBlockElement.cgi(*(jsonValue->cast<JsonString>()));
 					}
 					
 					locationBlocks.push_back(LocationBlockElement);
 				}
 				serverBlock.locations(locationBlocks);
 			}
+			
+			serverBlockList.push_back(serverBlock);
+			it++;
+			
 		}
 
+		
+		rootBlock.server(serverBlockList);
 
 			
 			// other keys
@@ -344,10 +387,14 @@ Configuration::fromJsonFile(const std::string &path) throw (IOException)
 			// if (!serverBlock.port().present())
 		//		throw Exception("No name has been specified for server");
 				
-			
-			it++;
-		}
-	}
+		
 	
-	return (Configuration());
+	}
+
+	
+
+	return (Configuration(path)
+				.root(rootBlock)
+				.setMime()
+				.build());
 }

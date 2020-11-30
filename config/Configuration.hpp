@@ -6,7 +6,7 @@
 /*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/28 11:33:47 by ecaceres          #+#    #+#             */
-/*   Updated: 2020/11/30 09:37:45 by alicetetu        ###   ########.fr       */
+/*   Updated: 2020/11/30 16:58:38 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@
 #include <config/block/MimeBlock.hpp>
 #include <config/block/RootBlock.hpp>
 #include <config/block/ServerBlock.hpp>
+#include <config/block/ErrorPageBlock.hpp>
 #include <util/log/Logger.hpp>
 #include <util/log/LoggerFactory.hpp>
 #include <http/mime/MimeRegistry.hpp>
@@ -58,6 +59,8 @@ class Configuration
 		 servers(void) const;
 
 		Configuration setMime();
+		Configuration & root(RootBlock &rootBlock);
+		Configuration & build();
 
 	public:
         static Configuration 

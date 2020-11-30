@@ -26,6 +26,7 @@ class LocationBlock
 		Optional<std::string> m_root;
 		Optional<bool> m_listing;
 		Optional<std::vector<std::string> > m_indexFiles;
+		Optional<std::string> m_cgi;
 
 	public:
 		LocationBlock(void);
@@ -52,6 +53,9 @@ class LocationBlock
 
 		LocationBlock&
 		index(std::vector<std::string> files);
+
+		LocationBlock&
+		cgi(std::string cgi);
 
 	public:
 		static LocationBlock DEFAULT;

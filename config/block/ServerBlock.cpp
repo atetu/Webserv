@@ -6,7 +6,7 @@
 /*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/28 11:34:45 by ecaceres          #+#    #+#             */
-/*   Updated: 2020/11/29 16:49:54 by alicetetu        ###   ########.fr       */
+/*   Updated: 2020/11/30 16:02:14 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,8 @@ ServerBlock::ServerBlock() :
 		m_names(),
 		m_maxBodySize(),
 		m_root(),
-		m_locations()
+		m_locations(),
+		m_errors()
 {
 }
 
@@ -30,7 +31,8 @@ ServerBlock::ServerBlock(const ServerBlock &other) :
 		m_names(other.m_names),
 		m_maxBodySize(other.m_maxBodySize),
 		m_root(other.m_root),
-		m_locations(other.m_locations)
+		m_locations(other.m_locations),
+		m_errors(other.m_errors)
 {
 }
 
@@ -49,6 +51,7 @@ ServerBlock::operator =(const ServerBlock &other)
 		m_maxBodySize = other.m_maxBodySize;
 		m_root = other.m_root;
 		m_locations = other.m_locations;
+		m_errors = (other.m_errors);
 	}
 
 	return (*this);
@@ -110,6 +113,14 @@ ServerBlock&
 ServerBlock::locations(std::vector<LocationBlock> locations)
 {
 	m_locations.set(locations);
+
+	return (*this);
+}
+
+ServerBlock&
+ServerBlock::errors(std::vector<ErrorPageBlock> errors)
+{
+	m_errors.set(errors);
 
 	return (*this);
 }
