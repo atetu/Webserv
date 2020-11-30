@@ -6,23 +6,23 @@
 /*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/19 15:34:02 by ecaceres          #+#    #+#             */
-/*   Updated: 2020/11/27 14:18:50 by alicetetu        ###   ########.fr       */
+/*   Updated: 2020/11/29 17:36:45 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-//#include <config/block/LocationBlock.hpp>
-//#include <config/block/ServerBlock.hpp>
-//#include <config/Configuration.hpp>
-//#include <exception/Exception.hpp>
-//#include <http/HTTPMethod.hpp>
-//#include <http/HTTPOrchestrator.hpp>
-//#include <util/ContainerBuilder.hpp>
-//#include <util/log/LoggerFactory.hpp>
-//#include <util/unit/DataSize.hpp>
-#include "util/options/Option.hpp"
-#include "util/options/OptionParser.hpp"
-#include "util/options/ParserException.hpp"
-#include "util/json/Json.hpp"
+// #include <config/block/LocationBlock.hpp>
+// #include <config/block/ServerBlock.hpp>
+#include "config/Configuration.hpp"
+// #include <exception/Exception.hpp>
+// #include <http/HTTPMethod.hpp>
+// #include <http/HTTPOrchestrator.hpp>
+// #include <util/ContainerBuilder.hpp>
+// #include <util/log/LoggerFactory.hpp>
+// #include <util/unit/DataSize.hpp>
+#include <util/options/Option.hpp>
+#include <util/options/OptionParser.hpp>
+#include <util/options/ParserException.hpp>
+#include <util/json/Json.hpp>
 #include <csignal>
 #include <iostream>
 #include <string>
@@ -96,7 +96,7 @@ main(int argc, char **argv)
 		// CHECK CONF FILE
 	}
 	
-	JsonReader reader = JsonReader::fromFile(configFile);
+	Configuration::fromJsonFile(configFile);
 
 	
 // 	Configuration configuration(ContainerBuilder<ServerBlock>() //

@@ -6,17 +6,21 @@
 /*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/28 11:33:47 by ecaceres          #+#    #+#             */
-/*   Updated: 2020/11/27 17:53:13 by alicetetu        ###   ########.fr       */
+/*   Updated: 2020/11/30 09:37:45 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef CONFIGURATION_HPP_
 # define CONFIGURATION_HPP_
 
-#include <config/block/Block.hpp>
-#include <log/Logger.hpp>
-#include <log/LoggerFactory.hpp>
-#include <mime/MimeRegistry.hpp>
+#include <config/block/CGI.hpp>
+#include <config/block/LocationBlock.hpp>
+#include <config/block/MimeBlock.hpp>
+#include <config/block/RootBlock.hpp>
+#include <config/block/ServerBlock.hpp>
+#include <util/log/Logger.hpp>
+#include <util/log/LoggerFactory.hpp>
+#include <http/mime/MimeRegistry.hpp>
 #include <vector>
 
 class Configuration
@@ -28,7 +32,7 @@ class Configuration
 		typedef std::vector<ServerBlock>::const_iterator siterator;
 
 	private:
-	//	std::vector<ServerBlock> m_servers;
+		std::vector<ServerBlock> m_servers;
 		std::string m_file;
     	MimeRegistry m_mimeRegistry;
 		//mimeRegistry.loadFromFile("mime.json");
@@ -37,7 +41,7 @@ class Configuration
 		// 	list<CGIBlock>
 		// 	list<ServerBlock>
 		// }
-
+	
 	public:
 		Configuration(void);
 		Configuration(const std::string &file);
@@ -50,13 +54,14 @@ class Configuration
 		Configuration&
 		operator=(const Configuration &other);
 
-		// const std::vector<ServerBlock>&
-		// servers(void) const;
+		const std::vector<ServerBlock>&
+		 servers(void) const;
 
 		Configuration setMime();
 
 	public:
-        static Configuration fromJsonFile(const std::string &path);
+        static Configuration 
+		fromJsonFile(const std::string &path) throw (IOException);;
 };
 
 #endif /* CONFIGURATION_HPP_ */

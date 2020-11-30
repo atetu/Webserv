@@ -6,7 +6,7 @@
 /*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/28 11:34:45 by ecaceres          #+#    #+#             */
-/*   Updated: 2020/11/28 18:39:14 by alicetetu        ###   ########.fr       */
+/*   Updated: 2020/11/29 16:49:54 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,7 +84,7 @@ ServerBlock::names(std::list<std::string> names)
 	return (*this);
 }
 
-const Optional<std::list<std::string>>
+const Optional<std::list<std::string> >
 ServerBlock::names(void) const
 {
 	return (m_names);
