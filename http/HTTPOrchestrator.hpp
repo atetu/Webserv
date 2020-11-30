@@ -56,6 +56,9 @@ class HTTPOrchestrator
 		void
 		clearFd(int fd);
 
+		void
+		printSelectOutput(fd_set &readFds, fd_set &writeFds);
+
 	public:
 		void
 		start();

@@ -1,31 +1,38 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   MethodHandler.hpp                                  :+:      :+:    :+:   */
+/*   IReadableBuffer.hpp                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ecaceres <ecaceres@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2020/11/25 17:59:33 by ecaceres          #+#    #+#             */
-/*   Updated: 2020/11/25 17:59:33 by ecaceres         ###   ########.fr       */
+/*   Created: 2020/11/29 18:19:03 by ecaceres          #+#    #+#             */
+/*   Updated: 2020/11/29 18:19:03 by ecaceres         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef HTTPMETHODHANDLER_HPP_
-# define HTTPMETHODHANDLER_HPP_
+#ifndef IREADABLEBUFFER_HPP_
+# define IREADABLEBUFFER_HPP_
 
-class HTTPRequest;
-class HTTPResponse;
+#include <stddef.h>
+#include <util/buffer/IBuffer.hpp>
 
-class HTTPMethodHandler
+class IReadableBuffer :
+		public IBuffer
 {
 	public:
 		virtual
-		~HTTPMethodHandler()
+		~IReadableBuffer(void)
 		{
 		}
 
-		virtual HTTPResponse*
-		handle(HTTPRequest &request) = 0;
+		virtual bool
+		next(char &c) = 0;
+
+		virtual bool
+		peek(char &c) const = 0;
+
+		virtual bool
+		next(std::string &str, bool crlf = false) = 0;
 };
 
-#endif /* HTTPMETHODHANDLER_HPP_ */
+#endif /* IREADABLEBUFFER_HPP_ */

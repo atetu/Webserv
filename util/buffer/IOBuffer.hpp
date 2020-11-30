@@ -21,11 +21,13 @@ class IOBuffer :
 {
 	private:
 		int m_fd;
-		size_t m_maxSize;
+		bool m_closeOnDestroy;
+		size_type m_maxSize;
+		bool m_readEverything;
 
 	public:
 		IOBuffer(void);
-		IOBuffer(int fd, size_t maxSize = std::string::npos);
+		IOBuffer(int fd, bool closeOnDestroy = true, size_type maxSize = std::string::npos);
 		IOBuffer(const IOBuffer &other);
 
 		virtual
@@ -34,9 +36,26 @@ class IOBuffer :
 		IOBuffer&
 		operator =(const IOBuffer &other);
 
-		inline operator int(void) const
+		inline
+		operator int(void) const
 		{
 			return (m_fd);
+		}
+
+		void
+		storeFrom(IOBuffer &buffer, bool andClear = true)
+		{
+			size_type capacity = std::min(this->capacity(), buffer.capacity());
+
+			if (capacity)
+			{
+				m_storage += buffer.storage().substr(0, capacity);
+
+				buffer.storage().erase(buffer.storage().begin(), buffer.storage().begin() + capacity);
+			}
+
+			if (andClear)
+				buffer.clear();
 		}
 
 		ssize_t
@@ -52,7 +71,22 @@ class IOBuffer :
 		send(size_t len = 2048);
 
 		size_t
-		capacity();
+		capacity() const;
+
+		void
+		close(void);
+
+		inline bool
+		hasReadEverything() const
+		{
+			return (m_readEverything);
+		}
+
+		inline int
+		fd() const
+		{
+			return (m_fd);
+		}
 };
 
 #endif /* IOBUFFER_HPP_ */

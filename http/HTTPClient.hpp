@@ -14,27 +14,71 @@
 # define HTTPCLIENT_HPP_
 
 #include <http/HTTPRequestParser.hpp>
-
-class IOBuffer;
-
-class HTTPRequest;
-class HTTPResponse;
+#include <util/buffer/IOBuffer.hpp>
+#include <http/HTTPRequest.hpp>
+#include <http/HTTPResponse.hpp>
 
 class HTTPClient
 {
 	private:
-		IOBuffer *m_in;
-		IOBuffer *m_out;
+		int m_fd;
+		IOBuffer m_in;
+		IOBuffer m_out;
 		HTTPRequestParser m_parser;
 		unsigned long m_lastAction;
 		HTTPRequest *m_request;
 		HTTPResponse *m_response;
 
+		HTTPClient(void);
+		HTTPClient(const HTTPClient &other);
+
+		HTTPClient&
+		operator =(const HTTPClient &other);
+
 	public:
-		HTTPClient();
+		HTTPClient(int fd);
 
 		virtual
 		~HTTPClient();
+
+		void
+		updateLastAction();
+
+		inline IOBuffer&
+		in()
+		{
+			return (m_in);
+		}
+
+		inline IOBuffer&
+		out()
+		{
+			return (m_out);
+		}
+
+		inline HTTPRequestParser&
+		parser()
+		{
+			return (m_parser);
+		}
+
+		inline unsigned long&
+		lastAction()
+		{
+			return (m_lastAction);
+		}
+
+		inline HTTPRequest*&
+		request(void)
+		{
+			return (m_request);
+		}
+
+		inline HTTPResponse*&
+		response(void)
+		{
+			return (m_response);
+		}
 };
 
 #endif /* HTTPCLIENT_HPP_ */

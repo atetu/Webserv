@@ -34,6 +34,8 @@ const std::string HTTPHeaderFields::TRANSFER_ENCODING/*	*/= "Transfer-Encoding";
 const std::string HTTPHeaderFields::USER_AGENT/*		*/= "User-Agent";
 const std::string HTTPHeaderFields::WWW_AUTHENTICATE/*	*/= "WWW-Authenticate";
 
+const std::string HTTPHeaderFields::MIME_HTML/*	        */= "text/html";
+
 HTTPHeaderFields::HTTPHeaderFields(void) :
 		m_storage()
 {
@@ -251,6 +253,12 @@ HTTPHeaderFields&
 HTTPHeaderFields::wwwAuthenticate(const std::string &value)
 {
 	return (set(WWW_AUTHENTICATE, value));
+}
+
+HTTPHeaderFields&
+HTTPHeaderFields::html(void)
+{
+	return (contentType(MIME_HTML));
 }
 
 HTTPHeaderFields&

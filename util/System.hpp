@@ -1,31 +1,34 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   MethodHandler.hpp                                  :+:      :+:    :+:   */
+/*   System.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ecaceres <ecaceres@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2020/11/25 17:59:33 by ecaceres          #+#    #+#             */
-/*   Updated: 2020/11/25 17:59:33 by ecaceres         ###   ########.fr       */
+/*   Created: 2020/11/29 20:48:01 by ecaceres          #+#    #+#             */
+/*   Updated: 2020/11/29 20:48:01 by ecaceres         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef HTTPMETHODHANDLER_HPP_
-# define HTTPMETHODHANDLER_HPP_
+#ifndef SYSTEM_HPP_
+# define SYSTEM_HPP_
 
-class HTTPRequest;
-class HTTPResponse;
-
-class HTTPMethodHandler
+class System
 {
+	private:
+		System();
+		System(const System &other);
+
+		System&
+		operator =(const System &other);
+
 	public:
 		virtual
-		~HTTPMethodHandler()
-		{
-		}
+		~System();
 
-		virtual HTTPResponse*
-		handle(HTTPRequest &request) = 0;
+	public:
+		static unsigned long
+		currentTimeSeconds(void);
 };
 
-#endif /* HTTPMETHODHANDLER_HPP_ */
+#endif /* SYSTEM_HPP_ */

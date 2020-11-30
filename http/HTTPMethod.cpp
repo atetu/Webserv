@@ -51,3 +51,9 @@ HTTPMethod::operator =(const HTTPMethod &other)
 
 	return (*this);
 }
+
+HTTPMethodHandler&
+HTTPMethod::handler(void) const
+{
+	return (*m_handler);
+}

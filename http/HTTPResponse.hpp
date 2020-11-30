@@ -46,21 +46,34 @@ class HTTPResponse
 				format(void) const;
 		};
 
+		/**
+		 * Base body class.
+		 */
 		class IBody
 		{
 			public:
 				virtual
 				~IBody();
 
+				/**
+				 * Write to the output information that will be sent to the socket.
+				 *
+				 * @param buffer IO Buffer to write to.
+				 * @return Whether or not everything has been sent.
+				 */
 				virtual bool
-				write(IOBuffer &fd) = 0;
+				write(IOBuffer &buffer) = 0;
 		};
 
+		/**
+		 * The File Body fill-up an internal buffer with information of a source IOBuffer.
+		 * Slowly reading (from a file) then writing (to the output) to return the file in small chunks.
+		 */
 		class FileBody :
 				public IBody
 		{
 			private:
-				IOBuffer m_fd;
+				IOBuffer m_buffer;
 
 			public:
 				FileBody(int fd);
@@ -70,8 +83,14 @@ class HTTPResponse
 
 				virtual bool
 				write(IOBuffer &fd);
+
+				IOBuffer&
+				buffer();
 		};
 
+		/**
+		 * The String Body only put the whole provided string into the IOBuffer.
+		 */
 		class StringBody :
 				public IBody
 		{
@@ -114,6 +133,12 @@ class HTTPResponse
 
 		bool
 		write(IOBuffer &fd);
+
+		IBody*
+		body() const
+		{
+			return (m_body);
+		}
 
 	public:
 		static inline HTTPResponse*

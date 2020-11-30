@@ -14,9 +14,6 @@
 # define HTTPMETHOD_HPP_
 
 #include <util/Enum.hpp>
-#include <iostream>
-#include <string>
-#include <vector>
 
 class HTTPMethodHandler;
 
@@ -34,7 +31,7 @@ class HTTPMethod :
 		HTTPMethod&
 		operator =(const HTTPMethod &other);
 
-		const HTTPMethodHandler&
+		HTTPMethodHandler&
 		handler(void) const;
 
 	public:
@@ -47,5 +44,7 @@ class HTTPMethod :
 		static HTTPMethod *OPTIONS;
 		static HTTPMethod *TRACE;
 };
+
+#include <http/handler/HTTPMethodHandler.hpp>
 
 #endif /* HTTPMETHOD_HPP_ */

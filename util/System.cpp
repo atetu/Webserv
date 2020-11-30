@@ -1,31 +1,29 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   MethodHandler.hpp                                  :+:      :+:    :+:   */
+/*   System.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ecaceres <ecaceres@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2020/11/25 17:59:33 by ecaceres          #+#    #+#             */
-/*   Updated: 2020/11/25 17:59:33 by ecaceres         ###   ########.fr       */
+/*   Created: 2020/11/29 20:48:01 by ecaceres          #+#    #+#             */
+/*   Updated: 2020/11/29 20:48:01 by ecaceres         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef HTTPMETHODHANDLER_HPP_
-# define HTTPMETHODHANDLER_HPP_
+#include <sys/time.h>
+#include <unistd.h>
+#include <util/System.hpp>
 
-class HTTPRequest;
-class HTTPResponse;
-
-class HTTPMethodHandler
+System::~System()
 {
-	public:
-		virtual
-		~HTTPMethodHandler()
-		{
-		}
+}
 
-		virtual HTTPResponse*
-		handle(HTTPRequest &request) = 0;
-};
+unsigned long
+System::currentTimeSeconds(void)
+{
+	struct timeval val;
+	if (::gettimeofday(&val, NULL))
+		return (0);
 
-#endif /* HTTPMETHODHANDLER_HPP_ */
+	return (val.tv_sec);
+}

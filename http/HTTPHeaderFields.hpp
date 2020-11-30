@@ -137,6 +137,9 @@ class HTTPHeaderFields
 		wwwAuthenticate(const std::string &value);
 
 		HTTPHeaderFields&
+		html(void);
+
+		HTTPHeaderFields&
 		set(const std::string &key, const std::string &value);
 
 		const_iterator
@@ -167,6 +170,7 @@ class HTTPHeaderFields
 		static const std::string TRANSFER_ENCODING;
 		static const std::string USER_AGENT;
 		static const std::string WWW_AUTHENTICATE;
+		static const std::string MIME_HTML;
 };
 
 #endif /* HTTPHEADERFIELDS_HPP_ */

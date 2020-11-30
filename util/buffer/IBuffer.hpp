@@ -1,31 +1,33 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   MethodHandler.hpp                                  :+:      :+:    :+:   */
+/*   IBuffer.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ecaceres <ecaceres@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2020/11/25 17:59:33 by ecaceres          #+#    #+#             */
-/*   Updated: 2020/11/25 17:59:33 by ecaceres         ###   ########.fr       */
+/*   Created: 2020/11/29 18:19:03 by ecaceres          #+#    #+#             */
+/*   Updated: 2020/11/29 18:19:03 by ecaceres         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef HTTPMETHODHANDLER_HPP_
-# define HTTPMETHODHANDLER_HPP_
+#ifndef IBUFFER_HPP_
+# define IBUFFER_HPP_
 
-class HTTPRequest;
-class HTTPResponse;
+#include <string>
 
-class HTTPMethodHandler
+class IBuffer
 {
 	public:
 		virtual
-		~HTTPMethodHandler()
+		~IBuffer(void)
 		{
 		}
 
-		virtual HTTPResponse*
-		handle(HTTPRequest &request) = 0;
+		virtual std::string&
+		storage() = 0;
+
+		virtual const std::string&
+		storage() const = 0;
 };
 
-#endif /* HTTPMETHODHANDLER_HPP_ */
+#endif /* IBUFFER_HPP_ */

@@ -13,9 +13,11 @@
 #ifndef ENUM_HPP_
 # define ENUM_HPP_
 
+#include <exception/Exception.hpp>
 #include <util/Objects.hpp>
 #include <iostream>
 #include <string>
+#include <typeinfo>
 #include <vector>
 
 # define ENUM_DEFINE(clazz, name, constructor) clazz *clazz::name = clazz::enumValue(#name, constructor);
@@ -123,6 +125,30 @@ template<typename E>
 			values()
 			{
 				return (enumConstants().storage());
+			}
+
+			inline static const E*
+			find(const std::string &string)
+			{
+				const Container &storage = values();
+
+				for (iterator it = storage.begin(); it != storage.end(); it++)
+					if ((*it)->name() == string)
+						return (*it);
+
+				return (NULL);
+			}
+
+			inline static const E&
+			valueOf(const std::string &string)
+			{
+				const Container &storage = values();
+
+				for (iterator it = storage.begin(); it != storage.end(); it++)
+					if ((*it)->name() == string)
+						return (*it);
+
+				throw Exception("Enum value " + std::string(typeid(E).name()) + "." + string + " does not exists");
 			}
 	};
 

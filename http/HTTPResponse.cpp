@@ -93,43 +93,26 @@ HTTPResponse::IBody::~IBody()
 }
 
 HTTPResponse::FileBody::FileBody(int fd) :
-		m_fd(fd)
+		m_buffer(fd, true)
 {
+}
+
+IOBuffer&
+HTTPResponse::FileBody::buffer()
+{
+	return (m_buffer);
 }
 
 HTTPResponse::FileBody::~FileBody()
 {
-	if (m_fd != -1)
-		::close(m_fd);
-	std::cout << "~ closed fd #" << m_fd << std::endl;
 }
 
 bool
-HTTPResponse::FileBody::write(IOBuffer &fd)
+HTTPResponse::FileBody::write(IOBuffer &buffer)
 {
-//	if (m_fd == -1)
-//		return (1);
-//
-//	size_t capacity = std::min(m_fd.capacity(), fd.capacity());
-//
-//	if (capacity)
-//	{
-//		char buffer[capacity];
-//		ssize_t r = ::read(m_fd, buffer, capacity);
-//
-//		if (r == 0)
-//		{
-//			std::cout << "closed fd #" << m_fd << std::endl;
-//			::close(m_fd);
-//			m_fd = -1;
-//		}
-//
-//		if (r >= 0)
-//			fd.store(buffer, capacity, m_fd == -1);
-//	}
-//
-//	return (m_fd == -1);
-	return (-1);
+	buffer.storeFrom(m_buffer);
+
+	return (m_buffer.hasReadEverything() && m_buffer.capacity() == 0);
 }
 
 HTTPResponse::StringBody::StringBody(std::string string) :
@@ -151,7 +134,7 @@ HTTPResponse::StringBody::write(IOBuffer &fd)
 		m_sent = true;
 	}
 
-	return (1);
+	return (true);
 }
 
 HTTPResponse::HTTPResponse(const HTTPStatus &status, const HTTPHeaderFields &headers, IBody *body) :
@@ -179,7 +162,7 @@ HTTPResponse::~HTTPResponse()
 }
 
 bool
-HTTPResponse::write(IOBuffer &fd)
+HTTPResponse::write(IOBuffer &out)
 {
 	std::string str;
 	HTTPHeaderFields::const_iterator it;
@@ -188,15 +171,13 @@ HTTPResponse::write(IOBuffer &fd)
 	if (m_state == NONE)
 		m_state = HEADERS;
 
-//	std::cout << (int)fd << ": " << m_state << std::endl;
-
 	switch (m_state)
 	{
 		case HEADERS:
-			fd.store(m_statusLine.format());
-			fd.store(HTTP::CRLF);
-			fd.store(m_headers.format());
-			fd.store(HTTP::CRLF);
+			out.store(m_statusLine.format());
+			out.store(HTTP::CRLF);
+			out.store(m_headers.format());
+			out.store(HTTP::CRLF);
 
 			if (m_body)
 				m_state = BODY;
@@ -206,13 +187,13 @@ HTTPResponse::write(IOBuffer &fd)
 			break;
 
 		case BODY:
-			if (m_body && m_body->write(fd))
+			if (m_body && m_body->write(out))
 				m_state = FLUSHING;
 
 			break;
 
 		case FLUSHING:
-			if (fd.send() < 0 || fd.capacity() == 0)
+			if (out.send() < 0 || out.capacity() == 0)
 				m_state = FINISHED;
 
 			break;

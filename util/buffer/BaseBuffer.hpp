@@ -13,26 +13,35 @@
 #ifndef BASEBUFFER_HPP_
 # define BASEBUFFER_HPP_
 
+#include <stddef.h>
+#include <util/buffer/IReadableBuffer.hpp>
+#include <util/buffer/IWritableBuffer.hpp>
+#include <iterator>
 #include <string>
 
-class BaseBuffer
+class BaseBuffer :
+		public IWritableBuffer,
+		public IReadableBuffer
 {
+	public:
+		typedef std::string::size_type size_type;
+
 	protected:
-		std::string m_buffer;
+		std::string m_storage;
 
 	public:
 		BaseBuffer() :
-				m_buffer()
+				m_storage()
 		{
 		}
 
 		BaseBuffer(const std::string &buffer) :
-				m_buffer(buffer)
+				m_storage(buffer)
 		{
 		}
 
 		BaseBuffer(const BaseBuffer &other) :
-				m_buffer(other.m_buffer)
+				m_storage(other.m_storage)
 		{
 		}
 
@@ -45,7 +54,7 @@ class BaseBuffer
 		operator=(const BaseBuffer &other)
 		{
 			if (this != &other)
-				m_buffer = other.m_buffer;
+				m_storage = other.m_storage;
 
 			return (*this);
 		}
@@ -53,47 +62,58 @@ class BaseBuffer
 		void
 		store(char c)
 		{
-			m_buffer += c;
+			m_storage += c;
 		}
 
 		void
 		store(const std::string &str)
 		{
-			m_buffer += str;
+			m_storage += str;
 		}
 
 		void
 		store(const void *buffer, size_t len)
 		{
-			m_buffer += std::string(static_cast<const char*>(buffer), len);
+			m_storage += std::string(static_cast<const char*>(buffer), len);
 		}
 
-		bool
-		getChar(char &c)
+		virtual bool
+		next(char &c)
 		{
-			if (m_buffer.empty())
+			if (m_storage.empty())
 				return (false);
 
-			c = m_buffer[0];
+			c = m_storage[0];
 
-			m_buffer.erase(0, 1);
+			m_storage.erase(0, 1);
 
 			return (true);
 		}
 
-		bool
-		getLine(std::string &str, bool crlf = false)
+		virtual bool
+		peek(char &c) const
 		{
-			if (m_buffer.empty())
+			if (m_storage.empty())
 				return (false);
 
-			for (std::string::iterator it = m_buffer.begin(); it != m_buffer.end(); it++)
+			c = m_storage[0];
+
+			return (true);
+		}
+
+		virtual bool
+		next(std::string &str, bool crlf = false)
+		{
+			if (m_storage.empty())
+				return (false);
+
+			for (std::string::iterator it = m_storage.begin(); it != m_storage.end(); it++)
 			{
 				if (*it == '\n')
 				{
-					str = std::string(m_buffer.begin(), it);
+					str = std::string(m_storage.begin(), it);
 
-					m_buffer.erase(m_buffer.begin(), it);
+					m_storage.erase(m_storage.begin(), it);
 
 					return (true);
 				}
@@ -103,9 +123,27 @@ class BaseBuffer
 		}
 
 		size_t
-		size()
+		size() const
 		{
-			return (m_buffer.size());
+			return (m_storage.size());
+		}
+
+		void
+		clear()
+		{
+			m_storage.clear();
+		}
+
+		inline std::string&
+		storage()
+		{
+			return (m_storage);
+		}
+
+		inline const std::string&
+		storage() const
+		{
+			return (m_storage);
 		}
 };
 

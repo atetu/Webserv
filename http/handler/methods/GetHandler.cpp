@@ -55,7 +55,7 @@ GetHandler::handle(HTTPRequest &request)
 
 		headers.contentLength(st.st_size);
 
-		return (new HTTPResponse(*HTTPStatus::OK, headers, NULL /* TODO */));
+		return (new HTTPResponse(*HTTPStatus::OK, headers, new HTTPResponse::FileBody(fd)));
 	}
 
 	if (S_ISDIR(st.st_mode))
@@ -80,8 +80,8 @@ GetHandler::handle(HTTPRequest &request)
 			std::string file(entry->d_name);
 			std::string absolute = directory + "/" + file;
 
-			if (::stat(absolute.c_str(), &st) != -1 && S_ISDIR(st.st_mode))
-				file += '/';
+//			if (::stat(absolute.c_str(), &st) != -1 && S_ISDIR(st.st_mode))
+//				file += '/';
 
 			listing += std::string("		<a href=\"./") + file + "\">" + file + "</a><br>\n";
 		}
@@ -92,7 +92,10 @@ GetHandler::handle(HTTPRequest &request)
 
 		::closedir(dir);
 
-		return (new HTTPResponse(*HTTPStatus::OK, headers, NULL /* TODO */));
+		headers.html();
+		headers.contentLength(listing.size());
+
+		return (new HTTPResponse(*HTTPStatus::OK, headers, new HTTPResponse::StringBody(listing)));
 	}
 
 	return (HTTPResponse::status(*HTTPStatus::NOT_FOUND));

@@ -1,31 +1,44 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   MethodHandler.hpp                                  :+:      :+:    :+:   */
+/*   IWritableBuffer.hpp                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ecaceres <ecaceres@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2020/11/25 17:59:33 by ecaceres          #+#    #+#             */
-/*   Updated: 2020/11/25 17:59:33 by ecaceres         ###   ########.fr       */
+/*   Created: 2020/11/29 18:19:03 by ecaceres          #+#    #+#             */
+/*   Updated: 2020/11/29 18:19:03 by ecaceres         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef HTTPMETHODHANDLER_HPP_
-# define HTTPMETHODHANDLER_HPP_
+#ifndef IWRITABLEBUFFER_HPP_
+# define IWRITABLEBUFFER_HPP_
 
-class HTTPRequest;
-class HTTPResponse;
+#include <stddef.h>
+#include <util/buffer/IBuffer.hpp>
 
-class HTTPMethodHandler
+class IWritableBuffer :
+		public IBuffer
 {
 	public:
 		virtual
-		~HTTPMethodHandler()
+		~IWritableBuffer(void)
 		{
 		}
 
-		virtual HTTPResponse*
-		handle(HTTPRequest &request) = 0;
+		virtual void
+		store(char c) = 0;
+
+		virtual void
+		store(const std::string &str) = 0;
+
+		virtual void
+		store(const void *buffer, size_t len) = 0;
+
+		virtual size_t
+		size() const = 0;
+
+		virtual void
+		clear() = 0;
 };
 
-#endif /* HTTPMETHODHANDLER_HPP_ */
+#endif /* IWRITABLEBUFFER_HPP_ */
