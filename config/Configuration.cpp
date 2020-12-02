@@ -6,7 +6,7 @@
 /*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/28 11:33:47 by ecaceres          #+#    #+#             */
-/*   Updated: 2020/11/30 17:29:40 by alicetetu        ###   ########.fr       */
+/*   Updated: 2020/12/02 12:29:26 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,27 +36,49 @@
 			}
 
 Configuration::Configuration() :
-		m_servers()
+		m_file(""),
+		m_servers(),
+		m_mimeRegistry(),
+		m_rootBlock(),
+		m_mimeBlock()
 {
 }
 
-// Configuration::Configuration(std::vector<ServerBlock> servers) :
-// 		m_servers(servers)
-// {
-// }
-
-// Configuration::Configuration(const Configuration &other) :
-// 		m_servers(other.m_servers)
-// {
-// }
-
 Configuration::Configuration(const std::string &file) :
-		m_file(file)
+		m_file(file),
+		m_servers(),
+		m_mimeRegistry(),
+		m_rootBlock(),
+		m_mimeBlock()
+{
+}
+
+Configuration::Configuration(const Configuration &other) :
+		m_file(other.m_file),
+		m_servers(other.m_servers),
+		m_mimeRegistry(other.m_mimeRegistry),
+		m_rootBlock(other.m_rootBlock),
+		m_mimeBlock(other.m_mimeBlock)
 {
 }
 
 Configuration::~Configuration()
 {
+}
+
+Configuration&
+Configuration::operator =(const Configuration &other)
+{
+	if (this != &other)
+	{
+		m_file = other.m_file;
+		m_servers = other.m_servers;
+		m_mimeRegistry = other.m_mimeRegistry;
+		m_rootBlock = other.m_rootBlock;
+		m_mimeBlock = other.m_mimeBlock;
+	}
+
+	return (*this);
 }
 
 Configuration&
@@ -73,20 +95,35 @@ Configuration::build()
 	return (*this);
 }
 
-// Configuration&
-// Configuration::operator=(const Configuration &other)
-// {
-// 	if (this != &other)
-// 		m_servers = other.m_servers;
+const std::string&
+Configuration::getFile(void) const
+{
+	return (m_file);
+}
 
-// 	return (*this);
-// }
+const std::vector<ServerBlock>&
+Configuration::getServers(void) const
+{
+	return (m_servers);
+}
 
-// const std::vector<ServerBlock>&
-// Configuration::servers(void) const
-// {
-// 	return (m_servers);
-// }
+const MimeRegistry&
+Configuration::getMimeRegistry(void) const
+{
+	return (m_mimeRegistry);
+}
+
+const MimeBlock&
+Configuration::getMimeBlock(void) const
+{
+	return (m_mimeBlock);
+}
+
+const RootBlock&
+Configuration::getRootBlock(void) const
+{
+	return (m_rootBlock);
+}
 
 Configuration Configuration::setMime()
 {
@@ -377,24 +414,181 @@ Configuration::fromJsonFile(const std::string &path) throw (IOException)
 			it++;
 			
 		}
-
 		
 		rootBlock.server(serverBlockList);
-
+	}
+	
+	std::list<CGI> CgiBlockList;
+	
+	if (root->has("cgi"))
+	{
+		JsonValue *cgiJsonValue = root->get("cgi");
+		if (!cgiJsonValue->instanceOf<JsonObject>())
+			throw Exception("CGI list is not an object");
 			
-			// other keys
+		JsonObject *cgiObject = cgiJsonValue->cast<JsonObject>();
+		
+		JsonObject::iterator cgi_it = cgiObject->begin();
+		JsonObject::iterator cgi_ite = cgiObject->end();
+	
+		std::vector<std::string> CGINames;
+					
+		while (cgi_it != cgi_ite)
+		{	
+			CGINames.push_back(cgi_it->first);
+			cgi_it++;
+		}
+		for(std::vector<std::string>::iterator vec_it = CGINames.begin(); vec_it != CGINames.end() ; ++vec_it)
+		{
+			std::string cgiKey;
+			
+			if(cgiObject->has(*vec_it))
+				cgiKey = *vec_it;
+									
+			CGI CgiBlockElement(cgiKey);
+			
+			JsonValue *jsonValue = cgiObject->get(cgiKey);
+			
+			if (!jsonValue->instanceOf<JsonObject>())
+				throw Exception("Json Object expected for CGI elements");
+					
+			JsonObject *cgiValueObject = jsonValue->cast<JsonObject>();
+								
+			if (cgiValueObject->has("path"))
+			{
+				JsonValue *jsonValue = cgiValueObject->get("path");
+				
+				if (!jsonValue->instanceOf<JsonString>())
+					throw Exception("Expected JSON String for cgi path, but got: " + jsonValue->typeString());
+
+				CgiBlockElement.path(*(jsonValue->cast<JsonString>()));
+			}
+			
+			else
+				throw Exception("No path given for CGI Object");
+			
+			CgiBlockList.push_back(CgiBlockElement);
+		}								
+		
+		rootBlock.cgi(CgiBlockList);
+	}
+	
+	if (root->has("mime"))
+	{
+		JsonValue *mimeJsonValue = root->get("mime");
+		
+		if (!mimeJsonValue->instanceOf<JsonObject>())
+			throw Exception("CGI list is not an object");
+			
+		JsonObject *mimeObject = mimeJsonValue->cast<JsonObject>();
+
+		MimeBlock mimeBlock;
+		
+		if (mimeObject->has("includes"))
+		{
+			JsonValue *jsonValue = mimeObject->get("includes");
+		
+			if (jsonValue->instanceOf<JsonArray>())
+			{
+				JsonArray *includes = jsonValue->cast<JsonArray>();
+					
+				JsonArray::iterator it = includes->begin();
+				JsonArray::iterator ite = includes->end();
+				
+				std::vector<std::string> includesElements;
+				
+				while (it != ite)
+				{
+					if (!(*it)->instanceOf<JsonString>())
+						throw Exception("Include element is not a string value (in array)");
+					includesElements.push_back(*((*it)->cast<JsonString>()));
+					it++;
+				}
+				if (includesElements.empty())
+					throw Exception("Includes array provided, but empty");
+						
+				mimeBlock.includes(includesElements);
+			}
+		}
+		
+		if (mimeObject->has("define"))
+		{
+			JsonValue *jsonValue = mimeObject->get("define");
+		
+			if (jsonValue->instanceOf<JsonObject>())
+			{
+				JsonObject *defineObject = jsonValue->cast<JsonObject>();
+					
+				JsonObject::iterator it = defineObject->begin();
+				JsonObject::iterator ite = defineObject->end();
+				
+				std::vector<Mime> definesElements;
+
+				std::vector<std::string> defineNames;
+				
+				while (it != ite)
+				{
+				//	if (!((&(it->first))->instanceOf<JsonString>()))
+					// 	throw Exception("Define element is not a string value (in array)");
+					defineNames.push_back(it->first);
+					it++;
+				}
+
+				for(std::vector<std::string>::iterator vec_it = defineNames.begin(); vec_it != defineNames.end() ; ++vec_it)
+				{
+					std::string defineKey;
+			
+					defineKey = *vec_it;
+			
+					JsonValue *jsonValue = defineObject->get(defineKey);
+			
+					if (!jsonValue->instanceOf<JsonArray>())
+						throw Exception("Json Array expected for define elements in mimes");
+					
+					JsonArray *defineValue = jsonValue->cast<JsonArray>();
+					
+					JsonArray::iterator define_it = defineValue->begin();
+					JsonArray::iterator define_ite = defineValue->end();
+					
+					std::list<std::string> defineValueList;
+					
+					while (define_it != define_ite)
+					{
+						if (!(*define_it)->instanceOf<JsonString>())
+							throw Exception("Extension is not a string value (in array)");
+						defineValueList.push_back(*((*define_it)->cast<JsonString>()));
+						define_it++;
+					}
+
+					if (defineValueList.empty())
+						throw Exception("Define Value array provided, but empty");
+						
+					Mime MimeElement(defineKey, defineValueList);
+					
+					definesElements.push_back(MimeElement);
+				}
+				mimeBlock.define(definesElements);
+			}
+
+		}
+
+	}	
+		
+		
+	
+				// other keys
 			
 			// if (!serverBlock.port().present())
 		//		throw Exception("No name has been specified for server");
 				
 		
 	
-	}
+	
 
 	
 
 	return (Configuration(path)
-				.root(rootBlock)
-				.setMime()
-				.build());
+		.root(rootBlock)
+		.setMime()
+		.build());
 }

@@ -12,14 +12,28 @@
 
 #include <config/block/MimeBlock.hpp>
 
-MimeBlock::MimeBlock()
+MimeBlock::MimeBlock() :
+	m_includes(),
+	m_define()
 {
-	// TODO Auto-generated constructor stub
-
 }
 
 MimeBlock::~MimeBlock()
 {
-	// TODO Auto-generated destructor stub
 }
 
+MimeBlock&
+MimeBlock::includes(const std::vector<std::string> & includes)
+{
+	m_includes.set(includes);
+
+	return (*this);
+}
+
+MimeBlock&
+MimeBlock::define(const std::vector<Mime> & defines)
+{
+	m_define.set(defines);
+
+	return (*this);
+}

@@ -6,7 +6,7 @@
 /*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/28 11:34:15 by ecaceres          #+#    #+#             */
-/*   Updated: 2020/11/30 13:51:23 by alicetetu        ###   ########.fr       */
+/*   Updated: 2020/12/01 10:40:19 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,7 @@ class CGI
 
 	public:
 		CGI();
+		CGI(std::string name);
 		CGI(const CGI &other);
 
 		virtual
@@ -31,6 +32,9 @@ class CGI
 
 		CGI&
 		operator=(const CGI &other);
+
+		CGI&
+		path(const std::string & path);
 };
 
 #endif /* SRC_CONFIG_BLOCK_CGI_HPP_ */

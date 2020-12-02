@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   MimeRegistry.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ecaceres <ecaceres@student.42.fr>          +#+  +:+       +#+        */
+/*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/26 17:39:30 by ecaceres          #+#    #+#             */
-/*   Updated: 2020/10/26 17:39:30 by ecaceres         ###   ########.fr       */
+/*   Updated: 2020/12/02 12:31:03 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,7 +66,7 @@ MimeRegistry::clearMapping(map &mapping)
 		return;
 
 	for (const_iterator it = mapping.begin(); it != mapping.end(); it++)
-		delete it->second;
+//		delete it->second;
 
 	return (mapping.clear());
 }

@@ -6,7 +6,7 @@
 /*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/28 11:33:47 by ecaceres          #+#    #+#             */
-/*   Updated: 2020/11/30 16:58:38 by alicetetu        ###   ########.fr       */
+/*   Updated: 2020/12/02 11:58:21 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,21 +33,16 @@ class Configuration
 		typedef std::vector<ServerBlock>::const_iterator siterator;
 
 	private:
-		std::vector<ServerBlock> m_servers;
 		std::string m_file;
-    	MimeRegistry m_mimeRegistry;
-		//mimeRegistry.loadFromFile("mime.json");
-    	RootBlock m_rootBlock;
-		// {
-		// 	list<CGIBlock>
-		// 	list<ServerBlock>
-		// }
-	
+		std::vector<ServerBlock> m_servers;
+		MimeRegistry m_mimeRegistry;
+	   	MimeBlock m_mimeBlock;
+		RootBlock m_rootBlock;
+		
 	public:
 		Configuration(void);
 		Configuration(const std::string &file);
-		// Configuration(std::vector<ServerBlock> servers);
-		// Configuration(const Configuration &other);
+		Configuration(const Configuration &other);
 
 		virtual
 		~Configuration();
@@ -55,16 +50,19 @@ class Configuration
 		Configuration&
 		operator=(const Configuration &other);
 
-		const std::vector<ServerBlock>&
-		 servers(void) const;
-
+		const std::string& getFile(void) const;
+		const std::vector<ServerBlock>& getServers(void) const;
+		const MimeRegistry& getMimeRegistry(void) const;
+		const MimeBlock& getMimeBlock(void) const;
+		const RootBlock& getRootBlock(void) const;
+		
 		Configuration setMime();
 		Configuration & root(RootBlock &rootBlock);
 		Configuration & build();
 
 	public:
         static Configuration 
-		fromJsonFile(const std::string &path) throw (IOException);;
+		fromJsonFile(const std::string &path) throw (IOException);
 };
 
 #endif /* CONFIGURATION_HPP_ */
