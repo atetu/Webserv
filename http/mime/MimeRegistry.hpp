@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   MimeRegistry.hpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ecaceres <ecaceres@student.42.fr>          +#+  +:+       +#+        */
+/*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/26 17:39:30 by ecaceres          #+#    #+#             */
-/*   Updated: 2020/10/26 17:39:30 by ecaceres         ###   ########.fr       */
+/*   Updated: 2020/12/02 18:00:27 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@
 #include <string>
 #include <exception/IOException.hpp>
 #include <util/log/Logger.hpp>
+#include <util/json/JsonObject.hpp>
 
 /**
  * MIME Registry to allow an easy mapping and reverse mapping between MIME string type notation (e.g. text/csv) and a corresponding file extension.
@@ -47,6 +48,22 @@ class MimeRegistry
 		operator =(const MimeRegistry &other);
 
 	private:
+		/**
+		 * Copy a mapping from an instance to another.
+		 * This will do a deep mapping by deep copying all of the instance.
+		 *
+		 * @param from Source map to copy from.
+		 * @param to Target map to copy to.
+		 */
+		void
+		copyMapping(const map &from, map &to);
+
+		/**
+		 * Clear a mapping.
+		 * This will call the delete operator on all of the entries.
+		 *
+		 * @param mapping Mapping to clear.
+		 */
 		void
 		clearMapping(map &mapping);
 
@@ -93,6 +110,9 @@ class MimeRegistry
 		 */
 		void
 		loadFromFile(const std::string &path) throw (IOException);
+
+		void
+		loadFromJson(const JsonObject &jsonObject);
 
 		/**
 		 * Get the normal mapping map size.

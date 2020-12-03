@@ -55,3 +55,14 @@ CGI::path(const std::string & path)
 	return (*this);
 }
 
+const std::string
+CGI::name(void) const
+{
+	return (m_name);
+}
+
+const Optional<std::string>
+CGI::path(void) const
+{
+	return (m_path);
+}

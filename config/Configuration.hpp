@@ -6,7 +6,7 @@
 /*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/28 11:33:47 by ecaceres          #+#    #+#             */
-/*   Updated: 2020/12/02 11:58:21 by alicetetu        ###   ########.fr       */
+/*   Updated: 2020/12/02 17:53:05 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,14 +30,14 @@ class Configuration
         static Logger &LOG;
 	
 	public:
-		typedef std::vector<ServerBlock>::const_iterator siterator;
+		typedef std::vector<ServerBlock*>::const_iterator siterator;
 
 	private:
 		std::string m_file;
-		std::vector<ServerBlock> m_servers;
-		MimeRegistry m_mimeRegistry;
-	   	MimeBlock m_mimeBlock;
-		RootBlock m_rootBlock;
+		//std::vector<ServerBlock> m_servers;
+		MimeRegistry *m_mimeRegistry;
+	   	MimeBlock *m_mimeBlock;
+		RootBlock *m_rootBlock;
 		
 	public:
 		Configuration(void);
@@ -51,13 +51,13 @@ class Configuration
 		operator=(const Configuration &other);
 
 		const std::string& getFile(void) const;
-		const std::vector<ServerBlock>& getServers(void) const;
-		const MimeRegistry& getMimeRegistry(void) const;
-		const MimeBlock& getMimeBlock(void) const;
-		const RootBlock& getRootBlock(void) const;
+	//	const std::vector<ServerBlock>& getServers(void) const;
+		const MimeRegistry* getMimeRegistry(void) const;
+		const MimeBlock* getMimeBlock(void) const;
+		const RootBlock* getRootBlock(void) const;
 		
-		Configuration setMime();
-		Configuration & root(RootBlock &rootBlock);
+		Configuration & mime(MimeBlock *mimeBlock);
+		Configuration & root(RootBlock *rootBlock);
 		Configuration & build();
 
 	public:

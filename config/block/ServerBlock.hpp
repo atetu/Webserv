@@ -6,7 +6,7 @@
 /*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/28 11:34:45 by ecaceres          #+#    #+#             */
-/*   Updated: 2020/11/30 16:02:34 by alicetetu        ###   ########.fr       */
+/*   Updated: 2020/12/03 10:02:58 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,8 +30,8 @@ class ServerBlock
 		Optional<std::list<std::string> > m_names;
 		Optional<DataSize> m_maxBodySize;
 		Optional<std::string> m_root;	
-		Optional<std::vector<LocationBlock> > m_locations;
-		Optional<std::vector<ErrorPageBlock> > m_errors;
+		Optional<std::vector<LocationBlock*> > m_locations;
+		Optional<std::vector<ErrorPageBlock*> > m_errors;
 
 	public:
 		ServerBlock();
@@ -65,10 +65,13 @@ class ServerBlock
 		root(std::string root);
 
 		ServerBlock&
-		locations(std::vector<LocationBlock> locations);
+		locations(std::vector<LocationBlock*> locations);
 
+		const Optional<std::vector<LocationBlock*> >
+		locations(void) const;
+		
 		ServerBlock&
-		errors(std::vector<ErrorPageBlock> errors);
+		errors(std::vector<ErrorPageBlock*> errors);
 
 	public:
 		static const std::string DEFAULT_HOST;

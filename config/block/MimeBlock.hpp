@@ -35,6 +35,9 @@ class MimeBlock
 
 		MimeBlock&
 		define(const std::vector<Mime> & defines);
+
+		Optional<std::vector<std::string> >&
+		getIncludes();
 };
 
 #endif /* MIMEBLOCK_HPP_ */

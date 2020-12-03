@@ -6,7 +6,7 @@
 /*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/28 11:34:45 by ecaceres          #+#    #+#             */
-/*   Updated: 2020/11/30 16:02:14 by alicetetu        ###   ########.fr       */
+/*   Updated: 2020/12/03 10:05:25 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -110,15 +110,22 @@ ServerBlock::root(std::string root)
 }
 
 ServerBlock&
-ServerBlock::locations(std::vector<LocationBlock> locations)
+ServerBlock::locations(std::vector<LocationBlock*> locations)
 {
 	m_locations.set(locations);
 
 	return (*this);
 }
 
+const Optional<std::vector<LocationBlock*> >
+ServerBlock::locations(void) const
+{
+	return (m_locations);
+}
+		
+
 ServerBlock&
-ServerBlock::errors(std::vector<ErrorPageBlock> errors)
+ServerBlock::errors(std::vector<ErrorPageBlock*> errors)
 {
 	m_errors.set(errors);
 

@@ -37,3 +37,9 @@ MimeBlock::define(const std::vector<Mime> & defines)
 
 	return (*this);
 }
+
+Optional<std::vector<std::string> >&
+MimeBlock::getIncludes()
+{
+	return (m_includes);
+}

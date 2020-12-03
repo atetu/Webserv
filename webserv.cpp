@@ -6,7 +6,7 @@
 /*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/19 15:34:02 by ecaceres          #+#    #+#             */
-/*   Updated: 2020/11/29 17:36:45 by alicetetu        ###   ########.fr       */
+/*   Updated: 2020/12/03 11:52:35 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,7 +96,16 @@ main(int argc, char **argv)
 		// CHECK CONF FILE
 	}
 	
-	Configuration::fromJsonFile(configFile);
+	try
+	{
+		Configuration::fromJsonFile(configFile);
+	}
+	catch(const std::exception& e)
+	{
+		std::cerr << e.what() << '\n';
+		::exit(2);
+	}
+	
 
 	
 // 	Configuration configuration(ContainerBuilder<ServerBlock>() //

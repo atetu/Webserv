@@ -18,7 +18,7 @@ RootBlock::RootBlock():
 {
 }
 
-RootBlock::RootBlock(std::list<ServerBlock> serverBlockList) :
+RootBlock::RootBlock(std::list<ServerBlock*> serverBlockList) :
 		m_serverBlockList(serverBlockList),
 		m_CGIList()
 {
@@ -47,15 +47,27 @@ RootBlock::~RootBlock()
 }
 
 RootBlock &
-RootBlock::server(const std::list<ServerBlock> &serverBlockList)
+RootBlock::server(const std::list<ServerBlock*> &serverBlockList)
 {
 	m_serverBlockList = serverBlockList;
 	return (*this);
 }
 
 RootBlock &
-RootBlock::cgi(const std::list<CGI> &CGIList)
+RootBlock::cgi(const std::list<CGI*> &CGIList)
 {
 	m_CGIList = CGIList;
 	return (*this);
+}
+
+const std::list<ServerBlock*>
+RootBlock::server(void) const
+{
+	return (m_serverBlockList);
+}
+
+const std::list<CGI*>
+RootBlock::cgi(void) const
+{
+	return (m_CGIList);
 }

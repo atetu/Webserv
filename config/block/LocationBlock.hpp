@@ -57,6 +57,10 @@ class LocationBlock
 		LocationBlock&
 		cgi(std::string cgi);
 
+		const Optional<std::string>
+		cgi(void) const;
+		
+
 	public:
 		static LocationBlock DEFAULT;
 };

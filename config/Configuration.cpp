@@ -6,7 +6,7 @@
 /*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/28 11:33:47 by ecaceres          #+#    #+#             */
-/*   Updated: 2020/12/02 12:29:26 by alicetetu        ###   ########.fr       */
+/*   Updated: 2020/12/03 11:46:08 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,25 +37,22 @@
 
 Configuration::Configuration() :
 		m_file(""),
-		m_servers(),
-		m_mimeRegistry(),
-		m_rootBlock(),
-		m_mimeBlock()
+		m_mimeRegistry(NULL),
+		m_rootBlock(NULL),
+		m_mimeBlock(NULL)
 {
 }
 
 Configuration::Configuration(const std::string &file) :
 		m_file(file),
-		m_servers(),
-		m_mimeRegistry(),
-		m_rootBlock(),
-		m_mimeBlock()
+		m_mimeRegistry(NULL),
+		m_rootBlock(NULL),
+		m_mimeBlock(NULL)
 {
 }
 
 Configuration::Configuration(const Configuration &other) :
 		m_file(other.m_file),
-		m_servers(other.m_servers),
 		m_mimeRegistry(other.m_mimeRegistry),
 		m_rootBlock(other.m_rootBlock),
 		m_mimeBlock(other.m_mimeBlock)
@@ -72,7 +69,6 @@ Configuration::operator =(const Configuration &other)
 	if (this != &other)
 	{
 		m_file = other.m_file;
-		m_servers = other.m_servers;
 		m_mimeRegistry = other.m_mimeRegistry;
 		m_rootBlock = other.m_rootBlock;
 		m_mimeBlock = other.m_mimeBlock;
@@ -82,7 +78,7 @@ Configuration::operator =(const Configuration &other)
 }
 
 Configuration&
-Configuration::root(RootBlock &rootBlock)
+Configuration::root(RootBlock *rootBlock)
 {
 	m_rootBlock = rootBlock;
 	
@@ -101,33 +97,40 @@ Configuration::getFile(void) const
 	return (m_file);
 }
 
-const std::vector<ServerBlock>&
-Configuration::getServers(void) const
-{
-	return (m_servers);
-}
-
-const MimeRegistry&
+const MimeRegistry*
 Configuration::getMimeRegistry(void) const
 {
 	return (m_mimeRegistry);
 }
 
-const MimeBlock&
+const MimeBlock*
 Configuration::getMimeBlock(void) const
 {
 	return (m_mimeBlock);
 }
 
-const RootBlock&
+const RootBlock*
 Configuration::getRootBlock(void) const
 {
 	return (m_rootBlock);
 }
 
-Configuration Configuration::setMime()
+Configuration&
+Configuration::mime(MimeBlock *mimeBlock)
 {
-	m_mimeRegistry.loadFromFile("mime.json");
+	m_mimeBlock = mimeBlock;
+	if (m_mimeBlock && m_mimeBlock->getIncludes().present())
+	{
+		std::vector<std::string> mimeFile = m_mimeBlock->getIncludes().get();
+		std::vector<std::string>::iterator it = mimeFile.begin();
+		std::vector<std::string>::iterator ite = mimeFile.end();
+		m_mimeRegistry = new MimeRegistry;
+		while (it != ite)
+		{
+			m_mimeRegistry->loadFromFile("mime.json");
+			++it;
+		}
+	}
 	return (*this);
 }
 
@@ -141,7 +144,9 @@ Configuration::fromJsonFile(const std::string &path) throw (IOException)
     
 	JsonObject *root = object->cast<JsonObject>(); // pourquoi le caster?
 
-	RootBlock rootBlock;
+	RootBlock *rootBlock = new RootBlock();
+
+	MimeBlock *mimeBlock =  NULL;
 
 	if (root->has("servers"))
 	{
@@ -155,24 +160,23 @@ Configuration::fromJsonFile(const std::string &path) throw (IOException)
 		JsonArray::iterator it = servers->begin();
 		JsonArray::iterator ite = servers->end();
 		
-		std::list<ServerBlock> serverBlockList;
+		std::list<ServerBlock*> serverBlockList;
 		
 		while (it != ite)
 		{
-			ServerBlock serverBlock;
+			ServerBlock *serverBlock = new ServerBlock;
 			
 			if (!(*it)->instanceOf<JsonObject>())
 				throw Exception("Server is not an object");
 			
 			JsonObject *server = (*it)->cast<JsonObject>();
 			
-			
 			BIND("port", JsonNumber, int, 
-				{serverBlock.port(value);
+				{serverBlock->port(value);
 			});
 			
 			BIND("host", JsonString, std::string, {
-				serverBlock.host(value);
+				serverBlock->host(value);
 			});
 			
 			if (server->has("name"))
@@ -180,7 +184,7 @@ Configuration::fromJsonFile(const std::string &path) throw (IOException)
 				JsonValue *jsonValue = server->get("name");
 				if (jsonValue->instanceOf<JsonString>())
 				{
-					serverBlock.names(ContainerBuilder<std::string, std::list<std::string> >().
+					serverBlock->names(ContainerBuilder<std::string, std::list<std::string> >().
 					add(*(jsonValue->cast<JsonString>()))
 					.build());
 				}
@@ -202,7 +206,7 @@ Configuration::fromJsonFile(const std::string &path) throw (IOException)
 					if (serverNames.empty())
 						throw Exception("Server name array provided, but empty");
 					
-					serverBlock.names(serverNames);
+					serverBlock->names(serverNames);
 				}
 			}
 			
@@ -211,7 +215,7 @@ Configuration::fromJsonFile(const std::string &path) throw (IOException)
 			//});
 			
 			BIND("maxBodySize", JsonString, std::string, 
-				{serverBlock.maxBodySize(DataSize::parse(value));
+				{serverBlock->maxBodySize(DataSize::parse(value));
 			});
 			
 
@@ -228,7 +232,7 @@ Configuration::fromJsonFile(const std::string &path) throw (IOException)
 				JsonObject::iterator error_ite = error->end();
 				
 				std::vector<std::string> errorNames;
-				std::vector<ErrorPageBlock> errorBlocks;
+				std::vector<ErrorPageBlock*> errorBlocks;
 				
 				while (error_it != error_ite)
 				{	
@@ -247,23 +251,23 @@ Configuration::fromJsonFile(const std::string &path) throw (IOException)
 					int n;
 					iss >> n;
 				
-					ErrorPageBlock errorBlockElement;
-					errorBlockElement.code(n);
+					ErrorPageBlock *errorBlockElement = new ErrorPageBlock;
+					errorBlockElement->code(n);
 					
 					JsonValue *errorFile = error->get(*vec_it);
 					if (!errorFile->instanceOf<JsonString>())
 						throw Exception("Error file is not a string value (in object)");
 				
-					errorBlockElement.path(*(errorFile->cast<JsonString>()));
+					errorBlockElement->path(*(errorFile->cast<JsonString>()));
 
 					errorBlocks.push_back(errorBlockElement);
 				}
-				serverBlock.errors(errorBlocks);
+				serverBlock->errors(errorBlocks);
 		
 			}
 			
 			BIND("root", JsonString, std::string,   // pas sure vu que c'est apres une virgule
-				{serverBlock.root(value);
+				{serverBlock->root(value);
 			});
 			
 
@@ -280,7 +284,7 @@ Configuration::fromJsonFile(const std::string &path) throw (IOException)
 				JsonObject::iterator locations_ite = locations->end();
 				
 				std::vector<std::string> locationsNames;
-				std::vector<LocationBlock> locationBlocks;
+				std::vector<LocationBlock*> locationBlocks;
 				
 				while (locations_it != locations_ite)
 				{	
@@ -294,7 +298,7 @@ Configuration::fromJsonFile(const std::string &path) throw (IOException)
 					if(locations->has(*vec_it))
 						locationPath = *vec_it;
 										
-					LocationBlock LocationBlockElement(locationPath);
+					LocationBlock *LocationBlockElement = new LocationBlock(locationPath);
 					
 					JsonValue *jsonValue = locations->get(locationPath);
 					if (!jsonValue->instanceOf<JsonObject>())
@@ -329,7 +333,7 @@ Configuration::fromJsonFile(const std::string &path) throw (IOException)
 						if (allowedMethods.empty())
 							throw Exception("Method array provided, but empty");
 						
-						LocationBlockElement.methods(allowedMethods);
+						LocationBlockElement->methods(allowedMethods);
 					}
 						
 					if (LocationObject->has("alias"))
@@ -339,7 +343,7 @@ Configuration::fromJsonFile(const std::string &path) throw (IOException)
 						if (!jsonValue->instanceOf<JsonString>())
 							throw Exception("Expected JSON String for alias, but got: " + jsonValue->typeString());
 											
-						LocationBlockElement.alias(*(jsonValue->cast<JsonString>()));
+						LocationBlockElement->alias(*(jsonValue->cast<JsonString>()));
 					}
 
 					if (LocationObject->has("root"))
@@ -349,7 +353,7 @@ Configuration::fromJsonFile(const std::string &path) throw (IOException)
 						if (!jsonValue->instanceOf<JsonString>())
 							throw Exception("Expected JSON String for root, but got: " + jsonValue->typeString());
 												
-						LocationBlockElement.root(*(jsonValue->cast<JsonString>()));
+						LocationBlockElement->root(*(jsonValue->cast<JsonString>()));
 					}
 
 					if (LocationObject->has("listing"))
@@ -359,7 +363,7 @@ Configuration::fromJsonFile(const std::string &path) throw (IOException)
 						if (!jsonValue->instanceOf<JsonBoolean>())
 							throw Exception("Expected JSON Boolean for listing, but got: " + jsonValue->typeString());
 												
-						LocationBlockElement.listing(*(jsonValue->cast<JsonBoolean>()));
+						LocationBlockElement->listing(*(jsonValue->cast<JsonBoolean>()));
 					}
 						
 					if (LocationObject->has("index"))
@@ -387,7 +391,7 @@ Configuration::fromJsonFile(const std::string &path) throw (IOException)
 						if (indexFiles.empty())
 							throw Exception("Index array provided, but empty");
 							
-						LocationBlockElement.index(indexFiles);
+						LocationBlockElement->index(indexFiles);
 					}
 
 					if (LocationObject->has("uploads"))
@@ -402,12 +406,12 @@ Configuration::fromJsonFile(const std::string &path) throw (IOException)
 						JsonValue *jsonValue = LocationObject->get("cgi");
 						if (!jsonValue->instanceOf<JsonString>())
     						throw Exception("Expected JSON String, but got: " + jsonValue->typeString());
-						LocationBlockElement.cgi(*(jsonValue->cast<JsonString>()));
+						LocationBlockElement->cgi(*(jsonValue->cast<JsonString>()));
 					}
 					
 					locationBlocks.push_back(LocationBlockElement);
 				}
-				serverBlock.locations(locationBlocks);
+				serverBlock->locations(locationBlocks);
 			}
 			
 			serverBlockList.push_back(serverBlock);
@@ -415,10 +419,10 @@ Configuration::fromJsonFile(const std::string &path) throw (IOException)
 			
 		}
 		
-		rootBlock.server(serverBlockList);
+		rootBlock->server(serverBlockList);
 	}
 	
-	std::list<CGI> CgiBlockList;
+	std::list<CGI*> CgiBlockList;
 	
 	if (root->has("cgi"))
 	{
@@ -445,7 +449,7 @@ Configuration::fromJsonFile(const std::string &path) throw (IOException)
 			if(cgiObject->has(*vec_it))
 				cgiKey = *vec_it;
 									
-			CGI CgiBlockElement(cgiKey);
+			CGI *CgiBlockElement = new CGI(cgiKey);
 			
 			JsonValue *jsonValue = cgiObject->get(cgiKey);
 			
@@ -461,7 +465,7 @@ Configuration::fromJsonFile(const std::string &path) throw (IOException)
 				if (!jsonValue->instanceOf<JsonString>())
 					throw Exception("Expected JSON String for cgi path, but got: " + jsonValue->typeString());
 
-				CgiBlockElement.path(*(jsonValue->cast<JsonString>()));
+				CgiBlockElement->path(*(jsonValue->cast<JsonString>()));
 			}
 			
 			else
@@ -470,9 +474,9 @@ Configuration::fromJsonFile(const std::string &path) throw (IOException)
 			CgiBlockList.push_back(CgiBlockElement);
 		}								
 		
-		rootBlock.cgi(CgiBlockList);
+		rootBlock->cgi(CgiBlockList);
 	}
-	
+
 	if (root->has("mime"))
 	{
 		JsonValue *mimeJsonValue = root->get("mime");
@@ -482,7 +486,7 @@ Configuration::fromJsonFile(const std::string &path) throw (IOException)
 			
 		JsonObject *mimeObject = mimeJsonValue->cast<JsonObject>();
 
-		MimeBlock mimeBlock;
+		mimeBlock = new MimeBlock();
 		
 		if (mimeObject->has("includes"))
 		{
@@ -507,7 +511,7 @@ Configuration::fromJsonFile(const std::string &path) throw (IOException)
 				if (includesElements.empty())
 					throw Exception("Includes array provided, but empty");
 						
-				mimeBlock.includes(includesElements);
+				mimeBlock->includes(includesElements);
 			}
 		}
 		
@@ -567,28 +571,71 @@ Configuration::fromJsonFile(const std::string &path) throw (IOException)
 					
 					definesElements.push_back(MimeElement);
 				}
-				mimeBlock.define(definesElements);
+				mimeBlock->define(definesElements);
 			}
 
 		}
 
 	}	
-		
-		
+	
+	// verification CGI
+	std::list<ServerBlock*> serverBlockList = rootBlock->server();
+
+	std::list<ServerBlock*>::iterator server_it = serverBlockList.begin();
+	std::list<ServerBlock*>::iterator server_ite = serverBlockList.end();
+
+	while (server_it != server_ite)
+	{
+		Optional<std::vector<LocationBlock*> > locations = (*server_it)->locations(); // vector
+		if (locations.present())
+		{
+			std::vector<LocationBlock*> locationsVector = locations.get();	
+			std::vector<LocationBlock*>::iterator locations_it = locationsVector.begin();
+			std::vector<LocationBlock*>::iterator locations_ite = locationsVector.end();
+
+			while (locations_it != locations_ite)
+			{
+				LocationBlock *locationBlock = *locations_it;
+				if (locationBlock->cgi().present())
+				{
+					std::string cgiValue = locationBlock->cgi().get();
+					
+					std::list<CGI*> cgiList = rootBlock->cgi();
+					std::list<CGI*>::iterator cgi_it = cgiList.begin();
+					std::list<CGI*>::iterator cgi_ite = cgiList.end();
+
+					while (cgi_it != cgi_ite)
+					{
+						CGI *cgiBlock = *cgi_it;	
+						if (cgiBlock->name().compare(cgiValue) == 0)
+						{
+							if (cgiBlock->path().present())
+								break;
+							else
+								throw Exception("No path given for CGI Element");								
+						}
+						cgi_it++;
+					}
+					if (cgi_it == cgi_ite)
+						throw Exception("No CGI corresponding to the CGI Element given in server object");
+				}
+				locations_it++;
+			}
+		}
+		server_it++;
+	}
+	
+	
 	
 				// other keys
 			
 			// if (!serverBlock.port().present())
 		//		throw Exception("No name has been specified for server");
 				
-		
 	
 	
-
-	
-
 	return (Configuration(path)
 		.root(rootBlock)
-		.setMime()
+		.mime(mimeBlock)
 		.build());
 }

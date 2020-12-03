@@ -6,7 +6,7 @@
 /*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/28 11:34:15 by ecaceres          #+#    #+#             */
-/*   Updated: 2020/12/01 10:40:19 by alicetetu        ###   ########.fr       */
+/*   Updated: 2020/12/03 11:20:53 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,6 +35,12 @@ class CGI
 
 		CGI&
 		path(const std::string & path);
+
+		const std::string
+		name(void) const;
+
+		const Optional<std::string>
+		path(void) const;
 };
 
 #endif /* SRC_CONFIG_BLOCK_CGI_HPP_ */

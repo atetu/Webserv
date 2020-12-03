@@ -19,12 +19,12 @@
 class RootBlock
 {
 	private:
-		std::list<ServerBlock> m_serverBlockList;
-		std::list<CGI> m_CGIList;
+		std::list<ServerBlock*> m_serverBlockList;
+		std::list<CGI*> m_CGIList;
 
 	public:
 		RootBlock();
-		RootBlock(std::list<ServerBlock>);
+		RootBlock(std::list<ServerBlock*>);
 		RootBlock(const RootBlock &other);
 		
 		virtual
@@ -33,8 +33,14 @@ class RootBlock
 		RootBlock&
 		operator =(const RootBlock &other);
 
-		RootBlock &server(const std::list<ServerBlock> &serverBlockList);
-		RootBlock &cgi(const std::list<CGI> &CGIList);
+		RootBlock &server(const std::list<ServerBlock*> &serverBlockList);
+		RootBlock &cgi(const std::list<CGI*> &CGIList);
+
+		const std::list<ServerBlock*>
+		server(void) const;
+
+		const std::list<CGI*>
+		cgi(void) const;
 };
 
 #endif /* ROOTBLOCK_HPP_ */
