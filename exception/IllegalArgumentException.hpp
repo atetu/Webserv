@@ -21,7 +21,7 @@ class IllegalArgumentException :
 {
 	public:
 		IllegalArgumentException(void);
-		IllegalArgumentException(std::string message);
+		IllegalArgumentException(const std::string &message);
 		IllegalArgumentException(const IllegalArgumentException &other);
 
 		virtual

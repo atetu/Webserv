@@ -24,7 +24,7 @@ class Exception :
 
 	public:
 		Exception(void);
-		Exception(std::string message);
+		Exception(const std::string &message);
 		Exception(const Exception &other);
 
 		virtual

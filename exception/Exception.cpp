@@ -17,7 +17,7 @@ Exception::Exception() :
 {
 }
 
-Exception::Exception(std::string message) :
+Exception::Exception(const std::string &message) :
 		m_message(message)
 {
 }

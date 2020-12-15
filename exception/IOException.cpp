@@ -27,13 +27,13 @@ IOException::IOException(int errorno) :
 {
 }
 
-IOException::IOException(std::string message) :
+IOException::IOException(const std::string &message) :
 		Exception(message),
 		m_errorno(0)
 {
 }
 
-IOException::IOException(std::string message, int errorno) :
+IOException::IOException(const std::string &message, int errorno) :
 		Exception(message + ": " + strerror(errorno)),
 		m_errorno(errorno)
 {

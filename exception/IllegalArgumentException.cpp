@@ -17,7 +17,7 @@ IllegalArgumentException::IllegalArgumentException(void) :
 {
 }
 
-IllegalArgumentException::IllegalArgumentException(std::string message) :
+IllegalArgumentException::IllegalArgumentException(const std::string &message) :
 		RuntimeException(message)
 {
 }

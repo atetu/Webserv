@@ -24,8 +24,8 @@ class IOException :
 	public:
 		IOException(void);
 		IOException(int errorno);
-		IOException(std::string message);
-		IOException(std::string message, int errorno);
+		IOException(const std::string &message);
+		IOException(const std::string &message, int errorno);
 		IOException(const IOException &other);
 
 		virtual
