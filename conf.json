@@ -41,9 +41,27 @@
 				"/xx": {
 					"methods": [
 						"GET",
-						"POST"
+						"POST",
+						"PUT"
 					],
 					"root": "/var/www/html",
+					"listing": true,
+					"index": [
+						"index.html",
+						"index-webserv.html"
+					],
+					"uploads": {
+						"enabled": true,
+						"storeAt": "/var/www/html"
+					}
+				},
+				"/yy": {
+					"methods": [
+						"GET",
+						"POST",
+						"PUT"
+					],
+					"root": "/var/www/mmorp",
 					"listing": true,
 					"index": [
 						"index.html",

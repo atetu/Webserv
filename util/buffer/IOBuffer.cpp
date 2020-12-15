@@ -11,13 +11,16 @@
 /* ************************************************************************** */
 
 #include <exception/IOException.hpp>
+#include <stddef.h>
+#include <sys/fcntl.h>
 #include <sys/errno.h>
 #include <sys/socket.h>
+#include <sys/types.h>
 #include <sys/unistd.h>
 #include <util/buffer/IOBuffer.hpp>
 #include <algorithm>
+#include <iostream>
 #include <string>
-#include <fcntl.h>
 
 IOBuffer::IOBuffer() :
 		BaseBuffer(),
@@ -37,6 +40,8 @@ IOBuffer::IOBuffer(int fd, bool closeOnDestroy, size_type maxSize) :
 {
 	if (::fcntl(m_fd, F_SETFL, O_NONBLOCK) == -1)
 		throw IOException("fcntl", errno);
+
+	std::cout << "IOBuffer(" << fd << ", " << closeOnDestroy << ", " << maxSize << ");" << std::endl;
 }
 
 IOBuffer::IOBuffer(const IOBuffer &other) :
@@ -50,6 +55,8 @@ IOBuffer::IOBuffer(const IOBuffer &other) :
 
 IOBuffer::~IOBuffer()
 {
+	std::cout << "~IOBuffer(): m_fd=" << m_fd << ", m_closeOnDestroy=" << m_closeOnDestroy << std::endl;
+
 	if (m_closeOnDestroy)
 		close();
 }
@@ -156,6 +163,7 @@ IOBuffer::capacity() const
 void
 IOBuffer::close(void)
 {
+	std::cout << "closing: " << m_fd << std::endl;
 	::close(m_fd);
 
 	m_fd = -1;

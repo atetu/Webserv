@@ -14,17 +14,19 @@
 # define HTTPORCHESTRATOR_HPP_
 
 #include <config/Configuration.hpp>
+#include <http/HTTPClient.hpp>
 #include <http/HTTPServer.hpp>
 #include <sys/select.h>
+#include <util/buffer/IOBuffer.hpp>
 #include <list>
-#include <vector>
+#include <map>
 
 class Logger;
 
 class HTTPOrchestrator
 {
 	public:
-		typedef std::list<HTTPServer> server_container;
+		typedef std::list<HTTPServer*> server_container;
 		typedef server_container::iterator server_iterator;
 
 	public:
@@ -36,6 +38,10 @@ class HTTPOrchestrator
 		fd_set m_fds;
 		int m_highestFd;
 		int m_fdCount;
+		std::map<int, HTTPServer*> serverFds;
+		std::map<int, IOBuffer*> fileReadFds;
+		std::map<int, HTTPClient*> clientFds;
+		std::map<int, IOBuffer*> fileWriteFds;
 
 		HTTPOrchestrator(const Configuration &configuration, const server_container &servers);
 
@@ -58,6 +64,24 @@ class HTTPOrchestrator
 
 		void
 		printSelectOutput(fd_set &readFds, fd_set &writeFds);
+
+		void
+		addServerFd(int fd, HTTPServer &server);
+
+		void
+		addFileReadFd(int fd, IOBuffer &ioBuffer);
+
+		void
+		addClientFd(int fd, HTTPClient &client);
+
+		void
+		addFileWriteFd(int fd, IOBuffer &ioBuffer);
+
+		void
+		removeFileRead(int fd);
+
+		void
+		removeClient(int fd);
 
 	public:
 		void

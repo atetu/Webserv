@@ -121,7 +121,7 @@ URL::extension(std::string &out) const
 	if (!URL::filename(filename))
 		return (false);
 
-	std::string::size_type lastDotPos = m_path.rfind(".");
+	std::string::size_type lastDotPos = filename.rfind(".");
 
 	if (lastDotPos == std::string::npos)
 		return (false);

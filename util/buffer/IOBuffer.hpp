@@ -51,7 +51,7 @@ class IOBuffer :
 			{
 				m_storage += buffer.storage().substr(0, capacity);
 
-				buffer.storage().erase(buffer.storage().begin(), buffer.storage().begin() + capacity);
+				buffer.storage().erase(0, capacity);
 			}
 
 			if (andClear)

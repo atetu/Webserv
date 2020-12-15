@@ -36,12 +36,18 @@ OBJECTS					= $(SOURCES:.cpp=.o)
 COMPILER				= g++
 
 FRAMEWORKS				= 
-FLAGS					= -std=c++98 -g3 # -fsanitize=address
+FLAGS					= -std=c++98 -g3
 TARGET_REQUIRED_FLAGS	= -I.
 
 TOOL_BASE64_DECODE		= base64 -d
 
 MAKE_PREFIX				= "$(COLOR_LIGHT_MAGENTA)[$(COLOR_LIGHT_GREEN) make: $(TARGET) $(COLOR_LIGHT_MAGENTA)]"
+
+USE_FSANITIZE			= false
+
+ifeq ($(USE_FSANITIZE),true)
+	FLAGS += -fsanitize=address
+endif
 
 .cpp.o:
 	@echo $(MAKE_PREFIX) "$(COLOR_WHITE)Compiling: $(COLOR_LIGHT_YELLOW)$<$(COLOR_RESET)"

@@ -81,7 +81,11 @@ HTTPOrchestrator::HTTPOrchestrator(const Configuration &configuration, const ser
 		m_servers(servers),
 		m_fds(),
 		m_highestFd(0),
-		m_fdCount(0)
+		m_fdCount(0),
+		serverFds(),
+		fileReadFds(),
+		clientFds(),
+		fileWriteFds()
 {
 	FD_ZERO(&m_fds);
 }
@@ -100,7 +104,9 @@ HTTPOrchestrator::prepare(void)
 	{
 		try
 		{
-			it->prepare();
+			(*it)->prepare();
+
+			addServerFd((*it)->serverSocket().fd(), *(*it));
 		}
 		catch (...)
 		{
@@ -121,7 +127,7 @@ HTTPOrchestrator::unprepare(void)
 
 	while (it != ite)
 	{
-		it->unprepare();
+		(*it)->unprepare();
 
 		it++;
 	}
@@ -193,22 +199,9 @@ HTTPOrchestrator::start()
 	fd_set readFdSet;
 	fd_set writeFdSet;
 
-	std::map<int, HTTPServer*> serverFds;
-	std::map<int, IOBuffer*> fileReadFds;
-	std::map<int, HTTPClient*> clientFds;
-	std::map<int, IOBuffer*> fileWriteFds;
-
-	for (server_iterator it = m_servers.begin(); it != m_servers.end(); it++)
-	{
-		int fd = it->serverSocket().fd();
-
-		setFd(fd);
-		serverFds.insert(serverFds.end(), std::make_pair(fd, &(*it)));
-	}
-
-	struct timeval timeout;
-	timeout.tv_sec = 0;
-	timeout.tv_usec = 5000;
+	struct timeval timeout = {
+		.tv_sec = 0,
+		.tv_usec = 5000 };
 
 	while (1)
 	{
@@ -220,6 +213,7 @@ HTTPOrchestrator::start()
 
 		printSelectOutput(readFdSet, writeFdSet);
 
+		try
 		{
 			typedef std::map<int, HTTPServer*>::iterator iterator;
 
@@ -234,13 +228,16 @@ HTTPOrchestrator::start()
 					if (accepted == -1)
 						throw IOException("accept", errno);
 
-					setFd(accepted);
-
-					clientFds[accepted] = new HTTPClient(accepted);
+					addClientFd(accepted, *(new HTTPClient(accepted)));
 				}
 			}
 		}
+		catch (Exception &exception)
+		{
+			LOG.warn() << "Could not accept connection: " << exception.message() << std::endl;
+		}
 
+		try
 		{
 			typedef std::map<int, IOBuffer*>::iterator iterator;
 
@@ -256,21 +253,21 @@ HTTPOrchestrator::start()
 
 					if (buffer->read() == -1 || buffer->hasReadEverything())
 					{
-						std::cout << "fd-read :: remove(" << fd << "): " << ::strerror(errno) << std::endl;
+						std::cout << "fd-read :: remove(" << fd << " (" << buffer->fd() << ")): " << ::strerror(errno) << std::endl;
 						fdToRemove.insert(fdToRemove.end(), fd);
 					}
 				}
 			}
 
 			for (std::set<int>::iterator it = fdToRemove.begin(); it != fdToRemove.end(); it++)
-			{
-				iterator found = fileReadFds.find(*it);
-
-				if (found != fileReadFds.end())
-					fileReadFds.erase(found);
-			}
+				removeFileRead(*it);
+		}
+		catch (Exception &exception)
+		{
+			LOG.warn() << "Could not handle file reading: " << exception.message() << std::endl;
 		}
 
+		try
 		{
 			typedef std::map<int, HTTPClient*>::iterator iterator;
 
@@ -283,6 +280,8 @@ HTTPOrchestrator::start()
 
 				bool canRead = FD_ISSET(fd, &readFdSet);
 				bool canWrite = FD_ISSET(fd, &writeFdSet);
+
+				bool deleted = false;
 
 				HTTPClient *client = it->second;
 
@@ -307,7 +306,11 @@ HTTPOrchestrator::start()
 								{
 									URL url = URL("http", "locahost", 80, client->parser().path(), Optional<std::map<std::string, std::string> >(), Optional<std::string>());
 
-									client->request() = new HTTPRequest(*method, url, HTTPVersion::HTTP_1_1, HTTPHeaderFields(), m_configuration, RootBlock(), ServerBlock(), LocationBlock());
+									RootBlock rootBlock;
+									ServerBlock serverBlock;
+									LocationBlock locationBlock;
+
+									client->request() = new HTTPRequest(*method, url, HTTPVersion::HTTP_1_1, HTTPHeaderFields(), m_configuration, rootBlock, serverBlock, locationBlock);
 									client->response() = method->handler().handle(*client->request());
 
 									HTTPResponse::FileBody *fileBody = dynamic_cast<HTTPResponse::FileBody*>(client->response()->body());
@@ -315,8 +318,7 @@ HTTPOrchestrator::start()
 									{
 										IOBuffer &buffer = fileBody->buffer();
 
-										setFd(buffer.fd());
-										fileReadFds.insert(fileReadFds.end(), std::make_pair(buffer.fd(), &buffer));
+										addFileReadFd(buffer.fd(), buffer);
 									}
 								}
 
@@ -326,7 +328,7 @@ HTTPOrchestrator::start()
 					}
 				}
 
-				if (canWrite)
+				if (canWrite && !deleted)
 				{
 					if (client->response())
 					{
@@ -336,38 +338,49 @@ HTTPOrchestrator::start()
 						{
 							std::cout << "closing(" << fd << "): " << ::strerror(errno) << std::endl;
 
-							::close(fd);
-							delete client;
-
 							fdToRemove.insert(fdToRemove.end(), fd);
 
-							clearFd(fd);
+							deleted = true;
+
 							continue;
 						}
 					}
 				}
 
-				if (client->lastAction() + 5 < now)
+				if (client->response() && client->response()->body())
 				{
-					std::cout << "timeout: " << fd << std::endl;
+					std::cout << "client->response()->body()->isDone(): " << client->response()->body()->isDone() << std::endl;
+				}
 
-					::close(fd);
-					delete client;
+				if (!deleted && client->response() && client->response()->state() == HTTPResponse::FINISHED)
+				{
+					std::cout << "done: " << fd << std::endl;
 
 					fdToRemove.insert(fdToRemove.end(), fd);
 
-					clearFd(fd);
+					deleted = true;
+
+					continue;
+				}
+
+				if (!deleted && client->lastAction() + 5 < now)
+				{
+					std::cout << "timeout: " << fd << std::endl;
+
+					fdToRemove.insert(fdToRemove.end(), fd);
+
+					deleted = true;
+
 					continue;
 				}
 			}
 
 			for (std::set<int>::iterator it = fdToRemove.begin(); it != fdToRemove.end(); it++)
-			{
-				iterator found = clientFds.find(*it);
-
-				if (found != clientFds.end())
-					clientFds.erase(found);
-			}
+				removeClient(*it);
+		}
+		catch (Exception &exception)
+		{
+			LOG.warn() << "Could not handle client: " << exception.message() << std::endl;
 		}
 
 //		{
@@ -403,7 +416,81 @@ HTTPOrchestrator::start()
 
 	/* Should not happen. */
 	for (server_iterator it = m_servers.begin(); it != m_servers.end(); it++) // TODO Handle exit
-		::close(it->serverSocket().fd());
+		::close((*it)->serverSocket().fd());
+}
+
+void
+HTTPOrchestrator::addServerFd(int fd, HTTPServer &server)
+{
+	setFd(fd);
+	serverFds.insert(serverFds.end(), std::make_pair(fd, &server));
+}
+
+void
+HTTPOrchestrator::addFileReadFd(int fd, IOBuffer &ioBuffer)
+{
+	setFd(fd);
+	fileReadFds.insert(fileReadFds.end(), std::make_pair(fd, &ioBuffer));
+}
+
+void
+HTTPOrchestrator::addClientFd(int fd, HTTPClient &client)
+{
+	setFd(fd);
+
+	clientFds[fd] = &client;
+}
+
+void
+HTTPOrchestrator::addFileWriteFd(int fd, IOBuffer &ioBuffer)
+{
+}
+
+void
+HTTPOrchestrator::removeFileRead(int fd)
+{
+	typedef std::map<int, IOBuffer*>::iterator iterator;
+
+	iterator found = fileReadFds.find(fd);
+
+	if (found != fileReadFds.end())
+	{
+		fileReadFds.erase(found);
+		clearFd(fd);
+	}
+}
+
+void
+HTTPOrchestrator::removeClient(int fd)
+{
+	typedef std::map<int, HTTPClient*>::iterator iterator;
+
+	iterator found = clientFds.find(fd);
+
+	if (found != clientFds.end())
+	{
+		HTTPClient *client = found->second;
+
+		HTTPResponse *response = client->response();
+		if (response)
+		{
+			HTTPResponse::IBody *body = response->body();
+
+			if (body)
+			{
+				HTTPResponse::FileBody *fileBody = dynamic_cast<HTTPResponse::FileBody*>(body);
+				if (fileBody)
+					removeFileRead(fileBody->buffer().fd());
+			}
+		}
+
+		::close(fd);
+		delete client;
+
+		clearFd(fd);
+
+		clientFds.erase(found);
+	}
 }
 
 HTTPOrchestrator
@@ -429,7 +516,7 @@ HTTPOrchestrator::create(const Configuration &configuration)
 
 	while (itr != itre)
 	{
-		httpServers.push_back(HTTPServer(itr->first, itr->second));
+		httpServers.push_back(new HTTPServer(itr->first, itr->second));
 		itr++;
 	}
 

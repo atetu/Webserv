@@ -10,19 +10,10 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <exception/Exception.hpp>
 #include <http/HTTPClient.hpp>
 #include <stddef.h>
+#include <sys/unistd.h>
 #include <util/System.hpp>
-
-HTTPClient::~HTTPClient(void)
-{
-	if (m_request)
-		delete m_request;
-
-	if (m_response)
-		delete m_response;
-}
 
 HTTPClient::HTTPClient(int fd) :
 		m_fd(fd),
@@ -34,6 +25,19 @@ HTTPClient::HTTPClient(int fd) :
 		m_response(NULL)
 {
 	updateLastAction();
+}
+
+HTTPClient::~HTTPClient(void)
+{
+	std::cout << "~HTTPClient(): m_request=" << (void*)m_request << ", m_response=" << (void*)m_response << std::endl;
+
+	if (m_request)
+		delete m_request;
+
+	if (m_response)
+		delete m_response;
+
+	::close(m_fd);
 }
 
 void

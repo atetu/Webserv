@@ -128,6 +128,12 @@ class BaseBuffer :
 			return (m_storage.size());
 		}
 
+		bool
+		empty() const
+		{
+			return (m_storage.empty());
+		}
+
 		void
 		clear()
 		{

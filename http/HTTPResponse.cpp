@@ -105,6 +105,7 @@ HTTPResponse::FileBody::buffer()
 
 HTTPResponse::FileBody::~FileBody()
 {
+	std::cout << "~FileBody()" << std::endl;
 }
 
 bool
@@ -112,7 +113,13 @@ HTTPResponse::FileBody::write(IOBuffer &buffer)
 {
 	buffer.storeFrom(m_buffer);
 
-	return (m_buffer.hasReadEverything() && m_buffer.capacity() == 0);
+	return (isDone());
+}
+
+bool
+HTTPResponse::FileBody::isDone(void)
+{
+	return (m_buffer.hasReadEverything() && m_buffer.size() == 0);
 }
 
 HTTPResponse::StringBody::StringBody(std::string string) :
@@ -123,6 +130,7 @@ HTTPResponse::StringBody::StringBody(std::string string) :
 
 HTTPResponse::StringBody::~StringBody()
 {
+	std::cout << "~StringBody(): m_sent=" << m_sent << std::endl;
 }
 
 bool
@@ -135,6 +143,12 @@ HTTPResponse::StringBody::write(IOBuffer &fd)
 	}
 
 	return (true);
+}
+
+bool
+HTTPResponse::StringBody::isDone(void)
+{
+	return (m_sent);
 }
 
 HTTPResponse::HTTPResponse(const HTTPStatus &status, const HTTPHeaderFields &headers, IBody *body) :
@@ -157,6 +171,8 @@ HTTPResponse::HTTPResponse(const HTTPVersion &version, const HTTPStatus &status,
 
 HTTPResponse::~HTTPResponse()
 {
+	std::cout << "~HTTPResponse(): m_body=" << (void*)m_body << std::endl;
+
 	if (m_body)
 		delete m_body;
 }
@@ -193,7 +209,7 @@ HTTPResponse::write(IOBuffer &out)
 			break;
 
 		case FLUSHING:
-			if (out.send() < 0 || out.capacity() == 0)
+			if (out.send() < 0 || out.size() == 0)
 				m_state = FINISHED;
 
 			break;

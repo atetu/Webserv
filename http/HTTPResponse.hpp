@@ -63,6 +63,9 @@ class HTTPResponse
 				 */
 				virtual bool
 				write(IOBuffer &buffer) = 0;
+
+				virtual bool
+				isDone() = 0;
 		};
 
 		/**
@@ -86,6 +89,9 @@ class HTTPResponse
 
 				IOBuffer&
 				buffer();
+
+				bool
+				isDone();
 		};
 
 		/**
@@ -106,6 +112,9 @@ class HTTPResponse
 
 				virtual bool
 				write(IOBuffer &fd);
+
+				bool
+				isDone();
 		};
 
 		enum State
@@ -138,6 +147,12 @@ class HTTPResponse
 		body() const
 		{
 			return (m_body);
+		}
+
+		State
+		state() const
+		{
+			return (m_state);
 		}
 
 	public:
