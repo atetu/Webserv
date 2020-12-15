@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HTTPMethod.hpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ecaceres <ecaceres@student.42.fr>          +#+  +:+       +#+        */
+/*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/27 17:32:53 by ecaceres          #+#    #+#             */
-/*   Updated: 2020/10/27 17:32:53 by ecaceres         ###   ########.fr       */
+/*   Updated: 2020/12/10 16:05:57 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,9 +14,6 @@
 # define HTTPMETHOD_HPP_
 
 #include <util/Enum.hpp>
-#include <iostream>
-#include <string>
-#include <vector>
 
 class HTTPMethodHandler;
 
@@ -34,7 +31,7 @@ class HTTPMethod :
 		HTTPMethod&
 		operator =(const HTTPMethod &other);
 
-		const HTTPMethodHandler&
+		HTTPMethodHandler&
 		handler(void) const;
 
 	public:
@@ -47,5 +44,7 @@ class HTTPMethod :
 		static HTTPMethod *OPTIONS;
 		static HTTPMethod *TRACE;
 };
+
+#include <http/handler/HTTPMethodHandler.hpp>
 
 #endif /* HTTPMETHOD_HPP_ */

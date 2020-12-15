@@ -6,7 +6,7 @@
 /*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/28 11:33:47 by ecaceres          #+#    #+#             */
-/*   Updated: 2020/12/02 17:53:05 by alicetetu        ###   ########.fr       */
+/*   Updated: 2020/12/09 11:25:39 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,8 +29,8 @@ class Configuration
 	public:
         static Logger &LOG;
 	
-	public:
-		typedef std::vector<ServerBlock*>::const_iterator siterator;
+//	public:
+	//	typedef std::vector<ServerBlock*>::const_iterator siterator;
 
 	private:
 		std::string m_file;

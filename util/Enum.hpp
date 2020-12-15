@@ -3,19 +3,21 @@
 /*                                                        :::      ::::::::   */
 /*   Enum.hpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ecaceres <ecaceres@student.42.fr>          +#+  +:+       +#+        */
+/*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/27 15:18:24 by ecaceres          #+#    #+#             */
-/*   Updated: 2020/10/27 15:18:24 by ecaceres         ###   ########.fr       */
+/*   Updated: 2020/12/10 16:25:05 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef ENUM_HPP_
 # define ENUM_HPP_
 
+#include <exception/Exception.hpp>
 #include <util/Objects.hpp>
 #include <iostream>
 #include <string>
+#include <typeinfo>
 #include <vector>
 
 # define ENUM_DEFINE(clazz, name, constructor) clazz *clazz::name = clazz::enumValue(#name, constructor);
@@ -80,6 +82,7 @@ template<typename E>
 			static const Pointer
 			enumValue(const std::string &name, const E &from)
 			{
+				//std::cout << name << std::endl;
 				Pointer value = new E(from);
 				value->m_name = name;
 				value->m_ordinal = nextOrdinal();
@@ -123,6 +126,30 @@ template<typename E>
 			values()
 			{
 				return (enumConstants().storage());
+			}
+
+			inline static const E*
+			find(const std::string &string)
+			{
+				const Container &storage = values();
+
+				for (iterator it = storage.begin(); it != storage.end(); it++)
+					if ((*it)->name() == string)
+						return (*it);
+
+				return (NULL);
+			}
+
+			inline static const E&
+			valueOf(const std::string &string)
+			{
+				const Container &storage = values();
+
+				for (iterator it = storage.begin(); it != storage.end(); it++)
+					if ((*it)->name() == string)
+						return (*it);
+
+				throw Exception("Enum value " + std::string(typeid(E).name()) + "." + string + " does not exists");
 			}
 	};
 

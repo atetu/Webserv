@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   HttpResponse.hpp                                   :+:      :+:    :+:   */
+/*   HTTPResponse.hpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ecaceres <ecaceres@student.42.fr>          +#+  +:+       +#+        */
+/*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/27 16:38:46 by ecaceres          #+#    #+#             */
-/*   Updated: 2020/10/27 16:38:46 by ecaceres         ###   ########.fr       */
+/*   Updated: 2020/12/09 15:51:48 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,6 @@
 #include <http/HTTPHeaderFields.hpp>
 #include <http/HTTPStatus.hpp>
 #include <http/HTTPVersion.hpp>
-#include <sys/types.h>
 #include <util/buffer/IOBuffer.hpp>
 #include <string>
 
@@ -47,21 +46,34 @@ class HTTPResponse
 				format(void) const;
 		};
 
+		/**
+		 * Base body class.
+		 */
 		class IBody
 		{
 			public:
 				virtual
 				~IBody();
 
+				/**
+				 * Write to the output information that will be sent to the socket.
+				 *
+				 * @param buffer IO Buffer to write to.
+				 * @return Whether or not everything has been sent.
+				 */
 				virtual bool
-				write(IOBuffer &fd) = 0;
+				write(IOBuffer &buffer) = 0;
 		};
 
+		/**
+		 * The File Body fill-up an internal buffer with information of a source IOBuffer.
+		 * Slowly reading (from a file) then writing (to the output) to return the file in small chunks.
+		 */
 		class FileBody :
 				public IBody
 		{
 			private:
-				IOBuffer m_fd;
+				IOBuffer m_buffer;
 
 			public:
 				FileBody(int fd);
@@ -71,8 +83,14 @@ class HTTPResponse
 
 				virtual bool
 				write(IOBuffer &fd);
+
+				IOBuffer&
+				buffer();
 		};
 
+		/**
+		 * The String Body only put the whole provided string into the IOBuffer.
+		 */
 		class StringBody :
 				public IBody
 		{
@@ -107,6 +125,7 @@ class HTTPResponse
 		ssize_t m_state_index;
 
 	public:
+		HTTPResponse(const HTTPStatus &status, const HTTPHeaderFields &headers, IBody *body);
 		HTTPResponse(const HTTPVersion &version, const HTTPStatus &status, const HTTPHeaderFields &headers, IBody *body);
 
 		virtual
@@ -114,6 +133,12 @@ class HTTPResponse
 
 		bool
 		write(IOBuffer &fd);
+
+		IBody*
+		body() const
+		{
+			return (m_body);
+		}
 
 	public:
 		static inline HTTPResponse*

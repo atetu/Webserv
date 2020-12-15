@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HTTPMethod.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ecaceres <ecaceres@student.42.fr>          +#+  +:+       +#+        */
+/*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/27 17:32:53 by ecaceres          #+#    #+#             */
-/*   Updated: 2020/10/27 17:32:53 by ecaceres         ###   ########.fr       */
+/*   Updated: 2020/12/10 16:30:06 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,4 +50,10 @@ HTTPMethod::operator =(const HTTPMethod &other)
 		m_handler = other.m_handler;
 
 	return (*this);
+}
+
+HTTPMethodHandler&
+HTTPMethod::handler(void) const
+{
+	return (*m_handler);
 }

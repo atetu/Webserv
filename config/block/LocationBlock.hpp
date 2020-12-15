@@ -59,6 +59,9 @@ class LocationBlock
 
 		const Optional<std::string>
 		cgi(void) const;
+
+		std::string
+		path(void);
 		
 
 	public:

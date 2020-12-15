@@ -6,7 +6,7 @@
 /*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/19 15:34:02 by ecaceres          #+#    #+#             */
-/*   Updated: 2020/12/03 11:52:35 by alicetetu        ###   ########.fr       */
+/*   Updated: 2020/12/08 18:57:48 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 #include "config/Configuration.hpp"
 // #include <exception/Exception.hpp>
 // #include <http/HTTPMethod.hpp>
-// #include <http/HTTPOrchestrator.hpp>
+#include <http/HTTPOrchestrator.hpp>
 // #include <util/ContainerBuilder.hpp>
 // #include <util/log/LoggerFactory.hpp>
 // #include <util/unit/DataSize.hpp>
@@ -96,9 +96,10 @@ main(int argc, char **argv)
 		// CHECK CONF FILE
 	}
 	
+	Configuration configuration;
 	try
 	{
-		Configuration::fromJsonFile(configFile);
+		configuration = Configuration::fromJsonFile(configFile);
 	}
 	catch(const std::exception& e)
 	{
@@ -138,12 +139,13 @@ main(int argc, char **argv)
 
 // 	signal(SIGPIPE, SIG_IGN);
 
-// 	try {
-// 		HTTPOrchestrator::create(configuration).start();
-// 	} catch (Exception &e) {
-// 		std::cerr << "Ouch... The server has thrown an exception: " << std::endl;
-// 		std::cerr << typeid(e).name() << ".what(): " << e.what() << std::endl;
-// 	}
+ 	try {
+ 		HTTPOrchestrator::create(configuration).start();
+ 	}
+	catch (Exception &e) {
+ 		std::cerr << "Ouch... The server has thrown an exception: " << std::endl;
+ 		std::cerr << typeid(e).name() << ".what(): " << e.what() << std::endl;
+ 	}
 
 // //	throw IOException("ORCHESTRATOR LOOP HAS BEEN EXITED", errno);
 

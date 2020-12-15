@@ -6,7 +6,7 @@
 /*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/28 11:34:45 by ecaceres          #+#    #+#             */
-/*   Updated: 2020/12/03 10:02:58 by alicetetu        ###   ########.fr       */
+/*   Updated: 2020/12/15 12:30:28 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,6 +51,9 @@ class ServerBlock
 
 		ServerBlock&
 		host(std::string host);
+
+		const Optional<std::string>
+		host(void) const;
 
 		ServerBlock&
 		names(std::list<std::string> names);

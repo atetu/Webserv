@@ -3,15 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   HTTPHeaderFields.cpp                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ecaceres <ecaceres@student.42.fr>          +#+  +:+       +#+        */
+/*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/27 18:39:24 by ecaceres          #+#    #+#             */
-/*   Updated: 2020/10/27 18:39:24 by ecaceres         ###   ########.fr       */
+/*   Updated: 2020/12/14 14:11:30 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <http/HTTP.hpp>
 #include <http/HTTPHeaderFields.hpp>
+#include <http/HTTPValueParser.hpp>
 #include <util/Convert.hpp>
 #include <string>
 
@@ -288,4 +289,105 @@ HTTPHeaderFields::format(void) const
 	}
 
 	return (str);
+}
+
+std::map<std::string, std::string>
+HTTPHeaderFields::storage(void)
+{
+	return (m_storage);
+}
+
+HTTPValueParser*
+HTTPHeaderFields::getValueWithWeight(std::string field)
+{
+	map::iterator it = m_storage.begin();
+	map::iterator ite = m_storage.end();
+
+	while (it != ite && it->first != field)
+		it++;
+	
+	std::string value = it->second;
+	
+	HTTPValueParser *valueParser = new HTTPValueParser(value);
+	
+	char c ;
+	
+	while (valueParser->next(c))
+		valueParser->consume(c);
+	valueParser->consume('\0');
+	
+	// std::map<float, std::list<std::string> > *mmap = valueParser->getMap();
+	
+	//  std::map<float,  std::list<std::string> >::iterator itt = mmap->begin();
+    // std::map<float,  std::list<std::string> >::iterator itte = mmap->end();
+    
+    // while (itt != itte)
+    // {
+    //     std::cout << itt->first << " : " ;
+	// std::list<std::string>::iterator it_list =itt->second.begin();
+    // std::list<std::string>::iterator ite_list = itt->second.end();
+      
+	// while (it_list != ite_list)
+	// {
+            
+    // 	  std::cout<< "[value] " << *it_list << std::endl;
+    //       it_list++;
+	// }
+	// itt++;
+	// }
+	return (valueParser);
+}
+
+HTTPHeaderFields*
+HTTPHeaderFields::create(std::vector<HTTPHeaderParser> headerParser)
+{
+	std::vector<HTTPHeaderParser>::iterator it = headerParser.begin();
+	std::vector<HTTPHeaderParser>::iterator ite = headerParser.end();
+
+	HTTPHeaderFields *header = new HTTPHeaderFields();
+	
+	while (it != ite)
+	{
+		if (it->getField().compare(ACCEPT_CHARSETS) == 0)
+		{
+	//		std::string value = it->getValue();
+	//		HTTPValueParser valueParser(value);
+			header->acceptCharsets(it->getValue());
+		}
+		else if (it->getField().compare(ACCEPT_LANGUAGE) == 0)
+			header->acceptLanguage(it->getValue());
+		else if (it->getField().compare(ALLOW) == 0)
+			header->allow(it->getValue());
+		else if (it->getField().compare(AUTHORIZATION) == 0)
+			header->authorization(it->getValue());
+		else if (it->getField().compare(CONTENT_LANGUAGE) == 0)
+			header->contentLanguage(it->getValue());
+		else if (it->getField().compare(CONTENT_LOCATION) == 0)
+			header->contentLocation(it->getValue());
+		else if (it->getField().compare(CONTENT_TYPE) == 0)
+			header->acceptCharsets(it->getValue());
+		else if (it->getField().compare(DATE) == 0)
+			header->date(it->getValue());
+		else if (it->getField().compare(HOST) == 0)
+			header->host(it->getValue());
+		else if (it->getField().compare(LAST_MODIFIED) == 0)
+			header->lastModified(it->getValue());
+		else if (it->getField().compare(LOCATION) == 0)
+			header->location(it->getValue());
+		else if (it->getField().compare(REFERER) == 0)
+			header->referer(it->getValue());
+		else if (it->getField().compare(RETRY_AFTER) == 0)
+			header->retryAfter(it->getValue());
+		else if (it->getField().compare(SERVER) == 0)
+			header->server(it->getValue());
+		else if (it->getField().compare(TRANSFER_ENCODING) == 0)
+			header->transferEncoding(it->getValue());
+		else if (it->getField().compare(USER_AGENT) == 0)
+			header->userAgent(it->getValue());
+		else if (it->getField().compare(WWW_AUTHENTICATE) == 0)
+			header->wwwAuthenticate(it->getValue()); 
+		// if not recognized ignored and not added
+		it++;
+	}
+	return (header);
 }

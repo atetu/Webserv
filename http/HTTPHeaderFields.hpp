@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HTTPHeaderFields.hpp                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ecaceres <ecaceres@student.42.fr>          +#+  +:+       +#+        */
+/*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/27 18:39:24 by ecaceres          #+#    #+#             */
-/*   Updated: 2020/10/27 18:39:24 by ecaceres         ###   ########.fr       */
+/*   Updated: 2020/12/12 12:19:04 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,8 @@
 
 #include <http/HTTPDate.hpp>
 #include <http/HTTPMethod.hpp>
+#include <http/HTTPHeaderParser.hpp>
+#include <http/HTTPValueParser.hpp>
 #include <http/mime/Mime.hpp>
 #include <http/mime/MimeRegistry.hpp>
 #include <stddef.h>
@@ -27,6 +29,7 @@ class HTTPHeaderFields
 {
 	public:
 		typedef std::map<std::string, std::string> map;
+		//typedef std::map<std::string, std::map<float, std::list<std::string> > > map; // [header field [preference / value]]
 		typedef map::const_iterator const_iterator;
 
 	private:
@@ -147,6 +150,16 @@ class HTTPHeaderFields
 
 		std::string
 		format(void) const;
+
+		map
+		storage(void);
+
+		HTTPValueParser*
+		getValueWithWeight(std::string field);
+		
+	public:
+		static HTTPHeaderFields*
+		create(std::vector<HTTPHeaderParser> headerParser);
 
 	public:
 		static const std::string ACCEPT_CHARSETS;

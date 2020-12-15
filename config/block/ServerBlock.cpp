@@ -6,7 +6,7 @@
 /*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/28 11:34:45 by ecaceres          #+#    #+#             */
-/*   Updated: 2020/12/03 10:05:25 by alicetetu        ###   ########.fr       */
+/*   Updated: 2020/12/15 12:30:16 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,6 +79,12 @@ ServerBlock::host(std::string host)
 	return (*this);
 }
 
+const Optional<std::string>
+ServerBlock::host(void) const
+{
+	return (m_host);
+}
+		
 ServerBlock&
 ServerBlock::names(std::list<std::string> names)
 {

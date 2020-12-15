@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HTTPOrchestrator.hpp                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ecaceres <ecaceres@student.42.fr>          +#+  +:+       +#+        */
+/*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/28 14:34:10 by ecaceres          #+#    #+#             */
-/*   Updated: 2020/10/28 14:34:10 by ecaceres         ###   ########.fr       */
+/*   Updated: 2020/12/10 10:55:26 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,6 +55,9 @@ class HTTPOrchestrator
 
 		void
 		clearFd(int fd);
+
+		void
+		printSelectOutput(fd_set &readFds, fd_set &writeFds);
 
 	public:
 		void

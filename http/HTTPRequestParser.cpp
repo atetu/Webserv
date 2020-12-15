@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HTTPRequestParser.cpp                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ecaceres <ecaceres@student.42.fr>          +#+  +:+       +#+        */
+/*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/27 17:29:02 by ecaceres          #+#    #+#             */
-/*   Updated: 2020/10/27 17:29:02 by ecaceres         ###   ########.fr       */
+/*   Updated: 2020/12/11 11:22:40 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,8 @@ HTTPRequestParser::HTTPRequestParser() :
 		m_major(-1),
 		m_minor(-1),
 		m_last_char(0),
-		m_last_char2(0)
+		m_last_char2(0),
+		m_headerParser()
 {
 	m_method.reserve(16);
 	m_path.reserve(60);
@@ -182,7 +183,11 @@ HTTPRequestParser::consume(char c)
 
 		case S_HTTP_END2:
 		{
-			m_state = S_FIELD;
+			if (m_last_char2 == '\n' && m_last_char == '\r' && c == '\n')
+				m_state = S_END;
+			else
+				m_state = S_CONTINUE;
+			// m_state = S_FIELD;
 
 			break;
 		}
@@ -191,11 +196,20 @@ HTTPRequestParser::consume(char c)
 		{
 			if (m_last_char2 == '\n' && m_last_char == '\r' && c == '\n')
 				m_state = S_END;
+			else
+				m_state = S_CONTINUE;
 
 			break;
 		}
-	}
 
+		case S_END:
+			break;
+			
+		case S_CONTINUE:
+			break;
+		
+	}
+	
 	m_last_char2 = m_last_char;
 	m_last_char = c;
 }
@@ -228,4 +242,22 @@ int
 HTTPRequestParser::minor() const
 {
 	return (m_minor);
+}
+
+void
+HTTPRequestParser::header(HTTPHeaderParser headerParser)
+{
+	m_headerParser.push_back(headerParser);
+}
+
+std::vector<HTTPHeaderParser> 
+HTTPRequestParser::getHeader()
+{
+	return (m_headerParser);
+}
+
+char
+HTTPRequestParser::lastChar() const
+{
+	return (m_last_char);
 }

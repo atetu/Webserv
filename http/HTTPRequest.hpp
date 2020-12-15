@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HTTPRequest.hpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ecaceres <ecaceres@student.42.fr>          +#+  +:+       +#+        */
+/*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/20 13:18:11 by ecaceres          #+#    #+#             */
-/*   Updated: 2020/10/20 13:18:11 by ecaceres         ###   ########.fr       */
+/*   Updated: 2020/12/09 16:06:25 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@
 #include <config/block/LocationBlock.hpp>
 #include <config/block/RootBlock.hpp>
 #include <config/block/ServerBlock.hpp>
+#include <config/Configuration.hpp>
 #include <http/HTTPHeaderFields.hpp>
 #include <http/HTTPMethod.hpp>
 #include <http/HTTPVersion.hpp>
@@ -28,9 +29,10 @@ class HTTPRequest
 		URL m_url;
 		HTTPVersion m_version;
 		HTTPHeaderFields m_headerFields;
-		RootBlock &m_rootBlock;
-		ServerBlock &m_serverBlock;
-		LocationBlock &m_locationBlock;
+		const Configuration &m_configuration;
+		const RootBlock &m_rootBlock;
+		const ServerBlock &m_serverBlock;
+		const LocationBlock &m_locationBlock;
 
 	private:
 		HTTPRequest(void);
@@ -40,7 +42,7 @@ class HTTPRequest
 		operator =(const HTTPRequest &other);
 
 	public:
-		HTTPRequest(const HTTPMethod &method, const URL &url, const HTTPVersion &version, const HTTPHeaderFields &headerFields, RootBlock &rootBlock, ServerBlock &serverBlock, LocationBlock &locationBlock);
+		HTTPRequest(const HTTPMethod &method, const URL &url, const HTTPVersion &version, const HTTPHeaderFields &headerFields, const Configuration &configuration, const RootBlock &rootBlock, const ServerBlock &serverBlock, const LocationBlock &locationBlock);
 
 		virtual
 		~HTTPRequest(void);
@@ -69,6 +71,12 @@ class HTTPRequest
 			return (m_headerFields);
 		}
 
+		inline const Configuration&
+		configuration()
+		{
+			return (m_configuration);
+		}
+
 		inline const ServerBlock&
 		server()
 		{
@@ -79,6 +87,21 @@ class HTTPRequest
 		location()
 		{
 			return (m_locationBlock);
+		}
+
+		inline std::string
+		root(void) const
+		{
+			// if (m_locationBlock.root().present())
+			// 	return (m_locationBlock.root().get());
+
+			// if (m_serverBlock.root().present())
+			// 	return (m_serverBlock.root().get());
+
+			// if (m_rootBlock.root().present())
+			// 	return (m_rootBlock.root().get());
+
+			return ("./");
 		}
 };
 

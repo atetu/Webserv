@@ -13,8 +13,8 @@
 #ifndef HTTPMETHODHANDLER_HPP_
 # define HTTPMETHODHANDLER_HPP_
 
-#include <http/HTTPRequest.hpp>
-#include <http/HTTPResponse.hpp>
+class HTTPRequest;
+class HTTPResponse;
 
 class HTTPMethodHandler
 {
