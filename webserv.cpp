@@ -6,32 +6,24 @@
 /*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/19 15:34:02 by ecaceres          #+#    #+#             */
-/*   Updated: 2020/12/03 11:52:35 by alicetetu        ###   ########.fr       */
+/*   Updated: 2020/12/08 18:57:48 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <config/block/LocationBlock.hpp>
-#include <config/block/ServerBlock.hpp>
 #include <config/Configuration.hpp>
+#include <cygwin/stat.h>
 #include <exception/Exception.hpp>
-#include <http/HTTPMethod.hpp>
 #include <http/HTTPOrchestrator.hpp>
 #include <http/mime/MimeRegistry.hpp>
-#include <util/ContainerBuilder.hpp>
-#include <util/log/LoggerFactory.hpp>
-#include <util/unit/DataSize.hpp>
+#include <sys/stat.h>
 #include <util/options/Option.hpp>
 #include <util/options/OptionParser.hpp>
-#include <util/options/ParserException.hpp>
-#include <util/json/Json.hpp>
-#include <csignal>
+#include <cstdlib>
 #include <iostream>
+#include <list>
+#include <map>
 #include <string>
 #include <typeinfo>
-#include <vector>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <unistd.h>
 
 int
 main(int argc, char **argv)
@@ -125,16 +117,17 @@ main(int argc, char **argv)
 	{
 		// CHECK CONF FILE
 	}
-
-	try
-	{
-		Configuration::fromJsonFile(configFile);
-	}
-	catch (const std::exception &e)
-	{
-		std::cerr << e.what() << '\n';
-		::exit(2);
-	}
+	
+//	Configuration configuration;
+//	try
+//	{
+//		configuration = Configuration::fromJsonFile(configFile);
+//	}
+//	catch (const std::exception &e)
+//	{
+//		std::cerr << e.what() << '\n';
+//		::exit(2);
+//	}
 
 // 	Configuration configuration(ContainerBuilder<ServerBlock>() //
 // 	/**/.add(ServerBlock()
@@ -168,14 +161,15 @@ main(int argc, char **argv)
 
 // 	try {
 // 		HTTPOrchestrator::create(configuration).start();
-// 	} catch (Exception &e) {
+// 	}
+//	catch (Exception &e) {
 // 		std::cerr << "Ouch... The server has thrown an exception: " << std::endl;
 // 		std::cerr << typeid(e).name() << ".what(): " << e.what() << std::endl;
 // 	}
 
 // //	throw IOException("ORCHESTRATOR LOOP HAS BEEN EXITED", errno);
 
-// 	LoggerFactory::destroy();
+ 	LoggerFactory::destroy();
 
 	return (0);
 }

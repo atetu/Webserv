@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HTTPRequestParser.hpp                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ecaceres <ecaceres@student.42.fr>          +#+  +:+       +#+        */
+/*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/27 17:29:02 by ecaceres          #+#    #+#             */
-/*   Updated: 2020/10/27 17:29:02 by ecaceres         ###   ########.fr       */
+/*   Updated: 2020/12/11 11:23:21 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,9 @@
 # ifdef minor
 #  undef minor
 # endif
+# include <iostream>
+# include <vector>
+#include <http/HTTPHeaderParser.hpp>
 
 class HTTPRequestParser
 {
@@ -29,7 +32,7 @@ class HTTPRequestParser
 		enum State
 		{
 			S_NOT_STARTED,
-			S_ERROR,
+	//		S_ERROR,
 			S_METHOD,
 			S_SPACES_BEFORE_PATH,
 			S_PATH,
@@ -49,7 +52,8 @@ class HTTPRequestParser
 			S_HTTP_END,
 			S_HTTP_END2,
 			S_FIELD,
-			S_EMPTY_LINE,
+		//	S_EMPTY_LINE,
+			S_CONTINUE,
 			S_END,
 		};
 
@@ -62,6 +66,8 @@ class HTTPRequestParser
 
 		char m_last_char;
 		char m_last_char2;
+
+		std::vector<HTTPHeaderParser> m_headerParser;
 
 	public:
 		HTTPRequestParser();
@@ -83,6 +89,15 @@ class HTTPRequestParser
 
 		int
 		minor() const;
+
+		void
+		header(HTTPHeaderParser headerParser);
+
+		std::vector<HTTPHeaderParser> 
+		getHeader();
+
+		char
+		lastChar() const;
 };
 
 #endif /* HTTPREQUESTPARSER_HPP_ */

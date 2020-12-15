@@ -6,7 +6,7 @@
 /*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/28 19:10:59 by ecaceres          #+#    #+#             */
-/*   Updated: 2020/12/03 10:13:43 by alicetetu        ###   ########.fr       */
+/*   Updated: 2020/12/15 16:32:11 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -120,4 +120,10 @@ const Optional<std::string>
 LocationBlock::cgi(void) const
 {
 	return (m_cgi);
+}
+
+std::string
+LocationBlock::path()
+{
+	return (m_path);
 }

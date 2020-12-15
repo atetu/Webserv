@@ -6,7 +6,7 @@
 /*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/28 14:33:42 by ecaceres          #+#    #+#             */
-/*   Updated: 2020/11/24 15:25:29 by alicetetu        ###   ########.fr       */
+/*   Updated: 2020/12/09 14:58:48 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,12 +18,6 @@ HTTPServer::HTTPServer(void) :
 		m_socketServer()
 {
 }
-
-//HTTPServer::HTTPServer(int port, const std::vector<ServerBlock> &servers) : // pourquoi on se retrouve avec un vecteur et pas juste un ServerBlock?
-//		m_port(port),
-//		m_servers(servers)
-//{
-//}
 
 HTTPServer::HTTPServer(const HTTPServer &other) :
 		m_port(other.m_port),

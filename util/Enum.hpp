@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Enum.hpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ecaceres <ecaceres@student.42.fr>          +#+  +:+       +#+        */
+/*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/27 15:18:24 by ecaceres          #+#    #+#             */
-/*   Updated: 2020/10/27 15:18:24 by ecaceres         ###   ########.fr       */
+/*   Updated: 2020/12/10 16:25:05 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,6 +82,7 @@ template<typename E>
 			static const Pointer
 			enumValue(const std::string &name, const E &from)
 			{
+				//std::cout << name << std::endl;
 				Pointer value = new E(from);
 				value->m_name = name;
 				value->m_ordinal = nextOrdinal();

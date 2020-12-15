@@ -10,6 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+#include <exception/Exception.hpp>
 #include <http/HTTPClient.hpp>
 #include <stddef.h>
 #include <sys/unistd.h>
@@ -37,7 +38,7 @@ HTTPClient::~HTTPClient(void)
 	if (m_response)
 		delete m_response;
 
-	::close(m_fd);
+	::close (m_fd);
 }
 
 void
@@ -47,4 +48,16 @@ HTTPClient::updateLastAction()
 
 	if (time)
 		m_lastAction = time;
+}
+
+void
+HTTPClient::header(HTTPHeaderParser headerParser)
+{
+	m_headerParser.push_back(headerParser);
+}
+
+std::vector<HTTPHeaderParser>
+HTTPClient::getHeader()
+{
+	return (m_headerParser);
 }

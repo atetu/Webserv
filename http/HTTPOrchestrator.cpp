@@ -6,7 +6,7 @@
 /*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/28 14:34:10 by ecaceres          #+#    #+#             */
-/*   Updated: 2020/11/26 16:02:37 by alicetetu        ###   ########.fr       */
+/*   Updated: 2020/12/15 15:59:32 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,6 +37,11 @@
 #include <set>
 #include <utility>
 
+#include <http/handler/HTTPMethodHandler.hpp>
+#include <http/handler/methods/GetHandler.hpp>
+#include <http/HTTPRequest.hpp>
+#include <http/HTTPHeaderParser.hpp>
+#include <http/HTTPFindLocation.hpp>
 class System;
 
 #ifdef __linux__
@@ -205,7 +210,7 @@ HTTPOrchestrator::start()
 
 	while (1)
 	{
-		readFdSet = m_fds; // la je ne comprends pas
+		readFdSet = m_fds;
 		writeFdSet = m_fds;
 
 		if (::select(m_highestFd + 1, &readFdSet, &writeFdSet, NULL, &timeout) == -1)
