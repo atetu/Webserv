@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ParserException.hpp                 :+:      :+:    :+:   */
+/*   OptionParserException.hpp                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -10,32 +10,25 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef PARSEREXCEPTION_HPP_
-# define PARSEREXCEPTION_HPP_
+#ifndef OPTIONPARSEREXCEPTION_HPP_
+# define OPTIONPARSEREXCEPTION_HPP_
 
+#include <exception/Exception.hpp>
 #include <string>
-# include <exception>
 
-class ParserException :
-		public std::exception
-{	
-	private:
-		std::string m_message;
-	
+class OptionParserException :
+		public Exception
+{
 	public:
-		ParserException(void);
-		ParserException(std::string message);
-		ParserException(const ParserException &other);
+		OptionParserException(void);
+		OptionParserException(const std::string &message);
+		OptionParserException(const OptionParserException &other);
 
 		virtual
-		~ParserException() throw ();
+		~OptionParserException() throw ();
 
-		ParserException&
-		operator=(const ParserException &other);
-
-		const std::string& message() const;
-
-		const char* what() const throw ();
+		OptionParserException&
+		operator=(const OptionParserException &other);
 };
 
-#endif /* ParserException_HPP_ */
+#endif /* PARSEREXCEPTION_HPP_ */

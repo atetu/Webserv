@@ -10,166 +10,80 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <config/Configuration.hpp>
-#include <cygwin/stat.h>
 #include <exception/Exception.hpp>
-#include <http/HTTPOrchestrator.hpp>
-#include <http/mime/MimeRegistry.hpp>
-#include <sys/stat.h>
+#include <util/Enum.hpp>
+#include <util/log/LoggerFactory.hpp>
+#include <util/log/LogLevel.hpp>
+#include <util/options/CommandLine.hpp>
 #include <util/options/Option.hpp>
 #include <util/options/OptionParser.hpp>
-#include <cstdlib>
 #include <iostream>
 #include <list>
-#include <map>
 #include <string>
-#include <typeinfo>
+
+const Option OPT_HELP('h', "help", "display this help message");
+const Option OPT_CHECK('c', "check", "only check the config file");
+const Option OPT_CONFIG_FILE('f', "config-file", "specify the config file", "file");
+const Option OPT_LOG_LEVEL('l', "log-level", "change the log-level", "level");
+
+int
+delegated_main(int argc, char **argv)
+{
+	std::string configFile = "conf.json";
+	bool checkOnly = false;
+	const LogLevel *level = LogLevel::INFO;
+
+	std::list<const Option*> lst;
+	lst.push_back(&OPT_HELP);
+	lst.push_back(&OPT_CHECK);
+	lst.push_back(&OPT_CONFIG_FILE);
+	lst.push_back(&OPT_LOG_LEVEL);
+
+	OptionParser parser(lst);
+
+	try
+	{
+		CommandLine commandLine = parser.parse(argc, argv);
+
+		if (commandLine.has(OPT_HELP))
+		{
+			std::cout << parser.help() << std::endl;
+			return (0);
+		}
+
+		if (commandLine.has(OPT_CHECK))
+			checkOnly = true;
+
+		if (commandLine.has(OPT_CONFIG_FILE))
+			configFile = commandLine.last(OPT_CONFIG_FILE);
+
+		if (commandLine.has(OPT_LOG_LEVEL))
+		{
+			const std::string &input = commandLine.last(OPT_LOG_LEVEL);
+
+			const LogLevel *foundLevel = LogLevel::find(input);
+			if (foundLevel)
+				level = foundLevel;
+			else
+				throw Exception("Unknown log level: " + input);
+		}
+	}
+	catch (Exception &exception)
+	{
+		std::cerr << argv[0] << ": " << exception.what() << std::endl;
+		std::cerr << "Try '" << argv[0] << " --help' for more informations." << std::endl;
+		return (1);
+	}
+
+	return (0);
+}
 
 int
 main(int argc, char **argv)
 {
-	MimeRegistry mimeRegistry;
-	mimeRegistry.loadFromFile("mime.json");
+	int exitCode = delegated_main(argc, argv);
 
-//	Configuration configuration(mimeRegistry, ContainerBuilder<ServerBlock>() //
-//	/**/.add(ServerBlock()
-//	/**//**/.port(1502)
-//	/**//**/.host("127.0.0.1")
-//	/**//**/.names(ContainerBuilder<std::string, std::list<std::string> >().add("boxplay.io").build())
-//	/**//**/.maxBodySize(DataSize::ofMegabytes(10))
-//	/**//**/.root("/var/www/html")
-////	/**//**/.locations(ContainerBuilder<LocationBlock*>()
-////	/**//**//**/.add(&(new LocationBlock()
-////	/**//**//**//**/.methods(ContainerBuilder<std::string>()
-////	/**//**//**//**//**/.add("GET")
-////	/**//**//**//**//**/.add("HEAD")
-////	/**//**//**//**//**/.add("POST")
-////	/**//**//**//**//**/.build())
-////	/**//**//**//**/.index(ContainerBuilder<std::string>()
-////	/**//**//**//**//**/.add("index.html")
-////	/**//**//**//**//**/.add("index-default.html")
-////	/**//**//**//**//**/.build())
-////	/**//**//**//**/.listing(true))
-//	/**//**//**/.build())//))
-////	/**/.add(ServerBlock()
-////	/**//**/.port(2051)
-////	/**//**/.host("127.0.0.1")
-////	/**//**/.names("boxplay2.io")
-////	/**//**/.maxBodySize(DataSize::ofMegabytes(10))
-////	/**//**/.root("/var/www/html"))
-//	/**/.build());
+	LoggerFactory::destroy();
 
-	//OPTIONS
-
-	Option helpOption("-", "--", 'h', "help", "display this help message", false, "", "");
-	Option checkOption("-", "--", 'c', "check", "only check the config file", false, "", "");
-	Option configFileOption("-", "--", 'f', "config-file", "specify the config file", true, "", "");
-
-	std::string configFile;
-
-	std::list<Option*> lst;
-	lst.push_back(&helpOption);
-	lst.push_back(&checkOption);
-	lst.push_back(&configFileOption);
-	std::map<char, std::string> optionMap;
-
-	OptionParser parser(lst, &optionMap);
-
-	try
-	{
-		parser.parse(argc, argv);
-	}
-	catch (std::exception const &e)
-	{
-		std::cerr << e.what() << std::endl;
-		::exit(1);
-	}
-	if (optionMap.find('h') != optionMap.end())
-	{
-		for (std::list<Option*>::iterator it = lst.begin(); it != lst.end(); ++it)
-		{
-			std::cout << (*it)->getShortStart() << (*it)->getShortArg() << "	" << (*it)->getLongStart() << (*it)->getLongArg();
-			if ((*it)->hasValue())
-				std::cout << "	";
-			else
-				std::cout << "		";
-			std::cout << (*it)->getDescription() << std::endl;
-		}
-	}
-	if (configFileOption.getValue().compare("") != 0)
-	{
-		configFile = configFileOption.getValue();
-		std::cout << "config file: " << configFile << std::endl;
-	}
-	else
-		configFile = "conf.json";
-
-	struct stat buf;
-	if (stat(configFile.c_str(), &buf) != 0)
-	{
-		if (optionMap.find('c') != optionMap.end() || optionMap.find('f') != optionMap.end() || optionMap.find('h') == optionMap.end())
-		{
-			std::cerr << "Config file does not exist.\n";
-			::exit(1);
-		}
-	}
-	if (optionMap.find('c') != optionMap.end())
-	{
-		// CHECK CONF FILE
-	}
-	
-//	Configuration configuration;
-//	try
-//	{
-//		configuration = Configuration::fromJsonFile(configFile);
-//	}
-//	catch (const std::exception &e)
-//	{
-//		std::cerr << e.what() << '\n';
-//		::exit(2);
-//	}
-
-// 	Configuration configuration(ContainerBuilder<ServerBlock>() //
-// 	/**/.add(ServerBlock()
-// 	/**//**/.port(1502)
-// 	/**//**/.host("127.0.0.1")
-// 	/**//**/.name("boxplay.io")
-// 	/**//**/.maxBodySize(DataSize::ofMegabytes(10))
-// 	/**//**/.root("/var/www/html")
-// 	/**//**/.locations(ContainerBuilder<LocationBlock>()
-// 	/**//**//**/.add(LocationBlock()
-// 	/**//**//**//**/.methods(ContainerBuilder<std::string>()
-// 	/**//**//**//**//**/.add("GET")
-// 	/**//**//**//**//**/.add("HEAD")
-// 	/**//**//**//**//**/.add("POST")
-// 	/**//**//**//**//**/.build())
-// 	/**//**//**//**/.index(ContainerBuilder<std::string>()
-// 	/**//**//**//**//**/.add("index.html")
-// 	/**//**//**//**//**/.add("index-default.html")
-// 	/**//**//**//**//**/.build())
-// 	/**//**//**//**/.listing(true))
-// 	/**//**//**/.build()))
-// 	/**/.add(ServerBlock()
-// 	/**//**/.port(2051)
-// 	/**//**/.host("127.0.0.1")
-// 	/**//**/.name("boxplay2.io")
-// 	/**//**/.maxBodySize(DataSize::ofMegabytes(10))
-// 	/**//**/.root("/var/www/html"))
-// 	/**/.build());
-
-// 	signal(SIGPIPE, SIG_IGN);
-
-// 	try {
-// 		HTTPOrchestrator::create(configuration).start();
-// 	}
-//	catch (Exception &e) {
-// 		std::cerr << "Ouch... The server has thrown an exception: " << std::endl;
-// 		std::cerr << typeid(e).name() << ".what(): " << e.what() << std::endl;
-// 	}
-
-// //	throw IOException("ORCHESTRATOR LOOP HAS BEEN EXITED", errno);
-
- 	LoggerFactory::destroy();
-
-	return (0);
+	return (exitCode);
 }

@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ParserException.cpp                 :+:      :+:    :+:   */
+/*   OptionParserException.cpp                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -10,45 +10,31 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "ParserException.hpp"
+#include <util/options/OptionParserException.hpp>
 
-ParserException::ParserException() :
-		m_message()
+OptionParserException::OptionParserException() :
+		Exception()
 {
 }
 
-ParserException::ParserException(std::string message):
-		m_message(message)
+OptionParserException::OptionParserException(const std::string &message) :
+		Exception(message)
 {
 }
 
-ParserException::ParserException
-(const ParserException &other):
-		m_message(other.m_message)
+OptionParserException::OptionParserException(const OptionParserException &other) :
+		Exception(other)
 {
 }
 
-ParserException::~ParserException() throw ()
+OptionParserException::~OptionParserException() throw ()
 {
 }
 
-ParserException&
-ParserException::operator =(const ParserException &other)
+OptionParserException&
+OptionParserException::operator =(const OptionParserException &other)
 {
-	if (this != &other)
-		m_message = other.m_message;
+	Exception::operator =(other);
+
 	return (*this);
 }
-
-const std::string&
-ParserException::message() const
-{
-	return (m_message);
-}
-
-const char*
-ParserException::what() const throw ()
-{
-	return (m_message.c_str());
-}
-

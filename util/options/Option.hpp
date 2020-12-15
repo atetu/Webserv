@@ -13,38 +13,44 @@
 #ifndef OPTION_HPP_
 # define OPTION_HPP_
 
-#include <iostream>
-
+# include <string>
 
 class Option
 {
 	private:
-		std::string m_shortStart;
-		std::string m_longStart;
 		char m_short;
 		std::string m_long;
 		std::string m_description;
-		bool m_hasValue;
-		std::string m_valueName;
-		std::string m_value;
+		std::string m_argumentName;
 
-	public:
-		Option();
-		Option(std::string shortStart, std::string longStart, char shortArg, std::string longArg, std::string description, bool hasValue, std::string valueName, std::string value);
+	private:
+		Option(void);
 		Option(const Option &other);
 
-		virtual	~Option();
+		Option&
+		operator=(const Option &other);
 
-		void addConfigFile(std::string str);
-		std::string getLongStart();
-		std::string getShortStart();
-		std::string getLongArg();
-		char getShortArg();
-		std::string getValue();
-		std::string getDescription(void);
-		
-		bool hasValue(void);
-		
-		Option& operator=(const Option &other);
+	public:
+		Option(char shortName, std::string longName, std::string description);
+		Option(char shortName, std::string longName, std::string description, std::string valueName);
+
+		virtual
+		~Option(void);
+
+		char
+		shortName(void) const;
+
+		const std::string&
+		longName(void) const;
+
+		const std::string&
+		description(void) const;
+
+		bool
+		hasArgument(void) const;
+
+		const std::string&
+		argumentName(void) const;
 };
+
 #endif /* OPTION_HPP_ */
