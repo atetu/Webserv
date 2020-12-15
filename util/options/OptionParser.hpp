@@ -16,6 +16,7 @@
 #include <util/options/Option.hpp>
 #include <util/options/CommandLine.hpp>
 #include <util/options/OptionParserException.hpp>
+#include <vector>
 #include <list>
 
 class OptionParser
@@ -44,7 +45,7 @@ class OptionParser
 		parse(int argc, char **argv) throw (OptionParserException);
 
 		std::string
-		help(void) const;
+		help(const std::string &program, const std::string &description, const std::vector<std::string> &authors) const;
 };
 
 #endif /* OPTIONPARSER_HPP_ */

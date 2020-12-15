@@ -12,8 +12,11 @@
 
 #include <stddef.h>
 #include <util/options/OptionParser.hpp>
-#include <map>
+#include <algorithm>
+#include <iomanip>
+#include <sstream>
 #include <string>
+#include <vector>
 
 OptionParser::OptionParser(list options) :
 		m_options(options)
@@ -46,7 +49,7 @@ OptionParser::parse(int argc, char **argv) throw (OptionParserException)
 			if (name.empty())
 				throw OptionParserException(std::string("unparsable option: ") + current);
 
-			bool consideredAsLong = name.length() > 1;
+			bool consideredAsLong = isLong || name.length() > 1;
 
 			const Option *found = NULL;
 			for (iterator it = m_options.begin(); it != m_options.end(); it++)
@@ -72,6 +75,8 @@ OptionParser::parse(int argc, char **argv) throw (OptionParserException)
 			const char *argument = "";
 			if (found->hasArgument())
 			{
+				index++;
+
 				if (!hasMore)
 					throw OptionParserException(std::string("option requires an argument: '") + current + std::string(" <") + found->argumentName() + std::string(">'"));
 
@@ -80,23 +85,52 @@ OptionParser::parse(int argc, char **argv) throw (OptionParserException)
 
 			values[found->shortName()].push_back(argument);
 		}
+		else
+			throw OptionParserException(std::string("unrecognized input: '") + current + std::string("'"));
 	}
 
 	return (CommandLine(values));
 }
 
 std::string
-OptionParser::help(void) const // TODO Finish
+OptionParser::help(const std::string &program, const std::string &description, const std::vector<std::string> &authors) const // TODO Need to be moved
 {
-	std::string out;
+	size_t longestLong = 0;
 
-	iterator it = m_options.begin();
-	iterator ite = m_options.end();
+	for (iterator it = m_options.begin(); it != m_options.end(); it++)
+		longestLong = std::max(longestLong, (*it)->longName().size() + (*it)->argumentName().size() + 3);
 
-	for (; it != ite; it++)
+	std::stringstream stream;
+	stream << "Usage: " << program << " [OPTION]..." << std::endl;
+	stream << description << std::endl << std::endl;
+
+	for (iterator it = m_options.begin(); it != m_options.end(); it++)
 	{
-		out += (*it)->longName() + " <" + (*it)->argumentName() + ">\n";
+		const Option *option = *it;
+
+		stream << "  -" << option->shortName();
+		stream << ", --" << std::setw(longestLong) << std::left;
+
+		if (option->hasArgument())
+			stream << option->longName() + (" <" + option->argumentName() + ">");
+		else
+			stream << option->longName();
+
+		stream << "  " << option->description();
+		stream << std::endl;
 	}
 
-	return (out);
+	stream << std::endl;
+
+	if (!authors.empty())
+	{
+		stream << "Authors:" << std::endl;
+
+		for (std::vector<std::string>::const_iterator it = authors.begin(); it != authors.end(); it++)
+		{
+			stream << "  " << *it << std::endl;
+		}
+	}
+
+	return (stream.str());
 }

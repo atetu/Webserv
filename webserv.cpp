@@ -11,6 +11,7 @@
 /* ************************************************************************** */
 
 #include <exception/Exception.hpp>
+#include <util/ContainerBuilder.hpp>
 #include <util/Enum.hpp>
 #include <util/log/LoggerFactory.hpp>
 #include <util/log/LogLevel.hpp>
@@ -20,6 +21,7 @@
 #include <iostream>
 #include <list>
 #include <string>
+#include <vector>
 
 const Option OPT_HELP('h', "help", "display this help message");
 const Option OPT_CHECK('c', "check", "only check the config file");
@@ -47,7 +49,12 @@ delegated_main(int argc, char **argv)
 
 		if (commandLine.has(OPT_HELP))
 		{
-			std::cout << parser.help() << std::endl;
+			std::vector<std::string> authors = ContainerBuilder<std::string>()
+			/**/.add("Enzo CACERES <ecaceres@student.42.fr>")
+			/**/.add("Alice TETU <alicetetu@student.42.fr>")
+			/**/.build();
+
+			std::cout << parser.help(argv[0], "A small web server", authors) << std::endl;
 			return (0);
 		}
 
