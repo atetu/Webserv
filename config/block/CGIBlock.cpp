@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   CGI.cpp                                       :+:      :+:    :+:   */
+/*   CGIBlock.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ecaceres <ecaceres@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -10,32 +10,32 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <config/block/CGI.hpp>
+#include <config/block/CGIBlock.hpp>
 
-CGI::CGI():
-	m_name(""),
-	m_path()
+CGIBlock::CGIBlock() :
+		m_name(""),
+		m_path()
 {
 }
 
-CGI::CGI(std::string name):
-	m_name(name),
-	m_path()
+CGIBlock::CGIBlock(std::string name) :
+		m_name(name),
+		m_path()
 {
 }
 
-CGI::~CGI()
+CGIBlock::~CGIBlock()
 {
 }
 
-CGI::CGI(const CGI &other) :
-	m_name(other.m_name),
-	m_path(other.m_path)
+CGIBlock::CGIBlock(const CGIBlock &other) :
+		m_name(other.m_name),
+		m_path(other.m_path)
 {
 }
 
-CGI&
-CGI::operator=(const CGI &other)
+CGIBlock&
+CGIBlock::operator=(const CGIBlock &other)
 {
 	if (this != &other)
 	{
@@ -47,22 +47,10 @@ CGI::operator=(const CGI &other)
 
 }
 
-CGI&
-CGI::path(const std::string & path)
+CGIBlock&
+CGIBlock::path(const std::string &path)
 {
 	m_path.set(path);
 
 	return (*this);
-}
-
-const std::string
-CGI::name(void) const
-{
-	return (m_name);
-}
-
-const Optional<std::string>
-CGI::path(void) const
-{
-	return (m_path);
 }

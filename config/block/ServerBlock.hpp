@@ -14,24 +14,23 @@
 # define SERVERBLOCK_HPP_
 
 #include <config/block/LocationBlock.hpp>
-#include <config/block/ErrorPageBlock.hpp>
 #include <util/Optional.hpp>
 #include <util/unit/DataSize.hpp>
-#include <iostream>
-#include <vector>
 #include <list>
+#include <map>
+#include <string>
+#include <vector>
 
 class ServerBlock
 {
-	public:
+	private:
 		Optional<int> m_port;
 		Optional<std::string> m_host;
-	//	Optional<std::string> m_name; // a retirer  si j'ai bien compris
 		Optional<std::list<std::string> > m_names;
 		Optional<DataSize> m_maxBodySize;
-		Optional<std::string> m_root;	
+		Optional<std::string> m_root;
 		Optional<std::vector<LocationBlock*> > m_locations;
-		Optional<std::vector<ErrorPageBlock*> > m_errors;
+		Optional<std::map<int, std::string> > m_errors;
 
 	public:
 		ServerBlock();
@@ -46,20 +45,11 @@ class ServerBlock
 		ServerBlock&
 		port(int port);
 
-		const Optional<int>
-		port(void) const;
-
 		ServerBlock&
 		host(std::string host);
 
-		const Optional<std::string>
-		host(void) const;
-
 		ServerBlock&
 		names(const std::list<std::string> &names);
-
-		const Optional<std::list<std::string> >
-		names(void) const;
 
 		ServerBlock&
 		maxBodySize(DataSize maxBodySize);
@@ -67,20 +57,41 @@ class ServerBlock
 		ServerBlock&
 		root(const std::string &root);
 
+		ServerBlock&
+		locations(std::vector<LocationBlock*> locations);
+
+		ServerBlock&
+		errors(std::map<int, std::string> errors);
+
+		const Optional<int>
+		port(void) const
+		{
+			return (m_port);
+		}
+
+		const Optional<std::string>&
+		host(void) const
+		{
+			return (m_host);
+		}
+
+		const Optional<std::list<std::string> >
+		names(void) const
+		{
+			return (m_names);
+		}
+
 		inline const Optional<std::string>&
 		root(void) const
 		{
 			return (m_root);
 		}
 
-		ServerBlock&
-		locations(std::vector<LocationBlock*> locations);
-
-		const Optional<std::vector<LocationBlock*> >
-		locations(void) const;
-		
-		ServerBlock&
-		errors(std::vector<ErrorPageBlock*> errors);
+		const Optional<std::vector<LocationBlock*> >&
+		locations(void) const
+		{
+			return (m_locations);
+		}
 
 	public:
 		static const std::string DEFAULT_HOST;

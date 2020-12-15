@@ -1,42 +1,52 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ErrorPageBlock.hpp                                 :+:      :+:    :+:   */
+/*   CGIBlock.hpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2020/11/30 14:26:30 by alicetetu         #+#    #+#             */
-/*   Updated: 2020/11/30 15:40:40 by alicetetu        ###   ########.fr       */
+/*   Created: 2020/10/28 11:34:15 by ecaceres          #+#    #+#             */
+/*   Updated: 2020/12/03 11:20:53 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef ERRORPAGEBLOCK_HPP_
-# define ERRORPAGEBLOCK_HPP_
+#ifndef CGIBLOCK_HPP_
+# define CGIBLOCK_HPP_
 
 #include <util/Optional.hpp>
 #include <string>
 
-class ErrorPageBlock
+class CGIBlock
 {
 	private:
-		std::string m_path;
-		Optional<int> m_errorCode;
+		std::string m_name;
+		Optional<std::string> m_path;
 
 	public:
-		ErrorPageBlock(void);
-		ErrorPageBlock(const ErrorPageBlock &other);
+		CGIBlock();
+		CGIBlock(std::string name);
+		CGIBlock(const CGIBlock &other);
 
 		virtual
-		~ErrorPageBlock();
+		~CGIBlock();
 
-		ErrorPageBlock&
-		operator=(const ErrorPageBlock &other);
+		CGIBlock&
+		operator=(const CGIBlock &other);
 
-		ErrorPageBlock&
-		path(std::string path);
-		
-		ErrorPageBlock&
-		code(int code);
+		CGIBlock&
+		path(const std::string &path);
+
+		inline const std::string&
+		name(void) const
+		{
+			return (m_name);
+		}
+
+		inline const Optional<std::string>&
+		path(void) const
+		{
+			return (m_path);
+		}
 };
 
-#endif
+#endif /* CGIBLOCK_HPP_ */

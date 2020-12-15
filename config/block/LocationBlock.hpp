@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   LocationBlock.hpp                                       :+:      :+:    :+:   */
+/*   LocationBlock.hpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ecaceres <ecaceres@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -14,7 +14,7 @@
 # define LOCATIONBLOCK_HPP_
 
 #include <util/Optional.hpp>
-#include <iostream>
+#include <string>
 #include <vector>
 
 class LocationBlock
@@ -48,12 +48,6 @@ class LocationBlock
 		LocationBlock&
 		root(std::string root);
 
-		inline const Optional<std::string>&
-		root(void) const
-		{
-			return (m_root);
-		}
-
 		LocationBlock&
 		listing(bool listing);
 
@@ -63,12 +57,23 @@ class LocationBlock
 		LocationBlock&
 		cgi(std::string cgi);
 
-		const Optional<std::string>
-		cgi(void) const;
+		inline const std::string&
+		path(void)
+		{
+			return (m_path);
+		}
 
-		std::string
-		path(void);
-		
+		inline const Optional<std::string>&
+		root(void) const
+		{
+			return (m_root);
+		}
+
+		inline const Optional<std::string>&
+		cgi(void) const
+		{
+			return (m_cgi);
+		}
 
 	public:
 		static LocationBlock DEFAULT;

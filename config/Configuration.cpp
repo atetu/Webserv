@@ -425,7 +425,7 @@ Configuration::fromJsonFile(const std::string &path) throw (IOException)
 		rootBlock->server(serverBlockList);
 	}
 	
-	std::list<CGI*> CgiBlockList;
+	std::list<CGIBlock*> CgiBlockList;
 	
 	if (root->has("cgi"))
 	{
@@ -452,7 +452,7 @@ Configuration::fromJsonFile(const std::string &path) throw (IOException)
 			if(cgiObject->has(*vec_it))
 				cgiKey = *vec_it;
 									
-			CGI *CgiBlockElement = new CGI(cgiKey);
+			CGIBlock *CgiBlockElement = new CGIBlock(cgiKey);
 			
 			JsonValue *jsonValue = cgiObject->get(cgiKey);
 			
@@ -603,13 +603,13 @@ Configuration::fromJsonFile(const std::string &path) throw (IOException)
 				{
 					std::string cgiValue = locationBlock->cgi().get();
 					
-					std::list<CGI*> cgiList = rootBlock->cgi();
-					std::list<CGI*>::iterator cgi_it = cgiList.begin();
-					std::list<CGI*>::iterator cgi_ite = cgiList.end();
+					std::list<CGIBlock*> cgiList = rootBlock->cgi();
+					std::list<CGIBlock*>::iterator cgi_it = cgiList.begin();
+					std::list<CGIBlock*>::iterator cgi_ite = cgiList.end();
 
 					while (cgi_it != cgi_ite)
 					{
-						CGI *cgiBlock = *cgi_it;	
+						CGIBlock *cgiBlock = *cgi_it;	
 						if (cgiBlock->name().compare(cgiValue) == 0)
 						{
 							if (cgiBlock->path().present())

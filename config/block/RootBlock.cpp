@@ -12,21 +12,23 @@
 
 #include <config/block/RootBlock.hpp>
 
-RootBlock::RootBlock():
-		m_serverBlockList(),
-		m_CGIList()
-{
-}
-
-RootBlock::RootBlock(std::list<ServerBlock*> serverBlockList) :
-		m_serverBlockList(serverBlockList),
-		m_CGIList()
+RootBlock::RootBlock() :
+		m_root(),
+		m_mimeBlock(),
+		m_serverBlocks(),
+		m_cgiBlocks()
 {
 }
 
 RootBlock::RootBlock(const RootBlock &other) :
-		m_serverBlockList(other.m_serverBlockList),
-		m_CGIList(other.m_CGIList)
+		m_root(other.m_root),
+		m_mimeBlock(other.m_mimeBlock),
+		m_serverBlocks(other.m_serverBlocks),
+		m_cgiBlocks(other.m_cgiBlocks)
+{
+}
+
+RootBlock::~RootBlock()
 {
 }
 
@@ -35,39 +37,43 @@ RootBlock::operator =(const RootBlock &other)
 {
 	if (this != &other)
 	{
-		m_serverBlockList = other.m_serverBlockList;
-		m_CGIList = other.m_CGIList;
+		m_root = other.m_root;
+		m_mimeBlock = other.m_mimeBlock;
+		m_serverBlocks = other.m_serverBlocks;
+		m_cgiBlocks = other.m_cgiBlocks;
 	}
+
 	return (*this);
 }
 
-RootBlock::~RootBlock()
+RootBlock&
+RootBlock::root(const std::string &root)
 {
-	// TODO Auto-generated destructor stub
-}
+	m_root.set(root);
 
-RootBlock &
-RootBlock::server(const std::list<ServerBlock*> &serverBlockList)
-{
-	m_serverBlockList = serverBlockList;
 	return (*this);
 }
 
-RootBlock &
-RootBlock::cgi(const std::list<CGI*> &CGIList)
+RootBlock&
+RootBlock::mimeBlock(const MimeBlock &mimeBlock)
 {
-	m_CGIList = CGIList;
+	m_mimeBlock.set(&mimeBlock);
+
 	return (*this);
 }
 
-const std::list<ServerBlock*>
-RootBlock::server(void) const
+RootBlock&
+RootBlock::serverBlocks(const std::list<const ServerBlock*> &serverBlocks)
 {
-	return (m_serverBlockList);
+	m_serverBlocks.set(serverBlocks);
+
+	return (*this);
 }
 
-const std::list<CGI*>
-RootBlock::cgi(void) const
+RootBlock&
+RootBlock::cgiBlocks(const std::list<const CGIBlock*> &cgiBlocks)
 {
-	return (m_CGIList);
+	m_cgiBlocks.set(cgiBlocks);
+
+	return (*this);
 }

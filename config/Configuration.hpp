@@ -13,31 +13,25 @@
 #ifndef CONFIGURATION_HPP_
 # define CONFIGURATION_HPP_
 
-#include <config/block/CGI.hpp>
-#include <config/block/LocationBlock.hpp>
-#include <config/block/MimeBlock.hpp>
 #include <config/block/RootBlock.hpp>
 #include <config/block/ServerBlock.hpp>
-#include <config/block/ErrorPageBlock.hpp>
-#include <util/log/Logger.hpp>
-#include <util/log/LoggerFactory.hpp>
 #include <http/mime/MimeRegistry.hpp>
+#include <string>
 #include <vector>
+
+// TODO: All blocks need deep-copy, same goes for mime registry
+// Configuration should not be passed around like a normal object, but must be kept as singleton if possible
 
 class Configuration
 {
 	public:
-        static Logger &LOG;
-	
-//	public:
-	//	typedef std::vector<ServerBlock*>::const_iterator siterator;
+		static Logger &LOG;
 
 	private:
 		std::string m_file;
 		MimeRegistry *m_mimeRegistry;
-	   	MimeBlock *m_mimeBlock;
 		RootBlock *m_rootBlock;
-		
+
 	public:
 		Configuration(void);
 		Configuration(const MimeRegistry &mimeRegistry, const std::vector<ServerBlock*> &servers);
@@ -50,24 +44,29 @@ class Configuration
 		Configuration&
 		operator=(const Configuration &other);
 
+		inline const std::string&
+		file(void) const
+		{
+			return (m_file);
+		}
+
 		inline const MimeRegistry&
 		mimeRegistry(void) const
 		{
 			return (*m_mimeRegistry);
 		}
 
-		const std::string& getFile(void) const;
-	//	const std::vector<ServerBlock>& getServers(void) const;
-		const MimeRegistry* getMimeRegistry(void) const;
-		const MimeBlock* getMimeBlock(void) const;
-		const RootBlock* getRootBlock(void) const;
-		
-		Configuration & mime(MimeBlock *mimeBlock);
-		Configuration & root(RootBlock *rootBlock);
-		Configuration & build();
+		inline const RootBlock&
+		rootBlock(void) const
+		{
+			return (*m_rootBlock);
+		}
+
+		Configuration&
+		build();
 
 	public:
-        static Configuration 
+		static Configuration
 		fromJsonFile(const std::string &path) throw (IOException);
 };
 

@@ -22,22 +22,35 @@ class MimeBlock
 {
 	private:
 		Optional<std::vector<std::string> > m_includes;
-		Optional<std::vector<Mime> > m_define;
+		Optional<std::vector<Mime*> > m_defines;
 
 	public:
 		MimeBlock();
+		MimeBlock(const MimeBlock &other);
 
 		virtual
 		~MimeBlock();
 
 		MimeBlock&
-		includes(const std::vector<std::string> & includes);
+		operator =(const MimeBlock &other);
 
 		MimeBlock&
-		define(const std::vector<Mime> & defines);
+		includes(const std::vector<std::string> &includes);
 
-		Optional<std::vector<std::string> >&
-		getIncludes();
+		MimeBlock&
+		defines(const std::vector<Mime*> &defines);
+
+		const Optional<std::vector<std::string> >&
+		includes()
+		{
+			return (m_includes);
+		}
+
+		const Optional<std::vector<Mime*> >&
+		defines()
+		{
+			return (m_defines);
+		}
 };
 
 #endif /* MIMEBLOCK_HPP_ */

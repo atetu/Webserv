@@ -65,12 +65,6 @@ ServerBlock::port(int port)
 	return (*this);
 }
 
-const Optional<int>
-ServerBlock::port(void) const
-{
-	return (m_port);
-}
-
 ServerBlock&
 ServerBlock::host(std::string host)
 {
@@ -79,24 +73,12 @@ ServerBlock::host(std::string host)
 	return (*this);
 }
 
-const Optional<std::string>
-ServerBlock::host(void) const
-{
-	return (m_host);
-}
-		
 ServerBlock&
 ServerBlock::names(const std::list<std::string> &names)
 {
 	m_names.set(names);
 
 	return (*this);
-}
-
-const Optional<std::list<std::string> >
-ServerBlock::names(void) const
-{
-	return (m_names);
 }
 
 ServerBlock&
@@ -123,15 +105,8 @@ ServerBlock::locations(std::vector<LocationBlock*> locations)
 	return (*this);
 }
 
-const Optional<std::vector<LocationBlock*> >
-ServerBlock::locations(void) const
-{
-	return (m_locations);
-}
-		
-
 ServerBlock&
-ServerBlock::errors(std::vector<ErrorPageBlock*> errors)
+ServerBlock::errors(std::map<int, std::string> errors)
 {
 	m_errors.set(errors);
 

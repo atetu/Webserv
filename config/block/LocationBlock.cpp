@@ -115,15 +115,3 @@ LocationBlock::cgi(std::string cgi)
 
 	return (*this);
 }
-
-const Optional<std::string>
-LocationBlock::cgi(void) const
-{
-	return (m_cgi);
-}
-
-std::string
-LocationBlock::path()
-{
-	return (m_path);
-}

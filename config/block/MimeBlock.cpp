@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   MimeBlock.cpp                                       :+:      :+:    :+:   */
+/*   MimeBlock.cpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ecaceres <ecaceres@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -13,8 +13,14 @@
 #include <config/block/MimeBlock.hpp>
 
 MimeBlock::MimeBlock() :
-	m_includes(),
-	m_define()
+		m_includes(),
+		m_defines()
+{
+}
+
+MimeBlock::MimeBlock(const MimeBlock &other) :
+		m_includes(other.m_includes),
+		m_defines(other.m_defines)
 {
 }
 
@@ -23,7 +29,19 @@ MimeBlock::~MimeBlock()
 }
 
 MimeBlock&
-MimeBlock::includes(const std::vector<std::string> & includes)
+MimeBlock::operator =(const MimeBlock &other)
+{
+	if (this != &other)
+	{
+		m_includes = other.m_includes;
+		m_defines = other.m_defines;
+	}
+
+	return (*this);
+}
+
+MimeBlock&
+MimeBlock::includes(const std::vector<std::string> &includes)
 {
 	m_includes.set(includes);
 
@@ -31,15 +49,9 @@ MimeBlock::includes(const std::vector<std::string> & includes)
 }
 
 MimeBlock&
-MimeBlock::define(const std::vector<Mime> & defines)
+MimeBlock::defines(const std::vector<Mime*> &defines)
 {
-	m_define.set(defines);
+	m_defines.set(defines);
 
 	return (*this);
-}
-
-Optional<std::vector<std::string> >&
-MimeBlock::getIncludes()
-{
-	return (m_includes);
 }

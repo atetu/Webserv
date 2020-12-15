@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   RootBlock.hpp                                       :+:      :+:    :+:   */
+/*   RootBlock.hpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ecaceres <ecaceres@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -13,44 +13,66 @@
 #ifndef ROOTBLOCK_HPP_
 # define ROOTBLOCK_HPP_
 
-#include <util/Optional.hpp>
-#include <string>
+#include <config/block/CGIBlock.hpp>
+#include <config/block/MimeBlock.hpp>
 #include <config/block/ServerBlock.hpp>
-#include <config/block/CGI.hpp>
+#include <util/Optional.hpp>
+#include <list>
+#include <string>
 
 class RootBlock
 {
 	private:
-		std::list<ServerBlock*> m_serverBlockList;
-		std::list<CGI*> m_CGIList;
+		Optional<std::string> m_root;
+		Optional<const MimeBlock*> m_mimeBlock;
+		Optional<std::list<const ServerBlock*> > m_serverBlocks;
+		Optional<std::list<const CGIBlock*> > m_cgiBlocks;
 
 	public:
 		RootBlock();
-		RootBlock(std::list<ServerBlock*>);
 		RootBlock(const RootBlock &other);
-		
+
 		virtual
 		~RootBlock();
-
-		inline Optional<std::string>&
-		root(void) const
-		{
-			static Optional<std::string> empty;
-
-			return (empty);
-		}
 
 		RootBlock&
 		operator =(const RootBlock &other);
 
-		RootBlock &server(const std::list<ServerBlock*> &serverBlockList);
-		RootBlock &cgi(const std::list<CGI*> &CGIList);
+		RootBlock&
+		root(const std::string &root);
 
-		const std::list<ServerBlock*>
-		server(void) const;
+		RootBlock&
+		mimeBlock(const MimeBlock &mimeBlock);
 
-		const std::list<CGI*>
-		cgi(void) const;
+		RootBlock&
+		serverBlocks(const std::list<const ServerBlock*> &serverBlocks);
+
+		RootBlock&
+		cgiBlocks(const std::list<const CGIBlock*> &cgiBlocks);
+
+		inline Optional<std::string>&
+		root(void) const
+		{
+			return (m_root);
+		}
+
+		inline Optional<MimeBlock*>&
+		mimeBlock(void) const
+		{
+			return (m_mimeBlock);
+		}
+
+		const Optional<std::list<const ServerBlock*> >&
+		serverBlocks(void) const
+		{
+			return (m_serverBlocks);
+		}
+
+		const Optional<std::list<const CGIBlock*> >&
+		cgiBlocks(void) const
+		{
+			return (m_cgiBlocks);
+		}
 };
 
 #endif /* ROOTBLOCK_HPP_ */
