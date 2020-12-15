@@ -347,11 +347,6 @@ HTTPOrchestrator::start()
 					}
 				}
 
-				if (client->response() && client->response()->body())
-				{
-					std::cout << "client->response()->body()->isDone(): " << client->response()->body()->isDone() << std::endl;
-				}
-
 				if (!deleted && client->response() && client->response()->state() == HTTPResponse::FINISHED)
 				{
 					std::cout << "done: " << fd << std::endl;

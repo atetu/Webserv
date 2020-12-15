@@ -40,10 +40,7 @@ GetHandler::handle(HTTPRequest &request)
 
 	struct stat st;
 	if (::stat(path.c_str(), &st) != 0)
-	{
-		std::cout << "could not stat " << path << ", returning NOT_FOUND" << std::endl;
 		return (HTTPResponse::status(*HTTPStatus::NOT_FOUND));
-	}
 
 	if (S_ISREG(st.st_mode))
 	{
@@ -57,8 +54,6 @@ GetHandler::handle(HTTPRequest &request)
 			headers.contentType(request.configuration().mimeRegistry(), extension);
 
 		headers.contentLength(st.st_size);
-
-		std::cout << "found file " << path << " of size: " << st.st_size << std::endl;
 
 		return (new HTTPResponse(*HTTPStatus::OK, headers, new HTTPResponse::FileBody(fd)));
 	}
@@ -88,7 +83,7 @@ GetHandler::handle(HTTPRequest &request)
 //			if (::stat(absolute.c_str(), &st) != -1 && S_ISDIR(st.st_mode))
 //				file += '/';
 
-			listing += std::string("		<a href=\"./") + file + "\">" + file + "</a><br>\n";
+			listing += std::string("		<a href=\"./") + absolute + "\">" + file + "</a><br>\n";
 		}
 
 		listing += ""
