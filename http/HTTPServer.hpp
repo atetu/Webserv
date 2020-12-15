@@ -21,12 +21,12 @@ class HTTPServer
 {
 	private:
 		int m_port;
-		std::vector<ServerBlock> m_servers;
+		std::vector<ServerBlock*> m_servers;
 		SocketServer m_socketServer;
 
 	public:
 		HTTPServer(void);
-		HTTPServer(int port, const std::vector<ServerBlock> &servers);
+		HTTPServer(int port, const std::vector<ServerBlock*> &servers);
 		HTTPServer(const HTTPServer &other);
 
 		virtual

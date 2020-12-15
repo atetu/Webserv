@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ServerBlock.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ecaceres <ecaceres@student.42.fr>          +#+  +:+       +#+        */
+/*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/28 11:34:45 by ecaceres          #+#    #+#             */
-/*   Updated: 2020/10/28 11:34:45 by ecaceres         ###   ########.fr       */
+/*   Updated: 2020/12/03 10:05:25 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,20 +17,22 @@ const std::string ServerBlock::DEFAULT_HOST = "0.0.0.0";
 ServerBlock::ServerBlock() :
 		m_port(),
 		m_host(),
-		m_name(),
+		m_names(),
 		m_maxBodySize(),
 		m_root(),
-		m_locations()
+		m_locations(),
+		m_errors()
 {
 }
 
 ServerBlock::ServerBlock(const ServerBlock &other) :
 		m_port(other.m_port),
 		m_host(other.m_host),
-		m_name(other.m_name),
+		m_names(other.m_names),
 		m_maxBodySize(other.m_maxBodySize),
 		m_root(other.m_root),
-		m_locations(other.m_locations)
+		m_locations(other.m_locations),
+		m_errors(other.m_errors)
 {
 }
 
@@ -45,10 +47,11 @@ ServerBlock::operator =(const ServerBlock &other)
 	{
 		m_port = other.m_port;
 		m_host = other.m_host;
-		m_name = other.m_name;
+		m_names = other.m_names;
 		m_maxBodySize = other.m_maxBodySize;
 		m_root = other.m_root;
 		m_locations = other.m_locations;
+		m_errors = (other.m_errors);
 	}
 
 	return (*this);
@@ -77,17 +80,17 @@ ServerBlock::host(std::string host)
 }
 
 ServerBlock&
-ServerBlock::name(std::string name)
+ServerBlock::names(const std::list<std::string> &names)
 {
-	m_name.set(name);
+	m_names.set(names);
 
 	return (*this);
 }
 
-const Optional<std::string>
-ServerBlock::name(void) const
+const Optional<std::list<std::string> >
+ServerBlock::names(void) const
 {
-	return (m_name);
+	return (m_names);
 }
 
 ServerBlock&
@@ -99,7 +102,7 @@ ServerBlock::maxBodySize(DataSize maxBodySize)
 }
 
 ServerBlock&
-ServerBlock::root(std::string root)
+ServerBlock::root(const std::string &root)
 {
 	m_root.set(root);
 
@@ -107,9 +110,24 @@ ServerBlock::root(std::string root)
 }
 
 ServerBlock&
-ServerBlock::locations(std::vector<LocationBlock> locations)
+ServerBlock::locations(std::vector<LocationBlock*> locations)
 {
 	m_locations.set(locations);
+
+	return (*this);
+}
+
+const Optional<std::vector<LocationBlock*> >
+ServerBlock::locations(void) const
+{
+	return (m_locations);
+}
+		
+
+ServerBlock&
+ServerBlock::errors(std::vector<ErrorPageBlock*> errors)
+{
+	m_errors.set(errors);
 
 	return (*this);
 }

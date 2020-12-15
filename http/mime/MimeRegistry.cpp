@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   MimeRegistry.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ecaceres <ecaceres@student.42.fr>          +#+  +:+       +#+        */
+/*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/26 17:39:30 by ecaceres          #+#    #+#             */
-/*   Updated: 2020/10/26 17:39:30 by ecaceres         ###   ########.fr       */
+/*   Updated: 2020/12/02 18:34:06 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,7 @@
 #include <iostream>
 #include <iterator>
 #include <list>
+#include <map>
 
 Logger &MimeRegistry::LOG = LoggerFactory::get("MIME Registry");
 
@@ -116,7 +117,6 @@ const Mime*
 MimeRegistry::MimeRegistry::findByMimeType(const std::string &type) const
 {
 	const_iterator it = m_mapping.find(type);
-
 	if (it == m_mapping.end())
 		return (NULL);
 
@@ -137,12 +137,13 @@ MimeRegistry::findByFileExtension(const std::string &type) const
 void
 MimeRegistry::loadFromFile(const std::string &path) throw (IOException)
 {
+	
 	JsonObject *object = JsonReader::fromFile(path).readObject();
 
 	loadFromJson(*object);
 
 	delete object;
-
+	
 	LOG.debug() << "Loaded " << size() << " MIME(s)" << std::endl;
 }
 
@@ -151,6 +152,7 @@ MimeRegistry::loadFromJson(const JsonObject &jsonObject)
 {
 	for (JsonObject::const_iterator it = jsonObject.begin(); it != jsonObject.end(); it++)
 	{
+		
 		const std::string &mimeType = it->first;
 		JsonValue *jsonValue = it->second;
 

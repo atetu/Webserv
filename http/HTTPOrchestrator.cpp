@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HTTPOrchestrator.cpp                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ecaceres <ecaceres@student.42.fr>          +#+  +:+       +#+        */
+/*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/28 14:34:10 by ecaceres          #+#    #+#             */
-/*   Updated: 2020/10/28 14:34:10 by ecaceres         ###   ########.fr       */
+/*   Updated: 2020/11/26 16:02:37 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -205,7 +205,7 @@ HTTPOrchestrator::start()
 
 	while (1)
 	{
-		readFdSet = m_fds;
+		readFdSet = m_fds; // la je ne comprends pas
 		writeFdSet = m_fds;
 
 		if (::select(m_highestFd + 1, &readFdSet, &writeFdSet, NULL, &timeout) == -1)
@@ -491,29 +491,29 @@ HTTPOrchestrator::removeClient(int fd)
 HTTPOrchestrator
 HTTPOrchestrator::create(const Configuration &configuration)
 {
-	typedef std::map<int, std::vector<ServerBlock> >::iterator plsiterator;
+	typedef std::map<int, std::vector<ServerBlock*> >::iterator plsiterator;
 
-	std::map<int, std::vector<ServerBlock> > portToServersMap;
+	std::map<int, std::vector<ServerBlock*> > portToServersMap;
 
-	Configuration::siterator it = configuration.servers().begin();
-	Configuration::siterator ite = configuration.servers().end();
-
-	while (it != ite)
-	{
-		portToServersMap[it->port().get()].push_back(*it);
-		LOG.debug() << "Mapping port " << it->port().get() << " with server: " << it->name().get() << std::endl;
-		it++;
-	}
+//	Configuration::siterator it = configuration.servers().begin();
+//	Configuration::siterator ite = configuration.servers().end();
+//
+//	while (it != ite)
+//	{
+//		portToServersMap[it->port().get()].push_back(*it);
+//		LOG.debug() << "Mapping port " << it->port().get() << " with server: " << it->name().get() << std::endl;
+//		it++;
+//	}
 
 	server_container httpServers;
-	plsiterator itr = portToServersMap.begin();
-	plsiterator itre = portToServersMap.end();
-
-	while (itr != itre)
-	{
-		httpServers.push_back(new HTTPServer(itr->first, itr->second));
-		itr++;
-	}
+//	plsiterator itr = portToServersMap.begin();
+//	plsiterator itre = portToServersMap.end();
+//
+//	while (itr != itre)
+//	{
+//		httpServers.push_back(new HTTPServer(itr->first, itr->second));
+//		itr++;
+//	}
 
 	return (HTTPOrchestrator(configuration, httpServers));
 }

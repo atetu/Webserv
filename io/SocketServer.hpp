@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   SocketServer.hpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ecaceres <ecaceres@student.42.fr>          +#+  +:+       +#+        */
+/*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/19 15:01:16 by ecaceres          #+#    #+#             */
-/*   Updated: 2020/10/19 15:01:16 by ecaceres         ###   ########.fr       */
+/*   Updated: 2020/11/24 15:16:01 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,7 @@ class SocketServer :
 		~SocketServer();
 
 		void
-		reusable(void) throw (IOException);
+		reusable(void) throw (IOException); // je ne connais pas cette ecriture
 
 		void
 		bind(int port) throw (IOException);

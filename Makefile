@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: ecaceres <marvin@42.fr>                    +#+  +:+       +#+         #
+#    By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2019/08/13 15:11:33 by ecaceres          #+#    #+#              #
-#    Updated: 2019/08/13 15:11:34 by ecaceres         ###   ########.fr        #
+#    Updated: 2020/11/30 16:18:47 by alicetetu        ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -39,7 +39,7 @@ FRAMEWORKS				=
 FLAGS					= -std=c++98 -g3
 TARGET_REQUIRED_FLAGS	= -I.
 
-TOOL_BASE64_DECODE		= base64 -d
+TOOL_BASE64_DECODE		= base64 -D
 
 MAKE_PREFIX				= "$(COLOR_LIGHT_MAGENTA)[$(COLOR_LIGHT_GREEN) make: $(TARGET) $(COLOR_LIGHT_MAGENTA)]"
 

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ContainerBuilder.hpp                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ecaceres <ecaceres@student.42.fr>          +#+  +:+       +#+        */
+/*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/28 16:47:12 by ecaceres          #+#    #+#             */
-/*   Updated: 2020/10/28 16:47:12 by ecaceres         ###   ########.fr       */
+/*   Updated: 2020/11/28 10:42:43 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 
 #include <vector>
 
-template<typename T, typename Container = std::vector<T> >
+template<typename T, typename Container = std::vector<T> > // enzo est ce que tu pourrais me reexpliquer ca?
 	class ContainerBuilder
 	{
 		private:

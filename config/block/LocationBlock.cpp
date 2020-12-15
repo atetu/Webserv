@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   LocationBlock.cpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ecaceres <ecaceres@student.42.fr>          +#+  +:+       +#+        */
+/*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/28 19:10:59 by ecaceres          #+#    #+#             */
-/*   Updated: 2020/10/28 19:10:59 by ecaceres         ###   ########.fr       */
+/*   Updated: 2020/12/03 10:13:43 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,8 @@ LocationBlock::LocationBlock(void) :
 		m_alias(),
 		m_root(),
 		m_listing(),
-		m_indexFiles()
+		m_indexFiles(),
+		m_cgi()
 {
 }
 
@@ -30,7 +31,8 @@ LocationBlock::LocationBlock(std::string path) :
 		m_alias(),
 		m_root(),
 		m_listing(),
-		m_indexFiles()
+		m_indexFiles(),
+		m_cgi()
 {
 }
 
@@ -40,7 +42,8 @@ LocationBlock::LocationBlock(const LocationBlock &other) :
 		m_alias(other.m_alias),
 		m_root(other.m_root),
 		m_listing(other.m_listing),
-		m_indexFiles(other.m_indexFiles)
+		m_indexFiles(other.m_indexFiles),
+		m_cgi(other.m_cgi)
 {
 }
 
@@ -59,6 +62,7 @@ LocationBlock::operator =(const LocationBlock &other)
 		m_root = other.m_root;
 		m_listing = other.m_listing;
 		m_indexFiles = other.m_indexFiles;
+		m_cgi = other.m_cgi;
 	}
 
 	return (*this);
@@ -102,4 +106,18 @@ LocationBlock::index(std::vector<std::string> files)
 	m_indexFiles.set(files);
 
 	return (*this);
+}
+
+LocationBlock&
+LocationBlock::cgi(std::string cgi)
+{
+	m_cgi.set(cgi);
+
+	return (*this);
+}
+
+const Optional<std::string>
+LocationBlock::cgi(void) const
+{
+	return (m_cgi);
 }

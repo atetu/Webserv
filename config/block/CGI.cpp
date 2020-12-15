@@ -12,27 +12,57 @@
 
 #include <config/block/CGI.hpp>
 
-CGI::CGI()
+CGI::CGI():
+	m_name(""),
+	m_path()
 {
-	// TODO Auto-generated constructor stub
+}
 
+CGI::CGI(std::string name):
+	m_name(name),
+	m_path()
+{
 }
 
 CGI::~CGI()
 {
-	// TODO Auto-generated destructor stub
 }
 
-CGI::CGI(const CGI &other)
+CGI::CGI(const CGI &other) :
+	m_name(other.m_name),
+	m_path(other.m_path)
 {
-	// TODO Auto-generated constructor stub
-
 }
 
 CGI&
 CGI::operator=(const CGI &other)
 {
-	// TODO Auto-generated method stub
+	if (this != &other)
+	{
+		m_name = other.m_name;
+		m_path = other.m_path;
+	}
+
+	return (*this);
 
 }
 
+CGI&
+CGI::path(const std::string & path)
+{
+	m_path.set(path);
+
+	return (*this);
+}
+
+const std::string
+CGI::name(void) const
+{
+	return (m_name);
+}
+
+const Optional<std::string>
+CGI::path(void) const
+{
+	return (m_path);
+}
