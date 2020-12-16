@@ -152,7 +152,6 @@ MimeRegistry::loadFromJson(const JsonObject &jsonObject)
 {
 	for (JsonObject::const_iterator it = jsonObject.begin(); it != jsonObject.end(); it++)
 	{
-		
 		const std::string &mimeType = it->first;
 		JsonValue *jsonValue = it->second;
 

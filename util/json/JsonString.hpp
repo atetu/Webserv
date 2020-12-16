@@ -17,7 +17,8 @@
 #include <util/json/JsonValue.hpp>
 #include <string>
 
-class JsonString: public JsonValue
+class JsonString :
+		public JsonValue
 {
 	private:
 		std::string m_value;
