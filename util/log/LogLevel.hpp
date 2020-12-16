@@ -13,7 +13,7 @@
 #ifndef LOGLEVEL_HPP_
 # define LOGLEVEL_HPP_
 
-# include <util/Enum.hpp>
+#include <util/Enum.hpp>
 
 class LogLevel :
 		public Enum<LogLevel>
@@ -25,6 +25,8 @@ class LogLevel :
 		static LogLevel *WARN;
 		static LogLevel *ERROR;
 		static LogLevel *FATAL;
+
+		static const LogLevel *ACTIVE;
 };
 
 #endif /* LOGLEVEL_HPP_ */

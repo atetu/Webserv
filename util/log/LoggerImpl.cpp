@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   LoggerImpl.cpp                                       :+:      :+:    :+:   */
+/*   LoggerImpl.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ecaceres <ecaceres@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -10,9 +10,12 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+#include <util/Enum.hpp>
 #include <util/log/LoggerImpl.hpp>
+#include <util/log/LogLevel.hpp>
 
 const std::string LoggerImpl::DEFAULT_TAG = "???";
+NullStream LoggerImpl::VOID;
 
 LoggerImpl::LoggerImpl() :
 		m_tag(DEFAULT_TAG)
@@ -72,6 +75,9 @@ LoggerImpl::fatal() const
 std::ostream&
 LoggerImpl::log(LogLevel &level) const
 {
+	if (LogLevel::ACTIVE == NULL || LogLevel::ACTIVE->ordinal() > level.ordinal())
+		return (VOID);
+
 	return (std::cout << "[" << level.name() << "] " << m_tag << ": ");
 }
 

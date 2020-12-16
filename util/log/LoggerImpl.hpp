@@ -16,12 +16,30 @@
 #include <util/log/Logger.hpp>
 #include <iostream>
 #include <string>
+#include <sstream>
+
+class NullStream :
+		public std::stringstream
+{
+	public:
+		NullStream() :
+				std::stringstream()
+		{
+		}
+};
+
+template<typename T>
+	void
+	operator<<(const NullStream&, const T&)
+	{
+	}
 
 class LoggerImpl :
 		public Logger
 {
 	private:
 		static const std::string DEFAULT_TAG;
+		static NullStream VOID;
 
 	private:
 		std::string m_tag;
