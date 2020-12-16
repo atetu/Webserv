@@ -233,7 +233,7 @@ JsonBoolean*
 JsonParser::getTrue(void)
 {
 	if (m_currentEvent != JsonParserEvent::VALUE_TRUE)
-		throw getException("True", *m_currentEvent);
+		throw getException("true", *m_currentEvent);
 
 	return (new JsonBoolean(true));
 }
@@ -242,7 +242,7 @@ JsonBoolean*
 JsonParser::getFalse(void)
 {
 	if (m_currentEvent != JsonParserEvent::VALUE_FALSE)
-		throw getException("False", *m_currentEvent);
+		throw getException("false", *m_currentEvent);
 
 	return (new JsonBoolean(false));
 }
@@ -250,8 +250,8 @@ JsonParser::getFalse(void)
 JsonNull*
 JsonParser::getNull(void)
 {
-	if (m_currentEvent != JsonParserEvent::VALUE_FALSE)
-		throw getException("Null", *m_currentEvent);
+	if (m_currentEvent != JsonParserEvent::VALUE_NULL)
+		throw getException("null", *m_currentEvent);
 
 	return (new JsonNull());
 }
