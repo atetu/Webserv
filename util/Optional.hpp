@@ -73,6 +73,12 @@ template<typename T>
 				return (m_present);
 			}
 
+			bool
+			empty() const
+			{
+				return (!m_present);
+			}
+
 			Optional&
 			ensurePresent()
 			{
