@@ -232,12 +232,8 @@ JsonTokenizer::asDouble(void) const
 	sstream.str(raw);
 	sstream << std::fixed << std::setprecision(precision);
 
-	std::cout << sstream.str() << std::endl;
-
 	double value;
 	sstream >> value;
-
-	std::cout << std::fixed << std::setprecision(precision) << value << std::endl;
 
 	return (value);
 }
