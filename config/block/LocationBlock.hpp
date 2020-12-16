@@ -21,7 +21,7 @@ class LocationBlock
 {
 	private:
 		std::string m_path;
-		Optional<std::vector<std::string> > m_allowedMethods;
+		Optional<std::vector<std::string> > m_methods;
 		Optional<std::string> m_alias;
 		Optional<std::string> m_root;
 		Optional<bool> m_listing;

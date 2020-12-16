@@ -14,13 +14,40 @@
 # define CONFIGURATION_HPP_
 
 #include <config/block/RootBlock.hpp>
-#include <config/block/ServerBlock.hpp>
+#include <exception/Exception.hpp>
 #include <http/mime/MimeRegistry.hpp>
+#include <util/Convert.hpp>
+#include <util/json/JsonArray.hpp>
+#include <util/json/JsonObject.hpp>
+#include <util/json/JsonReader.hpp>
+#include <util/json/JsonValue.hpp>
+#include <iterator>
+#include <list>
+#include <map>
 #include <string>
-#include <vector>
+#include <typeinfo>
 
 // TODO: All blocks need deep-copy, same goes for mime registry
 // Configuration should not be passed around like a normal object, but must be kept as singleton if possible
+
+#define KEY_DOT "."
+#define KEY_ROOT "json"
+#define KEY_ROOT_ROOT "root"
+#define KEY_ROOT_MIME "mime"
+#define KEY_ROOT_CGI "cgi"
+#define KEY_ROOT_SERVERS "servers"
+#define KEY_SERVER_PORT "port"
+#define KEY_SERVER_HOST "host"
+#define KEY_SERVER_NAMES "names"
+#define KEY_SERVER_MAXBODYSIZE "maxBodySize"
+#define KEY_SERVER_ROOT "root"
+#define KEY_SERVER_LOCATIONS "locations"
+#define KEY_LOCATION_METHODS "methods"
+#define KEY_LOCATION_ALIAS "alias"
+#define KEY_LOCATION_ROOT "root"
+#define KEY_LOCATION_LISTING "listing"
+#define KEY_LOCATION_INDEX_FILES "index"
+#define KEY_LOCATION_CGI "cgi"
 
 class Configuration
 {
@@ -29,13 +56,12 @@ class Configuration
 
 	private:
 		std::string m_file;
-		MimeRegistry *m_mimeRegistry;
-		RootBlock *m_rootBlock;
+		const MimeRegistry *m_mimeRegistry;
+		const RootBlock *m_rootBlock;
 
 	public:
 		Configuration(void);
-		Configuration(const MimeRegistry &mimeRegistry, const std::vector<ServerBlock*> &servers);
-		Configuration(const std::string &file);
+		Configuration(const std::string &file, const MimeRegistry &mimeRegistry, const RootBlock &rootBlock);
 		Configuration(const Configuration &other);
 
 		virtual
@@ -67,7 +93,98 @@ class Configuration
 
 	public:
 		static Configuration
-		fromJsonFile(const std::string &path) throw (IOException);
+		fromJsonFile(const std::string &path);
+
+	private:
+		class FromJsonBuilder
+		{
+			public:
+				static JsonObject&
+				rootObject(JsonReader &jsonReader);
+
+				static RootBlock*
+				buildRootBlock(const JsonObject &jsonObject);
+
+				static MimeBlock*
+				buildMimeBlock(const std::string &path, const JsonObject &jsonObject);
+
+				template<typename T>
+					static std::list<T const*>
+					buildBlocks(const std::string &path, const JsonArray &jsonArray, T*
+					(*builder)(const std::string&, const JsonObject&))
+					{
+						std::list<const T*> blocks;
+
+						try
+						{
+							int index = 0;
+							for (JsonArray::const_iterator it = jsonArray.begin(); it != jsonArray.end(); it++)
+							{
+								std::string ipath = path + "[" + Convert::toString(index) + "]";
+								const JsonObject &object = jsonCast<JsonObject>(ipath, *it);
+
+								blocks.push_back((*builder)(ipath, object));
+
+								index++;
+							}
+						}
+						catch (...)
+						{
+							// TODO delete blocks items
+
+							throw;
+						}
+
+						return (blocks);
+					}
+
+				template<typename T>
+					static std::list<T const*>
+					buildBlocks(const std::string &path, const JsonObject &jsonObject, T*
+					(*builder)(const std::string&, const std::string&, const JsonObject&))
+					{
+						std::list<const T*> blocks;
+
+						try
+						{
+							for (JsonObject::const_iterator it = jsonObject.begin(); it != jsonObject.end(); it++)
+							{
+								const std::string &key = it->first;
+								std::string ipath = path + KEY_DOT + key;
+								const JsonObject &object = jsonCast<JsonObject>(ipath, it->second);
+
+								blocks.push_back((*builder)(ipath, key, object));
+							}
+						}
+						catch (...)
+						{
+							// TODO delete blocks items
+
+							throw;
+						}
+
+						return (blocks);
+					}
+
+				static CGIBlock*
+				buildCGIBlock(const std::string &path, const std::string &key, const JsonObject &jsonObject);
+
+				static ServerBlock*
+				buildServerBlock(const std::string &path, const JsonObject &jsonObject);
+
+				static LocationBlock*
+				buildLocationBlock(const std::string &path, const std::string &key, const JsonObject &jsonObject);
+
+				template<typename T>
+					static const T&
+					jsonCast(const std::string &path, const JsonValue *jsonValue)
+					{
+						if (!jsonValue->instanceOf<T>())
+							throw Exception("Cannot cast " + jsonValue->typeString() + " to " + JsonTypeTraits<T>::typeString + " (" + path + ")");
+
+						return (*(jsonValue->cast<T>()));
+					}
+		};
 };
 
 #endif /* CONFIGURATION_HPP_ */

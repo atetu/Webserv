@@ -10,9 +10,14 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <exception/Exception.hpp>
+#include <config/Configuration.hpp>
+#include <exception/IOException.hpp>
 #include <util/ContainerBuilder.hpp>
 #include <util/Enum.hpp>
+#include <util/json/JsonException.hpp>
+#include <util/json/JsonObject.hpp>
+#include <util/json/JsonReader.hpp>
+#include <util/log/Logger.hpp>
 #include <util/log/LoggerFactory.hpp>
 #include <util/log/LogLevel.hpp>
 #include <util/options/CommandLine.hpp>
@@ -21,25 +26,28 @@
 #include <iostream>
 #include <list>
 #include <string>
+#include <typeinfo>
 #include <vector>
 
 const Option OPT_HELP('h', "help", "display this help message");
+const Option OPT_LOG_LEVEL('l', "log-level", "change the log-level", "level");
 const Option OPT_CHECK('c', "check", "only check the config file");
 const Option OPT_CONFIG_FILE('f', "config-file", "specify the config file", "file");
-const Option OPT_LOG_LEVEL('l', "log-level", "change the log-level", "level");
 
 int
 delegated_main(int argc, char **argv)
 {
+	const char *program = argv[0];
+
 	std::string configFile = "conf.json";
 	bool checkOnly = false;
 	const LogLevel *level = LogLevel::INFO;
 
 	std::list<const Option*> lst;
 	lst.push_back(&OPT_HELP);
+	lst.push_back(&OPT_LOG_LEVEL);
 	lst.push_back(&OPT_CHECK);
 	lst.push_back(&OPT_CONFIG_FILE);
-	lst.push_back(&OPT_LOG_LEVEL);
 
 	OptionParser parser(lst);
 
@@ -54,15 +62,9 @@ delegated_main(int argc, char **argv)
 			/**/.add("Alice TETU <alicetetu@student.42.fr>")
 			/**/.build();
 
-			std::cout << parser.help(argv[0], "A small web server", authors) << std::endl;
+			std::cout << parser.help(program, "A small web server", authors) << std::endl;
 			return (0);
 		}
-
-		if (commandLine.has(OPT_CHECK))
-			checkOnly = true;
-
-		if (commandLine.has(OPT_CONFIG_FILE))
-			configFile = commandLine.last(OPT_CONFIG_FILE);
 
 		if (commandLine.has(OPT_LOG_LEVEL))
 		{
@@ -72,8 +74,16 @@ delegated_main(int argc, char **argv)
 			if (foundLevel)
 				level = foundLevel;
 			else
-				throw Exception("Unknown log level: " + input);
+				throw Exception("unknown log level: " + input);
 		}
+
+		if (commandLine.has(OPT_CHECK))
+		{
+			checkOnly = true;
+		}
+
+		if (commandLine.has(OPT_CONFIG_FILE))
+			configFile = commandLine.last(OPT_CONFIG_FILE);
 	}
 	catch (Exception &exception)
 	{
@@ -82,13 +92,58 @@ delegated_main(int argc, char **argv)
 		return (1);
 	}
 
+	LogLevel::ACTIVE = level;
+	Logger &LOG = LoggerFactory::get("main");
+
+	LOG.debug() << "Set log level to: " << level->name() << std::endl;
+
+	Configuration configuration;
+
+	try
+	{
+		LOG.debug() << "Loading configuration... (path: " << configFile << ")" << std::endl;
+
+		configuration = Configuration::fromJsonFile(configFile);
+	}
+	catch (IOException &exception)
+	{
+		LOG.fatal() << "Cannot read configuration file." << std::endl;
+		LOG.fatal() << exception.message() << std::endl;
+		return (1);
+	}
+	catch (JsonException &exception)
+	{
+		LOG.fatal() << "Failed to parse configuration JSON." << std::endl;
+		LOG.fatal() << exception.message() << std::endl;
+		return (1);
+	}
+	catch (Exception &exception)
+	{
+		LOG.fatal() << "Failed create configuration." << std::endl;
+		LOG.fatal() << exception.message() << std::endl;
+		return (1);
+	}
+
+	if (checkOnly)
+		return (0);
+
+	// TODO Start orchestrator
+
 	return (0);
 }
 
 int
 main(int argc, char **argv)
 {
-	int exitCode = delegated_main(argc, argv);
+	int exitCode;
+
+	try {
+		exitCode = delegated_main(argc, argv);
+	} catch (std::exception &exception) {
+		exitCode = 1;
+
+		std::cerr << "unhandled " << typeid(exception).name() << ": " << exception.what() << std::endl;
+	}
 
 	LoggerFactory::destroy();
 

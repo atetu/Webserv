@@ -16,7 +16,7 @@ LocationBlock LocationBlock::DEFAULT;
 
 LocationBlock::LocationBlock(void) :
 		m_path(),
-		m_allowedMethods(),
+		m_methods(),
 		m_alias(),
 		m_root(),
 		m_listing(),
@@ -27,7 +27,7 @@ LocationBlock::LocationBlock(void) :
 
 LocationBlock::LocationBlock(std::string path) :
 		m_path(path),
-		m_allowedMethods(),
+		m_methods(),
 		m_alias(),
 		m_root(),
 		m_listing(),
@@ -38,7 +38,7 @@ LocationBlock::LocationBlock(std::string path) :
 
 LocationBlock::LocationBlock(const LocationBlock &other) :
 		m_path(other.m_path),
-		m_allowedMethods(other.m_allowedMethods),
+		m_methods(other.m_methods),
 		m_alias(other.m_alias),
 		m_root(other.m_root),
 		m_listing(other.m_listing),
@@ -57,7 +57,7 @@ LocationBlock::operator =(const LocationBlock &other)
 	if (this != &other)
 	{
 		m_path = other.m_path;
-		m_allowedMethods = other.m_allowedMethods;
+		m_methods = other.m_methods;
 		m_alias = other.m_alias;
 		m_root = other.m_root;
 		m_listing = other.m_listing;
@@ -71,7 +71,7 @@ LocationBlock::operator =(const LocationBlock &other)
 LocationBlock&
 LocationBlock::methods(std::vector<std::string> methods)
 {
-	m_allowedMethods.set(methods);
+	m_methods.set(methods);
 
 	return (*this);
 }

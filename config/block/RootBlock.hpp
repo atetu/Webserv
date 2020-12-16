@@ -50,25 +50,25 @@ class RootBlock
 		RootBlock&
 		cgiBlocks(const std::list<const CGIBlock*> &cgiBlocks);
 
-		inline Optional<std::string>&
+		inline const Optional<std::string>&
 		root(void) const
 		{
 			return (m_root);
 		}
 
-		inline Optional<MimeBlock*>&
+		inline const Optional<MimeBlock const*>&
 		mimeBlock(void) const
 		{
 			return (m_mimeBlock);
 		}
 
-		const Optional<std::list<const ServerBlock*> >&
+		inline const Optional<std::list<const ServerBlock*> >&
 		serverBlocks(void) const
 		{
 			return (m_serverBlocks);
 		}
 
-		const Optional<std::list<const CGIBlock*> >&
+		inline const Optional<std::list<const CGIBlock*> >&
 		cgiBlocks(void) const
 		{
 			return (m_cgiBlocks);

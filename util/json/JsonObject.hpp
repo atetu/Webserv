@@ -104,6 +104,17 @@ class JsonObject :
 			return (it->second);
 		}
 
+		const JsonValue*
+		get(const std::string &name) const
+		{
+			const_iterator it = m_value.find(name);
+
+			if (it == m_value.end())
+				return (NULL);
+
+			return (it->second);
+		}
+
 		inline iterator
 		begin()
 		{

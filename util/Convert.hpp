@@ -13,9 +13,8 @@
 #ifndef CONVERT_HPP_
 # define CONVERT_HPP_
 
-#if 1
 #include <sstream>
-#endif
+#include <string>
 
 class Convert
 {

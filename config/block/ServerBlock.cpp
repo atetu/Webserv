@@ -98,7 +98,7 @@ ServerBlock::root(const std::string &root)
 }
 
 ServerBlock&
-ServerBlock::locations(std::vector<LocationBlock*> locations)
+ServerBlock::locations(std::list<LocationBlock const*> locations)
 {
 	m_locations.set(locations);
 

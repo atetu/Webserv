@@ -19,7 +19,6 @@
 #include <list>
 #include <map>
 #include <string>
-#include <vector>
 
 class ServerBlock
 {
@@ -29,7 +28,7 @@ class ServerBlock
 		Optional<std::list<std::string> > m_names;
 		Optional<DataSize> m_maxBodySize;
 		Optional<std::string> m_root;
-		Optional<std::vector<LocationBlock*> > m_locations;
+		Optional<std::list<LocationBlock const*> > m_locations;
 		Optional<std::map<int, std::string> > m_errors;
 
 	public:
@@ -58,7 +57,7 @@ class ServerBlock
 		root(const std::string &root);
 
 		ServerBlock&
-		locations(std::vector<LocationBlock*> locations);
+		locations(std::list<LocationBlock const*> locations);
 
 		ServerBlock&
 		errors(std::map<int, std::string> errors);
@@ -87,7 +86,7 @@ class ServerBlock
 			return (m_root);
 		}
 
-		const Optional<std::vector<LocationBlock*> >&
+		const Optional<std::list<LocationBlock const*> >&
 		locations(void) const
 		{
 			return (m_locations);
