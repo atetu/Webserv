@@ -14,6 +14,9 @@
 # define IBUFFER_HPP_
 
 #include <string>
+#include <sys/types.h>
+#include <sys/uio.h>
+#include <unistd.h>
 
 class IBuffer
 {

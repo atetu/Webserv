@@ -6,10 +6,9 @@
 /*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/15 17:11:28 by alicetetu         #+#    #+#             */
-/*   Updated: 2020/12/15 17:29:59 by alicetetu        ###   ########.fr       */
+/*   Updated: 2020/12/16 15:46:51 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-
 
 #include <http/HTTPLocationInterpretor.hpp>
 
@@ -69,6 +68,7 @@ HTTPLocationInterpretor::next(char &c)
 	m_path.erase(0, 1);
 
 	return (true);
+}
 
 void
 HTTPLocationInterpretor::consume(char &c)
@@ -76,48 +76,150 @@ HTTPLocationInterpretor::consume(char &c)
 	switch (m_state)
 	{
 		case S_NOT_STARTED:
-		case S_START:
+		case S_FIRST:
 		{
 			if (c == ' ')
 			{
 			}
 			else if (c == '/')
 			{
-				(*m_map)[m_weightNb].push_back(m_valueElement);
-				m_valueElement = "";
-				m_valueElement.reserve(16);
-				m_state = S_STARTED; 
+				m_start += c;
+				m_state = S_START; 
 			}
-			else if (c == '.')
+			else if (c == '~')
 			{
-				m_state = S_END;
+				m_state = S_TILDE;
+			}
+			else if (c == '=')
+			{
+				m_state = S_EXACT_INTRO;
+				m_exact += c;
 			}
 			else if (c == '\0')
 			{
-				(*m_map)[m_weightNb].push_back(m_valueElement);
-				m_weightNb = 1;
-				m_weightStr = "";
-				m_weightStr.reserve(5); // ou 6
-				
-				m_state = S_END;
-			}
-			else
-			{
-				m_state = S_VALUE;
-				m_valueElement += c;
+				m_state = S_OVER;
 			}
 
 			break;
 		}
-		case S_SPACES_AFTER_VALUE:
+		case S_START:
+		{
+			if (c == ' ')
+			{
+				m_state = S_OVER; //check for exceptions if it can happen here
+			}
+			else
+			{
+				m_start += c;
+			}
+			break;
+		}
+		
+		case S_EXACT_INTRO:
 		{
 			if (c == ' ')
 				;
-			else if (c == ',')
+			else
 			{
-				(*m_map)[m_weightNb].push_back(m_valueElement);
-				m_valueElement = "";
-				m_valueElement.reserve(16);
-				m_state = S_NOT_STARTED; 
+				m_exact += c;
+				m_state = S_EXACT;
 			}
+			break;
+		}
+		
+		case S_EXACT:
+		{
+			if (c == ' ')
+			{
+				m_state = S_OVER; //check for exceptions if it can happen here
+			}
+			else
+			{
+				m_exact += c;
+				m_state = S_EXACT;
+			}
+			break;
+		}
+		
+		case S_TILDE:
+		{
+			if (c == ' ')
+			{
+				m_state = S_SPACE_AFTER_TILDE;
+			}
+			else if (c == '*')
+			{
+				m_state = S_NO_CASE_MODIFIER;
+			}
+			else if (c == '.')
+			{
+				m_state = S_END;
+				m_end += c;
+			}
+			else if (c == '^')
+			{
+				m_state = S_START;	
+			}
+			else if (c == '/')
+			{
+				m_state = S_START;	
+				m_start += c;
+			}
+			break;
+		}
+		
+		case S_SPACE_AFTER_TILDE:
+		{
+			if (c == ' ')
+			{
+				m_state = S_SPACE_AFTER_TILDE;
+			}
+			else if (c == '.')
+			{
+				m_state = S_END;
+				m_end += c;
+			}
+			else if (c == '^')
+			{
+				m_state = S_START;	
+			}
+			else if (c == '/')
+			{
+				m_state = S_START;	
+				m_start += c;
+			}
+			break;
+		}
+
+		case S_END :
+		{
+			if (c == ' ')
+			{
+				m_state = S_OVER; //check for exceptions if it can happen here
+			}
+			else
+			{
+				m_end += c;
+			}
+			break;
+		}
+	}
+}
+
+const std::string&
+HTTPLocationInterpretor::start(void)
+{
+	return (m_start);
+}
+
+const std::string&
+HTTPLocationInterpretor::end(void)
+{
+	return (m_end);
+}
+
+const std::string&
+HTTPLocationInterpretor::exact(void)
+{
+	return (m_exact);
 }
