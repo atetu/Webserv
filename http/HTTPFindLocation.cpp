@@ -6,7 +6,7 @@
 /*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/15 15:24:50 by alicetetu         #+#    #+#             */
-/*   Updated: 2020/12/16 15:46:27 by alicetetu        ###   ########.fr       */
+/*   Updated: 2020/12/16 17:07:53 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,44 +81,59 @@ HTTPFindLocation::parse(void)
 		
 		
 		char c ;
+		int start;
+		int end;
 	
 		while (interpretor.next(c))
 			interpretor.consume(c);
-//		interpretor.consume('\0');
 
 		if(!(interpretor.exact().empty()))
 		{
+			std::cout << "exact\n";
 			if (!(interpretor.exact().compare(m_clientPath) == 0))
+			{
+				it++;
 				continue;
+			}
 			else
 			{
-					m_locationBlock = *it;
-					break;
+				m_locationBlock = *it;
+				break;
 			}
 		}
 		if(!(interpretor.start().empty()))
 		{
-			if (!(interpretor.start().compare(0, m_clientPath.size(), m_clientPath) == 0))
+			if (!(m_clientPath.compare(0, interpretor.start().size(), interpretor.start()) == 0))
+			{	
+				it++;
 				continue;
+			}
+			start = 1;
 		}
-		if(!(interpretor.middle().empty()))
-		{
-			
-		}
+		
 		if(!(interpretor.end().empty()))
 		{
+			
 			std::string end = interpretor.end();
+			
 			int size = end.size();
 			int index = m_clientPath.size() - size;
-			if (end.compare(index, size, m_clientPath) == 0)
-			{
-				this->location(*it);
-				break;
+			if (m_clientPath.compare(index, size, end) == 0)
+				end = 1;
+			else
+			{	
+				it++;
+				continue;
 			}
 						
 		}
+		if (start || end)
+		{
+			this->location(*it);
+			break;
+		}	
 		
-		it ++;
+		it++;
 	}
 }
 

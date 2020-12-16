@@ -6,7 +6,7 @@
 /*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/15 17:11:25 by alicetetu         #+#    #+#             */
-/*   Updated: 2020/12/16 15:47:13 by alicetetu        ###   ########.fr       */
+/*   Updated: 2020/12/16 16:07:53 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,10 +56,7 @@ class HTTPLocationInterpretor
 		const std::string&
 		start(void);
 
-		const std::string&
-		middle(void);
-
-		const std::string&
+				const std::string&
 		end(void);
 		
 		const std::string&

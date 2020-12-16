@@ -6,7 +6,7 @@
 /*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/28 19:10:59 by ecaceres          #+#    #+#             */
-/*   Updated: 2020/12/15 16:32:11 by alicetetu        ###   ########.fr       */
+/*   Updated: 2020/12/16 17:15:49 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 LocationBlock LocationBlock::DEFAULT;
 
 LocationBlock::LocationBlock(void) :
-		m_path(),
+		m_path(""),
 		m_methods(),
 		m_alias(),
 		m_root(),

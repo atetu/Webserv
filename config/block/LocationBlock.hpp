@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   LocationBlock.hpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ecaceres <ecaceres@student.42.fr>          +#+  +:+       +#+        */
+/*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/28 19:10:59 by ecaceres          #+#    #+#             */
-/*   Updated: 2020/10/28 19:10:59 by ecaceres         ###   ########.fr       */
+/*   Updated: 2020/12/16 16:04:00 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,7 +58,7 @@ class LocationBlock
 		cgi(std::string cgi);
 
 		inline const std::string&
-		path(void)
+		path(void) const
 		{
 			return (m_path);
 		}
