@@ -10,21 +10,21 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <http/handler/methods/GetHandler.hpp>
-#include <http/handler/methods/DeleteHandler.hpp>
 #include <http/handler/methods/ConnectHandler.hpp>
+#include <http/handler/methods/DeleteHandler.hpp>
+#include <http/handler/methods/GetHandler.hpp>
 #include <http/HTTPMethod.hpp>
 
-#define DEFINE_METHOD(name, handler) ENUM_DEFINE(HTTPMethod, name, HTTPMethod(handler));
+#define DEFINE_METHOD(name, handler) ENUM_DEFINE(HTTPMethod, name, HTTPMethod(&handler));
 
-DEFINE_METHOD(GET,/*     */new GetHandler());
-DEFINE_METHOD(HEAD,/*    */new GetHandler());
-DEFINE_METHOD(POST,/*    */new GetHandler());
-DEFINE_METHOD(PUT,/*     */new GetHandler());
-DEFINE_METHOD(DELETE,/*  */new DeleteHandler());
-DEFINE_METHOD(CONNECT,/* */new ConnectHandler());
-DEFINE_METHOD(OPTIONS,/* */new GetHandler());
-DEFINE_METHOD(TRACE,/*   */new GetHandler());
+DEFINE_METHOD(GET,/*     */GetHandler::get());
+DEFINE_METHOD(HEAD,/*    */GetHandler::get());
+DEFINE_METHOD(POST,/*    */GetHandler::get());
+DEFINE_METHOD(PUT,/*     */GetHandler::get());
+DEFINE_METHOD(DELETE,/*  */DeleteHandler::get());
+DEFINE_METHOD(CONNECT,/* */ConnectHandler::get());
+DEFINE_METHOD(OPTIONS,/* */GetHandler::get());
+DEFINE_METHOD(TRACE,/*   */GetHandler::get());
 
 HTTPMethod::HTTPMethod(void) :
 		m_handler()
@@ -38,6 +38,10 @@ HTTPMethod::HTTPMethod(HTTPMethodHandler *handler) :
 
 HTTPMethod::HTTPMethod(const HTTPMethod &other) :
 		m_handler(other.m_handler)
+{
+}
+
+HTTPMethod::~HTTPMethod(void)
 {
 }
 

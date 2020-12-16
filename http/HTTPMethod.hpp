@@ -28,6 +28,9 @@ class HTTPMethod :
 		HTTPMethod(HTTPMethodHandler *handler);
 		HTTPMethod(const HTTPMethod &other);
 
+		virtual
+		~HTTPMethod(void);
+
 		HTTPMethod&
 		operator =(const HTTPMethod &other);
 
