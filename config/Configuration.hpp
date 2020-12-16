@@ -14,18 +14,18 @@
 # define CONFIGURATION_HPP_
 
 #include <config/block/RootBlock.hpp>
-#include <exception/Exception.hpp>
 #include <http/mime/MimeRegistry.hpp>
 #include <util/Convert.hpp>
 #include <util/json/JsonArray.hpp>
 #include <util/json/JsonObject.hpp>
 #include <util/json/JsonReader.hpp>
 #include <util/json/JsonValue.hpp>
+#include <util/Objects.hpp>
+#include <util/Optional.hpp>
 #include <iterator>
 #include <list>
 #include <map>
 #include <string>
-#include <typeinfo>
 
 // TODO: All blocks need deep-copy, same goes for mime registry
 // Configuration should not be passed around like a normal object, but must be kept as singleton if possible
@@ -92,8 +92,40 @@ class Configuration
 		build();
 
 	public:
-		static Configuration
+		static Configuration*
 		fromJsonFile(const std::string &path);
+
+		template<typename T>
+			static void
+			deleteBlocks(Optional<std::list<T const*> > &optional)
+			{
+				if (optional.present())
+				{
+					deleteBlocks(optional.get());
+					optional.unset();
+				}
+			}
+
+		template<typename T>
+			static void
+			deleteBlocks(std::list<T const*> &blocks)
+			{
+				for (typename std::list<T const*>::iterator it = blocks.begin(); it != blocks.end(); it++)
+					delete *it;
+
+				blocks.clear();
+			}
+
+		template<typename T>
+			static void
+			deleteBlock(Optional<T const*> &optional)
+			{
+				if (optional.present())
+				{
+					delete optional.get();
+					optional.unset();
+				}
+			}
 
 	private:
 		class FromJsonBuilder
@@ -101,12 +133,6 @@ class Configuration
 			public:
 				static JsonObject&
 				rootObject(JsonReader &jsonReader);
-
-				static RootBlock*
-				buildRootBlock(const JsonObject &jsonObject);
-
-				static MimeBlock*
-				buildMimeBlock(const std::string &path, const JsonObject &jsonObject);
 
 				template<typename T>
 					static std::list<T const*>
@@ -130,7 +156,7 @@ class Configuration
 						}
 						catch (...)
 						{
-							// TODO delete blocks items
+							Configuration::deleteBlocks<T>(blocks);
 
 							throw;
 						}
@@ -158,13 +184,40 @@ class Configuration
 						}
 						catch (...)
 						{
-							// TODO delete blocks items
+							Configuration::deleteBlocks<T>(blocks);
 
 							throw;
 						}
 
 						return (blocks);
 					}
+
+				template<typename JT, typename T>
+					static std::list<T>
+					buildCollection(const std::string &path, const JsonArray &jsonArray)
+					{
+						std::list<T> items;
+
+						int index = 0;
+						for (JsonArray::const_iterator it = jsonArray.begin(); it != jsonArray.end(); it++)
+						{
+							std::string ipath = path + "[" + Convert::toString(index) + "]";
+							const JT &jsonType = jsonCast<JT>(ipath, *it);
+
+							T item = jsonType; /* Automatic cast. */
+							items.push_back(item);
+
+							index++;
+						}
+
+						return (items);
+					}
+
+				static RootBlock*
+				buildRootBlock(const JsonObject &jsonObject);
+
+				static MimeBlock*
+				buildMimeBlock(const std::string &path, const JsonObject &jsonObject);
 
 				static CGIBlock*
 				buildCGIBlock(const std::string &path, const std::string &key, const JsonObject &jsonObject);
@@ -179,6 +232,8 @@ class Configuration
 					static const T&
 					jsonCast(const std::string &path, const JsonValue *jsonValue)
 					{
+						Objects::requireNonNull(jsonValue, "jsonValue == null");
+
 						if (!jsonValue->instanceOf<T>())
 							throw Exception("Cannot cast " + jsonValue->typeString() + " to " + JsonTypeTraits<T>::typeString + " (" + path + ")");
 

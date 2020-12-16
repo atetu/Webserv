@@ -19,16 +19,11 @@ LoggerFactory::get(const std::string &tag)
 {
 	logger_map &storage = getStorage();
 
-	Logger *current = storage[tag];
+	iterator it = storage.find(tag);
+	if (it == storage.end())
+		it = storage.insert(storage.end(), std::pair<std::string, Logger*>(tag, new LoggerImpl(tag)));
 
-	if (!current)
-	{
-		current = new LoggerImpl(tag);
-
-		storage.insert(storage.end(), std::pair<std::string, Logger*>(tag, current));
-	}
-
-	return (*current);
+	return (*it->second);
 }
 
 void
@@ -36,7 +31,7 @@ LoggerFactory::destroy(void)
 {
 	logger_map &storage = getStorage();
 
-	for (iterator it = storage.begin(); it != storage.begin(); it++)
+	for (iterator it = storage.begin(); it != storage.end(); it++)
 		delete it->second;
 
 	storage.clear();

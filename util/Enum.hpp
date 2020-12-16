@@ -39,9 +39,7 @@ template<typename E>
 				public:
 					~ContainerWrapper() /* std::vector<*> don't free pointers. */
 					{
-						iterator ite = m_container.end();
-
-						for (iterator it = m_container.begin(); it != ite; it++)
+						for (iterator it = m_container.begin(); it != m_container.end(); it++)
 							delete *it;
 					}
 

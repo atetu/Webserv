@@ -14,18 +14,18 @@
 # define LOCATIONBLOCK_HPP_
 
 #include <util/Optional.hpp>
+#include <list>
 #include <string>
-#include <vector>
 
 class LocationBlock
 {
 	private:
 		std::string m_path;
-		Optional<std::vector<std::string> > m_methods;
+		Optional<std::list<std::string> > m_methods;
 		Optional<std::string> m_alias;
 		Optional<std::string> m_root;
 		Optional<bool> m_listing;
-		Optional<std::vector<std::string> > m_indexFiles;
+		Optional<std::list<std::string> > m_indexFiles;
 		Optional<std::string> m_cgi;
 
 	public:
@@ -40,22 +40,22 @@ class LocationBlock
 		operator=(const LocationBlock &other);
 
 		LocationBlock&
-		methods(std::vector<std::string> methods);
+		methods(const std::list<std::string> &methods);
 
 		LocationBlock&
-		alias(std::string alias);
+		alias(const std::string &alias);
 
 		LocationBlock&
-		root(std::string root);
+		root(const std::string &root);
 
 		LocationBlock&
 		listing(bool listing);
 
 		LocationBlock&
-		index(std::vector<std::string> files);
+		index(const std::list<std::string> &files);
 
 		LocationBlock&
-		cgi(std::string cgi);
+		cgi(const std::string &cgi);
 
 		inline const std::string&
 		path(void) const

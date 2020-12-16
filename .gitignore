@@ -220,3 +220,4 @@ $RECYCLE.BIN/
 /find_libs.py
 /gather.py
 /updater.py
+/find_libs_bin.py

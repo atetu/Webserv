@@ -12,8 +12,10 @@
 
 #include <config/block/CGIBlock.hpp>
 #include <config/block/LocationBlock.hpp>
+#include <config/block/MimeBlock.hpp>
 #include <config/block/ServerBlock.hpp>
 #include <config/Configuration.hpp>
+#include <exception/Exception.hpp>
 #include <util/json/JsonBoolean.hpp>
 #include <util/json/JsonNumber.hpp>
 #include <util/json/JsonString.hpp>
@@ -47,6 +49,8 @@ Configuration::Configuration(const Configuration &other) :
 
 Configuration::~Configuration()
 {
+	delete m_rootBlock;
+	delete m_mimeRegistry;
 }
 
 Configuration&
@@ -84,17 +88,28 @@ Configuration::build()
 				} while (0);                                                            \
 			}
 
-Configuration
+Configuration*
 Configuration::fromJsonFile(const std::string &filepath)
 {
 	JsonObject *jsonObject = JsonReader::fromFile(filepath).readObject();
 
-	RootBlock *rootBlock = FromJsonBuilder::buildRootBlock(*jsonObject);
-	MimeRegistry *mimeRegistry = new MimeRegistry();
+	try
+	{
+		RootBlock *rootBlock = FromJsonBuilder::buildRootBlock(*jsonObject);
+		MimeRegistry *mimeRegistry = new MimeRegistry();
 
-	LOG.trace() << "Root Block: " << rootBlock << std::endl;
+		LOG.trace() << "Root Block: " << rootBlock << std::endl;
 
-	return (Configuration(filepath, *mimeRegistry, *rootBlock));
+		delete jsonObject;
+
+		return (new Configuration(filepath, *mimeRegistry, *rootBlock));
+	}
+	catch (...)
+	{
+		delete jsonObject;
+
+		throw;
+	}
 }
 
 JsonObject&
@@ -132,13 +147,13 @@ Configuration::FromJsonBuilder::buildRootBlock(const JsonObject &jsonObject)
 			rootBlock->root(string);
 		}
 
-//		if (jsonObject.has(KEY_ROOT_MIME))
-//		{
-//			std::string path = KEY_ROOT KEY_DOT KEY_ROOT_MIME;
-//			const JsonObject &object = jsonCast<JsonObject>(path, jsonObject.get(KEY_ROOT_MIME));
-//
-////			rootBlock->mimeBlock(*buildMimeBlock(path, object));
-//		}
+		if (jsonObject.has(KEY_ROOT_MIME))
+		{
+			std::string path = KEY_ROOT KEY_DOT KEY_ROOT_MIME;
+			const JsonObject &object = jsonCast<JsonObject>(path, jsonObject.get(KEY_ROOT_MIME));
+
+			rootBlock->mimeBlock(*buildMimeBlock(path, object));
+		}
 
 		if (jsonObject.has(KEY_ROOT_CGI))
 		{
@@ -166,6 +181,25 @@ Configuration::FromJsonBuilder::buildRootBlock(const JsonObject &jsonObject)
 	return (rootBlock);
 }
 
+MimeBlock*
+Configuration::FromJsonBuilder::buildMimeBlock(const std::string &path, const JsonObject &jsonObject)
+{
+	MimeBlock *mimeBlock = new MimeBlock();
+
+	try
+	{
+		// TODO
+	}
+	catch (...)
+	{
+		delete mimeBlock;
+
+		throw;
+	}
+
+	return (mimeBlock);
+}
+
 CGIBlock*
 Configuration::FromJsonBuilder::buildCGIBlock(const std::string &path, const std::string &key, const JsonObject &jsonObject)
 {
@@ -187,11 +221,13 @@ Configuration::FromJsonBuilder::buildServerBlock(const std::string &path, const 
 		{
 			try
 			{
-				serverBlock->maxBodySize(DataSize::parse(value));
+				serverBlock->maxBodySize(DataSize::parse(value))
+				;
 			}
 			catch (Exception &exception)
 			{
-				throw Exception(exception.message() + std::string(" (") + path + ")");
+				throw Exception(exception.message() + std::string(" (") + path + ")")
+				;
 			}
 		});
 
@@ -224,6 +260,24 @@ Configuration::FromJsonBuilder::buildLocationBlock(const std::string &path, cons
 		BIND(jsonObject, KEY_LOCATION_ROOT, JsonString, std::string, locationBlock, root);
 		BIND(jsonObject, KEY_LOCATION_LISTING, JsonBoolean, bool, locationBlock, listing);
 		BIND(jsonObject, KEY_LOCATION_CGI, JsonString, std::string, locationBlock, cgi);
+
+		if (jsonObject.has(KEY_LOCATION_METHODS))
+		{
+			std::string ipath = path + KEY_DOT KEY_LOCATION_METHODS;
+			const JsonArray &array = jsonCast<JsonArray>(ipath, jsonObject.get(KEY_LOCATION_METHODS));
+			std::list<std::string> methods = buildCollection<JsonString, std::string>(path, array);
+
+			locationBlock->methods(methods);
+		}
+
+		if (jsonObject.has(KEY_LOCATION_INDEX_FILES))
+		{
+			std::string ipath = path + KEY_DOT KEY_LOCATION_INDEX_FILES;
+			const JsonArray &array = jsonCast<JsonArray>(ipath, jsonObject.get(KEY_LOCATION_INDEX_FILES));
+			std::list<std::string> indexFiles = buildCollection<JsonString, std::string>(path, array);
+
+			locationBlock->index(indexFiles);
+		}
 	}
 	catch (...)
 	{

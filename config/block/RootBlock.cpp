@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   RootBlock.cpp                                       :+:      :+:    :+:   */
+/*   RootBlock.cpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ecaceres <ecaceres@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -11,6 +11,7 @@
 /* ************************************************************************** */
 
 #include <config/block/RootBlock.hpp>
+#include <config/Configuration.hpp>
 
 RootBlock::RootBlock() :
 		m_root(),
@@ -30,6 +31,9 @@ RootBlock::RootBlock(const RootBlock &other) :
 
 RootBlock::~RootBlock()
 {
+	Configuration::deleteBlocks<ServerBlock>(m_serverBlocks);
+	Configuration::deleteBlocks<CGIBlock>(m_cgiBlocks);
+	Configuration::deleteBlock<MimeBlock>(m_mimeBlock);
 }
 
 RootBlock&

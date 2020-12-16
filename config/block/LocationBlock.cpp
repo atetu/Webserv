@@ -69,7 +69,7 @@ LocationBlock::operator =(const LocationBlock &other)
 }
 
 LocationBlock&
-LocationBlock::methods(std::vector<std::string> methods)
+LocationBlock::methods(const std::list<std::string> &methods)
 {
 	m_methods.set(methods);
 
@@ -77,7 +77,7 @@ LocationBlock::methods(std::vector<std::string> methods)
 }
 
 LocationBlock&
-LocationBlock::alias(std::string alias)
+LocationBlock::alias(const std::string &alias)
 {
 	m_alias.set(alias);
 
@@ -85,7 +85,7 @@ LocationBlock::alias(std::string alias)
 }
 
 LocationBlock&
-LocationBlock::root(std::string root)
+LocationBlock::root(const std::string &root)
 {
 	m_root.set(root);
 
@@ -101,7 +101,7 @@ LocationBlock::listing(bool listing)
 }
 
 LocationBlock&
-LocationBlock::index(std::vector<std::string> files)
+LocationBlock::index(const std::list<std::string> &files)
 {
 	m_indexFiles.set(files);
 
@@ -109,7 +109,7 @@ LocationBlock::index(std::vector<std::string> files)
 }
 
 LocationBlock&
-LocationBlock::cgi(std::string cgi)
+LocationBlock::cgi(const std::string &cgi)
 {
 	m_cgi.set(cgi);
 
