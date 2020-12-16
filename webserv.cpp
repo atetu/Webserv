@@ -107,20 +107,17 @@ delegated_main(int argc, char **argv)
 	}
 	catch (IOException &exception)
 	{
-		LOG.fatal() << "Cannot read configuration file." << std::endl;
-		LOG.fatal() << exception.message() << std::endl;
+		LOG.fatal() << "Cannot read configuration file: " << exception.message() << std::endl;
 		return (1);
 	}
 	catch (JsonException &exception)
 	{
-		LOG.fatal() << "Failed to parse configuration JSON." << std::endl;
-		LOG.fatal() << exception.message() << std::endl;
+		LOG.fatal() << "Failed to parse JSON: " << exception.message() << std::endl;
 		return (1);
 	}
 	catch (Exception &exception)
 	{
-		LOG.fatal() << "Failed create configuration." << std::endl;
-		LOG.fatal() << exception.message() << std::endl;
+		LOG.fatal() << "Failed create configuration: " << exception.message() << std::endl;
 		return (1);
 	}
 
@@ -137,9 +134,12 @@ main(int argc, char **argv)
 {
 	int exitCode;
 
-	try {
+	try
+	{
 		exitCode = delegated_main(argc, argv);
-	} catch (std::exception &exception) {
+	}
+	catch (std::exception &exception)
+	{
 		exitCode = 1;
 
 		std::cerr << "unhandled " << typeid(exception).name() << ": " << exception.what() << std::endl;
