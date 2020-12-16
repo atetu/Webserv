@@ -11,6 +11,9 @@
 /* ************************************************************************** */
 
 #include <config/block/ServerBlock.hpp>
+#include <config/Configuration.hpp>
+
+class Configuration;
 
 const std::string ServerBlock::DEFAULT_HOST = "0.0.0.0";
 
@@ -38,6 +41,7 @@ ServerBlock::ServerBlock(const ServerBlock &other) :
 
 ServerBlock::~ServerBlock()
 {
+	Configuration::deleteBlocks<LocationBlock>(m_locations);
 }
 
 ServerBlock&

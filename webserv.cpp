@@ -97,7 +97,7 @@ delegated_main(int argc, char **argv)
 
 	LOG.debug() << "Set log level to: " << level->name() << std::endl;
 
-	Configuration configuration;
+	Configuration *configuration = NULL;
 
 	try
 	{
@@ -120,6 +120,9 @@ delegated_main(int argc, char **argv)
 		LOG.fatal() << "Failed create configuration: " << exception.message() << std::endl;
 		return (1);
 	}
+
+	delete configuration;
+	std::cout << configuration << std::endl;
 
 	if (checkOnly)
 		return (0);
