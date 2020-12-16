@@ -6,7 +6,7 @@
 /*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/28 14:34:10 by ecaceres          #+#    #+#             */
-/*   Updated: 2020/12/15 15:59:32 by alicetetu        ###   ########.fr       */
+/*   Updated: 2020/12/16 10:49:11 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -304,6 +304,28 @@ HTTPOrchestrator::start()
 							{
 								// TODO Route matching
 
+
+//	ENZO : not the right version but something like that that what suppressed during merging ?? Lacks thet part regarging route maching but not difficult to do it again
+								
+										// if (cli->parser.state() == HttpRequestParser::S_CONTINUE)
+								// {
+								// 	while (1)
+								// 	{
+								// 		HTTPHeaderParser headerParser;
+								// 		headerParser.consume(c);
+						
+								// 		while (cli->fd->consume(&c))
+								// 		{
+								// 			headerParser.consume(c);
+								// 			if (headerParser.state() == HTTPHeaderParser::S_END || headerParser.state() == HttpHeaderParser::S_CONTINUE)
+								// 			break;
+								// 		}
+								// 		cli->header(headerParser);
+								// 		if (headerParser.state() == HTTPHeaderParser::S_END)
+								// 			break;
+								// 	}
+								// }
+								
 								const HTTPMethod *method = HTTPMethod::find(client->parser().method());
 								if (!method)
 									client->response() = HTTPResponse::status(*HTTPStatus::METHOD_NOT_ALLOWED);
