@@ -27,6 +27,10 @@ class GetHandler :
 
 		HTTPResponse*
 		handle(HTTPRequest &request);
+
+	public:
+		static GetHandler&
+		get(void);
 };
 
 #endif /* GETHANDLER_HPP_ */

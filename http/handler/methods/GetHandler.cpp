@@ -100,3 +100,11 @@ GetHandler::handle(HTTPRequest &request)
 
 	return (HTTPResponse::status(*HTTPStatus::NOT_FOUND));
 }
+
+GetHandler&
+GetHandler::get(void)
+{
+	static GetHandler handler;
+
+	return (handler);
+}

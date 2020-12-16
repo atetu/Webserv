@@ -41,3 +41,11 @@ DeleteHandler::handle(HTTPRequest &request)
 	else
 		return (HTTPResponse::status(*HTTPStatus::NO_CONTENT));
 }
+
+DeleteHandler&
+DeleteHandler::get(void)
+{
+	static DeleteHandler handler;
+
+	return (handler);
+}

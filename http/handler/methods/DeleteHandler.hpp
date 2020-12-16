@@ -27,6 +27,10 @@ class DeleteHandler :
 
 		HTTPResponse*
 		handle(HTTPRequest &request);
+
+	public:
+		static DeleteHandler&
+		get(void);
 };
 
 #endif /* DELETEHANDLER_HPP_ */

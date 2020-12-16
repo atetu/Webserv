@@ -26,6 +26,10 @@ class ConnectHandler :
 
 		HTTPResponse*
 		handle(HTTPRequest &request);
+
+	public:
+		static ConnectHandler&
+		get(void);
 };
 
 #endif /* CONNECTHANDLER_HPP_ */

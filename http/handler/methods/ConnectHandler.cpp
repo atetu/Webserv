@@ -28,3 +28,11 @@ ConnectHandler::handle(HTTPRequest &request)
 {
 	return (HTTPResponse::status(*HTTPStatus::BAD_REQUEST));
 }
+
+ConnectHandler&
+ConnectHandler::get(void)
+{
+	static ConnectHandler handler;
+
+	return (handler);
+}
