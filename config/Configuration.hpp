@@ -36,12 +36,16 @@
 #define KEY_ROOT_MIME "mime"
 #define KEY_ROOT_CGI "cgi"
 #define KEY_ROOT_SERVERS "servers"
+#define KEY_MIME_INCLUDES "includes"
+#define KEY_MIME_DEFINE "define"
+#define KEY_CGI_PATH "path"
 #define KEY_SERVER_PORT "port"
 #define KEY_SERVER_HOST "host"
-#define KEY_SERVER_NAMES "names"
+#define KEY_SERVER_NAME "name"
 #define KEY_SERVER_MAXBODYSIZE "maxBodySize"
 #define KEY_SERVER_ROOT "root"
 #define KEY_SERVER_LOCATIONS "locations"
+#define KEY_SERVER_ERRORS "errors"
 #define KEY_LOCATION_METHODS "methods"
 #define KEY_LOCATION_ALIAS "alias"
 #define KEY_LOCATION_ROOT "root"
@@ -134,10 +138,10 @@ class Configuration
 				static JsonObject&
 				rootObject(JsonReader &jsonReader);
 
-				template<typename T>
+				template<typename T, typename JT>
 					static std::list<T const*>
 					buildBlocks(const std::string &path, const JsonArray &jsonArray, T*
-					(*builder)(const std::string&, const JsonObject&))
+					(*builder)(const std::string&, const JT&))
 					{
 						std::list<const T*> blocks;
 
@@ -147,9 +151,9 @@ class Configuration
 							for (JsonArray::const_iterator it = jsonArray.begin(); it != jsonArray.end(); it++)
 							{
 								std::string ipath = path + "[" + Convert::toString(index) + "]";
-								const JsonObject &object = jsonCast<JsonObject>(ipath, *it);
+								const JT &jsonType = jsonCast<JT>(ipath, *it);
 
-								blocks.push_back((*builder)(ipath, object));
+								blocks.push_back((*builder)(ipath, jsonType));
 
 								index++;
 							}
@@ -164,10 +168,10 @@ class Configuration
 						return (blocks);
 					}
 
-				template<typename T>
+				template<typename T, typename JT>
 					static std::list<T const*>
 					buildBlocks(const std::string &path, const JsonObject &jsonObject, T*
-					(*builder)(const std::string&, const std::string&, const JsonObject&))
+					(*builder)(const std::string&, const std::string&, const JT&))
 					{
 						std::list<const T*> blocks;
 
@@ -177,9 +181,9 @@ class Configuration
 							{
 								const std::string &key = it->first;
 								std::string ipath = path + KEY_DOT + key;
-								const JsonObject &object = jsonCast<JsonObject>(ipath, it->second);
+								const JT &jsonType = jsonCast<JT>(ipath, it->second);
 
-								blocks.push_back((*builder)(ipath, key, object));
+								blocks.push_back((*builder)(ipath, key, jsonType));
 							}
 						}
 						catch (...)
@@ -227,6 +231,12 @@ class Configuration
 
 				static LocationBlock*
 				buildLocationBlock(const std::string &path, const std::string &key, const JsonObject &jsonObject);
+
+				static Mime*
+				buildMime(const std::string &path, const std::string &key, const JsonArray &jsonArray);
+
+				static CustomErrorMap
+				buildCustomErrorMap(const std::string &path, const JsonObject &jsonObject);
 
 				template<typename T>
 					static const T&

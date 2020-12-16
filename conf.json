@@ -21,14 +21,12 @@
 		{
 			"port": 80,
 			"host": "0.0.0.0",
-			"name": [
-				"_"
-			],
+			"name": "boxplay.io",
 			"default": true,
 			"maxBodySize": "1MB",
-			"errorPages": {
+			"errors": {
 				"500": "500.html",
-				"404": "not-found.html"
+				"400": "not-found.html"
 			},
 			"root": "/var/www/html",
 			"locations": {
@@ -66,11 +64,7 @@
 					"index": [
 						"index.html",
 						"index-webserv.html"
-					],
-					"uploads": {
-						"enabled": true,
-						"storeAt": "/var/www/html"
-					}
+					]
 				},
 				"~.php": {
 					"cgi": "php"

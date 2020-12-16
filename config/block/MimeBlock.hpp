@@ -15,14 +15,14 @@
 
 #include <http/mime/Mime.hpp>
 #include <util/Optional.hpp>
+#include <list>
 #include <string>
-#include <vector>
 
 class MimeBlock
 {
 	private:
-		Optional<std::vector<std::string> > m_includes;
-		Optional<std::vector<Mime*> > m_defines;
+		Optional<std::list<std::string> > m_includes;
+		Optional<std::list<Mime const*> > m_defines;
 
 	public:
 		MimeBlock();
@@ -35,18 +35,18 @@ class MimeBlock
 		operator =(const MimeBlock &other);
 
 		MimeBlock&
-		includes(const std::vector<std::string> &includes);
+		includes(const std::list<std::string> &includes);
 
 		MimeBlock&
-		defines(const std::vector<Mime*> &defines);
+		defines(const std::list<Mime const*> &defines);
 
-		const Optional<std::vector<std::string> >&
+		const Optional<std::list<std::string> >&
 		includes()
 		{
 			return (m_includes);
 		}
 
-		const Optional<std::vector<Mime*> >&
+		const Optional<std::list<Mime const*> >&
 		defines()
 		{
 			return (m_defines);

@@ -13,6 +13,7 @@
 #ifndef SERVERBLOCK_HPP_
 # define SERVERBLOCK_HPP_
 
+#include <config/block/container/CustomErrorMap.hpp>
 #include <config/block/LocationBlock.hpp>
 #include <util/Optional.hpp>
 #include <util/unit/DataSize.hpp>
@@ -29,7 +30,7 @@ class ServerBlock
 		Optional<DataSize> m_maxBodySize;
 		Optional<std::string> m_root;
 		Optional<std::list<LocationBlock const*> > m_locations;
-		Optional<std::map<int, std::string> > m_errors;
+		Optional<CustomErrorMap> m_errors;
 
 	public:
 		ServerBlock();
@@ -51,33 +52,39 @@ class ServerBlock
 		names(const std::list<std::string> &names);
 
 		ServerBlock&
-		maxBodySize(DataSize maxBodySize);
+		maxBodySize(const DataSize &maxBodySize);
 
 		ServerBlock&
 		root(const std::string &root);
 
 		ServerBlock&
-		locations(std::list<LocationBlock const*> locations);
+		locations(const std::list<LocationBlock const*> &locations);
 
 		ServerBlock&
-		errors(std::map<int, std::string> errors);
+		errors(const CustomErrorMap &errors);
 
-		const Optional<int>
+		inline const Optional<int>
 		port(void) const
 		{
 			return (m_port);
 		}
 
-		const Optional<std::string>&
+		inline const Optional<std::string>&
 		host(void) const
 		{
 			return (m_host);
 		}
 
-		const Optional<std::list<std::string> >
+		inline const Optional<std::list<std::string> >
 		names(void) const
 		{
 			return (m_names);
+		}
+
+		inline const Optional<DataSize>
+		maxBodySize(void) const
+		{
+			return (m_maxBodySize);
 		}
 
 		inline const Optional<std::string>&
@@ -86,10 +93,16 @@ class ServerBlock
 			return (m_root);
 		}
 
-		const Optional<std::list<LocationBlock const*> >&
+		inline const Optional<std::list<LocationBlock const*> >&
 		locations(void) const
 		{
 			return (m_locations);
+		}
+
+		inline const Optional<CustomErrorMap>&
+		errors(void) const
+		{
+			return (m_errors);
 		}
 
 	public:

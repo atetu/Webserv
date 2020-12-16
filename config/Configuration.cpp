@@ -10,19 +10,23 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+#include <config/block/container/CustomErrorMap.hpp>
 #include <config/block/CGIBlock.hpp>
 #include <config/block/LocationBlock.hpp>
 #include <config/block/MimeBlock.hpp>
 #include <config/block/ServerBlock.hpp>
 #include <config/Configuration.hpp>
 #include <exception/Exception.hpp>
+#include <http/mime/Mime.hpp>
 #include <util/json/JsonBoolean.hpp>
 #include <util/json/JsonNumber.hpp>
 #include <util/json/JsonString.hpp>
 #include <util/log/Logger.hpp>
 #include <util/log/LoggerFactory.hpp>
 #include <util/unit/DataSize.hpp>
+#include <cctype>
 #include <iostream>
+#include <utility>
 
 Logger &Configuration::LOG = LoggerFactory::get("Configuration");
 
@@ -141,34 +145,34 @@ Configuration::FromJsonBuilder::buildRootBlock(const JsonObject &jsonObject)
 	{
 		if (jsonObject.has(KEY_ROOT_ROOT))
 		{
-			std::string path = KEY_ROOT KEY_DOT KEY_ROOT_ROOT;
-			const JsonString &string = jsonCast<JsonString>(path, jsonObject.get(KEY_ROOT_ROOT));
+			std::string ipath = KEY_ROOT KEY_DOT KEY_ROOT_ROOT;
+			const JsonString &string = jsonCast<JsonString>(ipath, jsonObject.get(KEY_ROOT_ROOT));
 
 			rootBlock->root(string);
 		}
 
 		if (jsonObject.has(KEY_ROOT_MIME))
 		{
-			std::string path = KEY_ROOT KEY_DOT KEY_ROOT_MIME;
-			const JsonObject &object = jsonCast<JsonObject>(path, jsonObject.get(KEY_ROOT_MIME));
+			std::string piath = KEY_ROOT KEY_DOT KEY_ROOT_MIME;
+			const JsonObject &object = jsonCast<JsonObject>(piath, jsonObject.get(KEY_ROOT_MIME));
 
-			rootBlock->mimeBlock(*buildMimeBlock(path, object));
+			rootBlock->mimeBlock(*buildMimeBlock(piath, object));
 		}
 
 		if (jsonObject.has(KEY_ROOT_CGI))
 		{
-			std::string path = KEY_ROOT KEY_DOT KEY_ROOT_CGI;
-			const JsonObject &object = jsonCast<JsonObject>(path, jsonObject.get(KEY_ROOT_CGI));
+			std::string ipath = KEY_ROOT KEY_DOT KEY_ROOT_CGI;
+			const JsonObject &object = jsonCast<JsonObject>(ipath, jsonObject.get(KEY_ROOT_CGI));
 
-			rootBlock->cgiBlocks(buildBlocks<CGIBlock>(path, object, &Configuration::FromJsonBuilder::buildCGIBlock));
+			rootBlock->cgiBlocks(buildBlocks<CGIBlock, JsonObject>(ipath, object, &Configuration::FromJsonBuilder::buildCGIBlock));
 		}
 
 		if (jsonObject.has(KEY_ROOT_SERVERS))
 		{
-			std::string path = KEY_ROOT KEY_DOT KEY_ROOT_SERVERS;
-			const JsonArray &array = jsonCast<JsonArray>(path, jsonObject.get(KEY_ROOT_SERVERS));
+			std::string ipath = KEY_ROOT KEY_DOT KEY_ROOT_SERVERS;
+			const JsonArray &array = jsonCast<JsonArray>(ipath, jsonObject.get(KEY_ROOT_SERVERS));
 
-			rootBlock->serverBlocks(buildBlocks<ServerBlock>(path, array, &Configuration::FromJsonBuilder::buildServerBlock));
+			rootBlock->serverBlocks(buildBlocks<ServerBlock, JsonObject>(ipath, array, &Configuration::FromJsonBuilder::buildServerBlock));
 		}
 	}
 	catch (...)
@@ -188,7 +192,21 @@ Configuration::FromJsonBuilder::buildMimeBlock(const std::string &path, const Js
 
 	try
 	{
-		// TODO
+		if (jsonObject.has(KEY_MIME_INCLUDES))
+		{
+			std::string ipath = path + KEY_DOT KEY_MIME_INCLUDES;
+			const JsonArray &array = jsonCast<JsonArray>(ipath, jsonObject.get(KEY_MIME_INCLUDES));
+
+			mimeBlock->includes(buildCollection<JsonString, std::string>(ipath, array));
+		}
+
+		if (jsonObject.has(KEY_MIME_DEFINE))
+		{
+			std::string ipath = path + KEY_DOT KEY_MIME_DEFINE;
+			const JsonObject &object = jsonCast<JsonObject>(ipath, jsonObject.get(KEY_MIME_DEFINE));
+
+			mimeBlock->defines(buildBlocks<Mime, JsonArray>(ipath, object, Configuration::FromJsonBuilder::buildMime));
+		}
 	}
 	catch (...)
 	{
@@ -203,7 +221,20 @@ Configuration::FromJsonBuilder::buildMimeBlock(const std::string &path, const Js
 CGIBlock*
 Configuration::FromJsonBuilder::buildCGIBlock(const std::string &path, const std::string &key, const JsonObject &jsonObject)
 {
-	return (new CGIBlock());
+	CGIBlock *cgiBlock = new CGIBlock(key);
+
+	try
+	{
+		BIND(jsonObject, KEY_CGI_PATH, JsonString, std::string, cgiBlock, path);
+	}
+	catch (...)
+	{
+		delete cgiBlock;
+
+		throw;
+	}
+
+	return (cgiBlock);
 }
 
 ServerBlock*
@@ -216,6 +247,23 @@ Configuration::FromJsonBuilder::buildServerBlock(const std::string &path, const 
 		BIND(jsonObject, KEY_SERVER_PORT, JsonNumber, int, serverBlock, port);
 		BIND(jsonObject, KEY_SERVER_HOST, JsonString, std::string, serverBlock, host);
 		BIND(jsonObject, KEY_SERVER_ROOT, JsonString, std::string, serverBlock, root);
+
+		if (jsonObject.has(KEY_SERVER_NAME))
+		{
+			std::list<std::string> names;
+
+			std::string ipath = path + KEY_DOT KEY_SERVER_NAME;
+
+			const JsonValue *jsonValue = jsonObject.get(KEY_SERVER_NAME);
+			if (jsonValue->instanceOf<JsonArray>())
+				names = buildCollection<JsonString, std::string>(ipath, *(jsonValue->cast<JsonArray>()));
+			else if (jsonValue->instanceOf<JsonString>())
+				names.push_back(jsonValue->cast<JsonString>()->operator std::string());
+			else
+				throw Exception("Cannot cast " + jsonValue->typeString() + " to " + JsonTypeTraits<JsonArray>::typeString + " or " + JsonTypeTraits<JsonString>::typeString + " (" + ipath + ")");
+
+			serverBlock->names(names);
+		}
 
 		BIND_CUSTOM(jsonObject, KEY_SERVER_MAXBODYSIZE, JsonString, std::string,
 		{
@@ -233,10 +281,18 @@ Configuration::FromJsonBuilder::buildServerBlock(const std::string &path, const 
 
 		if (jsonObject.has(KEY_SERVER_LOCATIONS))
 		{
-			std::string path = KEY_ROOT KEY_DOT KEY_SERVER_LOCATIONS;
-			const JsonObject &object = jsonCast<JsonObject>(path, jsonObject.get(KEY_SERVER_LOCATIONS));
+			std::string ipath = path + KEY_DOT KEY_SERVER_LOCATIONS;
+			const JsonObject &object = jsonCast<JsonObject>(ipath, jsonObject.get(KEY_SERVER_LOCATIONS));
 
-			serverBlock->locations(buildBlocks<LocationBlock>(path, object, &Configuration::FromJsonBuilder::buildLocationBlock));
+			serverBlock->locations(buildBlocks<LocationBlock, JsonObject>(ipath, object, &Configuration::FromJsonBuilder::buildLocationBlock));
+		}
+
+		if (jsonObject.has(KEY_SERVER_ERRORS))
+		{
+			std::string ipath = path + KEY_DOT KEY_SERVER_ERRORS;
+			const JsonObject &object = jsonCast<JsonObject>(ipath, jsonObject.get(KEY_SERVER_ERRORS));
+
+			serverBlock->errors(buildCustomErrorMap(ipath, object));
 		}
 	}
 	catch (...)
@@ -265,18 +321,16 @@ Configuration::FromJsonBuilder::buildLocationBlock(const std::string &path, cons
 		{
 			std::string ipath = path + KEY_DOT KEY_LOCATION_METHODS;
 			const JsonArray &array = jsonCast<JsonArray>(ipath, jsonObject.get(KEY_LOCATION_METHODS));
-			std::list<std::string> methods = buildCollection<JsonString, std::string>(path, array);
 
-			locationBlock->methods(methods);
+			locationBlock->methods(buildCollection<JsonString, std::string>(ipath, array));
 		}
 
 		if (jsonObject.has(KEY_LOCATION_INDEX_FILES))
 		{
 			std::string ipath = path + KEY_DOT KEY_LOCATION_INDEX_FILES;
 			const JsonArray &array = jsonCast<JsonArray>(ipath, jsonObject.get(KEY_LOCATION_INDEX_FILES));
-			std::list<std::string> indexFiles = buildCollection<JsonString, std::string>(path, array);
 
-			locationBlock->index(indexFiles);
+			locationBlock->index(buildCollection<JsonString, std::string>(ipath, array));
 		}
 	}
 	catch (...)
@@ -287,4 +341,44 @@ Configuration::FromJsonBuilder::buildLocationBlock(const std::string &path, cons
 	}
 
 	return (locationBlock);
+}
+
+Mime*
+Configuration::FromJsonBuilder::buildMime(const std::string &path, const std::string &key, const JsonArray &jsonArray)
+{
+	const std::string &type = key;
+	const std::list<std::string> extensions = buildCollection<JsonString, std::string>(path, jsonArray);
+
+	return (new Mime(type, extensions));
+}
+
+CustomErrorMap
+Configuration::FromJsonBuilder::buildCustomErrorMap(const std::string &path, const JsonObject &jsonObject)
+{
+	CustomErrorMap::map map;
+
+	for (JsonObject::const_iterator it = jsonObject.begin(); it != jsonObject.end(); it++)
+	{
+		long code;
+		const std::string key = it->first;
+
+		for (std::string::const_iterator kit = key.begin(); kit != key.end(); kit++)
+		{
+			if (!std::isdigit(*kit))
+				throw Exception("key '" + key + "' must only contains numbers (" + path + ")");
+		}
+
+		const JsonString &value = jsonCast<JsonString>(path + KEY_DOT + key, it->second);
+
+		std::stringstream stream;
+		stream << key;
+		stream >> code;
+
+		if (code == 0 || (code / 100 != 4 && code / 100 != 5)) // TODO Move to HTTPStatus::isError()
+			throw Exception("code '" + Convert::toString(code) + "' must be an error 4xx or 5xx (" + path + ")");
+
+		map.insert(map.end(), std::make_pair(code, value));
+	}
+
+	return (CustomErrorMap(map));
 }

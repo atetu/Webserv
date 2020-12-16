@@ -13,7 +13,7 @@
 #include <config/block/CGIBlock.hpp>
 
 CGIBlock::CGIBlock() :
-		m_name(""),
+		m_name(),
 		m_path()
 {
 }

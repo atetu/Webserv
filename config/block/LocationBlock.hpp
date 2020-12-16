@@ -63,10 +63,34 @@ class LocationBlock
 			return (m_path);
 		}
 
+		inline const Optional<std::list<std::string> >&
+		methods(void) const
+		{
+			return (m_methods);
+		}
+
+		inline const Optional<std::string>&
+		alias(void) const
+		{
+			return (m_alias);
+		}
+
 		inline const Optional<std::string>&
 		root(void) const
 		{
 			return (m_root);
+		}
+
+		inline const Optional<bool>&
+		listing(void) const
+		{
+			return (m_listing);
+		}
+
+		inline const Optional<std::list<std::string> >&
+		index(void) const
+		{
+			return (m_indexFiles);
 		}
 
 		inline const Optional<std::string>&

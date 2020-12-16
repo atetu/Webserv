@@ -41,7 +41,7 @@ MimeBlock::operator =(const MimeBlock &other)
 }
 
 MimeBlock&
-MimeBlock::includes(const std::vector<std::string> &includes)
+MimeBlock::includes(const std::list<std::string> &includes)
 {
 	m_includes.set(includes);
 
@@ -49,7 +49,7 @@ MimeBlock::includes(const std::vector<std::string> &includes)
 }
 
 MimeBlock&
-MimeBlock::defines(const std::vector<Mime*> &defines)
+MimeBlock::defines(const std::list<Mime const*> &defines)
 {
 	m_defines.set(defines);
 

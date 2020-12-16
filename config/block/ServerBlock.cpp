@@ -86,7 +86,7 @@ ServerBlock::names(const std::list<std::string> &names)
 }
 
 ServerBlock&
-ServerBlock::maxBodySize(DataSize maxBodySize)
+ServerBlock::maxBodySize(const DataSize &maxBodySize)
 {
 	m_maxBodySize.set(maxBodySize);
 
@@ -102,7 +102,7 @@ ServerBlock::root(const std::string &root)
 }
 
 ServerBlock&
-ServerBlock::locations(std::list<LocationBlock const*> locations)
+ServerBlock::locations(const std::list<LocationBlock const*> &locations)
 {
 	m_locations.set(locations);
 
@@ -110,7 +110,7 @@ ServerBlock::locations(std::list<LocationBlock const*> locations)
 }
 
 ServerBlock&
-ServerBlock::errors(std::map<int, std::string> errors)
+ServerBlock::errors(const CustomErrorMap &errors)
 {
 	m_errors.set(errors);
 
