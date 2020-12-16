@@ -163,7 +163,7 @@ class JsonObject :
 		const Type
 		type(void) const
 		{
-			return (TYPE_ARRAY);
+			return (TYPE_OBJECT);
 		}
 
 		const std::string
