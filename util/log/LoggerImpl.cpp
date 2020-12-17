@@ -10,10 +10,14 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+#include <stddef.h>
 #include <util/Enum.hpp>
 #include <util/log/LoggerImpl.hpp>
 #include <util/log/LogLevel.hpp>
+#include <algorithm>
+#include <iomanip>
 
+size_t LoggerImpl::LONGEST_NAME = 0;
 const std::string LoggerImpl::DEFAULT_TAG = "???";
 NullStream LoggerImpl::VOID;
 
@@ -25,6 +29,7 @@ LoggerImpl::LoggerImpl() :
 LoggerImpl::LoggerImpl(const std::string &tag) :
 		m_tag(tag)
 {
+	LoggerImpl::LONGEST_NAME = std::max(LoggerImpl::LONGEST_NAME, tag.size());
 }
 
 LoggerImpl::LoggerImpl(const LoggerImpl &other) :
@@ -78,7 +83,7 @@ LoggerImpl::log(LogLevel &level) const
 	if (LogLevel::ACTIVE == NULL || LogLevel::ACTIVE->ordinal() > level.ordinal())
 		return (VOID);
 
-	return (std::cout << "[" << level.name() << "] " << m_tag << ": ");
+	return (std::cout << "[" << std::setw(5) << level.name() << std::setw(0) << "] " << std::setw(LONGEST_NAME) << m_tag << ": ");
 }
 
 const std::string&
