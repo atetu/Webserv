@@ -10,29 +10,20 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+#include <arpa/inet.h>
+#include <asm/byteorder.h>
+#include <sys/socket.h>
 #include <exception/IOException.hpp>
 #include <io/Socket.hpp>
-#include <util/Convert.hpp>
 #include <sys/errno.h>
-#include <unistd.h>
+#include <sys/socket.h>
 #include <cstring>
 #include <string>
 
 static const int g_true = 1;
 
-Socket::Socket(void) :
-		m_fd(-1)
-{
-}
-
 Socket::Socket(int fd) :
-		m_fd(fd)
-{
-}
-
-Socket::Socket(const Socket &other) :
-		m_fd(other.m_fd),
-		m_addr(other.m_addr)
+		FileDescriptor(fd)
 {
 }
 
@@ -40,46 +31,104 @@ Socket::~Socket()
 {
 }
 
-Socket&
-Socket::operator =(const Socket &other)
+ssize_t
+Socket::recv(void *buf, size_t len, int flags)
 {
-	if (this != &other)
-	{
-		m_fd = other.m_fd;
-		m_addr = other.m_addr;
-	}
+	ensureNotClosed();
 
-	return (*this);
+	return (::recv(m_fd, buf, len, flags));
+}
+
+ssize_t
+Socket::send(const void *buf, size_t len, int flags)
+{
+	ensureNotClosed();
+
+	return (::send(m_fd, buf, len, flags));
 }
 
 void
 Socket::bind(int port)
 {
-	memset(&m_addr, 0, sizeof(m_addr));
+	struct sockaddr_in addr;
+	::memset(&addr, 0, sizeof(addr));
 
-	m_addr.sin_family = AF_INET;
-	m_addr.sin_addr.s_addr = htonl(INADDR_ANY);
-	m_addr.sin_port = htons(port);
+	addr.sin_family = AF_INET;
+	addr.sin_addr.s_addr = htonl(INADDR_ANY);
+	addr.sin_port = htons(port);
 
-	if (::bind(m_fd, (struct sockaddr*)&m_addr, sizeof(m_addr)) == -1)
-		throw IOException("bind(" + Convert::toString(port) + ")", errno);
+	bind(addr);
+
 }
 
 void
-Socket::close() throw (IOException)
+Socket::bind(const std::string &host, int port)
 {
-	::close(m_fd);
+	struct sockaddr_in addr;
+	::memset(&addr, 0, sizeof(addr));
+
+	addr.sin_family = AF_INET;
+	addr.sin_addr.s_addr = inet_addr(host.c_str());
+	addr.sin_port = htons(port);
+
+	bind(addr);
+}
+
+void
+Socket::bind(const struct sockaddr_in &addr)
+{
+	ensureNotClosed();
+
+	if (::bind(m_fd, (struct sockaddr*)&addr, sizeof(addr)) == -1)
+		throw IOException("bind", errno);
 }
 
 void
 Socket::reusable()
 {
+	ensureNotClosed();
+
 	if (::setsockopt(m_fd, SOL_SOCKET, SO_REUSEADDR, &g_true, sizeof(int)) == -1)
-		throw IOException("bind", errno);
+		throw IOException("setsockopt(SO_REUSEADDR)", errno);
 }
 
-int
-Socket::fd() const
+void
+Socket::listen(void)
 {
-	return (m_fd);
+	ensureNotClosed();
+
+	return (listen(DEFAULT_BACKLOG));
+}
+
+void
+Socket::listen(int backlog)
+{
+	ensureNotClosed();
+
+	if (::listen(m_fd, backlog) == -1)
+		throw IOException("listen", errno);
+}
+
+Socket*
+Socket::accept(void) const
+{
+	ensureNotClosed();
+
+	int fd = ::accept(raw(), NULL, NULL);
+
+	if (fd == -1)
+		throw IOException("accept", errno);
+
+	return (new Socket(fd));
+}
+
+Socket*
+Socket::create(void)
+{
+	int fd = ::socket(AF_INET, SOCK_STREAM, 0);
+
+	if (fd == -1)
+		throw IOException("socket", errno);
+
+	return (new Socket(fd));
 }

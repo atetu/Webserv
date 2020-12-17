@@ -23,6 +23,10 @@
 
 class ServerBlock
 {
+	public:
+		static const std::string DEFAULT_HOST;
+		static const short DEFAULT_PORT;
+
 	private:
 		Optional<int> m_port;
 		Optional<std::string> m_host;
@@ -104,9 +108,6 @@ class ServerBlock
 		{
 			return (m_errors);
 		}
-
-	public:
-		static const std::string DEFAULT_HOST;
 };
 
 #endif /* SERVERBLOCK_HPP_ */

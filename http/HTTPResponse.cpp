@@ -10,33 +10,13 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifdef __linux__
-# include <sys/socket.h>
-# include <unistd.h>
-#elif __APPLE__
-# include <sys/socket.h>
-# include <unistd.h>
-#elif __CYGWIN__
-# include <cygwin/socket.h>
-# include <sys/unistd.h>
-#else
-# error Unknown plateform
-#endif
-
-#include <exception/IOException.hpp>
-#include <http/HTTPResponse.hpp>
 #include <http/HTTP.hpp>
-#include <sys/errno.h>
-#include <sys/ioctl.h>
-#include <sys/socket.h>
-#include <sys/unistd.h>
-#include <cstring>
+#include <http/HTTPResponse.hpp>
+#include <util/buffer/impl/BaseBuffer.hpp>
+#include <util/buffer/impl/FileBuffer.hpp>
+#include <util/buffer/impl/SocketBuffer.hpp>
 #include <iostream>
-#include <map>
-
-#if 1
 #include <sstream>
-#endif
 
 HTTPResponse::StatusLine::StatusLine(void) :
 		m_version(HTTPVersion::HTTP_1_1),
@@ -92,26 +72,25 @@ HTTPResponse::IBody::~IBody()
 {
 }
 
-HTTPResponse::FileBody::FileBody(int fd) :
-		m_buffer(fd, true)
+HTTPResponse::FileBody::FileBody(FileBuffer &fileBuffer) :
+		m_fileBuffer(fileBuffer)
 {
 }
 
-IOBuffer&
-HTTPResponse::FileBody::buffer()
+FileBuffer&
+HTTPResponse::FileBody::fileBuffer()
 {
-	return (m_buffer);
+	return (m_fileBuffer);
 }
 
 HTTPResponse::FileBody::~FileBody()
 {
-	std::cout << "~FileBody()" << std::endl;
 }
 
 bool
-HTTPResponse::FileBody::write(IOBuffer &buffer)
+HTTPResponse::FileBody::write(SocketBuffer &socketBuffer)
 {
-	buffer.storeFrom(m_buffer);
+	socketBuffer.storeFrom(m_fileBuffer);
 
 	return (isDone());
 }
@@ -119,7 +98,7 @@ HTTPResponse::FileBody::write(IOBuffer &buffer)
 bool
 HTTPResponse::FileBody::isDone(void)
 {
-	return (m_buffer.hasReadEverything() && m_buffer.size() == 0);
+	return (m_fileBuffer.hasReadEverything() && m_fileBuffer.size() == 0);
 }
 
 HTTPResponse::StringBody::StringBody(std::string string) :
@@ -134,11 +113,11 @@ HTTPResponse::StringBody::~StringBody()
 }
 
 bool
-HTTPResponse::StringBody::write(IOBuffer &fd)
+HTTPResponse::StringBody::write(SocketBuffer &socketBuffer)
 {
 	if (!m_sent)
 	{
-		fd.store(m_string);
+		socketBuffer.store(m_string);
 		m_sent = true;
 	}
 
@@ -178,7 +157,7 @@ HTTPResponse::~HTTPResponse()
 }
 
 bool
-HTTPResponse::write(IOBuffer &out)
+HTTPResponse::write(SocketBuffer &socketBuffer)
 {
 	std::string str;
 	HTTPHeaderFields::const_iterator it;
@@ -190,10 +169,10 @@ HTTPResponse::write(IOBuffer &out)
 	switch (m_state)
 	{
 		case HEADERS:
-			out.store(m_statusLine.format());
-			out.store(HTTP::CRLF);
-			out.store(m_headers.format());
-			out.store(HTTP::CRLF);
+			socketBuffer.store(m_statusLine.format());
+			socketBuffer.store(HTTP::CRLF);
+			socketBuffer.store(m_headers.format());
+			socketBuffer.store(HTTP::CRLF);
 
 			if (m_body)
 				m_state = BODY;
@@ -203,13 +182,13 @@ HTTPResponse::write(IOBuffer &out)
 			break;
 
 		case BODY:
-			if (m_body && m_body->write(out))
+			if (m_body && m_body->write(socketBuffer))
 				m_state = FLUSHING;
 
 			break;
 
 		case FLUSHING:
-			if (out.send() < 0 || out.size() == 0)
+			if (socketBuffer.send() < 0 || socketBuffer.size() == 0)
 				m_state = FINISHED;
 
 			break;

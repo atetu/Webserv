@@ -11,18 +11,13 @@
 /* ************************************************************************** */
 
 #include <http/HTTPServer.hpp>
+#include <io/Socket.hpp>
 
-HTTPServer::HTTPServer(void) :
-		m_port(-1),
-		m_servers(),
-		m_socketServer()
-{
-}
-
-HTTPServer::HTTPServer(const HTTPServer &other) :
-		m_port(other.m_port),
-		m_servers(other.m_servers),
-		m_socketServer(other.m_socketServer)
+HTTPServer::HTTPServer(const std::string &host, short port, const std::list<ServerBlock const*> &serverBlocks) :
+		m_host(host),
+		m_port(port),
+		m_serverBlocks(serverBlocks),
+		m_socket(*Socket::create())
 {
 }
 
@@ -30,35 +25,22 @@ HTTPServer::~HTTPServer()
 {
 }
 
-HTTPServer&
-HTTPServer::operator =(const HTTPServer &other)
+void
+HTTPServer::start(void)
 {
-	if (this != &other)
-	{
-		m_port = other.m_port;
-		m_servers = other.m_servers;
-		m_socketServer = other.m_socketServer;
-	}
-
-	return (*this);
+	m_socket.bind(m_host, m_port);
+	m_socket.reusable();
+	m_socket.listen();
 }
 
 void
-HTTPServer::prepare(void)
+HTTPServer::terminate(void)
 {
-	m_socketServer.bind(m_port);
-	m_socketServer.reusable();
-	m_socketServer.listen();
+	m_socket.close();
 }
 
-void
-HTTPServer::unprepare(void)
+const Socket&
+HTTPServer::socket(void) const
 {
-	m_socketServer.close();
-}
-
-const SocketServer&
-HTTPServer::serverSocket(void) const
-{
-	return (m_socketServer);
+	return (m_socket);
 }

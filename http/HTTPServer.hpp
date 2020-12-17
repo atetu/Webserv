@@ -14,35 +14,40 @@
 # define HTTPSERVER_HPP_
 
 #include <config/block/ServerBlock.hpp>
-#include <io/SocketServer.hpp>
-#include <vector>
+#include <list>
+#include <string>
+
+class Socket;
 
 class HTTPServer
 {
 	private:
-		int m_port;
-		std::vector<ServerBlock*> m_servers;
-		SocketServer m_socketServer;
+		std::string m_host;
+		short m_port;
+		std::list<ServerBlock const*> m_serverBlocks;
+		Socket &m_socket;
 
-	public:
+	private:
 		HTTPServer(void);
-		HTTPServer(int port, const std::vector<ServerBlock*> &servers);
 		HTTPServer(const HTTPServer &other);
-
-		virtual
-		~HTTPServer();
 
 		HTTPServer&
 		operator=(const HTTPServer &other);
 
-		void
-		prepare(void);
+	public:
+		HTTPServer(const std::string &host, short port, const std::list<ServerBlock const*> &serverBlocks);
+
+		virtual
+		~HTTPServer();
 
 		void
-		unprepare(void);
+		start(void);
 
-		const SocketServer&
-		serverSocket(void) const;
+		void
+		terminate(void);
+
+		const Socket&
+		socket(void) const;
 };
 
 #endif /* HTTPSERVER_HPP_ */

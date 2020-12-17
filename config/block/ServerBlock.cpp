@@ -16,6 +16,7 @@
 class Configuration;
 
 const std::string ServerBlock::DEFAULT_HOST = "0.0.0.0";
+const short ServerBlock::DEFAULT_PORT = 80;
 
 ServerBlock::ServerBlock() :
 		m_port(),

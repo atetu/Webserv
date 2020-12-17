@@ -14,7 +14,7 @@
 #include <config/block/RootBlock.hpp>
 #include <config/block/ServerBlock.hpp>
 #include <exception/IOException.hpp>
-#include <http/HTTPClient.hpp>
+#include <http/handler/HTTPMethodHandler.hpp>
 #include <http/HTTPHeaderFields.hpp>
 #include <http/HTTPMethod.hpp>
 #include <http/HTTPOrchestrator.hpp>
@@ -23,61 +23,23 @@
 #include <http/HTTPResponse.hpp>
 #include <http/HTTPStatus.hpp>
 #include <http/HTTPVersion.hpp>
-#include <io/SocketServer.hpp>
+#include <io/Socket.hpp>
 #include <sys/errno.h>
-#include <sys/socket.h>
-#include <sys/time.h>
-#include <util/buffer/BaseBuffer.hpp>
-#include <util/buffer/IOBuffer.hpp>
+#include <sys/unistd.h>
+#include <util/buffer/impl/BaseBuffer.hpp>
+#include <util/buffer/impl/FileBuffer.hpp>
 #include <util/Enum.hpp>
 #include <util/log/Logger.hpp>
 #include <util/log/LoggerFactory.hpp>
+#include <util/Optional.hpp>
 #include <util/System.hpp>
 #include <util/URL.hpp>
-#include <set>
-#include <utility>
-
-#include <http/handler/HTTPMethodHandler.hpp>
-#include <http/handler/methods/GetHandler.hpp>
-#include <http/HTTPRequest.hpp>
-#include <http/HTTPHeaderParser.hpp>
-#include <http/HTTPFindLocation.hpp>
-class System;
-
-#ifdef __linux__
-# include <unistd.h>
-#include <sys/stat.h>
-#elif __APPLE__
-# include <unistd.h>
-#include <sys/stat.h>
-#elif __CYGWIN__
-# include <sys/unistd.h>
-#include <cygwin/stat.h>
-#include <sys/_default_fcntl.h>
-#include <sys/_timeval.h>
-#include <sys/dirent.h>
-#else
-# error Unknown plateform
-#endif
-
-#include <util/Optional.hpp>
 #include <cstring>
 #include <iostream>
-#include <iterator>
-#include <map>
+#include <set>
 #include <string>
-#include <sys/stat.h>
-#include <fcntl.h>
-
-unsigned long
-seconds()
-{
-	struct timeval val;
-	if (gettimeofday(&val, NULL))
-		return (0);
-
-	return (val.tv_sec);
-}
+#include <utility>
+#include <vector>
 
 Logger &HTTPOrchestrator::LOG = LoggerFactory::get("HTTP Orchestrator");
 
@@ -109,9 +71,11 @@ HTTPOrchestrator::prepare(void)
 	{
 		try
 		{
-			(*it)->prepare();
+			HTTPServer &httpServer = *(*it);
 
-			addServerFd((*it)->serverSocket().fd(), *(*it));
+			httpServer.start();
+
+			addServer(httpServer);
 		}
 		catch (...)
 		{
@@ -132,7 +96,7 @@ HTTPOrchestrator::unprepare(void)
 
 	while (it != ite)
 	{
-		(*it)->unprepare();
+		(*it)->terminate();
 
 		it++;
 	}
@@ -220,21 +184,15 @@ HTTPOrchestrator::start()
 
 		try
 		{
-			typedef std::map<int, HTTPServer*>::iterator iterator;
+			typedef std::map<int, HTTPServer const*>::iterator iterator;
 
 			for (iterator it = serverFds.begin(); it != serverFds.end(); it++)
 			{
-				int serverFd = it->first;
+				int fd = it->first;
+				const HTTPServer &httpServer = *it->second;
 
-				if (FD_ISSET(serverFd, &readFdSet))
-				{
-					int accepted = ::accept(serverFd, NULL, NULL);
-
-					if (accepted == -1)
-						throw IOException("accept", errno);
-
-					addClientFd(accepted, *(new HTTPClient(accepted)));
-				}
+				if (FD_ISSET(fd, &readFdSet))
+					addClient(*(new HTTPClient(*(httpServer.socket().accept()), httpServer)));
 			}
 		}
 		catch (Exception &exception)
@@ -244,7 +202,7 @@ HTTPOrchestrator::start()
 
 		try
 		{
-			typedef std::map<int, IOBuffer*>::iterator iterator;
+			typedef std::map<int, FileBuffer*>::iterator iterator;
 
 			std::set<int> fdToRemove;
 
@@ -254,11 +212,11 @@ HTTPOrchestrator::start()
 
 				if (FD_ISSET(fd, &readFdSet))
 				{
-					IOBuffer *buffer = it->second;
+					FileBuffer &buffer = *it->second;
 
-					if (buffer->read() == -1 || buffer->hasReadEverything())
+					if (buffer.read() == -1 || buffer.hasReadEverything())
 					{
-						std::cout << "fd-read :: remove(" << fd << " (" << buffer->fd() << ")): " << ::strerror(errno) << std::endl;
+						std::cout << "fd-read :: remove(" << fd << " (" << buffer.descriptor().raw() << ")): " << ::strerror(errno) << std::endl;
 						fdToRemove.insert(fdToRemove.end(), fd);
 					}
 				}
@@ -302,30 +260,6 @@ HTTPOrchestrator::start()
 
 							if (client->parser().state() == HTTPRequestParser::S_END)
 							{
-								// TODO Route matching
-
-
-//	ENZO : not the right version but something like that that what suppressed during merging ?? Lacks thet part regarging route maching but not difficult to do it again
-								
-										// if (cli->parser.state() == HttpRequestParser::S_CONTINUE)
-								// {
-								// 	while (1)
-								// 	{
-								// 		HTTPHeaderParser headerParser;
-								// 		headerParser.consume(c);
-						
-								// 		while (cli->fd->consume(&c))
-								// 		{
-								// 			headerParser.consume(c);
-								// 			if (headerParser.state() == HTTPHeaderParser::S_END || headerParser.state() == HttpHeaderParser::S_CONTINUE)
-								// 			break;
-								// 		}
-								// 		cli->header(headerParser);
-								// 		if (headerParser.state() == HTTPHeaderParser::S_END)
-								// 			break;
-								// 	}
-								// }
-								
 								const HTTPMethod *method = HTTPMethod::find(client->parser().method());
 								if (!method)
 									client->response() = HTTPResponse::status(*HTTPStatus::METHOD_NOT_ALLOWED);
@@ -342,11 +276,7 @@ HTTPOrchestrator::start()
 
 									HTTPResponse::FileBody *fileBody = dynamic_cast<HTTPResponse::FileBody*>(client->response()->body());
 									if (fileBody)
-									{
-										IOBuffer &buffer = fileBody->buffer();
-
-										addFileReadFd(buffer.fd(), buffer);
-									}
+										addFileRead(fileBody->fileBuffer());
 								}
 
 								break;
@@ -404,74 +334,40 @@ HTTPOrchestrator::start()
 		{
 			LOG.warn() << "Could not handle client: " << exception.message() << std::endl;
 		}
-
-//		{
-//			typedef std::map<int, FileDescriptorWrapper*>::iterator iterator;
-//
-//			std::set<int> fdToRemove;
-//
-//			for (iterator it = fileWriteFds.begin(); it != fileWriteFds.end(); it++)
-//			{
-//				int fd = it->first;
-//
-//				if (FD_ISSET(fd, &writeFdSet))
-//				{
-//					FileDescriptorWrapper *fdWrapper = it->second;
-//
-//					if (fdWrapper->flushWithWrite() == -1 || fdWrapper->isDone())
-//					{
-//						std::cout << "fd-write :: remove(" << fd << "): " << ::strerror(errno) << std::endl;
-//						fdToRemove.insert(fdToRemove.end(), fd);
-//					}
-//				}
-//			}
-//
-//			for (std::set<int>::iterator it = fdToRemove.begin(); it != fdToRemove.end(); it++)
-//			{
-//				iterator found = fileWriteFds.find(*it);
-//
-//				if (found != fileWriteFds.end())
-//					fileWriteFds.erase(found);
-//			}
-//		}
 	}
-
-	/* Should not happen. */
-	for (server_iterator it = m_servers.begin(); it != m_servers.end(); it++) // TODO Handle exit
-		::close((*it)->serverSocket().fd());
 }
 
 void
-HTTPOrchestrator::addServerFd(int fd, HTTPServer &server)
+HTTPOrchestrator::addServer(HTTPServer &server)
 {
+	int fd = server.socket().raw();
+
 	setFd(fd);
 	serverFds.insert(serverFds.end(), std::make_pair(fd, &server));
 }
 
 void
-HTTPOrchestrator::addFileReadFd(int fd, IOBuffer &ioBuffer)
+HTTPOrchestrator::addFileRead(FileBuffer &fileBuffer)
 {
+	int fd = fileBuffer.descriptor().raw();
+
 	setFd(fd);
-	fileReadFds.insert(fileReadFds.end(), std::make_pair(fd, &ioBuffer));
+	fileReadFds.insert(fileReadFds.end(), std::make_pair(fd, &fileBuffer));
 }
 
 void
-HTTPOrchestrator::addClientFd(int fd, HTTPClient &client)
+HTTPOrchestrator::addClient(HTTPClient &client)
 {
-	setFd(fd);
+	int fd = client.socket().raw();
 
+	setFd(fd);
 	clientFds[fd] = &client;
-}
-
-void
-HTTPOrchestrator::addFileWriteFd(int fd, IOBuffer &ioBuffer)
-{
 }
 
 void
 HTTPOrchestrator::removeFileRead(int fd)
 {
-	typedef std::map<int, IOBuffer*>::iterator iterator;
+	typedef std::map<int, FileBuffer*>::iterator iterator;
 
 	iterator found = fileReadFds.find(fd);
 
@@ -502,7 +398,7 @@ HTTPOrchestrator::removeClient(int fd)
 			{
 				HTTPResponse::FileBody *fileBody = dynamic_cast<HTTPResponse::FileBody*>(body);
 				if (fileBody)
-					removeFileRead(fileBody->buffer().fd());
+					removeFileRead(fileBody->fileBuffer().descriptor().raw());
 			}
 		}
 
@@ -515,32 +411,44 @@ HTTPOrchestrator::removeClient(int fd)
 	}
 }
 
-HTTPOrchestrator
+HTTPOrchestrator*
 HTTPOrchestrator::create(const Configuration &configuration)
 {
-	typedef std::map<int, std::vector<ServerBlock*> >::iterator plsiterator;
+	typedef std::map<short, std::list<ServerBlock const*> > port_map;
+	typedef port_map::const_iterator port_iterator;
 
-	std::map<int, std::vector<ServerBlock*> > portToServersMap;
+	typedef std::map<std::string, port_map> host_map;
+	typedef host_map::const_iterator host_iterator;
 
-//	Configuration::siterator it = configuration.servers().begin();
-//	Configuration::siterator ite = configuration.servers().end();
-//
-//	while (it != ite)
-//	{
-//		portToServersMap[it->port().get()].push_back(*it);
-//		LOG.debug() << "Mapping port " << it->port().get() << " with server: " << it->name().get() << std::endl;
-//		it++;
-//	}
+	host_map hostToPortToServersMap;
+
+	const RootBlock &rootBlock = configuration.rootBlock();
+
+	const RootBlock::slist serverBlocks = rootBlock.serverBlocks().get();
+	for (RootBlock::sciterator sit = serverBlocks.begin(); sit != serverBlocks.end(); sit++)
+	{
+		const ServerBlock &serverBlock = *(*sit);
+
+		const std::string host = serverBlock.host().orElse(ServerBlock::DEFAULT_HOST);
+		const short port = serverBlock.port().orElse(ServerBlock::DEFAULT_PORT);
+
+		hostToPortToServersMap[host][port].push_back(&serverBlock);
+	}
 
 	server_container httpServers;
-//	plsiterator itr = portToServersMap.begin();
-//	plsiterator itre = portToServersMap.end();
-//
-//	while (itr != itre)
-//	{
-//		httpServers.push_back(new HTTPServer(itr->first, itr->second));
-//		itr++;
-//	}
+	for (host_iterator hit = hostToPortToServersMap.begin(); hit != hostToPortToServersMap.end(); hit++)
+	{
+		const std::string &host = hit->first;
+		const port_map &portMap = hit->second;
 
-	return (HTTPOrchestrator(configuration, httpServers));
+		for (port_iterator pit = portMap.begin(); pit != portMap.end(); pit++)
+		{
+			short port = pit->first;
+			const std::list<ServerBlock const*> &serverBlocks = pit->second;
+
+			httpServers.push_back(new HTTPServer(host, port, serverBlocks));
+		}
+	}
+
+	return (new HTTPOrchestrator(configuration, httpServers));
 }

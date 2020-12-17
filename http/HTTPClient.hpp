@@ -14,19 +14,22 @@
 # define HTTPCLIENT_HPP_
 
 #include <http/HTTPRequestParser.hpp>
-#include <util/buffer/IOBuffer.hpp>
-#include <http/HTTPRequest.hpp>
-#include <http/HTTPResponse.hpp>
-#include <http/HTTPHeaderParser.hpp>
+#include <io/Socket.hpp>
+
+class HTTPServer;
+class SocketBuffer;
+class Socket;
+class HTTPRequest;
+class HTTPResponse;
 
 class HTTPClient
 {
 	private:
-		int m_fd;
-		IOBuffer m_in;
-		IOBuffer m_out;
+		Socket &m_socket;
+		SocketBuffer &m_in;
+		SocketBuffer &m_out;
+		const HTTPServer &m_server;
 		HTTPRequestParser m_parser;
-		std::vector<HTTPHeaderParser> m_headerParser;
 		unsigned long m_lastAction;
 		HTTPRequest *m_request;
 		HTTPResponse *m_response;
@@ -38,7 +41,7 @@ class HTTPClient
 		operator =(const HTTPClient &other);
 
 	public:
-		HTTPClient(int fd);
+		HTTPClient(Socket &socket, const HTTPServer &server);
 
 		virtual
 		~HTTPClient();
@@ -46,19 +49,13 @@ class HTTPClient
 		void
 		updateLastAction();
 
-		void
-		header(HTTPHeaderParser headerParser);
-
-		std::vector<HTTPHeaderParser> 
-		getHeader();
-
-		inline IOBuffer&
+		inline SocketBuffer&
 		in()
 		{
 			return (m_in);
 		}
 
-		inline IOBuffer&
+		inline SocketBuffer&
 		out()
 		{
 			return (m_out);
@@ -86,6 +83,12 @@ class HTTPClient
 		response(void)
 		{
 			return (m_response);
+		}
+
+		inline Socket&
+		socket(void)
+		{
+			return (m_socket);
 		}
 };
 

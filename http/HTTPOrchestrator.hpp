@@ -17,7 +17,7 @@
 #include <http/HTTPClient.hpp>
 #include <http/HTTPServer.hpp>
 #include <sys/select.h>
-#include <util/buffer/IOBuffer.hpp>
+#include <util/buffer/impl/SocketBuffer.hpp>
 #include <list>
 #include <map>
 
@@ -38,12 +38,18 @@ class HTTPOrchestrator
 		fd_set m_fds;
 		int m_highestFd;
 		int m_fdCount;
-		std::map<int, HTTPServer*> serverFds;
-		std::map<int, IOBuffer*> fileReadFds;
+		std::map<int, HTTPServer const*> serverFds;
+		std::map<int, FileBuffer*> fileReadFds;
 		std::map<int, HTTPClient*> clientFds;
-		std::map<int, IOBuffer*> fileWriteFds;
+		std::map<int, FileBuffer*> fileWriteFds;
 
+	private:
+		HTTPOrchestrator(void);
 		HTTPOrchestrator(const Configuration &configuration, const server_container &servers);
+		HTTPOrchestrator(const HTTPOrchestrator &other);
+
+		HTTPOrchestrator&
+		operator=(const HTTPOrchestrator &other);
 
 	public:
 		virtual
@@ -66,16 +72,16 @@ class HTTPOrchestrator
 		printSelectOutput(fd_set &readFds, fd_set &writeFds);
 
 		void
-		addServerFd(int fd, HTTPServer &server);
+		addServer(HTTPServer &server);
 
 		void
-		addFileReadFd(int fd, IOBuffer &ioBuffer);
+		addFileRead(FileBuffer &fileBuffer);
 
 		void
-		addClientFd(int fd, HTTPClient &client);
+		addClient(HTTPClient &client);
 
 		void
-		addFileWriteFd(int fd, IOBuffer &ioBuffer);
+		addFileWrite(FileBuffer &fileBuffer);
 
 		void
 		removeFileRead(int fd);
@@ -87,8 +93,11 @@ class HTTPOrchestrator
 		void
 		start();
 
+		void
+		terminate();
+
 	public:
-		static HTTPOrchestrator
+		static HTTPOrchestrator*
 		create(const Configuration &configuration);
 };
 

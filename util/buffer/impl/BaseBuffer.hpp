@@ -16,7 +16,6 @@
 #include <stddef.h>
 #include <util/buffer/IReadableBuffer.hpp>
 #include <util/buffer/IWritableBuffer.hpp>
-#include <iterator>
 #include <string>
 
 class BaseBuffer :
@@ -29,116 +28,44 @@ class BaseBuffer :
 	protected:
 		std::string m_storage;
 
-	public:
-		BaseBuffer() :
-				m_storage()
-		{
-		}
-
-		BaseBuffer(const std::string &buffer) :
-				m_storage(buffer)
-		{
-		}
-
-		BaseBuffer(const BaseBuffer &other) :
-				m_storage(other.m_storage)
-		{
-		}
-
-		virtual
-		~BaseBuffer()
-		{
-		}
+	private:
+		BaseBuffer(const BaseBuffer &other);
 
 		BaseBuffer&
-		operator=(const BaseBuffer &other)
-		{
-			if (this != &other)
-				m_storage = other.m_storage;
+		operator=(const BaseBuffer &other);
 
-			return (*this);
-		}
+	public:
+		BaseBuffer();
 
-		void
-		store(char c)
-		{
-			m_storage += c;
-		}
+		virtual
+		~BaseBuffer();
 
 		void
-		store(const std::string &str)
-		{
-			m_storage += str;
-		}
+		store(char c);
 
 		void
-		store(const void *buffer, size_t len)
-		{
-			m_storage += std::string(static_cast<const char*>(buffer), len);
-		}
+		store(const std::string &str);
 
-		virtual bool
-		next(char &c)
-		{
-			if (m_storage.empty())
-				return (false);
-
-			c = m_storage[0];
-
-			m_storage.erase(0, 1);
-
-			return (true);
-		}
-
-		virtual bool
-		peek(char &c) const
-		{
-			if (m_storage.empty())
-				return (false);
-
-			c = m_storage[0];
-
-			return (true);
-		}
-
-		virtual bool
-		next(std::string &str, bool crlf = false)
-		{
-			if (m_storage.empty())
-				return (false);
-
-			for (std::string::iterator it = m_storage.begin(); it != m_storage.end(); it++)
-			{
-				if (*it == '\n')
-				{
-					str = std::string(m_storage.begin(), it);
-
-					m_storage.erase(m_storage.begin(), it);
-
-					return (true);
-				}
-			}
-
-			return (false);
-		}
-
-		size_t
-		size() const
-		{
-			return (m_storage.size());
-		}
+		void
+		store(const void *buffer, size_t len);
 
 		bool
-		empty() const
-		{
-			return (m_storage.empty());
-		}
+		next(char &c);
+
+		bool
+		peek(char &c) const;
+
+		bool
+		next(std::string &str, bool crlf = false);
+
+		size_t
+		size() const;
+
+		bool
+		empty() const;
 
 		void
-		clear()
-		{
-			m_storage.clear();
-		}
+		clear();
 
 		inline std::string&
 		storage()

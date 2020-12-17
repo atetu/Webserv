@@ -22,11 +22,18 @@
 
 class RootBlock
 {
+	public:
+		typedef std::list<const ServerBlock*> slist;
+		typedef slist::const_iterator sciterator;
+
+		typedef std::list<const CGIBlock*> clist;
+		typedef clist::const_iterator cciterator;
+
 	private:
 		Optional<std::string> m_root;
 		Optional<const MimeBlock*> m_mimeBlock;
-		Optional<std::list<const ServerBlock*> > m_serverBlocks;
-		Optional<std::list<const CGIBlock*> > m_cgiBlocks;
+		Optional<slist> m_serverBlocks;
+		Optional<clist> m_cgiBlocks;
 
 	public:
 		RootBlock();
