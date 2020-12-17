@@ -6,7 +6,7 @@
 /*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/27 18:39:24 by ecaceres          #+#    #+#             */
-/*   Updated: 2020/12/17 11:05:01 by alicetetu        ###   ########.fr       */
+/*   Updated: 2020/12/17 14:50:20 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -348,58 +348,58 @@ HTTPHeaderFields::getValueWithWeight(std::string field)
 }
 
 HTTPHeaderFields*
-HTTPHeaderFields::create(std::vector<HTTPHeaderParser> headerParser)
+HTTPHeaderFields::create(std::map<std::string, std::string> headerMap)
 {
-	std::vector<HTTPHeaderParser>::iterator it = headerParser.begin();
-	std::vector<HTTPHeaderParser>::iterator ite = headerParser.end();
+	// std::map<std::string, std::string>::iterator it = headerMap.begin();
+	// std::map<std::string, std::string>::iterator ite = headerMap.end();
 
-	HTTPHeaderFields *header = new HTTPHeaderFields();
+	HTTPHeaderFields *header = new HTTPHeaderFields(headerMap);
 	
-	while (it != ite)
-	{
-		header->set(it->getField(), it->getValue());
+	// while (it != ite)
+	// {
+	// 	header->set(it->getField(), it->getValue());
 
-		if (it->getField().compare(ACCEPT_CHARSETS) == 0)
-		{
-	//		std::string value = it->getValue();
-	//		HTTPValueParser valueParser(value);
-			header->acceptCharsets(it->getValue());
-		}
-		else if (it->getField().compare(ACCEPT_LANGUAGE) == 0)
-			header->acceptLanguage(it->getValue());
-		else if (it->getField().compare(ALLOW) == 0)
-			header->allow(it->getValue());
-		else if (it->getField().compare(AUTHORIZATION) == 0)
-			header->authorization(it->getValue());
-		else if (it->getField().compare(CONTENT_LANGUAGE) == 0)
-			header->contentLanguage(it->getValue());
-		else if (it->getField().compare(CONTENT_LOCATION) == 0)
-			header->contentLocation(it->getValue());
-		else if (it->getField().compare(CONTENT_TYPE) == 0)
-			header->acceptCharsets(it->getValue());
-		else if (it->getField().compare(DATE) == 0)
-			header->date(it->getValue());
-		else if (it->getField().compare(HOST) == 0)
-			header->host(it->getValue());
-		else if (it->getField().compare(LAST_MODIFIED) == 0)
-			header->lastModified(it->getValue());
-		else if (it->getField().compare(LOCATION) == 0)
-			header->location(it->getValue());
-		else if (it->getField().compare(REFERER) == 0)
-			header->referer(it->getValue());
-		else if (it->getField().compare(RETRY_AFTER) == 0)
-			header->retryAfter(it->getValue());
-		else if (it->getField().compare(SERVER) == 0)
-			header->server(it->getValue());
-		else if (it->getField().compare(TRANSFER_ENCODING) == 0)
-			header->transferEncoding(it->getValue());
-		else if (it->getField().compare(USER_AGENT) == 0)
-			header->userAgent(it->getValue());
-		else if (it->getField().compare(WWW_AUTHENTICATE) == 0)
-			header->wwwAuthenticate(it->getValue()); 
-		// if not recognized ignored and not added
-		it++;
-	}
+	// 	if (it->getField().compare(ACCEPT_CHARSETS) == 0)
+	// 	{
+	// //		std::string value = it->getValue();
+	// //		HTTPValueParser valueParser(value);
+	// 		header->acceptCharsets(it->getValue());
+	// 	}
+	// 	else if (it->getField().compare(ACCEPT_LANGUAGE) == 0)
+	// 		header->acceptLanguage(it->getValue());
+	// 	else if (it->getField().compare(ALLOW) == 0)
+	// 		header->allow(it->getValue());
+	// 	else if (it->getField().compare(AUTHORIZATION) == 0)
+	// 		header->authorization(it->getValue());
+	// 	else if (it->getField().compare(CONTENT_LANGUAGE) == 0)
+	// 		header->contentLanguage(it->getValue());
+	// 	else if (it->getField().compare(CONTENT_LOCATION) == 0)
+	// 		header->contentLocation(it->getValue());
+	// 	else if (it->getField().compare(CONTENT_TYPE) == 0)
+	// 		header->acceptCharsets(it->getValue());
+	// 	else if (it->getField().compare(DATE) == 0)
+	// 		header->date(it->getValue());
+	// 	else if (it->getField().compare(HOST) == 0)
+	// 		header->host(it->getValue());
+	// 	else if (it->getField().compare(LAST_MODIFIED) == 0)
+	// 		header->lastModified(it->getValue());
+	// 	else if (it->getField().compare(LOCATION) == 0)
+	// 		header->location(it->getValue());
+	// 	else if (it->getField().compare(REFERER) == 0)
+	// 		header->referer(it->getValue());
+	// 	else if (it->getField().compare(RETRY_AFTER) == 0)
+	// 		header->retryAfter(it->getValue());
+	// 	else if (it->getField().compare(SERVER) == 0)
+	// 		header->server(it->getValue());
+	// 	else if (it->getField().compare(TRANSFER_ENCODING) == 0)
+	// 		header->transferEncoding(it->getValue());
+	// 	else if (it->getField().compare(USER_AGENT) == 0)
+	// 		header->userAgent(it->getValue());
+	// 	else if (it->getField().compare(WWW_AUTHENTICATE) == 0)
+	// 		header->wwwAuthenticate(it->getValue()); 
+	// 	// if not recognized ignored and not added
+	// 	it++;
+	// }
 	return (header);
 }
 // #endif

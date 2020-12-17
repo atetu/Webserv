@@ -26,7 +26,7 @@ class HTTPClient
 		IOBuffer m_in;
 		IOBuffer m_out;
 		HTTPRequestParser m_parser;
-		std::vector<HTTPHeaderParser> m_headerParser;
+	//	std::vector<HTTPHeaderParser> m_headerParser;
 		unsigned long m_lastAction;
 		HTTPRequest *m_request;
 		HTTPResponse *m_response;
@@ -49,8 +49,8 @@ class HTTPClient
 		void
 		header(HTTPHeaderParser headerParser);
 
-		std::vector<HTTPHeaderParser> 
-		getHeader();
+		// std::vector<HTTPHeaderParser> 
+		// getHeader();
 
 		inline IOBuffer&
 		in()

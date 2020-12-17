@@ -6,7 +6,7 @@
 /*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/27 17:29:02 by ecaceres          #+#    #+#             */
-/*   Updated: 2020/12/11 11:23:21 by alicetetu        ###   ########.fr       */
+/*   Updated: 2020/12/17 15:01:01 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,7 @@
 # endif
 # include <iostream>
 # include <vector>
+# include <map>
 #include <http/HTTPHeaderParser.hpp>
 
 class HTTPRequestParser
@@ -32,14 +33,9 @@ class HTTPRequestParser
 		enum State
 		{
 			S_NOT_STARTED,
-	//		S_ERROR,
 			S_METHOD,
 			S_SPACES_BEFORE_PATH,
 			S_PATH,
-//			S_QUERY_STRING_START,
-//			S_QUERY_STRING,
-//			S_FRAGMENT_START,
-//			S_FRAGMENT,
 			S_HTTP_START,
 			S_HTTP_H,
 			S_HTTP_HT,
@@ -52,8 +48,12 @@ class HTTPRequestParser
 			S_HTTP_END,
 			S_HTTP_END2,
 			S_FIELD,
-		//	S_EMPTY_LINE,
-			S_CONTINUE,
+			S_COLON,
+			S_SPACES_BEFORE_VALUE,
+			S_VALUE,
+			S_SPACES_AFTER_VALUE,
+			S_VALUE_END,
+			S_VALUE_END2,
 			S_END,
 		};
 
@@ -63,11 +63,12 @@ class HTTPRequestParser
 		std::string m_path;
 		int m_major;
 		int m_minor;
+		std::string m_field;
+		std::string m_value;
+		std::map<std::string, std::string> m_headerMap;
 
 		char m_last_char;
 		char m_last_char2;
-
-		std::vector<HTTPHeaderParser> m_headerParser;
 
 	public:
 		HTTPRequestParser();
@@ -90,11 +91,8 @@ class HTTPRequestParser
 		int
 		minor() const;
 
-		void
-		header(HTTPHeaderParser headerParser);
-
-		std::vector<HTTPHeaderParser> 
-		getHeader();
+		const std::map<std::string, std::string> &
+		header();
 
 		char
 		lastChar() const;

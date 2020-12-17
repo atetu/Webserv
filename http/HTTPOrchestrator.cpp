@@ -6,7 +6,7 @@
 /*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/28 14:34:10 by ecaceres          #+#    #+#             */
-/*   Updated: 2020/12/17 11:24:36 by alicetetu        ###   ########.fr       */
+/*   Updated: 2020/12/17 14:51:54 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -302,34 +302,13 @@ HTTPOrchestrator::start()
 
 							if (client->parser().state() == HTTPRequestParser::S_END)
 							{
-								// TODO Route matching
-								if (client->parser().state() == HTTPRequestParser::S_CONTINUE)
-								{
-									char y = client->parser().lastChar();
-									
-									while (1)
-									{
-										HTTPHeaderParser headerParser;
-										headerParser.consume(y);
-						
-										while (client->in().next(c))
-										{
-											headerParser.consume(c);
-											if (headerParser.state() == HTTPHeaderParser::S_END || headerParser.state() == HTTPHeaderParser::S_CONTINUE)
-												break;
-										}
-										client->header(headerParser);
-										if (headerParser.state() == HTTPHeaderParser::S_END)
-											break;
-									}
-								}
-							
-								HTTPHeaderFields *header = HTTPHeaderFields::create(client->getHeader());
+								//HTTPHeaderFields *header = HTTPHeaderFields::create(client->parser().header());
 								
+								HTTPHeaderFields *header = new HTTPHeaderFields(client->parser().header()); // isn't enough actually?
+							
 								std::map<std::string, std::string>::iterator header_it = header->storage().find("Host");
 								if (header_it == header->storage().end())
 									throw Exception("No host in header fields");
-									
 								std::string clientHost = header_it->second;
 								
 								const ServerBlock *serverBlock = m_configuration.rootBlock().findServerBlock(clientHost); // ca marche avec inline juste. Pourquoi ?? + explication du const a la fin de fonction?

@@ -6,7 +6,7 @@
 /*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/27 17:29:02 by ecaceres          #+#    #+#             */
-/*   Updated: 2020/12/11 11:22:40 by alicetetu        ###   ########.fr       */
+/*   Updated: 2020/12/17 15:01:24 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,17 +20,26 @@ HTTPRequestParser::HTTPRequestParser() :
 		m_path(),
 		m_major(-1),
 		m_minor(-1),
+		m_field(""),
+		m_value(""),
+		m_headerMap(),
 		m_last_char(0),
-		m_last_char2(0),
-		m_headerParser()
+		m_last_char2(0)
 {
 	m_method.reserve(16);
 	m_path.reserve(60);
 }
 
+
+#define ADD_TO_MAP(key, value)						\
+			m_headerMap[key] = value;				\
+			key = "";								\
+			value = "";								
+
 void
 HTTPRequestParser::consume(char c)
 {
+	
 	switch (m_state)
 	{
 		case S_NOT_STARTED:
@@ -184,27 +193,116 @@ HTTPRequestParser::consume(char c)
 		{
 			if (m_last_char2 == '\n' && m_last_char == '\r' && c == '\n')
 				m_state = S_END;
+			else if (c == ' ')
+				throw Exception("Space before field");
 			else
-				m_state = S_CONTINUE;
-			// m_state = S_FIELD;
-
+			{
+				m_state = S_FIELD;
+				m_field += c;
+			}
+		
 			break;
 		}
 
 		case S_FIELD:
 		{
+			if (c == ' ')
+			{
+				throw Exception("Space after Field");
+			}
+			else if (c == ':')
+			{
+				m_state = S_COLON;
+			}
+			else
+			{
+				m_state = S_FIELD;
+				m_field += c;
+			}
+
+			break;
+		}
+		
+		case S_COLON:
+		{
+			if (c == ' ')
+				m_state = S_SPACES_BEFORE_VALUE;
+			else
+				m_state = S_VALUE;
+		}
+			
+		case S_SPACES_BEFORE_VALUE:
+		{
+			if (c != ' ')
+			{
+				m_state = S_VALUE;
+				m_value += c;
+			}
+
+			break;
+		}
+
+		case S_VALUE:
+		{
+			if (c == ' ')
+				m_state = S_SPACES_AFTER_VALUE;
+			else if (c == '\r')
+			{	
+				ADD_TO_MAP(m_field, m_value);
+				m_state = S_VALUE_END;
+			}
+			else
+				m_value += c;
+
+			break;
+		}
+
+		case S_SPACES_AFTER_VALUE:
+		{
+			if (c == ' ')
+				m_state = S_SPACES_AFTER_VALUE;
+			else if (c == '\r')
+			{
+				ADD_TO_MAP(m_field, m_value);
+				m_state = S_VALUE_END;
+			}
+			else if (c == '\n')
+				m_state = S_VALUE_END2;
+					
+			else
+			{
+				m_value += ' ';
+				m_value += c;
+				m_state = S_VALUE;
+			}
+
+			break;
+		}
+
+		case S_VALUE_END:
+		{
+			if (c == '\n')
+				m_state = S_VALUE_END2;
+			else
+				throw Exception("Expected a \\n");
+
+			break;
+		}
+
+		case S_VALUE_END2:
+		{
 			if (m_last_char2 == '\n' && m_last_char == '\r' && c == '\n')
 				m_state = S_END;
 			else
-				m_state = S_CONTINUE;
+			{
+				m_field += c;
+				m_state = S_FIELD;
+			}
 
 			break;
 		}
 
 		case S_END:
-			break;
-			
-		case S_CONTINUE:
 			break;
 		
 	}
@@ -243,16 +341,11 @@ HTTPRequestParser::minor() const
 	return (m_minor);
 }
 
-void
-HTTPRequestParser::header(HTTPHeaderParser headerParser)
-{
-	m_headerParser.push_back(headerParser);
-}
 
-std::vector<HTTPHeaderParser> 
-HTTPRequestParser::getHeader()
+const std::map<std::string, std::string> &
+HTTPRequestParser::header()
 {
-	return (m_headerParser);
+	return (m_headerMap);
 }
 
 char

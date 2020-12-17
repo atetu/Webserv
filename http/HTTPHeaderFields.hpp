@@ -6,7 +6,7 @@
 /*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/27 18:39:24 by ecaceres          #+#    #+#             */
-/*   Updated: 2020/12/12 12:19:04 by alicetetu        ###   ########.fr       */
+/*   Updated: 2020/12/17 14:47:00 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -162,7 +162,7 @@ class HTTPHeaderFields
 		
 	public:
 		static HTTPHeaderFields*
-		create(std::vector<HTTPHeaderParser> headerParser);
+		create(std::map<std::string, std::string> headerMap);
 
 	public:
 		static const std::string ACCEPT_CHARSETS;
