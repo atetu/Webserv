@@ -16,11 +16,12 @@
 #include <config/block/MimeBlock.hpp>
 #include <config/block/ServerBlock.hpp>
 #include <config/Configuration.hpp>
-#include <exception/Exception.hpp>
+#include <config/exceptions/ConfigurationBindException.hpp>
 #include <http/mime/Mime.hpp>
 #include <util/json/JsonBoolean.hpp>
 #include <util/json/JsonNumber.hpp>
 #include <util/json/JsonString.hpp>
+#include <util/json/JsonValue.hpp>
 #include <util/log/Logger.hpp>
 #include <util/log/LoggerFactory.hpp>
 #include <util/unit/DataSize.hpp>
@@ -70,12 +71,6 @@ Configuration::operator =(const Configuration &other)
 	return (*this);
 }
 
-Configuration&
-Configuration::build()
-{
-	return (*this);
-}
-
 #define BIND(object, key, jsonType, type, to, apply) \
 			BIND_CUSTOM(object, key, jsonType, type, to->apply((type) value));
 
@@ -95,49 +90,45 @@ Configuration::build()
 Configuration*
 Configuration::fromJsonFile(const std::string &filepath)
 {
-	JsonObject *jsonObject = JsonReader::fromFile(filepath).readObject();
+	const JsonObject &jsonObject = JsonBuilder::rootObject(filepath);
 
 	try
 	{
-		RootBlock *rootBlock = FromJsonBuilder::buildRootBlock(*jsonObject);
+		RootBlock *rootBlock = JsonBuilder::buildRootBlock(jsonObject);
 		MimeRegistry *mimeRegistry = new MimeRegistry();
 
 		LOG.trace() << "Root Block: " << rootBlock << std::endl;
 
-		delete jsonObject;
+		delete &jsonObject;
 
 		return (new Configuration(filepath, *mimeRegistry, *rootBlock));
 	}
 	catch (...)
 	{
-		delete jsonObject;
+		delete &jsonObject;
 
 		throw;
 	}
 }
 
-JsonObject&
-Configuration::FromJsonBuilder::rootObject(JsonReader &jsonReader)
+const JsonObject&
+Configuration::JsonBuilder::rootObject(const std::string &filepath)
 {
-	JsonValue *jsonValue = jsonReader.read();
+	JsonValue *jsonValue = JsonReader::fromFile(filepath).read();
 
 	try
 	{
-		if (!jsonValue->instanceOf<JsonObject>())
-			throw Exception("Root JSON Value must be an Object, got: " + jsonValue->typeString());
+		return (jsonCast<JsonObject>(KEY_ROOT, jsonValue));
 	}
 	catch (...)
 	{
 		delete jsonValue;
-
 		throw;
 	}
-
-	return (*(jsonValue->cast<JsonObject>()));
 }
 
 RootBlock*
-Configuration::FromJsonBuilder::buildRootBlock(const JsonObject &jsonObject)
+Configuration::JsonBuilder::buildRootBlock(const JsonObject &jsonObject)
 {
 	RootBlock *rootBlock = new RootBlock();
 
@@ -164,7 +155,7 @@ Configuration::FromJsonBuilder::buildRootBlock(const JsonObject &jsonObject)
 			std::string ipath = KEY_ROOT KEY_DOT KEY_ROOT_CGI;
 			const JsonObject &object = jsonCast<JsonObject>(ipath, jsonObject.get(KEY_ROOT_CGI));
 
-			rootBlock->cgiBlocks(buildBlocks<CGIBlock, JsonObject>(ipath, object, &Configuration::FromJsonBuilder::buildCGIBlock));
+			rootBlock->cgiBlocks(buildBlocks<CGIBlock, JsonObject>(ipath, object, &Configuration::JsonBuilder::buildCGIBlock));
 		}
 
 		if (jsonObject.has(KEY_ROOT_SERVERS))
@@ -172,13 +163,12 @@ Configuration::FromJsonBuilder::buildRootBlock(const JsonObject &jsonObject)
 			std::string ipath = KEY_ROOT KEY_DOT KEY_ROOT_SERVERS;
 			const JsonArray &array = jsonCast<JsonArray>(ipath, jsonObject.get(KEY_ROOT_SERVERS));
 
-			rootBlock->serverBlocks(buildBlocks<ServerBlock, JsonObject>(ipath, array, &Configuration::FromJsonBuilder::buildServerBlock));
+			rootBlock->serverBlocks(buildBlocks<ServerBlock, JsonObject>(ipath, array, &Configuration::JsonBuilder::buildServerBlock));
 		}
 	}
 	catch (...)
 	{
 		delete rootBlock;
-
 		throw;
 	}
 
@@ -186,7 +176,7 @@ Configuration::FromJsonBuilder::buildRootBlock(const JsonObject &jsonObject)
 }
 
 MimeBlock*
-Configuration::FromJsonBuilder::buildMimeBlock(const std::string &path, const JsonObject &jsonObject)
+Configuration::JsonBuilder::buildMimeBlock(const std::string &path, const JsonObject &jsonObject)
 {
 	MimeBlock *mimeBlock = new MimeBlock();
 
@@ -205,13 +195,12 @@ Configuration::FromJsonBuilder::buildMimeBlock(const std::string &path, const Js
 			std::string ipath = path + KEY_DOT KEY_MIME_DEFINE;
 			const JsonObject &object = jsonCast<JsonObject>(ipath, jsonObject.get(KEY_MIME_DEFINE));
 
-			mimeBlock->defines(buildBlocks<Mime, JsonArray>(ipath, object, Configuration::FromJsonBuilder::buildMime));
+			mimeBlock->defines(buildBlocks<Mime, JsonArray>(ipath, object, Configuration::JsonBuilder::buildMime));
 		}
 	}
 	catch (...)
 	{
 		delete mimeBlock;
-
 		throw;
 	}
 
@@ -219,7 +208,7 @@ Configuration::FromJsonBuilder::buildMimeBlock(const std::string &path, const Js
 }
 
 CGIBlock*
-Configuration::FromJsonBuilder::buildCGIBlock(const std::string &path, const std::string &key, const JsonObject &jsonObject)
+Configuration::JsonBuilder::buildCGIBlock(const std::string &path, const std::string &key, const JsonObject &jsonObject)
 {
 	CGIBlock *cgiBlock = new CGIBlock(key);
 
@@ -230,7 +219,6 @@ Configuration::FromJsonBuilder::buildCGIBlock(const std::string &path, const std
 	catch (...)
 	{
 		delete cgiBlock;
-
 		throw;
 	}
 
@@ -238,7 +226,7 @@ Configuration::FromJsonBuilder::buildCGIBlock(const std::string &path, const std
 }
 
 ServerBlock*
-Configuration::FromJsonBuilder::buildServerBlock(const std::string &path, const JsonObject &jsonObject)
+Configuration::JsonBuilder::buildServerBlock(const std::string &path, const JsonObject &jsonObject)
 {
 	ServerBlock *serverBlock = new ServerBlock();
 
@@ -260,7 +248,7 @@ Configuration::FromJsonBuilder::buildServerBlock(const std::string &path, const 
 			else if (jsonValue->instanceOf<JsonString>())
 				names.push_back(jsonValue->cast<JsonString>()->operator std::string());
 			else
-				throw Exception("Cannot cast " + jsonValue->typeString() + " to " + JsonTypeTraits<JsonArray>::typeString + " or " + JsonTypeTraits<JsonString>::typeString + " (" + ipath + ")");
+				throw ConfigurationBindException::uncastable2<JsonArray, JsonString>(ipath, *jsonValue);
 
 			serverBlock->names(names);
 		}
@@ -271,11 +259,13 @@ Configuration::FromJsonBuilder::buildServerBlock(const std::string &path, const 
 			{
 				serverBlock->maxBodySize(DataSize::parse(value))
 				;
+				/* <-- Strange Eclipse bug when in macros. */
 			}
 			catch (Exception &exception)
 			{
 				throw Exception(exception.message() + std::string(" (") + path + ")")
 				;
+				/* <-- Strange Eclipse bug when in macros. */
 			}
 		});
 
@@ -284,7 +274,7 @@ Configuration::FromJsonBuilder::buildServerBlock(const std::string &path, const 
 			std::string ipath = path + KEY_DOT KEY_SERVER_LOCATIONS;
 			const JsonObject &object = jsonCast<JsonObject>(ipath, jsonObject.get(KEY_SERVER_LOCATIONS));
 
-			serverBlock->locations(buildBlocks<LocationBlock, JsonObject>(ipath, object, &Configuration::FromJsonBuilder::buildLocationBlock));
+			serverBlock->locations(buildBlocks<LocationBlock, JsonObject>(ipath, object, &Configuration::JsonBuilder::buildLocationBlock));
 		}
 
 		if (jsonObject.has(KEY_SERVER_ERRORS))
@@ -298,7 +288,6 @@ Configuration::FromJsonBuilder::buildServerBlock(const std::string &path, const 
 	catch (...)
 	{
 		delete serverBlock;
-
 		throw;
 	}
 
@@ -306,7 +295,7 @@ Configuration::FromJsonBuilder::buildServerBlock(const std::string &path, const 
 }
 
 LocationBlock*
-Configuration::FromJsonBuilder::buildLocationBlock(const std::string &path, const std::string &key, const JsonObject &jsonObject)
+Configuration::JsonBuilder::buildLocationBlock(const std::string &path, const std::string &key, const JsonObject &jsonObject)
 {
 	LocationBlock *locationBlock = new LocationBlock(key);
 
@@ -336,7 +325,6 @@ Configuration::FromJsonBuilder::buildLocationBlock(const std::string &path, cons
 	catch (...)
 	{
 		delete locationBlock;
-
 		throw;
 	}
 
@@ -344,7 +332,7 @@ Configuration::FromJsonBuilder::buildLocationBlock(const std::string &path, cons
 }
 
 Mime*
-Configuration::FromJsonBuilder::buildMime(const std::string &path, const std::string &key, const JsonArray &jsonArray)
+Configuration::JsonBuilder::buildMime(const std::string &path, const std::string &key, const JsonArray &jsonArray)
 {
 	const std::string &type = key;
 	const std::list<std::string> extensions = buildCollection<JsonString, std::string>(path, jsonArray);
@@ -353,7 +341,7 @@ Configuration::FromJsonBuilder::buildMime(const std::string &path, const std::st
 }
 
 CustomErrorMap
-Configuration::FromJsonBuilder::buildCustomErrorMap(const std::string &path, const JsonObject &jsonObject)
+Configuration::JsonBuilder::buildCustomErrorMap(const std::string &path, const JsonObject &jsonObject)
 {
 	CustomErrorMap::map map;
 
@@ -365,7 +353,7 @@ Configuration::FromJsonBuilder::buildCustomErrorMap(const std::string &path, con
 		for (std::string::const_iterator kit = key.begin(); kit != key.end(); kit++)
 		{
 			if (!std::isdigit(*kit))
-				throw Exception("key '" + key + "' must only contains numbers (" + path + ")");
+				throw ConfigurationBindException("key '" + key + "' must only contains numbers (" + path + ")");
 		}
 
 		const JsonString &value = jsonCast<JsonString>(path + KEY_DOT + key, it->second);
@@ -375,7 +363,7 @@ Configuration::FromJsonBuilder::buildCustomErrorMap(const std::string &path, con
 		stream >> code;
 
 		if (code == 0 || (code / 100 != 4 && code / 100 != 5)) // TODO Move to HTTPStatus::isError()
-			throw Exception("code '" + Convert::toString(code) + "' must be an error 4xx or 5xx (" + path + ")");
+			throw ConfigurationBindException("code '" + Convert::toString(code) + "' must be an error 4xx or 5xx (" + path + ")");
 
 		map.insert(map.end(), std::make_pair(code, value));
 	}

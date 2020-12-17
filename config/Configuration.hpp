@@ -14,12 +14,12 @@
 # define CONFIGURATION_HPP_
 
 #include <config/block/RootBlock.hpp>
+#include <config/exceptions/ConfigurationBindException.hpp>
 #include <http/mime/MimeRegistry.hpp>
 #include <util/Convert.hpp>
 #include <util/json/JsonArray.hpp>
 #include <util/json/JsonObject.hpp>
 #include <util/json/JsonReader.hpp>
-#include <util/json/JsonValue.hpp>
 #include <util/Objects.hpp>
 #include <util/Optional.hpp>
 #include <iterator>
@@ -31,7 +31,7 @@
 // Configuration should not be passed around like a normal object, but must be kept as singleton if possible
 
 #define KEY_DOT "."
-#define KEY_ROOT "json"
+#define KEY_ROOT "<root>"
 #define KEY_ROOT_ROOT "root"
 #define KEY_ROOT_MIME "mime"
 #define KEY_ROOT_CGI "cgi"
@@ -92,9 +92,6 @@ class Configuration
 			return (*m_rootBlock);
 		}
 
-		Configuration&
-		build();
-
 	public:
 		static Configuration*
 		fromJsonFile(const std::string &path);
@@ -132,11 +129,11 @@ class Configuration
 			}
 
 	private:
-		class FromJsonBuilder
+		class JsonBuilder
 		{
 			public:
-				static JsonObject&
-				rootObject(JsonReader &jsonReader);
+				static const JsonObject&
+				rootObject(const std::string &filepath);
 
 				template<typename T, typename JT>
 					static std::list<T const*>
@@ -208,7 +205,7 @@ class Configuration
 							std::string ipath = path + "[" + Convert::toString(index) + "]";
 							const JT &jsonType = jsonCast<JT>(ipath, *it);
 
-							T item = jsonType; /* Automatic cast. */
+							T item = jsonType; /* Automatic type operator cast. */
 							items.push_back(item);
 
 							index++;
@@ -245,7 +242,7 @@ class Configuration
 						Objects::requireNonNull(jsonValue, "jsonValue == null");
 
 						if (!jsonValue->instanceOf<T>())
-							throw Exception("Cannot cast " + jsonValue->typeString() + " to " + JsonTypeTraits<T>::typeString + " (" + path + ")");
+							throw ConfigurationBindException::uncastable<T>(path, *jsonValue);
 
 						return (*(jsonValue->cast<T>()));
 					}

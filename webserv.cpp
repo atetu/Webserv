@@ -11,12 +11,12 @@
 /* ************************************************************************** */
 
 #include <config/Configuration.hpp>
+#include <config/exceptions/ConfigurationBindException.hpp>
+#include <config/exceptions/ConfigurationValidateException.hpp>
 #include <exception/IOException.hpp>
 #include <util/ContainerBuilder.hpp>
 #include <util/Enum.hpp>
 #include <util/json/JsonException.hpp>
-#include <util/json/JsonObject.hpp>
-#include <util/json/JsonReader.hpp>
 #include <util/log/Logger.hpp>
 #include <util/log/LoggerFactory.hpp>
 #include <util/log/LogLevel.hpp>
@@ -107,12 +107,22 @@ delegated_main(int argc, char **argv)
 	}
 	catch (IOException &exception)
 	{
-		LOG.fatal() << "Cannot read configuration file: " << exception.message() << std::endl;
+		LOG.fatal() << "Failed to read file: " << exception.message() << std::endl;
 		return (1);
 	}
 	catch (JsonException &exception)
 	{
 		LOG.fatal() << "Failed to parse JSON: " << exception.message() << std::endl;
+		return (1);
+	}
+	catch (ConfigurationBindException &exception)
+	{
+		LOG.fatal() << "Failed bind configuration: " << exception.message() << std::endl;
+		return (1);
+	}
+	catch (ConfigurationValidateException &exception)
+	{
+		LOG.fatal() << "Failed validate configuration: " << exception.message() << std::endl;
 		return (1);
 	}
 	catch (Exception &exception)
