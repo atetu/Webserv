@@ -13,6 +13,7 @@
 #ifndef CGIBLOCK_HPP_
 # define CGIBLOCK_HPP_
 
+#include <sys/stat.h>
 #include <util/Optional.hpp>
 #include <string>
 
@@ -46,6 +47,18 @@ class CGIBlock
 		path(void) const
 		{
 			return (m_path);
+		}
+
+		inline bool
+		exists() const
+		{
+			if (m_path.present())
+			{
+				struct stat st;
+				return (::stat(m_path.get().c_str(), &st) == 0);
+			}
+
+			return (false);
 		}
 };
 

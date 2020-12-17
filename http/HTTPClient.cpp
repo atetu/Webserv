@@ -10,16 +10,19 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <exception/Exception.hpp>
 #include <http/HTTPClient.hpp>
+#include <http/HTTPRequest.hpp>
+#include <http/HTTPResponse.hpp>
 #include <stddef.h>
-#include <sys/unistd.h>
+#include <util/buffer/impl/SocketBuffer.hpp>
+#include <util/helper/DeleteHelper.hpp>
 #include <util/System.hpp>
 
-HTTPClient::HTTPClient(int fd) :
-		m_fd(fd),
-		m_in(fd, false),
-		m_out(fd, false),
+HTTPClient::HTTPClient(Socket &socket, const HTTPServer &server) :
+		m_socket(socket),
+		m_in(*SocketBuffer::from(socket, FileBuffer::NOTHING)),
+		m_out(*SocketBuffer::from(socket, FileBuffer::NOTHING)),
+		m_server(server),
 		m_parser(),
 		m_lastAction(),
 		m_request(NULL),
@@ -30,15 +33,12 @@ HTTPClient::HTTPClient(int fd) :
 
 HTTPClient::~HTTPClient(void)
 {
-	std::cout << "~HTTPClient(): m_request=" << (void*)m_request << ", m_response=" << (void*)m_response << std::endl;
+	delete &m_in;
+	delete &m_out;
+	delete &m_socket;
 
-	if (m_request)
-		delete m_request;
-
-	if (m_response)
-		delete m_response;
-
-	::close (m_fd);
+	DeleteHelper::pointer<HTTPRequest>(m_request);
+	DeleteHelper::pointer<HTTPResponse>(m_response);
 }
 
 void
@@ -48,16 +48,4 @@ HTTPClient::updateLastAction()
 
 	if (time)
 		m_lastAction = time;
-}
-
-void
-HTTPClient::header(HTTPHeaderParser headerParser)
-{
-	m_headerParser.push_back(headerParser);
-}
-
-std::vector<HTTPHeaderParser>
-HTTPClient::getHeader()
-{
-	return (m_headerParser);
 }

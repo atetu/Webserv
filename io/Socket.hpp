@@ -13,39 +13,58 @@
 #ifndef SOCKET_HPP_
 # define SOCKET_HPP_
 
-# include <netinet/in.h>
-#include <util/Closable.hpp>
-# include <sys/socket.h>
+#include <io/FileDescriptor.hpp>
+#include <stddef.h>
+#include <sys/types.h>
 
 class Socket :
-		public Closable
+		public FileDescriptor
 {
-	private:
-		int m_fd;
-		struct sockaddr_in m_addr;
-
 	public:
+		static const int DEFAULT_BACKLOG = 50;
+
+	private:
 		Socket(void);
 		Socket(int fd);
 		Socket(const Socket &other);
 
+		Socket&
+		operator=(const Socket &other);
+
+	public:
 		virtual
 		~Socket();
 
-		Socket&
-		operator=(const Socket &other);
+		ssize_t
+		recv(void *buf, size_t len, int flags);
+
+		ssize_t
+		send(const void *buf, size_t len, int flags);
 
 		void
 		bind(int port);
 
 		void
+		bind(const std::string &host, int port);
+
+		void
+		bind(const struct sockaddr_in &addr);
+
+		void
 		reusable();
 
 		void
-		close() throw (IOException);
+		listen(void);
 
-		int
-		fd() const;
+		void
+		listen(int backlog);
+
+		Socket*
+		accept(void) const;
+
+	public:
+		static Socket*
+		create(void);
 };
 
 #endif /* SOCKET_HPP_ */

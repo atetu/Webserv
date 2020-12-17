@@ -38,6 +38,7 @@ class LoggerImpl :
 		public Logger
 {
 	private:
+		static size_t LONGEST_NAME;
 		static const std::string DEFAULT_TAG;
 		static NullStream VOID;
 

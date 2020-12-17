@@ -16,15 +16,27 @@
 #include <config/block/MimeBlock.hpp>
 #include <config/block/ServerBlock.hpp>
 #include <config/Configuration.hpp>
+#include <config/exceptions/ConfigurationBindException.hpp>
+#include <config/exceptions/ConfigurationValidateException.hpp>
 #include <http/mime/Mime.hpp>
+#include <util/Convert.hpp>
+#include <util/helper/DeleteHelper.hpp>
 #include <util/helper/JsonBinderHelper.hpp>
+#include <util/json/JsonArray.hpp>
+#include <util/json/JsonBoolean.hpp>
+#include <util/json/JsonNumber.hpp>
+#include <util/json/JsonReader.hpp>
 #include <util/json/JsonString.hpp>
 #include <util/json/JsonValue.hpp>
 #include <util/log/Logger.hpp>
 #include <util/log/LoggerFactory.hpp>
+#include <util/Optional.hpp>
 #include <util/unit/DataSize.hpp>
 #include <cctype>
 #include <iostream>
+#include <iterator>
+#include <list>
+#include <map>
 #include <utility>
 
 Logger &Configuration::LOG = LoggerFactory::get("Configuration");
@@ -52,8 +64,8 @@ Configuration::Configuration(const Configuration &other) :
 
 Configuration::~Configuration()
 {
-	delete m_rootBlock;
-	delete m_mimeRegistry;
+	DeleteHelper::pointer<MimeRegistry>(m_mimeRegistry);
+	DeleteHelper::pointer<RootBlock>(m_rootBlock);
 }
 
 Configuration&
@@ -87,7 +99,7 @@ Configuration::fromJsonFile(const std::string &path, bool ignoreMimeIncludesErro
 
 		LOG.trace() << "Validating..." << std::endl;
 
-		// TODO Make validation
+		Validator::validate(*rootBlock);
 
 		LOG.trace() << "Filling MIME registry..." << std::endl;
 
@@ -135,6 +147,8 @@ Configuration::fromJsonFile(const std::string &path, bool ignoreMimeIncludesErro
 
 			LOG.debug() << "MIME Registry final size: " << mimeRegistry->size() << std::endl;
 		}
+		else
+			LOG.debug() << "MIME Registry is empty (no includes or define found)" << std::endl;
 
 		return (new Configuration(path, *mimeRegistry, *rootBlock));
 	}
@@ -413,4 +427,52 @@ Configuration::JsonBuilder::buildCustomErrorMap(const std::string &path, const J
 	}
 
 	return (CustomErrorMap(map));
+}
+
+void
+Configuration::Validator::validate(const RootBlock &rootBlock)
+{
+	typedef std::list<const ServerBlock*> slist;
+	typedef std::list<const LocationBlock*> llist;
+
+	if (rootBlock.serverBlocks().present())
+	{
+		const slist &serverBlocks = rootBlock.serverBlocks().get();
+
+		if (serverBlocks.empty())
+			throw ConfigurationValidateException("Server list is empty.");
+
+		for (slist::const_iterator sit = serverBlocks.begin(); sit != serverBlocks.end(); sit++)
+		{
+			const ServerBlock &serverBlock = *(*sit);
+
+			if (serverBlock.locations().present())
+			{
+				const llist &locationBlocks = serverBlock.locations().get();
+
+				for (llist::const_iterator lit = locationBlocks.begin(); lit != locationBlocks.end(); lit++)
+				{
+					const LocationBlock &locationBlock = *(*lit);
+
+					if (locationBlock.cgi().present())
+					{
+						const std::string &cgi = locationBlock.cgi().get();
+
+						if (!rootBlock.hasCGI(cgi))
+							throw ConfigurationValidateException("Undefined CGI with name: " + cgi);
+
+						const CGIBlock &cgiBlock = rootBlock.getCGI(cgi);
+
+						if (!cgiBlock.path().present())
+							throw ConfigurationValidateException("Used CGI '" + cgiBlock.name() + "' does not have a defined path.");
+
+						if (!cgiBlock.exists())
+							LOG.warn() << "CGI: " << cgiBlock.name() << ": " << cgiBlock.path().get() << ": stat() failed. (file does not exists?)" << std::endl;
+					}
+				}
+			}
+		}
+	}
+	else
+		throw ConfigurationValidateException("No server slist found.");
 }

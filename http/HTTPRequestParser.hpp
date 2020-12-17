@@ -91,8 +91,14 @@ class HTTPRequestParser
 		int
 		minor() const;
 
-		const std::map<std::string, std::string> &
+		const std::map<std::string, std::string>&
 		header();
+
+		void
+		header(HTTPHeaderParser headerParser);
+
+		std::vector<HTTPHeaderParser>
+		getHeader();
 
 		char
 		lastChar() const;

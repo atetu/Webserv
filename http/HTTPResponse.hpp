@@ -10,14 +10,17 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef SRC_HTTP_HTTPRESPONSE_HPP_
-# define SRC_HTTP_HTTPRESPONSE_HPP_
+#ifndef HTTPRESPONSE_HPP_
+# define HTTPRESPONSE_HPP_
 
 #include <http/HTTPHeaderFields.hpp>
 #include <http/HTTPStatus.hpp>
 #include <http/HTTPVersion.hpp>
-#include <util/buffer/IOBuffer.hpp>
+#include <sys/types.h>
 #include <string>
+
+class FileBuffer;
+class SocketBuffer;
 
 # define AWAITING_BUFFER_SIZE 512
 
@@ -58,44 +61,51 @@ class HTTPResponse
 				/**
 				 * Write to the output information that will be sent to the socket.
 				 *
-				 * @param buffer IO Buffer to write to.
+				 * @param buffer IO Buffer to write to. // TODO
 				 * @return Whether or not everything has been sent.
 				 */
 				virtual bool
-				write(IOBuffer &buffer) = 0;
+				write(SocketBuffer &socketBuffer) = 0;
 
 				virtual bool
 				isDone() = 0;
 		};
 
 		/**
-		 * The File Body fill-up an internal buffer with information of a source IOBuffer.
+		 * The File Body fill-up an internal buffer with information of a source IOBuffer. // TODO
 		 * Slowly reading (from a file) then writing (to the output) to return the file in small chunks.
 		 */
 		class FileBody :
 				public IBody
 		{
 			private:
-				IOBuffer m_buffer;
+				FileBuffer &m_fileBuffer;
+
+			private:
+				FileBody(void);
+				FileBody(const FileBody &other);
+
+				FileBody&
+				operator =(const FileBody &other);
 
 			public:
-				FileBody(int fd);
+				FileBody(FileBuffer &fileBuffer);
 
 				virtual
 				~FileBody();
 
 				virtual bool
-				write(IOBuffer &fd);
+				write(SocketBuffer &fd);
 
-				IOBuffer&
-				buffer();
+				FileBuffer&
+				fileBuffer();
 
 				bool
 				isDone();
 		};
 
 		/**
-		 * The String Body only put the whole provided string into the IOBuffer.
+		 * The String Body only put the whole provided string into the IOBuffer. // TODO
 		 */
 		class StringBody :
 				public IBody
@@ -111,7 +121,7 @@ class HTTPResponse
 				~StringBody();
 
 				virtual bool
-				write(IOBuffer &fd);
+				write(SocketBuffer &socketBuffer);
 
 				bool
 				isDone();
@@ -141,7 +151,7 @@ class HTTPResponse
 		~HTTPResponse();
 
 		bool
-		write(IOBuffer &fd);
+		write(SocketBuffer &socketBuffer);
 
 		IBody*
 		body() const
@@ -163,4 +173,4 @@ class HTTPResponse
 		}
 };
 
-#endif /* SRC_HTTP_HTTPRESPONSE_HPP_ */
+#endif /* HTTPRESPONSE_HPP_ */

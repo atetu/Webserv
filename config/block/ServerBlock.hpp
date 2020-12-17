@@ -24,6 +24,10 @@
 
 class ServerBlock
 {
+	public:
+		static const std::string DEFAULT_HOST;
+		static const short DEFAULT_PORT;
+
 	private:
 		Optional<int> m_port;
 		Optional<std::string> m_host;
@@ -112,9 +116,6 @@ class ServerBlock
 		// 	HTTPFindLocation findLocation(path, m_locations.get());
 		// 	return (findLocation.parse().location().get());
 		// }
-
-	public:
-		static const std::string DEFAULT_HOST;
 };
 
 #endif /* SERVERBLOCK_HPP_ */

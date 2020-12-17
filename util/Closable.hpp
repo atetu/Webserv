@@ -13,18 +13,14 @@
 #ifndef CLOSABLE_HPP_
 # define CLOSABLE_HPP_
 
-#include <exception/IOException.hpp>
-
 class Closable
 {
-
 	public:
 		virtual
 		~Closable();
 
 		virtual void
-		close() throw (IOException) = 0;
-
+		close() = 0;
 };
 
 #endif /* CLOSABLE_HPP_ */

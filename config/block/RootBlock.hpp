@@ -22,11 +22,18 @@
 
 class RootBlock
 {
+	public:
+		typedef std::list<const ServerBlock*> slist;
+		typedef slist::const_iterator sciterator;
+
+		typedef std::list<const CGIBlock*> clist;
+		typedef clist::const_iterator cciterator;
+
 	private:
 		Optional<std::string> m_root;
 		Optional<const MimeBlock*> m_mimeBlock;
-		Optional<std::list<const ServerBlock*> > m_serverBlocks;
-		Optional<std::list<const CGIBlock*> > m_cgiBlocks;
+		Optional<slist> m_serverBlocks;
+		Optional<clist> m_cgiBlocks;
 
 	public:
 		RootBlock();
@@ -77,12 +84,12 @@ class RootBlock
 		inline const ServerBlock*
 		findServerBlock(const std::string &clientHost) const
 		{
-			const ServerBlock* serverBlock;
+			const ServerBlock *serverBlock;
 			std::list<const ServerBlock*> serverBlockList = m_serverBlocks.get();
 			std::list<const ServerBlock*>::iterator server_it = serverBlockList.begin();
 			std::list<const ServerBlock*>::iterator server_ite = serverBlockList.end();
 			int found = 0;
-										
+
 			while (server_it != server_ite)
 			{
 				if ((*server_it)->names().present())
@@ -101,13 +108,50 @@ class RootBlock
 						}
 						serverNames_it++;
 					}
-												
+
 				}
 				if (found)
 					break;
 				server_it++;
 			}
 			return (serverBlock); // what happens if does not exit?
+		}
+
+		inline bool
+		hasCGI(const std::string &name) const
+		{
+			typedef std::list<const CGIBlock*> list;
+
+			if (m_cgiBlocks.present())
+			{
+				const list &cgiBlocks = m_cgiBlocks.get();
+
+				for (list::const_iterator it = cgiBlocks.begin(); it != cgiBlocks.end(); it++)
+				{
+					if ((*it)->name() == name)
+						return (true);
+				}
+			}
+
+			return (false);
+		}
+
+		inline const CGIBlock&
+		getCGI(const std::string &name) const
+		{
+			typedef std::list<const CGIBlock*> list;
+
+			const list &cgiBlocks = m_cgiBlocks.get();
+
+			for (list::const_iterator it = cgiBlocks.begin(); it != cgiBlocks.end(); it++)
+			{
+				const CGIBlock &cgiBlock = *(*it);
+
+				if (cgiBlock.name() == name)
+					return (cgiBlock);
+			}
+
+			throw NullPointerException("No CGI found with name: " + name);
 		}
 };
 

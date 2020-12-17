@@ -158,7 +158,7 @@ HTTPValueParser::consume(char c)
 		{
 			if (c == ' ')
 			{
-				m_weightNb = std::stof(m_weightStr);
+				m_weightNb = 0.0; // TODO: Not in c++98 //std::stof(m_weightStr);
 				(*m_map)[m_weightNb].push_back(m_valueElement);
 				m_valueElement = "";
 				m_valueElement.reserve(16);
@@ -170,7 +170,7 @@ HTTPValueParser::consume(char c)
 			}
 			else if (c == '\0')
 			{
-				m_weightNb = std::stof(m_weightStr);
+				m_weightNb = 0.0; // TODO: Not in c++98 //std::stof(m_weightStr);
 				(*m_map)[m_weightNb].push_back(m_valueElement); 
 				
 				m_valueElement = "";
@@ -183,7 +183,7 @@ HTTPValueParser::consume(char c)
 			}
 			else if (c == ',')
 			{
-				m_weightNb = std::stof(m_weightStr);
+				m_weightNb = 0.0; // TODO: Not in c++98 //std::stof(m_weightStr);
 				(*m_map)[m_weightNb].push_back(m_valueElement);
 				m_valueElement = "";
 				m_valueElement.reserve(16);

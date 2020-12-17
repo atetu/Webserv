@@ -172,7 +172,7 @@ HTTPRequestParser::consume(char c)
 			if (c == '\r')
 				m_state = S_HTTP_END;
 			else if (c == '\n')
-				m_state = S_HTTP_END2;
+				m_state = S_END; // TODO Changed since the parser hang forever. //S_HTTP_END2;
 			else
 				throw Exception("Expected a \\r or \\n");
 
@@ -182,7 +182,7 @@ HTTPRequestParser::consume(char c)
 		case S_HTTP_END:
 		{
 			if (c == '\n')
-				m_state = S_HTTP_END2;
+				m_state = S_END; // TODO Changed since the parser hang forever. //S_HTTP_END2;
 			else
 				throw Exception("Expected a \\n");
 
@@ -229,6 +229,8 @@ HTTPRequestParser::consume(char c)
 				m_state = S_SPACES_BEFORE_VALUE;
 			else
 				m_state = S_VALUE;
+
+			break;
 		}
 			
 		case S_SPACES_BEFORE_VALUE:

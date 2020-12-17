@@ -13,13 +13,15 @@
 #include <config/Configuration.hpp>
 #include <sys/stat.h>
 #include <dirent.h>
-#include <unistd.h>
 #include <http/handler/methods/GetHandler.hpp>
 #include <http/HTTPHeaderFields.hpp>
 #include <http/HTTPResponse.hpp>
 #include <http/HTTPStatus.hpp>
-#include <fcntl.h>
+#include <io/FileDescriptor.hpp>
+#include <sys/fcntl.h>
+#include <dirent.h>
 #include <sys/stat.h>
+#include <util/buffer/impl/FileBuffer.hpp>
 #include <util/URL.hpp>
 #include <string>
 
@@ -55,7 +57,7 @@ GetHandler::handle(HTTPRequest &request)
 
 		headers.contentLength(st.st_size);
 
-		return (new HTTPResponse(*HTTPStatus::OK, headers, new HTTPResponse::FileBody(fd)));
+		return (new HTTPResponse(*HTTPStatus::OK, headers, new HTTPResponse::FileBody(*FileBuffer::from(*FileDescriptor::wrap(fd), FileBuffer::CLOSE | FileBuffer::DELETE))));
 	}
 
 	if (S_ISDIR(st.st_mode))

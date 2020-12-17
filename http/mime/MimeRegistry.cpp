@@ -73,7 +73,7 @@ MimeRegistry::clearMapping(map &mapping)
 	for (const_iterator it = mapping.begin(); it != mapping.end(); it++)
 		delete it->second;
 
-	return (mapping.clear());
+	mapping.clear();
 }
 
 void
