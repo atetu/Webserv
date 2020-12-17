@@ -31,29 +31,29 @@ class DeleteHelper
 	public:
 		template<typename T>
 			static void
-			deletePointerList(Optional<std::list<T*> > &optional)
+			pointers(Optional<std::list<T*> > &optional)
 			{
 				if (optional.present())
 				{
-					deletePointerList(optional.get());
+					pointers(optional.get());
 					optional.unset();
 				}
 			}
 
 		template<typename T>
 			static void
-			deletePointerList(Optional<std::list<T const*> > &optional)
+			pointers(Optional<std::list<T const*> > &optional)
 			{
 				if (optional.present())
 				{
-					deletePointerList(optional.get());
+					pointers(optional.get());
 					optional.unset();
 				}
 			}
 
 		template<typename T>
 			static void
-			deletePointerList(std::list<T*> &blocks)
+			pointers(std::list<T*> &blocks)
 			{
 				for (typename std::list<T*>::iterator it = blocks.begin(); it != blocks.end(); it++)
 					delete *it;
@@ -63,7 +63,7 @@ class DeleteHelper
 
 		template<typename T>
 			static void
-			deletePointerList(std::list<T const*> &blocks)
+			pointers(std::list<T const*> &blocks)
 			{
 				for (typename std::list<T const*>::iterator it = blocks.begin(); it != blocks.end(); it++)
 					delete *it;
@@ -73,29 +73,29 @@ class DeleteHelper
 
 		template<typename T>
 			static void
-			deletePointer(Optional<T*> &optional)
+			pointer(Optional<T*> &optional)
 			{
 				if (optional.present())
 				{
-					deletePointer(optional.get());
+					pointer(optional.get());
 					optional.unset();
 				}
 			}
 
 		template<typename T>
 			static void
-			deletePointer(Optional<T const*> &optional)
+			pointer(Optional<T const*> &optional)
 			{
 				if (optional.present())
 				{
-					deletePointer(optional.get());
+					pointer(optional.get());
 					optional.unset();
 				}
 			}
 
 		template<typename T>
 			static void
-			deletePointer(T *&ptr)
+			pointer(T *&ptr)
 			{
 				if (ptr)
 					delete ptr;
@@ -105,7 +105,7 @@ class DeleteHelper
 
 		template<typename T>
 			static void
-			deletePointer(T const *&ptr)
+			pointer(T const *&ptr)
 			{
 				if (ptr)
 					delete ptr;

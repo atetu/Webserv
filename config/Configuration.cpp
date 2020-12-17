@@ -81,7 +81,7 @@ Configuration::fromJsonFile(const std::string &path, bool ignoreMimeIncludesErro
 		LOG.trace() << "Building ROOT Block..." << std::endl;
 
 		rootBlock = JsonBuilder::buildRootBlock(*jsonObject);
-		DeleteHelper::deletePointer(jsonObject);
+		DeleteHelper::pointer(jsonObject);
 
 		LOG.trace() << "Root Block: " << rootBlock << std::endl;
 
@@ -140,9 +140,9 @@ Configuration::fromJsonFile(const std::string &path, bool ignoreMimeIncludesErro
 	}
 	catch (...)
 	{
-		DeleteHelper::deletePointer(jsonObject);
-		DeleteHelper::deletePointer(rootBlock);
-		DeleteHelper::deletePointer(mimeRegistry);
+		DeleteHelper::pointer(jsonObject);
+		DeleteHelper::pointer(rootBlock);
+		DeleteHelper::pointer(mimeRegistry);
 
 		throw;
 	}

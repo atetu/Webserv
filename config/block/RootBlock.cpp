@@ -31,9 +31,9 @@ RootBlock::RootBlock(const RootBlock &other) :
 
 RootBlock::~RootBlock()
 {
-	DeleteHelper::deletePointerList<ServerBlock>(m_serverBlocks);
-	DeleteHelper::deletePointerList<CGIBlock>(m_cgiBlocks);
-	DeleteHelper::deletePointer<MimeBlock>(m_mimeBlock);
+	DeleteHelper::pointers<ServerBlock>(m_serverBlocks);
+	DeleteHelper::pointers<CGIBlock>(m_cgiBlocks);
+	DeleteHelper::pointer<MimeBlock>(m_mimeBlock);
 }
 
 RootBlock&

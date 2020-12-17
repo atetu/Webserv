@@ -27,7 +27,7 @@ MimeBlock::MimeBlock(const MimeBlock &other) :
 
 MimeBlock::~MimeBlock()
 {
-	DeleteHelper::deletePointerList<Mime>(m_defines);
+	DeleteHelper::pointers<Mime>(m_defines);
 }
 
 MimeBlock&

@@ -18,8 +18,6 @@
 #include <list>
 #include <utility>
 
-class DeleteHelper;
-
 Logger &MimeRegistry::LOG = LoggerFactory::get("MIME Registry");
 
 MimeRegistry::MimeRegistry(void) :
@@ -159,7 +157,7 @@ MimeRegistry::loadFromJson(const std::string &path, const JsonObject &jsonObject
 	for (std::list<Mime const*>::iterator it = mimes.begin(); it != mimes.end(); it++)
 		add(*(*it));
 
-	DeleteHelper::deletePointerList(mimes);
+	DeleteHelper::pointers(mimes);
 }
 
 size_t

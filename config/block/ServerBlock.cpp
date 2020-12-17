@@ -41,7 +41,7 @@ ServerBlock::ServerBlock(const ServerBlock &other) :
 
 ServerBlock::~ServerBlock()
 {
-	DeleteHelper::deletePointerList<LocationBlock>(m_locations);
+	DeleteHelper::pointers<LocationBlock>(m_locations);
 }
 
 ServerBlock&

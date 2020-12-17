@@ -60,7 +60,7 @@ class JsonBinderHelper
 				}
 				catch (...)
 				{
-					DeleteHelper::deletePointerList<T>(blocks);
+					DeleteHelper::pointers<T>(blocks);
 
 					throw;
 				}
@@ -88,7 +88,7 @@ class JsonBinderHelper
 				}
 				catch (...)
 				{
-					DeleteHelper::deletePointerList<T>(blocks);
+					DeleteHelper::pointers<T>(blocks);
 
 					throw;
 				}
