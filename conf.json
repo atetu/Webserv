@@ -1,8 +1,7 @@
 {
 	"mime": {
 		"includes": [
-			"mime.json",
-			"i-dont-exists.json"
+			"mime.json"
 		],
 		"define": {
 			"application/octet-stream": [

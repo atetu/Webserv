@@ -64,8 +64,8 @@ Configuration::Configuration(const Configuration &other) :
 
 Configuration::~Configuration()
 {
-	delete m_rootBlock;
-	delete m_mimeRegistry;
+	DeleteHelper::pointer<MimeRegistry>(m_mimeRegistry);
+	DeleteHelper::pointer<RootBlock>(m_rootBlock);
 }
 
 Configuration&

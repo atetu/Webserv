@@ -246,35 +246,35 @@ HTTPOrchestrator::start()
 
 				bool deleted = false;
 
-				HTTPClient *client = it->second;
+				HTTPClient &client = *it->second;
 
-				if (canRead && !client->response())
+				if (canRead && !client.response())
 				{
-					if (client->in().size() != 0 || client->in().recv() > 0)
+					if (client.in().size() != 0 || client.in().recv() > 0)
 					{
 						char c;
 
-						while (client->in().next(c))
+						while (client.in().next(c))
 						{
-							client->parser().consume(c);
+							client.parser().consume(c);
 
-							if (client->parser().state() == HTTPRequestParser::S_END)
+							if (client.parser().state() == HTTPRequestParser::S_END)
 							{
-								const HTTPMethod *method = HTTPMethod::find(client->parser().method());
+								const HTTPMethod *method = HTTPMethod::find(client.parser().method());
 								if (!method)
-									client->response() = HTTPResponse::status(*HTTPStatus::METHOD_NOT_ALLOWED);
+									client.response() = HTTPResponse::status(*HTTPStatus::METHOD_NOT_ALLOWED);
 								else
 								{
-									URL url = URL("http", "locahost", 80, client->parser().path(), Optional<std::map<std::string, std::string> >(), Optional<std::string>());
+									URL url = URL("http", "locahost", 80, client.parser().path(), Optional<std::map<std::string, std::string> >(), Optional<std::string>());
 
 									RootBlock rootBlock;
 									ServerBlock serverBlock;
 									LocationBlock locationBlock;
 
-									client->request() = new HTTPRequest(*method, url, HTTPVersion::HTTP_1_1, HTTPHeaderFields(), m_configuration, rootBlock, serverBlock, locationBlock);
-									client->response() = method->handler().handle(*client->request());
+									client.request() = new HTTPRequest(*method, url, HTTPVersion::HTTP_1_1, HTTPHeaderFields(), m_configuration, rootBlock, serverBlock, locationBlock);
+									client.response() = method->handler().handle(*client.request());
 
-									HTTPResponse::FileBody *fileBody = dynamic_cast<HTTPResponse::FileBody*>(client->response()->body());
+									HTTPResponse::FileBody *fileBody = dynamic_cast<HTTPResponse::FileBody*>(client.response()->body());
 									if (fileBody)
 										addFileRead(fileBody->fileBuffer());
 								}
@@ -287,10 +287,10 @@ HTTPOrchestrator::start()
 
 				if (canWrite && !deleted)
 				{
-					if (client->response())
+					if (client.response())
 					{
-						if (client->out().send() > 0 || !client->response()->write(client->out())) // TODO Add windows support
-							client->updateLastAction();
+						if (client.out().send() > 0 || !client.response()->write(client.out()))
+							client.updateLastAction();
 						else
 						{
 							std::cout << "closing(" << fd << "): " << ::strerror(errno) << std::endl;
@@ -304,7 +304,7 @@ HTTPOrchestrator::start()
 					}
 				}
 
-				if (!deleted && client->response() && client->response()->state() == HTTPResponse::FINISHED)
+				if (!deleted && client.response() && client.response()->state() == HTTPResponse::FINISHED)
 				{
 					std::cout << "done: " << fd << std::endl;
 
@@ -315,7 +315,7 @@ HTTPOrchestrator::start()
 					continue;
 				}
 
-				if (!deleted && client->lastAction() + 5 < now)
+				if (!deleted && client.lastAction() + 5 < now)
 				{
 					std::cout << "timeout: " << fd << std::endl;
 

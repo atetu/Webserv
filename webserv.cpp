@@ -14,8 +14,10 @@
 #include <config/exceptions/ConfigurationBindException.hpp>
 #include <config/exceptions/ConfigurationValidateException.hpp>
 #include <exception/IOException.hpp>
+#include <http/HTTPOrchestrator.hpp>
 #include <util/ContainerBuilder.hpp>
 #include <util/Enum.hpp>
+#include <util/helper/DeleteHelper.hpp>
 #include <util/json/JsonException.hpp>
 #include <util/log/Logger.hpp>
 #include <util/log/LoggerFactory.hpp>
@@ -102,6 +104,7 @@ delegated_main(int argc, char **argv)
 	LOG.debug() << "Set log level to: " << level->name() << std::endl;
 
 	Configuration *configuration = NULL;
+	HTTPOrchestrator *httpOrchestrator = NULL;
 
 	try
 	{
@@ -135,13 +138,25 @@ delegated_main(int argc, char **argv)
 		return (1);
 	}
 
-	delete configuration;
-	std::cout << configuration << std::endl;
+	if (!checkOnly)
+	{
+		try
+		{
+			httpOrchestrator = HTTPOrchestrator::create(*configuration);
+			httpOrchestrator->start();
+		}
+		catch (Exception &exception)
+		{
+			DeleteHelper::pointer<HTTPOrchestrator>(httpOrchestrator);
+			DeleteHelper::pointer<Configuration>(configuration);
 
-	if (checkOnly)
-		return (0);
+			LOG.fatal() << "Failed to orchestre: " << exception.message() << std::endl;
+			return (1);
+		}
+	}
 
-	// TODO Start orchestrator
+	DeleteHelper::pointer<HTTPOrchestrator>(httpOrchestrator);
+	DeleteHelper::pointer<Configuration>(configuration);
 
 	return (0);
 }

@@ -93,7 +93,7 @@ class HTTPRequestParser
 		void
 		header(HTTPHeaderParser headerParser);
 
-		std::vector<HTTPHeaderParser> 
+		std::vector<HTTPHeaderParser>
 		getHeader();
 
 		char
