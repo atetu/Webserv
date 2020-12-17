@@ -26,7 +26,6 @@
 #include <io/Socket.hpp>
 #include <sys/errno.h>
 #include <sys/unistd.h>
-#include <util/buffer/impl/BaseBuffer.hpp>
 #include <util/buffer/impl/FileBuffer.hpp>
 #include <util/Enum.hpp>
 #include <util/log/Logger.hpp>
@@ -39,7 +38,6 @@
 #include <set>
 #include <string>
 #include <utility>
-#include <vector>
 
 Logger &HTTPOrchestrator::LOG = LoggerFactory::get("HTTP Orchestrator");
 
@@ -64,10 +62,7 @@ HTTPOrchestrator::~HTTPOrchestrator()
 void
 HTTPOrchestrator::prepare(void)
 {
-	server_iterator it = m_servers.begin();
-	server_iterator ite = m_servers.end();
-
-	while (it != ite)
+	for (server_iterator it = m_servers.begin(); it != m_servers.end(); it++)
 	{
 		try
 		{
@@ -83,23 +78,14 @@ HTTPOrchestrator::prepare(void)
 
 			throw;
 		}
-
-		it++;
 	}
 }
 
 void
 HTTPOrchestrator::unprepare(void)
 {
-	server_iterator it = m_servers.begin();
-	server_iterator ite = m_servers.end();
-
-	while (it != ite)
-	{
+	for (server_iterator it = m_servers.begin(); it != m_servers.end(); it++)
 		(*it)->terminate();
-
-		it++;
-	}
 }
 
 void
@@ -398,7 +384,11 @@ HTTPOrchestrator::removeClient(int fd)
 			{
 				HTTPResponse::FileBody *fileBody = dynamic_cast<HTTPResponse::FileBody*>(body);
 				if (fileBody)
-					removeFileRead(fileBody->fileBuffer().descriptor().raw());
+				{
+					FileBuffer &fileBuffer = fileBody->fileBuffer();
+					removeFileRead(fileBuffer.descriptor().raw());
+					delete &fileBuffer;
+				}
 			}
 		}
 

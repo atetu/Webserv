@@ -15,8 +15,8 @@
 #include <util/buffer/impl/SocketBuffer.hpp>
 #include <algorithm>
 
-SocketBuffer::SocketBuffer(Socket &socket, bool closeOnDestroy, size_type maxSize) :
-		FileBuffer(socket, closeOnDestroy, maxSize)
+SocketBuffer::SocketBuffer(Socket &socket, int actionOnDestroy, size_type maxSize) :
+		FileBuffer(socket, actionOnDestroy, maxSize)
 {
 }
 
@@ -62,7 +62,7 @@ SocketBuffer::send(size_t len)
 }
 
 SocketBuffer*
-SocketBuffer::from(Socket &socket, bool closeOnDestroy, size_type maxSize)
+SocketBuffer::from(Socket &socket, int actionOnDestroy, size_type maxSize)
 {
-	return (new SocketBuffer(socket, closeOnDestroy, maxSize));
+	return (new SocketBuffer(socket, actionOnDestroy, maxSize));
 }

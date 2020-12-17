@@ -20,8 +20,8 @@
 
 HTTPClient::HTTPClient(Socket &socket, const HTTPServer &server) :
 		m_socket(socket),
-		m_in(*SocketBuffer::from(socket, false)),
-		m_out(*SocketBuffer::from(socket, false)),
+		m_in(*SocketBuffer::from(socket, FileBuffer::NOTHING)),
+		m_out(*SocketBuffer::from(socket, FileBuffer::NOTHING)),
 		m_server(server),
 		m_parser(),
 		m_lastAction(),

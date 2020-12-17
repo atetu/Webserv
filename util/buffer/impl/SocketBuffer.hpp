@@ -30,7 +30,7 @@ class SocketBuffer :
 		operator =(const SocketBuffer &other);
 
 	protected:
-		SocketBuffer(Socket &socket, bool closeOnDestroy, size_type maxSize);
+		SocketBuffer(Socket &socket, int actionOnDestroy, size_type maxSize);
 
 	public:
 		virtual
@@ -44,7 +44,7 @@ class SocketBuffer :
 
 	public:
 		static SocketBuffer*
-		from(Socket &socket, bool closeOnDestroy = true, size_type maxSize = std::string::npos);
+		from(Socket &socket, int actionOnDestroy = FileBuffer::CLOSE, size_type maxSize = std::string::npos);
 };
 
 #endif /* SOCKETBUFFER_HPP_ */

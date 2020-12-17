@@ -57,7 +57,7 @@ GetHandler::handle(HTTPRequest &request)
 
 		headers.contentLength(st.st_size);
 
-		return (new HTTPResponse(*HTTPStatus::OK, headers, new HTTPResponse::FileBody(*FileBuffer::from(*FileDescriptor::wrap(fd)))));
+		return (new HTTPResponse(*HTTPStatus::OK, headers, new HTTPResponse::FileBody(*FileBuffer::from(*FileDescriptor::wrap(fd), FileBuffer::CLOSE | FileBuffer::DELETE))));
 	}
 
 	if (S_ISDIR(st.st_mode))

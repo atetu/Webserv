@@ -13,10 +13,10 @@
 #include <util/buffer/impl/FileBuffer.hpp>
 #include <algorithm>
 
-FileBuffer::FileBuffer(FileDescriptor &fileDescriptor, bool closeOnDestroy, size_type maxSize) :
+FileBuffer::FileBuffer(FileDescriptor &fileDescriptor, int actionOnDestroy, size_type maxSize) :
 		BaseBuffer(),
 		m_fd(fileDescriptor),
-		m_closeOnDestroy(closeOnDestroy),
+		m_actionOnDestroy(actionOnDestroy),
 		m_maxSize(maxSize),
 		m_readEverything(false)
 {
@@ -24,8 +24,11 @@ FileBuffer::FileBuffer(FileDescriptor &fileDescriptor, bool closeOnDestroy, size
 
 FileBuffer::~FileBuffer()
 {
-	if (m_closeOnDestroy)
+	if (m_actionOnDestroy & CLOSE)
 		close();
+
+	if (m_actionOnDestroy & DELETE)
+		delete &m_fd;
 }
 
 ssize_t
@@ -97,7 +100,7 @@ FileBuffer::close(void)
 }
 
 FileBuffer*
-FileBuffer::from(FileDescriptor &fileDescriptor, bool closeOnDestroy, size_type maxSize)
+FileBuffer::from(FileDescriptor &fileDescriptor, int actionOnDestroy, size_type maxSize)
 {
-	return (new FileBuffer(fileDescriptor, closeOnDestroy, maxSize));
+	return (new FileBuffer(fileDescriptor, actionOnDestroy, maxSize));
 }

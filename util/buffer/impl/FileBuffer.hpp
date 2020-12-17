@@ -23,9 +23,17 @@ class FileBuffer :
 		public BaseBuffer,
 		public Closable
 {
+	public:
+		enum ActionOnDestructorMode
+		{
+			NOTHING/**/= 0b00,
+			CLOSE/*  */= 0b01,
+			DELETE/* */= 0b10,
+		};
+
 	protected:
 		FileDescriptor &m_fd;
-		bool m_closeOnDestroy;
+		int m_actionOnDestroy;
 		size_type m_maxSize;
 		bool m_readEverything;
 
@@ -37,7 +45,7 @@ class FileBuffer :
 		operator =(const FileBuffer &other);
 
 	protected:
-		FileBuffer(FileDescriptor &fileDescriptor, bool closeOnDestroy, size_type maxSize);
+		FileBuffer(FileDescriptor &fileDescriptor, int actionOnDestroy, size_type maxSize);
 
 	public:
 		virtual
@@ -72,7 +80,7 @@ class FileBuffer :
 
 	public:
 		static FileBuffer*
-		from(FileDescriptor &fileDescriptor, bool closeOnDestroy = true, size_type maxSize = std::string::npos);
+		from(FileDescriptor &fileDescriptor, int actionOnDestroy = CLOSE, size_type maxSize = std::string::npos);
 
 };
 
