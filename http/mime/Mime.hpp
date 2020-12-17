@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Mime.hpp                                       :+:      :+:    :+:   */
+/*   Mime.hpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ecaceres <ecaceres@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -13,9 +13,10 @@
 #ifndef MIME_HPP_
 # define MIME_HPP_
 
-# include <iostream>
-# include <string>
-# include <list>
+#include <util/json/JsonArray.hpp>
+#include <util/json/JsonObject.hpp>
+#include <list>
+#include <string>
 
 class Mime
 {
@@ -29,7 +30,7 @@ class Mime
 		list m_extensions;
 
 	public:
-		Mime();
+		Mime(void);
 		Mime(const string &type, const string &extension);
 		Mime(const string &type, const list &extensions);
 		Mime(const Mime &other);
@@ -38,10 +39,17 @@ class Mime
 		operator =(const Mime &other);
 
 		const string&
-		type() const;
+		type(void) const;
 
 		const list&
-		extensions() const;
+		extensions(void) const;
+
+	public:
+		static Mime*
+		builder(const std::string &path, const std::string &key, const JsonArray &jsonArray);
+
+		static std::list<Mime const*>
+		builder(const std::string &path, const JsonObject &jsonObject);
 };
 
 #endif /* MIME_HPP_ */

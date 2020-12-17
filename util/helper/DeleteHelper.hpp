@@ -31,6 +31,17 @@ class DeleteHelper
 	public:
 		template<typename T>
 			static void
+			deletePointerList(Optional<std::list<T*> > &optional)
+			{
+				if (optional.present())
+				{
+					deletePointerList(optional.get());
+					optional.unset();
+				}
+			}
+
+		template<typename T>
+			static void
 			deletePointerList(Optional<std::list<T const*> > &optional)
 			{
 				if (optional.present())
@@ -38,6 +49,16 @@ class DeleteHelper
 					deletePointerList(optional.get());
 					optional.unset();
 				}
+			}
+
+		template<typename T>
+			static void
+			deletePointerList(std::list<T*> &blocks)
+			{
+				for (typename std::list<T*>::iterator it = blocks.begin(); it != blocks.end(); it++)
+					delete *it;
+
+				blocks.clear();
 			}
 
 		template<typename T>
@@ -52,13 +73,44 @@ class DeleteHelper
 
 		template<typename T>
 			static void
+			deletePointer(Optional<T*> &optional)
+			{
+				if (optional.present())
+				{
+					deletePointer(optional.get());
+					optional.unset();
+				}
+			}
+
+		template<typename T>
+			static void
 			deletePointer(Optional<T const*> &optional)
 			{
 				if (optional.present())
 				{
-					delete optional.get();
+					deletePointer(optional.get());
 					optional.unset();
 				}
+			}
+
+		template<typename T>
+			static void
+			deletePointer(T *&ptr)
+			{
+				if (ptr)
+					delete ptr;
+
+				ptr = NULL;
+			}
+
+		template<typename T>
+			static void
+			deletePointer(T const *&ptr)
+			{
+				if (ptr)
+					delete ptr;
+
+				ptr = NULL;
 			}
 };
 

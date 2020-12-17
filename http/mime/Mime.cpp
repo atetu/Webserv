@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Mime.cpp                                       :+:      :+:    :+:   */
+/*   Mime.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ecaceres <ecaceres@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -11,8 +11,10 @@
 /* ************************************************************************** */
 
 #include <http/mime/Mime.hpp>
+#include <util/helper/JsonBinderHelper.hpp>
+#include <util/json/JsonString.hpp>
 
-Mime::Mime() :
+Mime::Mime(void) :
 		m_type(),
 		m_extensions()
 {
@@ -50,13 +52,28 @@ Mime::operator =(const Mime &other)
 }
 
 const Mime::string&
-Mime::type() const
+Mime::type(void) const
 {
 	return (m_type);
 }
 
 const Mime::list&
-Mime::extensions() const
+Mime::extensions(void) const
 {
 	return (m_extensions);
+}
+
+Mime*
+Mime::builder(const std::string &path, const std::string &key, const JsonArray &jsonArray)
+{
+	const std::string &type = key;
+	const std::list<std::string> extensions = JsonBinderHelper::buildCollection<JsonString, std::string>(path, jsonArray);
+
+	return (new Mime(type, extensions));
+}
+
+std::list<Mime const*>
+Mime::builder(const std::string &path, const JsonObject &jsonObject)
+{
+	return (JsonBinderHelper::buildBlocks<Mime, JsonArray>(path, jsonObject, Mime::builder));
 }

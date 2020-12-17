@@ -72,7 +72,7 @@ Configuration::operator =(const Configuration &other)
 Configuration*
 Configuration::fromJsonFile(const std::string &path, bool ignoreMimeIncludesError)
 {
-	const JsonObject &jsonObject = JsonBuilder::rootObject(path);
+	const JsonObject *jsonObject = &JsonBuilder::rootObject(path);
 	RootBlock *rootBlock = NULL;
 	MimeRegistry *mimeRegistry = NULL;
 
@@ -80,8 +80,8 @@ Configuration::fromJsonFile(const std::string &path, bool ignoreMimeIncludesErro
 	{
 		LOG.trace() << "Building ROOT Block..." << std::endl;
 
-		rootBlock = JsonBuilder::buildRootBlock(jsonObject);
-		delete &jsonObject;
+		rootBlock = JsonBuilder::buildRootBlock(*jsonObject);
+		DeleteHelper::deletePointer(jsonObject);
 
 		LOG.trace() << "Root Block: " << rootBlock << std::endl;
 
@@ -101,34 +101,48 @@ Configuration::fromJsonFile(const std::string &path, bool ignoreMimeIncludesErro
 			{
 				const std::list<std::string> &includes = mimeBlock.includes().get();
 
+				LOG.debug() << "From " << includes.size() << " file(s)." << std::endl;
+
 				for (std::list<std::string>::const_iterator it = includes.begin(); it != includes.end(); it++)
 				{
+					const std::string &file = *it;
+
+					LOG.debug() << "Current file: " << file << std::endl;
+
 					try
 					{
-						mimeRegistry->loadFromFile(path);
+						mimeRegistry->loadFromFile(file);
 					}
 					catch (Exception &exception)
 					{
 						if (ignoreMimeIncludesError)
-							LOG.warn() << "Failed to include MIME file: " << *it << std::endl;
+							LOG.warn() << "Failed to include MIME file: " << file << std::endl;
 						else
 							throw ConfigurationException("Failed to include MIME file: " + exception.message());
 					}
 				}
 			}
+
+			if (mimeBlock.defines().present())
+			{
+				const std::list<Mime const*> &defines = mimeBlock.defines().get();
+
+				LOG.debug() << "From " << defines.size() << " define(s)." << std::endl;
+
+				for (std::list<Mime const*>::const_iterator it = defines.begin(); it != defines.end(); it++)
+					mimeRegistry->add(*(*it));
+			}
+
+			LOG.debug() << "MIME Registry final size: " << mimeRegistry->size() << std::endl;
 		}
 
 		return (new Configuration(path, *mimeRegistry, *rootBlock));
 	}
 	catch (...)
 	{
-		delete &jsonObject;
-
-		if (rootBlock)
-			delete rootBlock;
-
-		if (mimeRegistry)
-			delete mimeRegistry;
+		DeleteHelper::deletePointer(jsonObject);
+		DeleteHelper::deletePointer(rootBlock);
+		DeleteHelper::deletePointer(mimeRegistry);
 
 		throw;
 	}
@@ -234,7 +248,7 @@ Configuration::JsonBuilder::buildMimeBlock(const std::string &path, const JsonOb
 			std::string ipath = path + KEY_DOT KEY_MIME_DEFINE;
 			const JsonObject &object = JsonBinderHelper::jsonCast<JsonObject>(ipath, jsonObject.get(KEY_MIME_DEFINE));
 
-			mimeBlock->defines(JsonBinderHelper::buildBlocks<Mime, JsonArray>(ipath, object, Configuration::JsonBuilder::buildMime));
+			mimeBlock->defines(JsonBinderHelper::buildBlocks<Mime, JsonArray>(ipath, object, Mime::builder));
 		}
 	}
 	catch (...)
@@ -368,15 +382,6 @@ Configuration::JsonBuilder::buildLocationBlock(const std::string &path, const st
 	}
 
 	return (locationBlock);
-}
-
-Mime*
-Configuration::JsonBuilder::buildMime(const std::string &path, const std::string &key, const JsonArray &jsonArray)
-{
-	const std::string &type = key;
-	const std::list<std::string> extensions = JsonBinderHelper::buildCollection<JsonString, std::string>(path, jsonArray);
-
-	return (new Mime(type, extensions));
 }
 
 CustomErrorMap

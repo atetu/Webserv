@@ -105,14 +105,12 @@ class MimeRegistry
 		 * Load MIMEs from a compatible file.
 		 *
 		 * @param path File path.
-		 * @throws IOException If the file cannot be open.
-		 * @throws JsonException If the file format is not a valid JSON.
 		 */
 		void
-		loadFromFile(const std::string &path) throw (IOException);
+		loadFromFile(const std::string &path);
 
 		void
-		loadFromJson(const JsonObject &jsonObject);
+		loadFromJson(const std::string &path, const JsonObject &jsonObject);
 
 		/**
 		 * Get the normal mapping map size.
@@ -120,7 +118,7 @@ class MimeRegistry
 		 * @return Normal mapping's map size.
 		 */
 		size_t
-		size();
+		size() const;
 };
 
 #endif /* MIMEREGISTRY_HPP_ */

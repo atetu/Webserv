@@ -11,17 +11,14 @@
 /* ************************************************************************** */
 
 #include <http/mime/MimeRegistry.hpp>
-#include <stddef.h>
-#include <util/json/JsonArray.hpp>
-#include <util/json/JsonObject.hpp>
+#include <util/helper/DeleteHelper.hpp>
 #include <util/json/JsonReader.hpp>
-#include <util/json/JsonString.hpp>
-#include <util/json/JsonValue.hpp>
 #include <util/log/LoggerFactory.hpp>
 #include <iostream>
-#include <iterator>
 #include <list>
-#include <map>
+#include <utility>
+
+class DeleteHelper;
 
 Logger &MimeRegistry::LOG = LoggerFactory::get("MIME Registry");
 
@@ -97,7 +94,7 @@ MimeRegistry::add(const Mime &mime)
 	{
 		const std::string &extension = *it;
 
-		if ((old = findByFileExtension(extension)) != NULL)
+		if ((old = findByFileExtension(extension)) != NULL) // TODO Make merging instead of replace
 			delete old;
 
 		m_reverse_mapping[extension] = new Mime(mime);
@@ -135,64 +132,38 @@ MimeRegistry::findByFileExtension(const std::string &type) const
 }
 
 void
-MimeRegistry::loadFromFile(const std::string &path) throw (IOException)
+MimeRegistry::loadFromFile(const std::string &path)
 {
-	
 	JsonObject *object = JsonReader::fromFile(path).readObject();
 
-	loadFromJson(*object);
-
-	delete object;
-	
-	LOG.debug() << "Loaded " << size() << " MIME(s)" << std::endl;
-}
-
-void
-MimeRegistry::loadFromJson(const JsonObject &jsonObject)
-{
-	for (JsonObject::const_iterator it = jsonObject.begin(); it != jsonObject.end(); it++)
+	try
 	{
-		const std::string &mimeType = it->first;
-		JsonValue *jsonValue = it->second;
+		loadFromJson("<root: " + path + ">", *object);
 
-		if (jsonValue->type() != JsonValue::TYPE_ARRAY)
-		{
-			LOG.warn() << "not an array: " << jsonValue->typeString() << " (key: " << mimeType << ")" << std::endl;
-			continue;
-		}
+		LOG.debug() << "Loaded " << size() << " MIME(s)" << std::endl;
 
-		JsonArray *jsonArray = jsonValue->cast<JsonArray>();
-
-		std::list<std::string> extensions;
-
-		size_t index = 0;
-		for (JsonArray::iterator ait = jsonArray->begin(); ait != jsonArray->end(); ait++)
-		{
-			jsonValue = *ait; /* Recycled variable */
-
-			if (jsonValue->type() != JsonValue::TYPE_STRING)
-			{
-				LOG.warn() << "not a string (key: " << it->first << ", index: " << index << ")" << std::endl;
-				continue;
-			}
-
-			extensions.push_back(*(jsonValue->cast<JsonString>())); // TODO Safe check?
-
-			index++;
-		}
-
-		if (extensions.empty())
-		{
-			LOG.warn() << "no usable data (or empty, key: " << mimeType << ")" << std::endl;
-			continue;
-		}
-
-		add(Mime(mimeType, extensions));
+		delete object;
+	}
+	catch (...)
+	{
+		delete object;
+		throw;
 	}
 }
 
+void
+MimeRegistry::loadFromJson(const std::string &path, const JsonObject &jsonObject)
+{
+	std::list<Mime const*> mimes = Mime::builder(path, jsonObject);
+
+	for (std::list<Mime const*>::iterator it = mimes.begin(); it != mimes.end(); it++)
+		add(*(*it));
+
+	DeleteHelper::deletePointerList(mimes);
+}
+
 size_t
-MimeRegistry::size()
+MimeRegistry::size() const
 {
 	return (m_mapping.size());
 }

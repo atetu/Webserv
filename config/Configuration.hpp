@@ -118,9 +118,6 @@ class Configuration
 				static LocationBlock*
 				buildLocationBlock(const std::string &path, const std::string &key, const JsonObject &jsonObject);
 
-				static Mime*
-				buildMime(const std::string &path, const std::string &key, const JsonArray &jsonArray);
-
 				static CustomErrorMap
 				buildCustomErrorMap(const std::string &path, const JsonObject &jsonObject);
 		};
