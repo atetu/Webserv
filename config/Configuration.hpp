@@ -14,17 +14,8 @@
 # define CONFIGURATION_HPP_
 
 #include <config/block/RootBlock.hpp>
-#include <config/exceptions/ConfigurationBindException.hpp>
 #include <http/mime/MimeRegistry.hpp>
-#include <util/Convert.hpp>
-#include <util/json/JsonArray.hpp>
 #include <util/json/JsonObject.hpp>
-#include <util/json/JsonReader.hpp>
-#include <util/Objects.hpp>
-#include <util/Optional.hpp>
-#include <iterator>
-#include <list>
-#include <map>
 #include <string>
 
 // TODO: All blocks need deep-copy, same goes for mime registry
@@ -120,6 +111,13 @@ class Configuration
 
 				static CustomErrorMap
 				buildCustomErrorMap(const std::string &path, const JsonObject &jsonObject);
+		};
+
+		class Validator
+		{
+			public:
+				static void
+				validate(const RootBlock &rootBlock);
 		};
 };
 

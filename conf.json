@@ -37,7 +37,7 @@
 					],
 					"alias": "icon.png"
 				},
-				"/xx": {
+				"/xx/": {
 					"methods": [
 						"GET",
 						"POST",
@@ -48,13 +48,9 @@
 					"index": [
 						"index.html",
 						"index-webserv.html"
-					],
-					"uploads": {
-						"enabled": true,
-						"storeAt": "/var/www/html"
-					}
+					]
 				},
-				"/yy": {
+				"/yy/": {
 					"methods": [
 						"GET",
 						"POST",
