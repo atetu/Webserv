@@ -6,7 +6,7 @@
 /*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/28 11:34:45 by ecaceres          #+#    #+#             */
-/*   Updated: 2020/12/15 12:30:28 by alicetetu        ###   ########.fr       */
+/*   Updated: 2020/12/17 11:23:35 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@
 #include <config/block/LocationBlock.hpp>
 #include <util/Optional.hpp>
 #include <util/unit/DataSize.hpp>
+#include <http/HTTPFindLocation.hpp>
 #include <list>
 #include <map>
 #include <string>
@@ -104,6 +105,13 @@ class ServerBlock
 		{
 			return (m_errors);
 		}
+
+		// inline const LocationBlock*
+		// ServerBlock::findLocation(const std::string &path) const
+		// {
+		// 	HTTPFindLocation findLocation(path, m_locations.get());
+		// 	return (findLocation.parse().location().get());
+		// }
 
 	public:
 		static const std::string DEFAULT_HOST;

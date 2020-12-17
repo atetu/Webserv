@@ -6,17 +6,9 @@
 /*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/09 11:39:57 by alicetetu         #+#    #+#             */
-/*   Updated: 2020/12/14 11:36:10 by alicetetu        ###   ########.fr       */
+/*   Updated: 2020/12/17 10:54:59 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-
-/*
-HTTPHeaderFields headerFields;
-
-consume -> jusau'au :
-comparaison ave strdings de HTTPHeaderFields
-set HTTPHEADERFields
-*/
 
 #include <exception/Exception.hpp>
 #include <http/HTTPHeaderParser.hpp>

@@ -6,7 +6,7 @@
 /*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/28 11:34:45 by ecaceres          #+#    #+#             */
-/*   Updated: 2020/12/16 14:18:38 by alicetetu        ###   ########.fr       */
+/*   Updated: 2020/12/17 11:10:44 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -116,3 +116,11 @@ ServerBlock::errors(const CustomErrorMap &errors)
 
 	return (*this);
 }
+
+
+// inline const LocationBlock*
+// ServerBlock::findLocations(const std::string &path) const
+// {
+// 	HTTPFindLocation findLocation(path, m_locations.get());
+// 	return (findLocation.parse().location().get());
+// }

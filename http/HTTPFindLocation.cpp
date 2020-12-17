@@ -6,7 +6,7 @@
 /*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/15 15:24:50 by alicetetu         #+#    #+#             */
-/*   Updated: 2020/12/16 17:07:53 by alicetetu        ###   ########.fr       */
+/*   Updated: 2020/12/17 10:03:04 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,7 +68,7 @@ HTTPFindLocation::location(void) const
 
 
 
-void
+HTTPFindLocation&
 HTTPFindLocation::parse(void)
 {
 	std::list<const LocationBlock*>::iterator it = m_serverLocations.begin();
@@ -135,5 +135,6 @@ HTTPFindLocation::parse(void)
 		
 		it++;
 	}
+	return (*this);
 }
 

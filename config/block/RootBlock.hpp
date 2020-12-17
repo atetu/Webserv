@@ -73,6 +73,42 @@ class RootBlock
 		{
 			return (m_cgiBlocks);
 		}
+
+		inline const ServerBlock*
+		findServerBlock(const std::string &clientHost) const
+		{
+			const ServerBlock* serverBlock;
+			std::list<const ServerBlock*> serverBlockList = m_serverBlocks.get();
+			std::list<const ServerBlock*>::iterator server_it = serverBlockList.begin();
+			std::list<const ServerBlock*>::iterator server_ite = serverBlockList.end();
+			int found = 0;
+										
+			while (server_it != server_ite)
+			{
+				if ((*server_it)->names().present())
+				{
+					std::list<std::string> serverNames = (*server_it)->names().get();
+					std::list<std::string>::iterator serverNames_it = serverNames.begin();
+					std::list<std::string>::iterator serverNames_ite = serverNames.end();
+
+					while (serverNames_it != serverNames_ite)
+					{
+						if (serverNames_it->compare(clientHost) == 0)
+						{
+							serverBlock = *server_it;
+							found = 1;
+							break;
+						}
+						serverNames_it++;
+					}
+												
+				}
+				if (found)
+					break;
+				server_it++;
+			}
+			return (serverBlock); // what happens if does not exit?
+		}
 };
 
 #endif /* ROOTBLOCK_HPP_ */

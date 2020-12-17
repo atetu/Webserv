@@ -6,7 +6,7 @@
 /*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/27 18:39:24 by ecaceres          #+#    #+#             */
-/*   Updated: 2020/12/14 14:11:30 by alicetetu        ###   ########.fr       */
+/*   Updated: 2020/12/17 11:05:01 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -305,7 +305,7 @@ HTTPHeaderFields::storage(void)
 	return (m_storage);
 }
 
-#if 0
+// #if 0
 HTTPValueParser*
 HTTPHeaderFields::getValueWithWeight(std::string field)
 {
@@ -402,4 +402,4 @@ HTTPHeaderFields::create(std::vector<HTTPHeaderParser> headerParser)
 	}
 	return (header);
 }
-#endif
+// #endif

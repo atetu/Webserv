@@ -6,7 +6,7 @@
 /*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/28 14:34:10 by ecaceres          #+#    #+#             */
-/*   Updated: 2020/12/16 10:49:11 by alicetetu        ###   ########.fr       */
+/*   Updated: 2020/12/17 11:24:36 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -303,30 +303,44 @@ HTTPOrchestrator::start()
 							if (client->parser().state() == HTTPRequestParser::S_END)
 							{
 								// TODO Route matching
-
-
-//	ENZO : not the right version but something like that that what suppressed during merging ?? Lacks thet part regarging route maching but not difficult to do it again
-								
-										// if (cli->parser.state() == HttpRequestParser::S_CONTINUE)
-								// {
-								// 	while (1)
-								// 	{
-								// 		HTTPHeaderParser headerParser;
-								// 		headerParser.consume(c);
+								if (client->parser().state() == HTTPRequestParser::S_CONTINUE)
+								{
+									char y = client->parser().lastChar();
+									
+									while (1)
+									{
+										HTTPHeaderParser headerParser;
+										headerParser.consume(y);
 						
-								// 		while (cli->fd->consume(&c))
-								// 		{
-								// 			headerParser.consume(c);
-								// 			if (headerParser.state() == HTTPHeaderParser::S_END || headerParser.state() == HttpHeaderParser::S_CONTINUE)
-								// 			break;
-								// 		}
-								// 		cli->header(headerParser);
-								// 		if (headerParser.state() == HTTPHeaderParser::S_END)
-								// 			break;
-								// 	}
-								// }
+										while (client->in().next(c))
+										{
+											headerParser.consume(c);
+											if (headerParser.state() == HTTPHeaderParser::S_END || headerParser.state() == HTTPHeaderParser::S_CONTINUE)
+												break;
+										}
+										client->header(headerParser);
+										if (headerParser.state() == HTTPHeaderParser::S_END)
+											break;
+									}
+								}
+							
+								HTTPHeaderFields *header = HTTPHeaderFields::create(client->getHeader());
 								
+								std::map<std::string, std::string>::iterator header_it = header->storage().find("Host");
+								if (header_it == header->storage().end())
+									throw Exception("No host in header fields");
+									
+								std::string clientHost = header_it->second;
+								
+								const ServerBlock *serverBlock = m_configuration.rootBlock().findServerBlock(clientHost); // ca marche avec inline juste. Pourquoi ?? + explication du const a la fin de fonction?
+													
+								//const LocationBlock *locationBlock = serverBlock->findLocation(client->parser().path()); //ne fonctionne pas je ne sais pas pourquoi :(((
+								
+								HTTPFindLocation findLocation(client->parser().path(), serverBlock->locations().get());
+								const LocationBlock *locationBlock = findLocation.parse().location().get();
+			
 								const HTTPMethod *method = HTTPMethod::find(client->parser().method());
+								
 								if (!method)
 									client->response() = HTTPResponse::status(*HTTPStatus::METHOD_NOT_ALLOWED);
 								else

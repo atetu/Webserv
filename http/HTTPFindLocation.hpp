@@ -6,7 +6,7 @@
 /*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/15 15:24:48 by alicetetu         #+#    #+#             */
-/*   Updated: 2020/12/16 15:48:11 by alicetetu        ###   ########.fr       */
+/*   Updated: 2020/12/17 10:02:05 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,7 @@ class HTTPFindLocation
 		const Optional<const LocationBlock*>
 		location(void) const;
 
-		void
+		HTTPFindLocation&
 		parse(void);
 };
 
