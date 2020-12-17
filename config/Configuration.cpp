@@ -16,10 +16,8 @@
 #include <config/block/MimeBlock.hpp>
 #include <config/block/ServerBlock.hpp>
 #include <config/Configuration.hpp>
-#include <config/exceptions/ConfigurationBindException.hpp>
 #include <http/mime/Mime.hpp>
-#include <util/json/JsonBoolean.hpp>
-#include <util/json/JsonNumber.hpp>
+#include <util/helper/JsonBinderHelper.hpp>
 #include <util/json/JsonString.hpp>
 #include <util/json/JsonValue.hpp>
 #include <util/log/Logger.hpp>
@@ -71,6 +69,71 @@ Configuration::operator =(const Configuration &other)
 	return (*this);
 }
 
+Configuration*
+Configuration::fromJsonFile(const std::string &path, bool ignoreMimeIncludesError)
+{
+	const JsonObject &jsonObject = JsonBuilder::rootObject(path);
+	RootBlock *rootBlock = NULL;
+	MimeRegistry *mimeRegistry = NULL;
+
+	try
+	{
+		LOG.trace() << "Building ROOT Block..." << std::endl;
+
+		rootBlock = JsonBuilder::buildRootBlock(jsonObject);
+		delete &jsonObject;
+
+		LOG.trace() << "Root Block: " << rootBlock << std::endl;
+
+		LOG.trace() << "Validating..." << std::endl;
+
+		// TODO Make validation
+
+		LOG.trace() << "Filling MIME registry..." << std::endl;
+
+		mimeRegistry = new MimeRegistry();
+
+		if (rootBlock->mimeBlock().present())
+		{
+			const MimeBlock &mimeBlock = *rootBlock->mimeBlock().get();
+
+			if (mimeBlock.includes().present())
+			{
+				const std::list<std::string> &includes = mimeBlock.includes().get();
+
+				for (std::list<std::string>::const_iterator it = includes.begin(); it != includes.end(); it++)
+				{
+					try
+					{
+						mimeRegistry->loadFromFile(path);
+					}
+					catch (Exception &exception)
+					{
+						if (ignoreMimeIncludesError)
+							LOG.warn() << "Failed to include MIME file: " << *it << std::endl;
+						else
+							throw ConfigurationException("Failed to include MIME file: " + exception.message());
+					}
+				}
+			}
+		}
+
+		return (new Configuration(path, *mimeRegistry, *rootBlock));
+	}
+	catch (...)
+	{
+		delete &jsonObject;
+
+		if (rootBlock)
+			delete rootBlock;
+
+		if (mimeRegistry)
+			delete mimeRegistry;
+
+		throw;
+	}
+}
+
 #define BIND(object, key, jsonType, type, to, apply) \
 			BIND_CUSTOM(object, key, jsonType, type, to->apply((type) value));
 
@@ -80,36 +143,12 @@ Configuration::operator =(const Configuration &other)
 				std::string ipath = path + KEY_DOT + key;                               \
 				const JsonValue *jsonValue = (object).get(key);                         \
 																						\
-				type value = jsonCast<jsonType>(ipath, jsonValue);                      \
+				type value = JsonBinderHelper::jsonCast<jsonType>(ipath, jsonValue);    \
 																						\
 				do {                                                                    \
 					apply;                                                              \
 				} while (0);                                                            \
 			}
-
-Configuration*
-Configuration::fromJsonFile(const std::string &filepath)
-{
-	const JsonObject &jsonObject = JsonBuilder::rootObject(filepath);
-
-	try
-	{
-		RootBlock *rootBlock = JsonBuilder::buildRootBlock(jsonObject);
-		MimeRegistry *mimeRegistry = new MimeRegistry();
-
-		LOG.trace() << "Root Block: " << rootBlock << std::endl;
-
-		delete &jsonObject;
-
-		return (new Configuration(filepath, *mimeRegistry, *rootBlock));
-	}
-	catch (...)
-	{
-		delete &jsonObject;
-
-		throw;
-	}
-}
 
 const JsonObject&
 Configuration::JsonBuilder::rootObject(const std::string &filepath)
@@ -118,7 +157,7 @@ Configuration::JsonBuilder::rootObject(const std::string &filepath)
 
 	try
 	{
-		return (jsonCast<JsonObject>(KEY_ROOT, jsonValue));
+		return (JsonBinderHelper::jsonCast<JsonObject>(KEY_ROOT, jsonValue));
 	}
 	catch (...)
 	{
@@ -137,7 +176,7 @@ Configuration::JsonBuilder::buildRootBlock(const JsonObject &jsonObject)
 		if (jsonObject.has(KEY_ROOT_ROOT))
 		{
 			std::string ipath = KEY_ROOT KEY_DOT KEY_ROOT_ROOT;
-			const JsonString &string = jsonCast<JsonString>(ipath, jsonObject.get(KEY_ROOT_ROOT));
+			const JsonString &string = JsonBinderHelper::jsonCast<JsonString>(ipath, jsonObject.get(KEY_ROOT_ROOT));
 
 			rootBlock->root(string);
 		}
@@ -145,7 +184,7 @@ Configuration::JsonBuilder::buildRootBlock(const JsonObject &jsonObject)
 		if (jsonObject.has(KEY_ROOT_MIME))
 		{
 			std::string piath = KEY_ROOT KEY_DOT KEY_ROOT_MIME;
-			const JsonObject &object = jsonCast<JsonObject>(piath, jsonObject.get(KEY_ROOT_MIME));
+			const JsonObject &object = JsonBinderHelper::jsonCast<JsonObject>(piath, jsonObject.get(KEY_ROOT_MIME));
 
 			rootBlock->mimeBlock(*buildMimeBlock(piath, object));
 		}
@@ -153,17 +192,17 @@ Configuration::JsonBuilder::buildRootBlock(const JsonObject &jsonObject)
 		if (jsonObject.has(KEY_ROOT_CGI))
 		{
 			std::string ipath = KEY_ROOT KEY_DOT KEY_ROOT_CGI;
-			const JsonObject &object = jsonCast<JsonObject>(ipath, jsonObject.get(KEY_ROOT_CGI));
+			const JsonObject &object = JsonBinderHelper::jsonCast<JsonObject>(ipath, jsonObject.get(KEY_ROOT_CGI));
 
-			rootBlock->cgiBlocks(buildBlocks<CGIBlock, JsonObject>(ipath, object, &Configuration::JsonBuilder::buildCGIBlock));
+			rootBlock->cgiBlocks(JsonBinderHelper::buildBlocks<CGIBlock, JsonObject>(ipath, object, &Configuration::JsonBuilder::buildCGIBlock));
 		}
 
 		if (jsonObject.has(KEY_ROOT_SERVERS))
 		{
 			std::string ipath = KEY_ROOT KEY_DOT KEY_ROOT_SERVERS;
-			const JsonArray &array = jsonCast<JsonArray>(ipath, jsonObject.get(KEY_ROOT_SERVERS));
+			const JsonArray &array = JsonBinderHelper::jsonCast<JsonArray>(ipath, jsonObject.get(KEY_ROOT_SERVERS));
 
-			rootBlock->serverBlocks(buildBlocks<ServerBlock, JsonObject>(ipath, array, &Configuration::JsonBuilder::buildServerBlock));
+			rootBlock->serverBlocks(JsonBinderHelper::buildBlocks<ServerBlock, JsonObject>(ipath, array, &Configuration::JsonBuilder::buildServerBlock));
 		}
 	}
 	catch (...)
@@ -185,17 +224,17 @@ Configuration::JsonBuilder::buildMimeBlock(const std::string &path, const JsonOb
 		if (jsonObject.has(KEY_MIME_INCLUDES))
 		{
 			std::string ipath = path + KEY_DOT KEY_MIME_INCLUDES;
-			const JsonArray &array = jsonCast<JsonArray>(ipath, jsonObject.get(KEY_MIME_INCLUDES));
+			const JsonArray &array = JsonBinderHelper::jsonCast<JsonArray>(ipath, jsonObject.get(KEY_MIME_INCLUDES));
 
-			mimeBlock->includes(buildCollection<JsonString, std::string>(ipath, array));
+			mimeBlock->includes(JsonBinderHelper::buildCollection<JsonString, std::string>(ipath, array));
 		}
 
 		if (jsonObject.has(KEY_MIME_DEFINE))
 		{
 			std::string ipath = path + KEY_DOT KEY_MIME_DEFINE;
-			const JsonObject &object = jsonCast<JsonObject>(ipath, jsonObject.get(KEY_MIME_DEFINE));
+			const JsonObject &object = JsonBinderHelper::jsonCast<JsonObject>(ipath, jsonObject.get(KEY_MIME_DEFINE));
 
-			mimeBlock->defines(buildBlocks<Mime, JsonArray>(ipath, object, Configuration::JsonBuilder::buildMime));
+			mimeBlock->defines(JsonBinderHelper::buildBlocks<Mime, JsonArray>(ipath, object, Configuration::JsonBuilder::buildMime));
 		}
 	}
 	catch (...)
@@ -244,7 +283,7 @@ Configuration::JsonBuilder::buildServerBlock(const std::string &path, const Json
 
 			const JsonValue *jsonValue = jsonObject.get(KEY_SERVER_NAME);
 			if (jsonValue->instanceOf<JsonArray>())
-				names = buildCollection<JsonString, std::string>(ipath, *(jsonValue->cast<JsonArray>()));
+				names = JsonBinderHelper::buildCollection<JsonString, std::string>(ipath, *(jsonValue->cast<JsonArray>()));
 			else if (jsonValue->instanceOf<JsonString>())
 				names.push_back(jsonValue->cast<JsonString>()->operator std::string());
 			else
@@ -272,15 +311,15 @@ Configuration::JsonBuilder::buildServerBlock(const std::string &path, const Json
 		if (jsonObject.has(KEY_SERVER_LOCATIONS))
 		{
 			std::string ipath = path + KEY_DOT KEY_SERVER_LOCATIONS;
-			const JsonObject &object = jsonCast<JsonObject>(ipath, jsonObject.get(KEY_SERVER_LOCATIONS));
+			const JsonObject &object = JsonBinderHelper::jsonCast<JsonObject>(ipath, jsonObject.get(KEY_SERVER_LOCATIONS));
 
-			serverBlock->locations(buildBlocks<LocationBlock, JsonObject>(ipath, object, &Configuration::JsonBuilder::buildLocationBlock));
+			serverBlock->locations(JsonBinderHelper::buildBlocks<LocationBlock, JsonObject>(ipath, object, &Configuration::JsonBuilder::buildLocationBlock));
 		}
 
 		if (jsonObject.has(KEY_SERVER_ERRORS))
 		{
 			std::string ipath = path + KEY_DOT KEY_SERVER_ERRORS;
-			const JsonObject &object = jsonCast<JsonObject>(ipath, jsonObject.get(KEY_SERVER_ERRORS));
+			const JsonObject &object = JsonBinderHelper::jsonCast<JsonObject>(ipath, jsonObject.get(KEY_SERVER_ERRORS));
 
 			serverBlock->errors(buildCustomErrorMap(ipath, object));
 		}
@@ -309,17 +348,17 @@ Configuration::JsonBuilder::buildLocationBlock(const std::string &path, const st
 		if (jsonObject.has(KEY_LOCATION_METHODS))
 		{
 			std::string ipath = path + KEY_DOT KEY_LOCATION_METHODS;
-			const JsonArray &array = jsonCast<JsonArray>(ipath, jsonObject.get(KEY_LOCATION_METHODS));
+			const JsonArray &array = JsonBinderHelper::jsonCast<JsonArray>(ipath, jsonObject.get(KEY_LOCATION_METHODS));
 
-			locationBlock->methods(buildCollection<JsonString, std::string>(ipath, array));
+			locationBlock->methods(JsonBinderHelper::buildCollection<JsonString, std::string>(ipath, array));
 		}
 
 		if (jsonObject.has(KEY_LOCATION_INDEX_FILES))
 		{
 			std::string ipath = path + KEY_DOT KEY_LOCATION_INDEX_FILES;
-			const JsonArray &array = jsonCast<JsonArray>(ipath, jsonObject.get(KEY_LOCATION_INDEX_FILES));
+			const JsonArray &array = JsonBinderHelper::jsonCast<JsonArray>(ipath, jsonObject.get(KEY_LOCATION_INDEX_FILES));
 
-			locationBlock->index(buildCollection<JsonString, std::string>(ipath, array));
+			locationBlock->index(JsonBinderHelper::buildCollection<JsonString, std::string>(ipath, array));
 		}
 	}
 	catch (...)
@@ -335,7 +374,7 @@ Mime*
 Configuration::JsonBuilder::buildMime(const std::string &path, const std::string &key, const JsonArray &jsonArray)
 {
 	const std::string &type = key;
-	const std::list<std::string> extensions = buildCollection<JsonString, std::string>(path, jsonArray);
+	const std::list<std::string> extensions = JsonBinderHelper::buildCollection<JsonString, std::string>(path, jsonArray);
 
 	return (new Mime(type, extensions));
 }
@@ -356,7 +395,7 @@ Configuration::JsonBuilder::buildCustomErrorMap(const std::string &path, const J
 				throw ConfigurationBindException("key '" + key + "' must only contains numbers (" + path + ")");
 		}
 
-		const JsonString &value = jsonCast<JsonString>(path + KEY_DOT + key, it->second);
+		const JsonString &value = JsonBinderHelper::jsonCast<JsonString>(path + KEY_DOT + key, it->second);
 
 		std::stringstream stream;
 		stream << key;

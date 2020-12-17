@@ -11,7 +11,7 @@
 /* ************************************************************************** */
 
 #include <config/block/RootBlock.hpp>
-#include <config/Configuration.hpp>
+#include <util/helper/DeleteHelper.hpp>
 
 RootBlock::RootBlock() :
 		m_root(),
@@ -31,9 +31,9 @@ RootBlock::RootBlock(const RootBlock &other) :
 
 RootBlock::~RootBlock()
 {
-	Configuration::deleteBlocks<ServerBlock>(m_serverBlocks);
-	Configuration::deleteBlocks<CGIBlock>(m_cgiBlocks);
-	Configuration::deleteBlock<MimeBlock>(m_mimeBlock);
+	DeleteHelper::deletePointerList<ServerBlock>(m_serverBlocks);
+	DeleteHelper::deletePointerList<CGIBlock>(m_cgiBlocks);
+	DeleteHelper::deletePointer<MimeBlock>(m_mimeBlock);
 }
 
 RootBlock&

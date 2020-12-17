@@ -94,39 +94,7 @@ class Configuration
 
 	public:
 		static Configuration*
-		fromJsonFile(const std::string &path);
-
-		template<typename T>
-			static void
-			deleteBlocks(Optional<std::list<T const*> > &optional)
-			{
-				if (optional.present())
-				{
-					deleteBlocks(optional.get());
-					optional.unset();
-				}
-			}
-
-		template<typename T>
-			static void
-			deleteBlocks(std::list<T const*> &blocks)
-			{
-				for (typename std::list<T const*>::iterator it = blocks.begin(); it != blocks.end(); it++)
-					delete *it;
-
-				blocks.clear();
-			}
-
-		template<typename T>
-			static void
-			deleteBlock(Optional<T const*> &optional)
-			{
-				if (optional.present())
-				{
-					delete optional.get();
-					optional.unset();
-				}
-			}
+		fromJsonFile(const std::string &path, bool ignoreMimeIncludesError);
 
 	private:
 		class JsonBuilder
@@ -134,85 +102,6 @@ class Configuration
 			public:
 				static const JsonObject&
 				rootObject(const std::string &filepath);
-
-				template<typename T, typename JT>
-					static std::list<T const*>
-					buildBlocks(const std::string &path, const JsonArray &jsonArray, T*
-					(*builder)(const std::string&, const JT&))
-					{
-						std::list<const T*> blocks;
-
-						try
-						{
-							int index = 0;
-							for (JsonArray::const_iterator it = jsonArray.begin(); it != jsonArray.end(); it++)
-							{
-								std::string ipath = path + "[" + Convert::toString(index) + "]";
-								const JT &jsonType = jsonCast<JT>(ipath, *it);
-
-								blocks.push_back((*builder)(ipath, jsonType));
-
-								index++;
-							}
-						}
-						catch (...)
-						{
-							Configuration::deleteBlocks<T>(blocks);
-
-							throw;
-						}
-
-						return (blocks);
-					}
-
-				template<typename T, typename JT>
-					static std::list<T const*>
-					buildBlocks(const std::string &path, const JsonObject &jsonObject, T*
-					(*builder)(const std::string&, const std::string&, const JT&))
-					{
-						std::list<const T*> blocks;
-
-						try
-						{
-							for (JsonObject::const_iterator it = jsonObject.begin(); it != jsonObject.end(); it++)
-							{
-								const std::string &key = it->first;
-								std::string ipath = path + KEY_DOT + key;
-								const JT &jsonType = jsonCast<JT>(ipath, it->second);
-
-								blocks.push_back((*builder)(ipath, key, jsonType));
-							}
-						}
-						catch (...)
-						{
-							Configuration::deleteBlocks<T>(blocks);
-
-							throw;
-						}
-
-						return (blocks);
-					}
-
-				template<typename JT, typename T>
-					static std::list<T>
-					buildCollection(const std::string &path, const JsonArray &jsonArray)
-					{
-						std::list<T> items;
-
-						int index = 0;
-						for (JsonArray::const_iterator it = jsonArray.begin(); it != jsonArray.end(); it++)
-						{
-							std::string ipath = path + "[" + Convert::toString(index) + "]";
-							const JT &jsonType = jsonCast<JT>(ipath, *it);
-
-							T item = jsonType; /* Automatic type operator cast. */
-							items.push_back(item);
-
-							index++;
-						}
-
-						return (items);
-					}
 
 				static RootBlock*
 				buildRootBlock(const JsonObject &jsonObject);
@@ -234,18 +123,6 @@ class Configuration
 
 				static CustomErrorMap
 				buildCustomErrorMap(const std::string &path, const JsonObject &jsonObject);
-
-				template<typename T>
-					static const T&
-					jsonCast(const std::string &path, const JsonValue *jsonValue)
-					{
-						Objects::requireNonNull(jsonValue, "jsonValue == null");
-
-						if (!jsonValue->instanceOf<T>())
-							throw ConfigurationBindException::uncastable<T>(path, *jsonValue);
-
-						return (*(jsonValue->cast<T>()));
-					}
 		};
 };
 

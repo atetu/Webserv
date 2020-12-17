@@ -41,13 +41,13 @@ class MimeBlock
 		defines(const std::list<Mime const*> &defines);
 
 		const Optional<std::list<std::string> >&
-		includes()
+		includes() const
 		{
 			return (m_includes);
 		}
 
 		const Optional<std::list<Mime const*> >&
-		defines()
+		defines() const
 		{
 			return (m_defines);
 		}

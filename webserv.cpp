@@ -33,21 +33,24 @@ const Option OPT_HELP('h', "help", "display this help message");
 const Option OPT_LOG_LEVEL('l', "log-level", "change the log-level", "level");
 const Option OPT_CHECK('c', "check", "only check the config file");
 const Option OPT_CONFIG_FILE('f', "config-file", "specify the config file", "file");
+const Option OPT_IGNORE_MIME_INCLUDES_ERROR('m', "ignore-mime-includes-error", "only warn when a MIME file inclusion cause an error");
 
 int
 delegated_main(int argc, char **argv)
 {
 	const char *program = argv[0];
 
-	std::string configFile = "conf.json";
-	bool checkOnly = false;
 	const LogLevel *level = LogLevel::INFO;
+	bool checkOnly = false;
+	bool ignoreMimeIncludesError = false;
+	std::string configFile = "conf.json";
 
 	std::list<const Option*> lst;
 	lst.push_back(&OPT_HELP);
 	lst.push_back(&OPT_LOG_LEVEL);
 	lst.push_back(&OPT_CHECK);
 	lst.push_back(&OPT_CONFIG_FILE);
+	lst.push_back(&OPT_IGNORE_MIME_INCLUDES_ERROR);
 
 	OptionParser parser(lst);
 
@@ -78,9 +81,10 @@ delegated_main(int argc, char **argv)
 		}
 
 		if (commandLine.has(OPT_CHECK))
-		{
 			checkOnly = true;
-		}
+
+		if (commandLine.has(OPT_IGNORE_MIME_INCLUDES_ERROR))
+			ignoreMimeIncludesError = true;
 
 		if (commandLine.has(OPT_CONFIG_FILE))
 			configFile = commandLine.last(OPT_CONFIG_FILE);
@@ -103,7 +107,7 @@ delegated_main(int argc, char **argv)
 	{
 		LOG.debug() << "Loading configuration... (path: " << configFile << ")" << std::endl;
 
-		configuration = Configuration::fromJsonFile(configFile);
+		configuration = Configuration::fromJsonFile(configFile, ignoreMimeIncludesError);
 	}
 	catch (IOException &exception)
 	{

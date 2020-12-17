@@ -11,7 +11,7 @@
 /* ************************************************************************** */
 
 #include <config/block/ServerBlock.hpp>
-#include <config/Configuration.hpp>
+#include <util/helper/DeleteHelper.hpp>
 
 class Configuration;
 
@@ -41,7 +41,7 @@ ServerBlock::ServerBlock(const ServerBlock &other) :
 
 ServerBlock::~ServerBlock()
 {
-	Configuration::deleteBlocks<LocationBlock>(m_locations);
+	DeleteHelper::deletePointerList<LocationBlock>(m_locations);
 }
 
 ServerBlock&

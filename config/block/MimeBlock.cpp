@@ -11,7 +11,7 @@
 /* ************************************************************************** */
 
 #include <config/block/MimeBlock.hpp>
-#include <config/Configuration.hpp>
+#include <util/helper/DeleteHelper.hpp>
 
 MimeBlock::MimeBlock() :
 		m_includes(),
@@ -27,7 +27,7 @@ MimeBlock::MimeBlock(const MimeBlock &other) :
 
 MimeBlock::~MimeBlock()
 {
-	Configuration::deleteBlocks<Mime>(m_defines);
+	DeleteHelper::deletePointerList<Mime>(m_defines);
 }
 
 MimeBlock&
