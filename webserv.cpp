@@ -13,6 +13,7 @@
 #include <config/Configuration.hpp>
 #include <config/exceptions/ConfigurationBindException.hpp>
 #include <config/exceptions/ConfigurationValidateException.hpp>
+#include <sys/signal.h>
 #include <exception/IOException.hpp>
 #include <http/HTTPOrchestrator.hpp>
 #include <util/ContainerBuilder.hpp>
@@ -25,6 +26,7 @@
 #include <util/options/CommandLine.hpp>
 #include <util/options/Option.hpp>
 #include <util/options/OptionParser.hpp>
+#include <csignal>
 #include <iostream>
 #include <list>
 #include <string>
@@ -168,6 +170,7 @@ main(int argc, char **argv)
 
 	try
 	{
+		signal(SIGPIPE, SIG_IGN);
 		exitCode = delegated_main(argc, argv);
 	}
 	catch (std::exception &exception)
