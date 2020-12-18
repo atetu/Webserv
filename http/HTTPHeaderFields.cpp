@@ -6,7 +6,7 @@
 /*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/27 18:39:24 by ecaceres          #+#    #+#             */
-/*   Updated: 2020/12/17 14:50:20 by alicetetu        ###   ########.fr       */
+/*   Updated: 2020/12/18 16:23:54 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -299,7 +299,7 @@ HTTPHeaderFields::format(void) const
 	return (str);
 }
 
-std::map<std::string, std::string>
+std::map<std::string, std::string> &
 HTTPHeaderFields::storage(void)
 {
 	return (m_storage);

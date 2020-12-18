@@ -89,7 +89,7 @@ class RootBlock
 			std::list<const ServerBlock*>::iterator server_it = serverBlockList.begin();
 			std::list<const ServerBlock*>::iterator server_ite = serverBlockList.end();
 			int found = 0;
-
+		//	std::cout << "ici\n";
 			while (server_it != server_ite)
 			{
 				if ((*server_it)->names().present())

@@ -6,7 +6,7 @@
 /*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/28 14:34:10 by ecaceres          #+#    #+#             */
-/*   Updated: 2020/12/18 12:22:21 by alicetetu        ###   ########.fr       */
+/*   Updated: 2020/12/18 17:32:07 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -160,24 +160,6 @@ HTTPOrchestrator::start()
 	struct timeval timeout = {
 		.tv_sec = 0,
 		.tv_usec = 5000 };
-	
-	// std::string clientHost = "boxplay.io";
-	// const ServerBlock *serverBlock = m_configuration.rootBlock().findServerBlock(clientHost); // ca marche avec inline juste. Pourquoi ?? + explication du const a la fin de fonction?
-	// 							// TODO Disabled since the parser has been disabled too
-
-	// if (serverBlock->locations().present())
-	// 	std::cout << "ici\n";
-	// else
-	// {
-	// 	std::cout << "not present\n";
-	// }
-	
-	// HTTPFindLocation findLocation("/xp", serverBlock->locations().get());
-	
-	// const LocationBlock *locationBlock = findLocation.parse().location().get();
-	// std::cout << locationBlock->path() << std::endl;
-	// return;
-	
 
 	while (1)
 	{
@@ -236,7 +218,7 @@ HTTPOrchestrator::start()
 		{
 			LOG.warn() << "Could not handle file reading: " << exception.message() << std::endl;
 		}
-
+	
 		try
 		{
 			typedef std::map<int, HTTPClient*>::iterator iterator;
@@ -255,50 +237,46 @@ HTTPOrchestrator::start()
 
 				HTTPClient &client = *it->second;
 
+		
+				
 				if (canRead && !client.response())
 				{
 					if (client.in().size() != 0 || client.in().recv() > 0)
 					{
 						char c;
 
+						
 						while (client.in().next(c))
 						{
 							client.parser().consume(c);
-
+																	
 							if (client.parser().state() == HTTPRequestParser::S_END)
 							{
-								//HTTPHeaderFields *header = HTTPHeaderFields::create(client->parser().header());
-								
 								HTTPHeaderFields *header = new HTTPHeaderFields(client.parser().header()); // isn't enough actually?
 							
 								std::map<std::string, std::string>::iterator header_it = header->storage().find("Host");
-								/*if (header_it == header->storage().end())
+								if (header_it == header->storage().end())
 									throw Exception("No host in header fields");
-								std::string clientHost = header_it->second;*/ // TODO Disabled since the parser has been disabled too
-
-								//const ServerBlock *serverBlock = m_configuration.rootBlock().findServerBlock(clientHost); // ca marche avec inline juste. Pourquoi ?? + explication du const a la fin de fonction?
-								// TODO Disabled since the parser has been disabled too
-
-
-								//const LocationBlock *locationBlock = serverBlock->findLocation(client->parser().path()); //ne fonctionne pas je ne sais pas pourquoi :(((
-								// const LocationBlock *locationBlock;
-								// if (serverBlock->locations().present())
-								// {
-								// 	HTTPFindLocation findLocation(client.parser().path(), serverBlock->locations().get());
-								// 	if (findLocation.parse().location().present())
-								// 		locationBlock = findLocation.parse().location().get();
-								// 	else
-								// 		throw Exception ("Loction not found");
-								// }
-								// else
-								// 	throw Exception("No location Block found in configuration file");
-													
-								// TODO @atetu don't to a .get() directly. Always check for the value with .present()
-								// If there is no value, an Exception will be thrown.
-								//
-								// if (optional.present())
-								//		optional.get()
-
+								std::string clientHost = header_it->second; 
+								//std::cout << "client : " << clientHost << std::endl;
+								
+								const ServerBlock *serverBlock = m_configuration.rootBlock().findServerBlock(clientHost); // ca marche avec inline juste. Pourquoi ?? + explication du const a la fin de fonction?
+								//std::cout << "server : " << serverBlock->host().get() << std::endl;
+							
+								const LocationBlock *locationBlock;
+								if (serverBlock->locations().present())
+								{
+									HTTPFindLocation findLocation(client.parser().path(), serverBlock->locations().get());
+									if (findLocation.parse().location().present())
+										locationBlock = findLocation.parse().location().get();
+									else
+										throw Exception ("Location not found");
+								}
+								else
+									throw Exception("No location Block found in configuration file");
+								
+								//std::cout << "location: " << locationBlock->path() << std::endl;				
+								
 								const HTTPMethod *method = HTTPMethod::find(client.parser().method());
 								if (!method)
 									client.response() = HTTPResponse::status(*HTTPStatus::METHOD_NOT_ALLOWED);
