@@ -6,7 +6,7 @@
 /*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/28 14:34:10 by ecaceres          #+#    #+#             */
-/*   Updated: 2020/12/18 17:32:07 by alicetetu        ###   ########.fr       */
+/*   Updated: 2020/12/18 19:01:03 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -270,11 +270,11 @@ HTTPOrchestrator::start()
 									if (findLocation.parse().location().present())
 										locationBlock = findLocation.parse().location().get();
 									else
-										throw Exception ("Location not found");
+										locationBlock = new LocationBlock();	
 								}
 								else
-									throw Exception("No location Block found in configuration file");
-								
+									locationBlock = new LocationBlock();
+																
 								//std::cout << "location: " << locationBlock->path() << std::endl;				
 								
 								const HTTPMethod *method = HTTPMethod::find(client.parser().method());
@@ -284,11 +284,11 @@ HTTPOrchestrator::start()
 								{
 									URL url = URL("http", "locahost", 80, client.parser().path(), Optional<std::map<std::string, std::string> >(), Optional<std::string>());
 
-									RootBlock rootBlock;
-									ServerBlock serverBlock;
-									LocationBlock locationBlock;
+									RootBlock rootBlock = m_configuration.rootBlock();
+									// ServerBlock serverBlock;
+									// LocationBlock locationBlock;
 
-									client.request() = new HTTPRequest(*method, url, HTTPVersion::HTTP_1_1, HTTPHeaderFields(), m_configuration, rootBlock, serverBlock, locationBlock);
+									client.request() = new HTTPRequest(*method, url, HTTPVersion::HTTP_1_1, HTTPHeaderFields(), m_configuration, rootBlock, *serverBlock, *locationBlock);
 									client.response() = method->handler().handle(*client.request());
 
 									HTTPResponse::FileBody *fileBody = dynamic_cast<HTTPResponse::FileBody*>(client.response()->body());
