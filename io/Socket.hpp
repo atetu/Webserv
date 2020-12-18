@@ -16,6 +16,9 @@
 #include <io/FileDescriptor.hpp>
 #include <stddef.h>
 #include <sys/types.h>
+#include <string>
+
+class InetSocketAddress;
 
 class Socket :
 		public FileDescriptor
@@ -60,7 +63,7 @@ class Socket :
 		listen(int backlog);
 
 		Socket*
-		accept(void) const;
+		accept(InetSocketAddress *socketAddress) const;
 
 	public:
 		static Socket*

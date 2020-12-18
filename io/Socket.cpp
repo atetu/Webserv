@@ -11,14 +11,15 @@
 /* ************************************************************************** */
 
 #include <arpa/inet.h>
-//#include <asm/byteorder.h>
+#include <asm/byteorder.h>
+#include <netinet/in.h>
 #include <sys/socket.h>
 #include <exception/IOException.hpp>
 #include <io/Socket.hpp>
+#include <net/address/InetSocketAddress.hpp>
 #include <sys/errno.h>
 #include <sys/socket.h>
 #include <cstring>
-#include <string>
 
 static const int g_true = 1;
 
@@ -110,11 +111,17 @@ Socket::listen(int backlog)
 }
 
 Socket*
-Socket::accept(void) const
+Socket::accept(InetSocketAddress *socketAddress) const
 {
 	ensureNotClosed();
 
-	int fd = ::accept(raw(), NULL, NULL);
+	struct sockaddr_storage addr;
+	socklen_t len = sizeof(addr);
+
+	int fd = ::accept(raw(), (struct sockaddr*)&addr, &len);
+
+	if (socketAddress)
+		*socketAddress = InetSocketAddress::from((struct sockaddr*)&addr, len);
 
 	if (fd == -1)
 		throw IOException("accept", errno);

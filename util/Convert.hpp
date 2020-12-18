@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Convert.hpp                                       :+:      :+:    :+:   */
+/*   Convert.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ecaceres <ecaceres@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -13,6 +13,7 @@
 #ifndef CONVERT_HPP_
 # define CONVERT_HPP_
 
+#include <iomanip>
 #include <sstream>
 #include <string>
 
@@ -26,6 +27,17 @@ class Convert
 				std::stringstream stream;
 
 				stream << t;
+
+				return (stream.str());
+			}
+
+		template<typename T>
+			inline static std::string
+			toString(const T &t, int base)
+			{
+				std::stringstream stream;
+
+				stream << std::setbase(base) << t;
 
 				return (stream.str());
 			}

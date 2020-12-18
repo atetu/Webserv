@@ -18,8 +18,9 @@
 #include <util/helper/DeleteHelper.hpp>
 #include <util/System.hpp>
 
-HTTPClient::HTTPClient(Socket &socket, const HTTPServer &server) :
+HTTPClient::HTTPClient(Socket &socket, InetSocketAddress socketAddress, const HTTPServer &server) :
 		m_socket(socket),
+		m_socketAddress(socketAddress),
 		m_in(*SocketBuffer::from(socket, FileBuffer::NOTHING)),
 		m_out(*SocketBuffer::from(socket, FileBuffer::NOTHING)),
 		m_server(server),
