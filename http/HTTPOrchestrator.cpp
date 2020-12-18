@@ -6,7 +6,7 @@
 /*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/28 14:34:10 by ecaceres          #+#    #+#             */
-/*   Updated: 2020/12/17 14:51:54 by alicetetu        ###   ########.fr       */
+/*   Updated: 2020/12/18 12:22:21 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -150,6 +150,8 @@ HTTPOrchestrator::printSelectOutput(fd_set &readFds, fd_set &writeFds)
 void
 HTTPOrchestrator::start()
 {
+	
+	
 	prepare();
 
 	fd_set readFdSet;
@@ -158,6 +160,24 @@ HTTPOrchestrator::start()
 	struct timeval timeout = {
 		.tv_sec = 0,
 		.tv_usec = 5000 };
+	
+	// std::string clientHost = "boxplay.io";
+	// const ServerBlock *serverBlock = m_configuration.rootBlock().findServerBlock(clientHost); // ca marche avec inline juste. Pourquoi ?? + explication du const a la fin de fonction?
+	// 							// TODO Disabled since the parser has been disabled too
+
+	// if (serverBlock->locations().present())
+	// 	std::cout << "ici\n";
+	// else
+	// {
+	// 	std::cout << "not present\n";
+	// }
+	
+	// HTTPFindLocation findLocation("/xp", serverBlock->locations().get());
+	
+	// const LocationBlock *locationBlock = findLocation.parse().location().get();
+	// std::cout << locationBlock->path() << std::endl;
+	// return;
+	
 
 	while (1)
 	{
@@ -261,10 +281,18 @@ HTTPOrchestrator::start()
 
 
 								//const LocationBlock *locationBlock = serverBlock->findLocation(client->parser().path()); //ne fonctionne pas je ne sais pas pourquoi :(((
-								
-								/*HTTPFindLocation findLocation(client.parser().path(), serverBlock->locations().get());
-								const LocationBlock *locationBlock = findLocation.parse().location().get();*/ // TODO Disabled since the parser has been disabled too
-								
+								// const LocationBlock *locationBlock;
+								// if (serverBlock->locations().present())
+								// {
+								// 	HTTPFindLocation findLocation(client.parser().path(), serverBlock->locations().get());
+								// 	if (findLocation.parse().location().present())
+								// 		locationBlock = findLocation.parse().location().get();
+								// 	else
+								// 		throw Exception ("Loction not found");
+								// }
+								// else
+								// 	throw Exception("No location Block found in configuration file");
+													
 								// TODO @atetu don't to a .get() directly. Always check for the value with .present()
 								// If there is no value, an Exception will be thrown.
 								//

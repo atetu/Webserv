@@ -63,14 +63,15 @@ class System;
 
 
 
-int main(int argc, char **argv)
+int test3(int argc, char **argv)
 {
     HTTPVersion correctHttpVersion(1, 1);
-    Configuration configuration;
-    configuration = Configuration::fromJsonFile(argv[1]);
-    configuration.rootBlock().serverBlocks().get();
+    Configuration *configuration;
+    bool ignoreMimeIncludesError = false;
+    configuration = Configuration::fromJsonFile(argv[1], ignoreMimeIncludesError);
+    configuration->rootBlock().serverBlocks().get();
     //.rootBlock()->serverBlocks();
-    std::list<const ServerBlock*> serverList = configuration.rootBlock().serverBlocks().get();
+    std::list<const ServerBlock*> serverList = configuration->rootBlock().serverBlocks().get();
     std::list<const ServerBlock*>::iterator it = serverList.begin();
     std::list<const ServerBlock*>::iterator ite = serverList.end();
     std::string path = "/";

@@ -3,15 +3,15 @@
 /*                                                        :::      ::::::::   */
 /*   Socket.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ecaceres <ecaceres@student.42.fr>          +#+  +:+       +#+        */
+/*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/19 14:33:05 by ecaceres          #+#    #+#             */
-/*   Updated: 2020/10/19 14:33:05 by ecaceres         ###   ########.fr       */
+/*   Updated: 2020/12/18 10:22:38 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <arpa/inet.h>
-#include <asm/byteorder.h>
+//#include <asm/byteorder.h>
 #include <sys/socket.h>
 #include <exception/IOException.hpp>
 #include <io/Socket.hpp>

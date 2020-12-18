@@ -14,7 +14,9 @@
 #include <io/FileDescriptor.hpp>
 #include <sys/fcntl.h>
 #include <sys/errno.h>
-#include <sys/unistd.h>
+#include <unistd.h>
+// #include <sys/types.h>
+// #include <sys/uio.h>
 
 FileDescriptor::FileDescriptor(int fd) :
 		m_fd(fd),

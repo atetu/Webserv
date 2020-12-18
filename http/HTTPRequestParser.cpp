@@ -6,7 +6,7 @@
 /*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/27 17:29:02 by ecaceres          #+#    #+#             */
-/*   Updated: 2020/12/17 15:01:24 by alicetetu        ###   ########.fr       */
+/*   Updated: 2020/12/18 10:58:37 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -172,7 +172,7 @@ HTTPRequestParser::consume(char c)
 			if (c == '\r')
 				m_state = S_HTTP_END;
 			else if (c == '\n')
-				m_state = S_END; // TODO Changed since the parser hang forever. //S_HTTP_END2;
+				m_state = S_HTTP_END2; // TODO Changed since the parser hang forever. //S_HTTP_END2;
 			else
 				throw Exception("Expected a \\r or \\n");
 
@@ -182,7 +182,7 @@ HTTPRequestParser::consume(char c)
 		case S_HTTP_END:
 		{
 			if (c == '\n')
-				m_state = S_END; // TODO Changed since the parser hang forever. //S_HTTP_END2;
+				m_state = S_HTTP_END2; // TODO Changed since the parser hang forever. //S_HTTP_END2;
 			else
 				throw Exception("Expected a \\n");
 
@@ -208,7 +208,7 @@ HTTPRequestParser::consume(char c)
 		{
 			if (c == ' ')
 			{
-				throw Exception("Space after Field");
+				throw Exception("Space after Field"); // not sure aboyt that to check
 			}
 			else if (c == ':')
 			{
@@ -265,6 +265,7 @@ HTTPRequestParser::consume(char c)
 				m_state = S_SPACES_AFTER_VALUE;
 			else if (c == '\r')
 			{
+				
 				ADD_TO_MAP(m_field, m_value);
 				m_state = S_VALUE_END;
 			}

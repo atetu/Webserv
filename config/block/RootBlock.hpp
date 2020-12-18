@@ -85,7 +85,7 @@ class RootBlock
 		findServerBlock(const std::string &clientHost) const
 		{
 			const ServerBlock *serverBlock;
-			std::list<const ServerBlock*> serverBlockList = m_serverBlocks.get();
+			std::list<const ServerBlock*> serverBlockList = m_serverBlocks.get(); // ici ref
 			std::list<const ServerBlock*>::iterator server_it = serverBlockList.begin();
 			std::list<const ServerBlock*>::iterator server_ite = serverBlockList.end();
 			int found = 0;
