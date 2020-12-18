@@ -183,62 +183,186 @@ HTTPOrchestrator::start()
 		readFdSet = m_fds;
 		writeFdSet = m_fds;
 
-		if (::select(m_highestFd + 1, &readFdSet, &writeFdSet, NULL, &timeout) == -1)
+		int fdCount;
+		if ((fdCount = ::select(m_highestFd + 1, &readFdSet, &writeFdSet, NULL, &timeout)) == -1)
 			throw IOException("select", errno);
 
 		printSelectOutput(readFdSet, writeFdSet);
 
-		try
+		if (fdCount)
 		{
-			typedef std::map<int, HTTPServer const*>::iterator iterator;
-
-			for (iterator it = serverFds.begin(); it != serverFds.end(); it++)
+			try
 			{
-				int fd = it->first;
-				const HTTPServer &httpServer = *it->second;
+				typedef std::map<int, HTTPServer const*>::iterator iterator;
 
-				if (FD_ISSET(fd, &readFdSet))
+				for (iterator it = serverFds.begin(); it != serverFds.end(); it++)
 				{
-					InetSocketAddress socketAddress;
-					Socket *socket = httpServer.socket().accept(&socketAddress);
+					int fd = it->first;
+					const HTTPServer &httpServer = *it->second;
 
-					addClient(*(new HTTPClient(*socket, socketAddress, httpServer)));
-				}
-			}
-		}
-		catch (Exception &exception)
-		{
-			LOG.warn() << "Could not accept connection: " << exception.message() << std::endl;
-		}
-
-		try
-		{
-			typedef std::map<int, FileBuffer*>::iterator iterator;
-
-			std::set<int> fdToRemove;
-
-			for (iterator it = fileReadFds.begin(); it != fileReadFds.end(); it++)
-			{
-				int fd = it->first;
-
-				if (FD_ISSET(fd, &readFdSet))
-				{
-					FileBuffer &buffer = *it->second;
-
-					if (buffer.read() == -1 || buffer.hasReadEverything())
+					if (FD_ISSET(fd, &readFdSet))
 					{
-						std::cout << "fd-read :: remove(" << fd << " (" << buffer.descriptor().raw() << ")): " << ::strerror(errno) << std::endl;
-						fdToRemove.insert(fdToRemove.end(), fd);
+						InetSocketAddress socketAddress;
+						Socket *socket = httpServer.socket().accept(&socketAddress);
+
+						addClient(*(new HTTPClient(*socket, socketAddress, httpServer)));
 					}
 				}
 			}
+			catch (Exception &exception)
+			{
+				LOG.warn() << "Could not accept connection: " << exception.message() << std::endl;
+			}
 
-			for (std::set<int>::iterator it = fdToRemove.begin(); it != fdToRemove.end(); it++)
-				removeFileRead(*it);
-		}
-		catch (Exception &exception)
-		{
-			LOG.warn() << "Could not handle file reading: " << exception.message() << std::endl;
+			try
+			{
+				typedef std::map<int, FileBuffer*>::iterator iterator;
+
+				std::set<int> fdToRemove;
+
+				for (iterator it = fileReadFds.begin(); it != fileReadFds.end(); it++)
+				{
+					int fd = it->first;
+
+					if (FD_ISSET(fd, &readFdSet))
+					{
+						FileBuffer &buffer = *it->second;
+
+						if (buffer.read() == -1 || buffer.hasReadEverything())
+						{
+							std::cout << "fd-read :: remove(" << fd << " (" << buffer.descriptor().raw() << ")): " << ::strerror(errno) << std::endl;
+							fdToRemove.insert(fdToRemove.end(), fd);
+						}
+					}
+				}
+
+				for (std::set<int>::iterator it = fdToRemove.begin(); it != fdToRemove.end(); it++)
+					removeFileRead(*it);
+			}
+			catch (Exception &exception)
+			{
+				LOG.warn() << "Could not handle file reading: " << exception.message() << std::endl;
+			}
+
+			try
+			{
+				typedef std::map<int, HTTPClient*>::iterator iterator;
+
+				std::set<int> fdToRemove;
+
+				for (iterator it = clientFds.begin(); it != clientFds.end(); it++)
+				{
+					int fd = it->first;
+
+					bool canRead = FD_ISSET(fd, &readFdSet);
+					bool canWrite = FD_ISSET(fd, &writeFdSet);
+
+					bool deleted = false;
+
+					HTTPClient &client = *it->second;
+
+					if (canRead && !client.response())
+					{
+						if (client.in().size() != 0 || client.in().recv() > 0)
+						{
+							char c;
+
+							while (client.in().next(c))
+							{
+								client.parser().consume(c);
+
+								if (client.parser().state() == HTTPRequestParser::S_END)
+								{
+									//HTTPHeaderFields *header = HTTPHeaderFields::create(client->parser().header());
+
+									HTTPHeaderFields *header = new HTTPHeaderFields(client.parser().header()); // isn't enough actually?
+
+									std::map<std::string, std::string>::iterator header_it = header->storage().find("Host");
+									/*if (header_it == header->storage().end())
+									 throw Exception("No host in header fields");
+									 std::string clientHost = header_it->second;*/ // TODO Disabled since the parser has been disabled too
+									//const ServerBlock *serverBlock = m_configuration.rootBlock().findServerBlock(clientHost); // ca marche avec inline juste. Pourquoi ?? + explication du const a la fin de fonction?
+									// TODO Disabled since the parser has been disabled too
+									//const LocationBlock *locationBlock = serverBlock->findLocation(client->parser().path()); //ne fonctionne pas je ne sais pas pourquoi :(((
+									// const LocationBlock *locationBlock;
+									// if (serverBlock->locations().present())
+									// {
+									// 	HTTPFindLocation findLocation(client.parser().path(), serverBlock->locations().get());
+									// 	if (findLocation.parse().location().present())
+									// 		locationBlock = findLocation.parse().location().get();
+									// 	else
+									// 		throw Exception ("Loction not found");
+									// }
+									// else
+									// 	throw Exception("No location Block found in configuration file");
+									// TODO @atetu don't to a .get() directly. Always check for the value with .present()
+									// If there is no value, an Exception will be thrown.
+									//
+									// if (optional.present())
+									//		optional.get()
+									const HTTPMethod *method = HTTPMethod::find(client.parser().method());
+									if (!method)
+										client.response() = HTTPResponse::status(*HTTPStatus::METHOD_NOT_ALLOWED);
+									else
+									{
+										URL url = URL("http", "locahost", 80, client.parser().path(), Optional<std::map<std::string, std::string> >(), Optional<std::string>());
+
+										RootBlock rootBlock;
+										ServerBlock serverBlock;
+										LocationBlock locationBlock;
+
+										client.request() = new HTTPRequest(*method, url, HTTPVersion::HTTP_1_1, HTTPHeaderFields(), m_configuration, rootBlock, serverBlock, locationBlock);
+										client.response() = method->handler().handle(*client.request());
+
+										HTTPResponse::FileBody *fileBody = dynamic_cast<HTTPResponse::FileBody*>(client.response()->body());
+										if (fileBody)
+											addFileRead(fileBody->fileBuffer());
+									}
+
+									break;
+								}
+							}
+						}
+					}
+
+					if (canWrite && !deleted)
+					{
+						if (client.response())
+						{
+							if (client.out().send() > 0 || !client.response()->write(client.out()))
+								client.updateLastAction();
+							else
+							{
+								std::cout << "closing(" << fd << "): " << ::strerror(errno) << std::endl;
+
+								fdToRemove.insert(fdToRemove.end(), fd);
+
+								deleted = true;
+
+								continue;
+							}
+						}
+					}
+
+					if (!deleted && client.response() && client.response()->state() == HTTPResponse::FINISHED)
+					{
+						std::cout << "done: " << fd << std::endl;
+
+						fdToRemove.insert(fdToRemove.end(), fd);
+
+						deleted = true;
+
+						continue;
+					}
+				}
+
+				for (std::set<int>::iterator it = fdToRemove.begin(); it != fdToRemove.end(); it++)
+					removeClient(*it);
+			}
+			catch (Exception &exception)
+			{
+				LOG.warn() << "Could not handle client: " << exception.message() << std::endl;
+			}
 		}
 
 		try
@@ -247,120 +371,17 @@ HTTPOrchestrator::start()
 
 			std::set<int> fdToRemove;
 
+			unsigned long now = System::currentTimeSeconds();
 			for (iterator it = clientFds.begin(); it != clientFds.end(); it++)
 			{
-				unsigned long now = System::currentTimeSeconds();
 				int fd = it->first;
-
-				bool canRead = FD_ISSET(fd, &readFdSet);
-				bool canWrite = FD_ISSET(fd, &writeFdSet);
-
-				bool deleted = false;
-
 				HTTPClient &client = *it->second;
 
-				if (canRead && !client.response())
-				{
-					if (client.in().size() != 0 || client.in().recv() > 0)
-					{
-						char c;
-
-						while (client.in().next(c))
-						{
-							client.parser().consume(c);
-
-							if (client.parser().state() == HTTPRequestParser::S_END)
-							{
-								//HTTPHeaderFields *header = HTTPHeaderFields::create(client->parser().header());
-
-								HTTPHeaderFields *header = new HTTPHeaderFields(client.parser().header()); // isn't enough actually?
-
-								std::map<std::string, std::string>::iterator header_it = header->storage().find("Host");
-								/*if (header_it == header->storage().end())
-								 throw Exception("No host in header fields");
-								 std::string clientHost = header_it->second;*/ // TODO Disabled since the parser has been disabled too
-								//const ServerBlock *serverBlock = m_configuration.rootBlock().findServerBlock(clientHost); // ca marche avec inline juste. Pourquoi ?? + explication du const a la fin de fonction?
-								// TODO Disabled since the parser has been disabled too
-
-								//const LocationBlock *locationBlock = serverBlock->findLocation(client->parser().path()); //ne fonctionne pas je ne sais pas pourquoi :(((
-								// const LocationBlock *locationBlock;
-								// if (serverBlock->locations().present())
-								// {
-								// 	HTTPFindLocation findLocation(client.parser().path(), serverBlock->locations().get());
-								// 	if (findLocation.parse().location().present())
-								// 		locationBlock = findLocation.parse().location().get();
-								// 	else
-								// 		throw Exception ("Loction not found");
-								// }
-								// else
-								// 	throw Exception("No location Block found in configuration file");
-								// TODO @atetu don't to a .get() directly. Always check for the value with .present()
-								// If there is no value, an Exception will be thrown.
-								//
-								// if (optional.present())
-								//		optional.get()
-								const HTTPMethod *method = HTTPMethod::find(client.parser().method());
-								if (!method)
-									client.response() = HTTPResponse::status(*HTTPStatus::METHOD_NOT_ALLOWED);
-								else
-								{
-									URL url = URL("http", "locahost", 80, client.parser().path(), Optional<std::map<std::string, std::string> >(), Optional<std::string>());
-
-									RootBlock rootBlock;
-									ServerBlock serverBlock;
-									LocationBlock locationBlock;
-
-									client.request() = new HTTPRequest(*method, url, HTTPVersion::HTTP_1_1, HTTPHeaderFields(), m_configuration, rootBlock, serverBlock, locationBlock);
-									client.response() = method->handler().handle(*client.request());
-
-									HTTPResponse::FileBody *fileBody = dynamic_cast<HTTPResponse::FileBody*>(client.response()->body());
-									if (fileBody)
-										addFileRead(fileBody->fileBuffer());
-								}
-
-								break;
-							}
-						}
-					}
-				}
-
-				if (canWrite && !deleted)
-				{
-					if (client.response())
-					{
-						if (client.out().send() > 0 || !client.response()->write(client.out()))
-							client.updateLastAction();
-						else
-						{
-							std::cout << "closing(" << fd << "): " << ::strerror(errno) << std::endl;
-
-							fdToRemove.insert(fdToRemove.end(), fd);
-
-							deleted = true;
-
-							continue;
-						}
-					}
-				}
-
-				if (!deleted && client.response() && client.response()->state() == HTTPResponse::FINISHED)
-				{
-					std::cout << "done: " << fd << std::endl;
-
-					fdToRemove.insert(fdToRemove.end(), fd);
-
-					deleted = true;
-
-					continue;
-				}
-
-				if (!deleted && client.lastAction() + 5 < now)
+				if (client.lastAction() + 5 < now)
 				{
 					std::cout << "timeout: " << fd << std::endl;
 
 					fdToRemove.insert(fdToRemove.end(), fd);
-
-					deleted = true;
 
 					continue;
 				}
@@ -371,7 +392,7 @@ HTTPOrchestrator::start()
 		}
 		catch (Exception &exception)
 		{
-			LOG.warn() << "Could not handle client: " << exception.message() << std::endl;
+			LOG.warn() << "Could not handle client (timeout): " << exception.message() << std::endl;
 		}
 	}
 }
