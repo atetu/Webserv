@@ -19,6 +19,7 @@
 #include <http/HTTPOrchestrator.hpp>
 #include <util/ContainerBuilder.hpp>
 #include <util/Enum.hpp>
+#include <util/Environment.hpp>
 #include <util/helper/DeleteHelper.hpp>
 #include <util/json/JsonException.hpp>
 #include <util/log/Logger.hpp>
@@ -41,7 +42,7 @@ const Option OPT_CONFIG_FILE('f', "config-file", "specify the config file", "fil
 const Option OPT_IGNORE_MIME_INCLUDES_ERROR('m', "ignore-mime-includes-error", "only warn when a MIME file inclusion cause an error");
 
 int
-delegated_main(int argc, char **argv)
+delegated_main(int argc, char **argv, char **envp)
 {
 	const char *program = argv[0];
 
@@ -106,6 +107,8 @@ delegated_main(int argc, char **argv)
 
 	LOG.debug() << "Set log level to: " << level->name() << std::endl;
 
+	Environment environment = Environment::envp(envp);
+
 	Configuration *configuration = NULL;
 	HTTPOrchestrator *httpOrchestrator = NULL;
 
@@ -167,14 +170,14 @@ delegated_main(int argc, char **argv)
 }
 
 int
-main(int argc, char **argv)
+main(int argc, char **argv, char **envp)
 {
 	int exitCode;
 
 	try
 	{
 		signal(SIGPIPE, SIG_IGN);
-		exitCode = delegated_main(argc, argv);
+		exitCode = delegated_main(argc, argv, envp);
 	}
 	catch (std::exception &exception)
 	{
