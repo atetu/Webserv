@@ -15,7 +15,6 @@
 #include <config/block/ServerBlock.hpp>
 #include <exception/IOException.hpp>
 #include <http/handler/HTTPMethodHandler.hpp>
-#include <http/HTTPFindLocation.hpp>
 #include <http/HTTPHeaderFields.hpp>
 #include <http/HTTPMethod.hpp>
 #include <http/HTTPOrchestrator.hpp>
@@ -25,6 +24,8 @@
 #include <http/HTTPStatus.hpp>
 #include <http/HTTPVersion.hpp>
 #include <io/Socket.hpp>
+#include <net/address/InetAddress.hpp>
+#include <net/address/InetSocketAddress.hpp>
 #include <sys/errno.h>
 #include <sys/unistd.h>
 #include <util/buffer/impl/SocketBuffer.hpp>
@@ -150,8 +151,7 @@ HTTPOrchestrator::printSelectOutput(fd_set &readFds, fd_set &writeFds)
 void
 HTTPOrchestrator::start()
 {
-	
-	
+
 	prepare();
 
 	fd_set readFdSet;
@@ -160,7 +160,7 @@ HTTPOrchestrator::start()
 	struct timeval timeout = {
 		.tv_sec = 0,
 		.tv_usec = 5000 };
-	
+
 	// std::string clientHost = "boxplay.io";
 	// const ServerBlock *serverBlock = m_configuration.rootBlock().findServerBlock(clientHost); // ca marche avec inline juste. Pourquoi ?? + explication du const a la fin de fonction?
 	// 							// TODO Disabled since the parser has been disabled too
@@ -171,13 +171,12 @@ HTTPOrchestrator::start()
 	// {
 	// 	std::cout << "not present\n";
 	// }
-	
+
 	// HTTPFindLocation findLocation("/xp", serverBlock->locations().get());
-	
+
 	// const LocationBlock *locationBlock = findLocation.parse().location().get();
 	// std::cout << locationBlock->path() << std::endl;
 	// return;
-	
 
 	while (1)
 	{
@@ -199,7 +198,12 @@ HTTPOrchestrator::start()
 				const HTTPServer &httpServer = *it->second;
 
 				if (FD_ISSET(fd, &readFdSet))
-					addClient(*(new HTTPClient(*(httpServer.socket().accept()), httpServer)));
+				{
+					InetSocketAddress socketAddress;
+					Socket *socket = httpServer.socket().accept(&socketAddress);
+
+					addClient(*(new HTTPClient(*socket, socketAddress, httpServer)));
+				}
 			}
 		}
 		catch (Exception &exception)
@@ -268,17 +272,15 @@ HTTPOrchestrator::start()
 							if (client.parser().state() == HTTPRequestParser::S_END)
 							{
 								//HTTPHeaderFields *header = HTTPHeaderFields::create(client->parser().header());
-								
+
 								HTTPHeaderFields *header = new HTTPHeaderFields(client.parser().header()); // isn't enough actually?
-							
+
 								std::map<std::string, std::string>::iterator header_it = header->storage().find("Host");
 								/*if (header_it == header->storage().end())
-									throw Exception("No host in header fields");
-								std::string clientHost = header_it->second;*/ // TODO Disabled since the parser has been disabled too
-
+								 throw Exception("No host in header fields");
+								 std::string clientHost = header_it->second;*/ // TODO Disabled since the parser has been disabled too
 								//const ServerBlock *serverBlock = m_configuration.rootBlock().findServerBlock(clientHost); // ca marche avec inline juste. Pourquoi ?? + explication du const a la fin de fonction?
 								// TODO Disabled since the parser has been disabled too
-
 
 								//const LocationBlock *locationBlock = serverBlock->findLocation(client->parser().path()); //ne fonctionne pas je ne sais pas pourquoi :(((
 								// const LocationBlock *locationBlock;
@@ -292,13 +294,11 @@ HTTPOrchestrator::start()
 								// }
 								// else
 								// 	throw Exception("No location Block found in configuration file");
-													
 								// TODO @atetu don't to a .get() directly. Always check for the value with .present()
 								// If there is no value, an Exception will be thrown.
 								//
 								// if (optional.present())
 								//		optional.get()
-
 								const HTTPMethod *method = HTTPMethod::find(client.parser().method());
 								if (!method)
 									client.response() = HTTPResponse::status(*HTTPStatus::METHOD_NOT_ALLOWED);
@@ -398,6 +398,8 @@ void
 HTTPOrchestrator::addClient(HTTPClient &client)
 {
 	int fd = client.socket().raw();
+
+	LOG.info() << client.socketAddress().address()->hostAddress() << std::endl;
 
 	setFd(fd);
 	clientFds[fd] = &client;

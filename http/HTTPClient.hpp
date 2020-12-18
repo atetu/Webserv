@@ -15,6 +15,7 @@
 
 #include <http/HTTPRequestParser.hpp>
 #include <io/Socket.hpp>
+#include <net/address/InetSocketAddress.hpp>
 
 class HTTPServer;
 class SocketBuffer;
@@ -26,6 +27,7 @@ class HTTPClient
 {
 	private:
 		Socket &m_socket;
+		InetSocketAddress m_socketAddress;
 		SocketBuffer &m_in;
 		SocketBuffer &m_out;
 		const HTTPServer &m_server;
@@ -41,7 +43,7 @@ class HTTPClient
 		operator =(const HTTPClient &other);
 
 	public:
-		HTTPClient(Socket &socket, const HTTPServer &server);
+		HTTPClient(Socket &socket, InetSocketAddress socketAddress, const HTTPServer &server);
 
 		virtual
 		~HTTPClient();
@@ -54,6 +56,18 @@ class HTTPClient
 
 		// std::vector<HTTPHeaderParser> 
 		// getHeader();
+
+		inline Socket&
+		socket(void)
+		{
+			return (m_socket);
+		}
+
+		inline InetSocketAddress&
+		socketAddress(void)
+		{
+			return (m_socketAddress);
+		}
 
 		inline SocketBuffer&
 		in()
@@ -89,12 +103,6 @@ class HTTPClient
 		response(void)
 		{
 			return (m_response);
-		}
-
-		inline Socket&
-		socket(void)
-		{
-			return (m_socket);
 		}
 };
 
