@@ -31,6 +31,8 @@ RootBlock::RootBlock(const RootBlock &other) :
 
 RootBlock::~RootBlock()
 {
+	std::cout << (char)*((char*)NULL) << std::endl;
+
 	DeleteHelper::pointers<ServerBlock>(m_serverBlocks);
 	DeleteHelper::pointers<CGIBlock>(m_cgiBlocks);
 	DeleteHelper::pointer<MimeBlock>(m_mimeBlock);

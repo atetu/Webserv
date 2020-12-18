@@ -64,6 +64,8 @@ Configuration::Configuration(const Configuration &other) :
 
 Configuration::~Configuration()
 {
+	std::cout << "~Configuration()" << std::endl;
+
 	DeleteHelper::pointer<MimeRegistry>(m_mimeRegistry);
 	DeleteHelper::pointer<RootBlock>(m_rootBlock);
 }

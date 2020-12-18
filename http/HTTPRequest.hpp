@@ -32,7 +32,7 @@ class HTTPRequest
 		const Configuration &m_configuration;
 		const RootBlock &m_rootBlock;
 		const ServerBlock &m_serverBlock;
-		const LocationBlock &m_locationBlock;
+		const Optional<LocationBlock const*> &m_locationBlock;
 
 	private:
 		HTTPRequest(void);
@@ -42,7 +42,7 @@ class HTTPRequest
 		operator =(const HTTPRequest &other);
 
 	public:
-		HTTPRequest(const HTTPMethod &method, const URL &url, const HTTPVersion &version, const HTTPHeaderFields &headerFields, const Configuration &configuration, const RootBlock &rootBlock, const ServerBlock &serverBlock, const LocationBlock &locationBlock);
+		HTTPRequest(const HTTPMethod &method, const URL &url, const HTTPVersion &version, const HTTPHeaderFields &headerFields, const Configuration &configuration, const RootBlock &rootBlock, const ServerBlock &serverBlock, const Optional<LocationBlock const*> &locationBlock);
 
 		virtual
 		~HTTPRequest(void);
@@ -83,26 +83,14 @@ class HTTPRequest
 			return (m_serverBlock);
 		}
 
-		inline const LocationBlock&
+		inline const Optional<LocationBlock const*>&
 		location()
 		{
 			return (m_locationBlock);
 		}
 
-		inline std::string
-		root(void) const
-		{
-			if (m_locationBlock.root().present())
-				return (m_locationBlock.root().get());
-
-			if (m_serverBlock.root().present())
-				return (m_serverBlock.root().get());
-
-			if (m_rootBlock.root().present())
-				return (m_rootBlock.root().get());
-
-			return ("./");
-		}
+		std::string
+		root(void) const;
 };
 
 #endif /* HTTPREQUEST_HPP_ */

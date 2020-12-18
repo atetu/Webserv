@@ -150,8 +150,7 @@ HTTPOrchestrator::printSelectOutput(fd_set &readFds, fd_set &writeFds)
 void
 HTTPOrchestrator::start()
 {
-	
-	
+
 	prepare();
 
 	fd_set readFdSet;
@@ -218,7 +217,7 @@ HTTPOrchestrator::start()
 		{
 			LOG.warn() << "Could not handle file reading: " << exception.message() << std::endl;
 		}
-	
+
 		try
 		{
 			typedef std::map<int, HTTPClient*>::iterator iterator;
@@ -237,63 +236,67 @@ HTTPOrchestrator::start()
 
 				HTTPClient &client = *it->second;
 
-		
-				
 				if (canRead && !client.response())
 				{
 					if (client.in().size() != 0 || client.in().recv() > 0)
 					{
 						char c;
 
-						
 						while (client.in().next(c))
 						{
 							client.parser().consume(c);
-																	
+
 							if (client.parser().state() == HTTPRequestParser::S_END)
 							{
-								HTTPHeaderFields *header = new HTTPHeaderFields(client.parser().header()); // isn't enough actually?
-							
-								std::map<std::string, std::string>::iterator header_it = header->storage().find("Host");
-								if (header_it == header->storage().end())
+								HTTPHeaderFields header = HTTPHeaderFields(client.parser().header()); // isn't enough actually?
+
+								std::map<std::string, std::string>::iterator header_it = header.storage().find("Host");
+								if (header_it == header.storage().end())
 									throw Exception("No host in header fields");
-								std::string clientHost = header_it->second; 
+								std::string clientHost = header_it->second;
 								//std::cout << "client : " << clientHost << std::endl;
-								
+
 								const ServerBlock *serverBlock = m_configuration.rootBlock().findServerBlock(clientHost); // ca marche avec inline juste. Pourquoi ?? + explication du const a la fin de fonction?
 								//std::cout << "server : " << serverBlock->host().get() << std::endl;
-							
-								const LocationBlock *locationBlock;
-								if (serverBlock->locations().present())
+
+								const LocationBlock *locationBlock = NULL;
+								if (serverBlock && serverBlock->locations().present())
 								{
-									HTTPFindLocation findLocation(client.parser().path(), serverBlock->locations().get());
+									std::cout << serverBlock->locations().present() << std::endl;
+
+									HTTPFindLocation findLocation(client.parser().path(),
+
+									serverBlock->locations().get());
+
 									if (findLocation.parse().location().present())
 										locationBlock = findLocation.parse().location().get();
-									else
-										locationBlock = new LocationBlock();	
 								}
-								else
-									locationBlock = new LocationBlock();
-																
-								//std::cout << "location: " << locationBlock->path() << std::endl;				
-								
-								const HTTPMethod *method = HTTPMethod::find(client.parser().method());
-								if (!method)
-									client.response() = HTTPResponse::status(*HTTPStatus::METHOD_NOT_ALLOWED);
+
+								if (!serverBlock)
+									client.response() = HTTPResponse::status(*HTTPStatus::NOT_FOUND);
 								else
 								{
-									URL url = URL("http", "locahost", 80, client.parser().path(), Optional<std::map<std::string, std::string> >(), Optional<std::string>());
+									//std::cout << "location: " << locationBlock->path() << std::endl;
 
-									RootBlock rootBlock = m_configuration.rootBlock();
-									// ServerBlock serverBlock;
-									// LocationBlock locationBlock;
+									const HTTPMethod *method = HTTPMethod::find(client.parser().method());
+									if (!method)
+										client.response() = HTTPResponse::status(*HTTPStatus::METHOD_NOT_ALLOWED);
+									else
+									{
+										URL url = URL("http", "locahost", 80, client.parser().path(), Optional<std::map<std::string, std::string> >(), Optional<std::string>());
 
-									client.request() = new HTTPRequest(*method, url, HTTPVersion::HTTP_1_1, HTTPHeaderFields(), m_configuration, rootBlock, *serverBlock, *locationBlock);
-									client.response() = method->handler().handle(*client.request());
+										const RootBlock &rootBlock = m_configuration.rootBlock();
 
-									HTTPResponse::FileBody *fileBody = dynamic_cast<HTTPResponse::FileBody*>(client.response()->body());
-									if (fileBody)
-										addFileRead(fileBody->fileBuffer());
+										const HTTPVersion &version = HTTPVersion::HTTP_1_1;
+										const Optional<LocationBlock const*> locationBlockOptional = Optional<LocationBlock const*>::ofNullable(locationBlock);
+
+										client.request() = new HTTPRequest(*method, url, version, header, m_configuration, rootBlock, *serverBlock, locationBlockOptional);
+										client.response() = method->handler().handle(*client.request());
+
+										HTTPResponse::FileBody *fileBody = dynamic_cast<HTTPResponse::FileBody*>(client.response()->body());
+										if (fileBody)
+											addFileRead(fileBody->fileBuffer());
+									}
 								}
 
 								break;

@@ -13,7 +13,7 @@
 #include <http/HTTPRequest.hpp>
 #include <sstream>
 
-HTTPRequest::HTTPRequest(const HTTPMethod &method, const URL &url, const HTTPVersion &version, const HTTPHeaderFields &headerFields, const Configuration &configuration, const RootBlock &rootBlock, const ServerBlock &serverBlock, const LocationBlock &locationBlock) :
+HTTPRequest::HTTPRequest(const HTTPMethod &method, const URL &url, const HTTPVersion &version, const HTTPHeaderFields &headerFields, const Configuration &configuration, const RootBlock &rootBlock, const ServerBlock &serverBlock, const Optional<LocationBlock const*> &locationBlock) :
 		m_method(method),
 		m_url(url),
 		m_version(version),
@@ -27,4 +27,24 @@ HTTPRequest::HTTPRequest(const HTTPMethod &method, const URL &url, const HTTPVer
 
 HTTPRequest::~HTTPRequest(void)
 {
+}
+
+std::string
+HTTPRequest::root(void) const
+{
+	if (m_locationBlock.present())
+	{
+		const LocationBlock &locationBlock = *m_locationBlock.get();
+
+		if (locationBlock.root().present())
+			return (locationBlock.root().get());
+	}
+
+	if (m_serverBlock.root().present())
+		return (m_serverBlock.root().get());
+
+	if (m_rootBlock.root().present())
+		return (m_rootBlock.root().get());
+
+	return ("./");
 }
