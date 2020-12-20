@@ -14,6 +14,7 @@
 # define OPTIONAL_HPP_
 
 #include <exception/Exception.hpp>
+#include <iostream>
 
 template<typename T>
 	class Optional
@@ -153,8 +154,18 @@ template<typename T>
 			onlyIf(bool present, T &value)
 			{
 				if (present)
-					return (Optional());
-				return (Optional(value));
+					return (Optional(value));
+
+				return (Optional());
+			}
+
+			static Optional<T>
+			ofNullable(T &value)
+			{
+				if (value != NULL)
+					return (Optional(value));
+
+				return (Optional());
 			}
 	};
 

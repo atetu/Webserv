@@ -175,7 +175,7 @@ JsonParser::ArrayContext::nextEvent(JsonParser &parser, JsonTokenizer &tokenizer
 }
 
 JsonParser::JsonParser(const std::string &source) :
-		m_currentContext(new NoneContext()), //je ne vois pas le constructeur par defaut
+		m_currentContext(new NoneContext()),
 		m_currentEvent(NULL),
 		m_stack(),
 		m_tokenizer(source)

@@ -21,7 +21,10 @@
 		{
 			"port": 80,
 			"host": "0.0.0.0",
-			"name": "boxplay.io",
+			"name": [
+				"boxplay.io",
+				"localhost"
+			],
 			"default": true,
 			"maxBodySize": "1MB",
 			"errors": {

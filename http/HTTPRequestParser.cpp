@@ -6,7 +6,7 @@
 /*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/27 17:29:02 by ecaceres          #+#    #+#             */
-/*   Updated: 2020/12/18 10:58:37 by alicetetu        ###   ########.fr       */
+/*   Updated: 2020/12/18 17:05:50 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -191,8 +191,9 @@ HTTPRequestParser::consume(char c)
 
 		case S_HTTP_END2:
 		{
-			if (m_last_char2 == '\n' && m_last_char == '\r' && c == '\n')
-				m_state = S_END;
+			m_state = S_END;
+			if (m_last_char2 == '\r' && m_last_char == '\n' && c == '\r')
+				m_state = S_HTTP_END3;
 			else if (c == ' ')
 				throw Exception("Space before field");
 			else
@@ -204,6 +205,20 @@ HTTPRequestParser::consume(char c)
 			break;
 		}
 
+		case S_HTTP_END3:
+		{
+			if (m_last_char2 == '\n' && m_last_char == '\r' && c == '\n')
+				m_state = S_END;
+			else if (c == ' ') // ou erreur
+				throw Exception("Space before field");
+			else
+			{
+				m_state = S_FIELD;
+				m_field += c;
+			}
+
+			break;
+		}
 		case S_FIELD:
 		{
 			if (c == ' ')
@@ -294,8 +309,8 @@ HTTPRequestParser::consume(char c)
 
 		case S_VALUE_END2:
 		{
-			if (m_last_char2 == '\n' && m_last_char == '\r' && c == '\n')
-				m_state = S_END;
+			if (m_last_char2 == '\r' && m_last_char == '\n' && c == '\r')
+				m_state = S_VALUE_END3;
 			else
 			{
 				m_field += c;
@@ -305,6 +320,19 @@ HTTPRequestParser::consume(char c)
 			break;
 		}
 
+		case S_VALUE_END3:
+		{
+			if (m_last_char2 == '\n' && m_last_char == '\r' && c == '\n')
+				m_state = S_END;
+			else
+			{
+				m_field += c;
+				m_state = S_FIELD; // should be an error, souldn't it?
+			}
+
+			break;
+		}
+		
 		case S_END:
 			break;
 		

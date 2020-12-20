@@ -33,7 +33,7 @@ class HTTPOrchestrator
 		static Logger &LOG;
 
 	private:
-		const Configuration m_configuration;
+		const Configuration &m_configuration;
 		server_container m_servers;
 		fd_set m_fds;
 		int m_highestFd;

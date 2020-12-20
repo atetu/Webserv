@@ -6,7 +6,7 @@
 /*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/27 17:29:02 by ecaceres          #+#    #+#             */
-/*   Updated: 2020/12/17 15:01:01 by alicetetu        ###   ########.fr       */
+/*   Updated: 2020/12/18 17:06:05 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,6 +47,7 @@ class HTTPRequestParser
 			S_HTTP_MINOR,
 			S_HTTP_END,
 			S_HTTP_END2,
+			S_HTTP_END3,
 			S_FIELD,
 			S_COLON,
 			S_SPACES_BEFORE_VALUE,
@@ -54,6 +55,7 @@ class HTTPRequestParser
 			S_SPACES_AFTER_VALUE,
 			S_VALUE_END,
 			S_VALUE_END2,
+			S_VALUE_END3,
 			S_END,
 		};
 

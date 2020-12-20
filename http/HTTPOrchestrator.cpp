@@ -6,7 +6,7 @@
 /*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/28 14:34:10 by ecaceres          #+#    #+#             */
-/*   Updated: 2020/12/18 12:22:21 by alicetetu        ###   ########.fr       */
+/*   Updated: 2020/12/18 19:01:03 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -161,23 +161,6 @@ HTTPOrchestrator::start()
 		.tv_sec = 0,
 		.tv_usec = 5000 };
 
-	// std::string clientHost = "boxplay.io";
-	// const ServerBlock *serverBlock = m_configuration.rootBlock().findServerBlock(clientHost); // ca marche avec inline juste. Pourquoi ?? + explication du const a la fin de fonction?
-	// 							// TODO Disabled since the parser has been disabled too
-
-	// if (serverBlock->locations().present())
-	// 	std::cout << "ici\n";
-	// else
-	// {
-	// 	std::cout << "not present\n";
-	// }
-
-	// HTTPFindLocation findLocation("/xp", serverBlock->locations().get());
-
-	// const LocationBlock *locationBlock = findLocation.parse().location().get();
-	// std::cout << locationBlock->path() << std::endl;
-	// return;
-
 	while (1)
 	{
 		readFdSet = m_fds;
@@ -273,50 +256,55 @@ HTTPOrchestrator::start()
 
 								if (client.parser().state() == HTTPRequestParser::S_END)
 								{
-									//HTTPHeaderFields *header = HTTPHeaderFields::create(client->parser().header());
+									HTTPHeaderFields header = HTTPHeaderFields(client.parser().header()); // isn't enough actually?
 
-									HTTPHeaderFields *header = new HTTPHeaderFields(client.parser().header()); // isn't enough actually?
+									std::map<std::string, std::string>::iterator header_it = header.storage().find("Host");
+									if (header_it == header.storage().end())
+										throw Exception("No host in header fields");
+									std::string clientHost = header_it->second;
+									//std::cout << "client : " << clientHost << std::endl;
 
-									std::map<std::string, std::string>::iterator header_it = header->storage().find("Host");
-									/*if (header_it == header->storage().end())
-									 throw Exception("No host in header fields");
-									 std::string clientHost = header_it->second;*/ // TODO Disabled since the parser has been disabled too
-									//const ServerBlock *serverBlock = m_configuration.rootBlock().findServerBlock(clientHost); // ca marche avec inline juste. Pourquoi ?? + explication du const a la fin de fonction?
-									// TODO Disabled since the parser has been disabled too
-									//const LocationBlock *locationBlock = serverBlock->findLocation(client->parser().path()); //ne fonctionne pas je ne sais pas pourquoi :(((
-									// const LocationBlock *locationBlock;
-									// if (serverBlock->locations().present())
-									// {
-									// 	HTTPFindLocation findLocation(client.parser().path(), serverBlock->locations().get());
-									// 	if (findLocation.parse().location().present())
-									// 		locationBlock = findLocation.parse().location().get();
-									// 	else
-									// 		throw Exception ("Loction not found");
-									// }
-									// else
-									// 	throw Exception("No location Block found in configuration file");
-									// TODO @atetu don't to a .get() directly. Always check for the value with .present()
-									// If there is no value, an Exception will be thrown.
-									//
-									// if (optional.present())
-									//		optional.get()
-									const HTTPMethod *method = HTTPMethod::find(client.parser().method());
-									if (!method)
-										client.response() = HTTPResponse::status(*HTTPStatus::METHOD_NOT_ALLOWED);
+									const ServerBlock *serverBlock = m_configuration.rootBlock().findServerBlock(clientHost); // ca marche avec inline juste. Pourquoi ?? + explication du const a la fin de fonction?
+									//std::cout << "server : " << serverBlock->host().get() << std::endl;
+
+									const LocationBlock *locationBlock = NULL;
+									if (serverBlock && serverBlock->locations().present())
+									{
+										std::cout << serverBlock->locations().present() << std::endl;
+
+										HTTPFindLocation findLocation(client.parser().path(),
+
+										serverBlock->locations().get());
+
+										if (findLocation.parse().location().present())
+											locationBlock = findLocation.parse().location().get();
+									}
+
+									if (!serverBlock)
+										client.response() = HTTPResponse::status(*HTTPStatus::NOT_FOUND);
 									else
 									{
-										URL url = URL("http", "locahost", 80, client.parser().path(), Optional<std::map<std::string, std::string> >(), Optional<std::string>());
+										//std::cout << "location: " << locationBlock->path() << std::endl;
 
-										RootBlock rootBlock;
-										ServerBlock serverBlock;
-										LocationBlock locationBlock;
+										const HTTPMethod *method = HTTPMethod::find(client.parser().method());
+										if (!method)
+											client.response() = HTTPResponse::status(*HTTPStatus::METHOD_NOT_ALLOWED);
+										else
+										{
+											URL url = URL("http", "locahost", 80, client.parser().path(), Optional<std::map<std::string, std::string> >(), Optional<std::string>());
 
-										client.request() = new HTTPRequest(*method, url, HTTPVersion::HTTP_1_1, HTTPHeaderFields(), m_configuration, rootBlock, serverBlock, locationBlock);
-										client.response() = method->handler().handle(*client.request());
+											const RootBlock &rootBlock = m_configuration.rootBlock();
 
-										HTTPResponse::FileBody *fileBody = dynamic_cast<HTTPResponse::FileBody*>(client.response()->body());
-										if (fileBody)
-											addFileRead(fileBody->fileBuffer());
+											const HTTPVersion &version = HTTPVersion::HTTP_1_1;
+											const Optional<LocationBlock const*> locationBlockOptional = Optional<LocationBlock const*>::ofNullable(locationBlock);
+
+											client.request() = new HTTPRequest(*method, url, version, header, m_configuration, rootBlock, *serverBlock, locationBlockOptional);
+											client.response() = method->handler().handle(*client.request());
+
+											HTTPResponse::FileBody *fileBody = dynamic_cast<HTTPResponse::FileBody*>(client.response()->body());
+											if (fileBody)
+												addFileRead(fileBody->fileBuffer());
+										}
 									}
 
 									break;
