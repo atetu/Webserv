@@ -33,8 +33,8 @@ namespace ft
 		if (str)
 		{
 			size_t len = strlen(str);
-			char *dup = new char[len];
-			return ((char*)memcpy(dup, str, len));
+			char *dup = new char[len + 1];
+			return ((char*)memcpy(dup, str, len + 1));
 		}
 
 		return (NULL);

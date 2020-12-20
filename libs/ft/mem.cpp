@@ -17,24 +17,28 @@ namespace ft
 	void*
 	memcpy(void *dest, const void *src, size_t len)
 	{
+		void *start = dest;
+
 		if (src && dest)
 		{
 			while (len >= 8)
 			{
-				*((unsigned long*)dest++) = *((const unsigned long*)src++);
+				*((unsigned long*&)dest)++ = *((const unsigned long*&)src)++;
 				len -= 8;
 			}
 
 			while (len--)
-				*((unsigned char*)dest++) = *((const unsigned char*)src++);
+				*((unsigned char*&)dest)++ = *((const unsigned char*&)src)++;
 		}
 
-		return (dest);
+		return (start);
 	}
 
 	void*
 	memset(void *dest, char val, size_t len)
 	{
+		void *start = dest;
+
 		if (dest)
 		{
 			if (len >= 8)
@@ -43,33 +47,35 @@ namespace ft
 
 				while (len >= 8)
 				{
-					*((unsigned long*)dest++) = xval;
+					*(((unsigned long*&)dest)++) = xval;
 					len -= 8;
 				}
 			}
 
 			while (len--)
-				*((unsigned char*)dest++) = val;
+				*(((unsigned char*&)dest)++) = val;
 		}
 
-		return (dest);
+		return (start);
 	}
 
 	void*
 	bzero(void *dest, size_t len)
 	{
+		void *start = dest;
+
 		if (dest)
 		{
 			while (len >= 8)
 			{
-				*((unsigned long*)dest++) = 0;
+				*(((unsigned long*&)dest)++) = 0;
 				len -= 8;
 			}
 
 			while (len--)
-				*((unsigned char*)dest++) = 0;
+				*(((unsigned char*&)dest)++) = 0;
 		}
 
-		return (dest);
+		return (start);
 	}
 }
