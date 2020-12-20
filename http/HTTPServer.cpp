@@ -44,3 +44,21 @@ HTTPServer::socket(void) const
 {
 	return (m_socket);
 }
+
+const std::string&
+HTTPServer::host() const
+{
+	return m_host;
+}
+
+short
+HTTPServer::port() const
+{
+	return m_port;
+}
+
+const std::list<const ServerBlock*>&
+HTTPServer::serverBlocks() const
+{
+	return m_serverBlocks;
+}

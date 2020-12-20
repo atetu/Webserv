@@ -10,27 +10,26 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+#include <libs/ft.hpp>
 #include <net/address/Inet4Address.hpp>
 #include <util/Convert.hpp>
-#include <cstring>
-#include <iostream>
 
 Inet4Address::Inet4Address() :
 		m_address()
 {
-	::memset(m_address, 0, sizeof(m_address));
+	ft::bzero(m_address, sizeof(m_address));
 }
 
 Inet4Address::Inet4Address(byte address[4]) :
 		m_address()
 {
-	::memcpy(m_address, address, sizeof(m_address));
+	ft::memcpy(m_address, address, sizeof(m_address));
 }
 
 Inet4Address::Inet4Address(const Inet4Address &other) :
 		m_address()
 {
-	::memcpy(m_address, other.m_address, sizeof(m_address));
+	ft::memcpy(m_address, other.m_address, sizeof(m_address));
 }
 
 Inet4Address::~Inet4Address()
@@ -41,7 +40,7 @@ Inet4Address&
 Inet4Address::operator =(const Inet4Address &other)
 {
 	if (this != &other)
-		::memcpy(m_address, other.m_address, sizeof(m_address));
+		ft::memcpy(m_address, other.m_address, sizeof(m_address));
 
 	return (*this);
 }

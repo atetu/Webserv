@@ -63,10 +63,16 @@ class HTTPClient
 			return (m_socket);
 		}
 
-		inline InetSocketAddress&
-		socketAddress(void)
+		inline const InetSocketAddress&
+		socketAddress(void) const
 		{
 			return (m_socketAddress);
+		}
+
+		const HTTPServer&
+		server() const
+		{
+			return (m_server);
 		}
 
 		inline SocketBuffer&
@@ -95,6 +101,12 @@ class HTTPClient
 
 		inline HTTPRequest*&
 		request(void)
+		{
+			return (m_request);
+		}
+
+		inline const HTTPRequest*
+		request(void) const
 		{
 			return (m_request);
 		}

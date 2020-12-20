@@ -31,6 +31,18 @@ class DeleteHelper
 	public:
 		template<typename T>
 			static void
+			pointers(const T *const*ptrarr)
+			{
+				if (ptrarr)
+				{
+					const T *ptr;
+					while ((ptr = *ptrarr++))
+						pointer<T>(ptr);
+				}
+			}
+
+		template<typename T>
+			static void
 			pointers(Optional<std::list<T*> > &optional)
 			{
 				if (optional.present())

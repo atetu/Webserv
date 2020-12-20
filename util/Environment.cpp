@@ -10,8 +10,8 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+#include <libs/ft.hpp>
 #include <util/Environment.hpp>
-#include <cstring>
 #include <utility>
 
 Environment::Environment() :
@@ -75,7 +75,7 @@ Environment::envp(char **envp)
 	char *str;
 	while ((str = *envp))
 	{
-		char *equal = std::strchr(str, '=');
+		char *equal = ft::strchr(str, '=');
 		const char *value = "";
 
 		if (equal)
@@ -93,4 +93,21 @@ Environment::envp(char **envp)
 	}
 
 	return (environment);
+}
+
+char**
+Environment::allocate() const
+{
+	char **envp = new char*[m_storage.size() + 1];
+
+	map::size_type index = 0;
+	for (const_iterator it = m_storage.begin(); it != m_storage.end(); it++)
+	{
+		std::string line = it->first + '=' + it->second;
+		envp[index++] = ft::strdup(line.c_str());
+	}
+
+	envp[index] = NULL;
+
+	return (envp);
 }
