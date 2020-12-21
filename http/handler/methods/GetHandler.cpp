@@ -35,6 +35,8 @@ GetHandler::~GetHandler()
 GenericHTTPResponse*
 GetHandler::handle(HTTPRequest &request)
 {
+	std::cout << "GET " << std::endl;
+
 	HTTPHeaderFields headers;
 
 	const std::string &path = request.root() + request.url().path();

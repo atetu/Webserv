@@ -16,6 +16,7 @@
 #include <sys/stat.h>
 #include <util/Optional.hpp>
 #include <string>
+#include <cerrno>
 
 class CGIBlock
 {
@@ -55,7 +56,11 @@ class CGIBlock
 			if (m_path.present())
 			{
 				struct stat st;
-				return (::stat(m_path.get().c_str(), &st) == 0);
+				bool exists = ::stat(m_path.get().c_str(), &st) == 0;
+
+				errno = 0;
+
+				return (exists);
 			}
 
 			return (false);

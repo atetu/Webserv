@@ -10,9 +10,9 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <io/Socket.hpp>
 #include <util/buffer/impl/FileDescriptorBuffer.hpp>
 #include <algorithm>
+#include <iostream>
 
 FileDescriptorBuffer::FileDescriptorBuffer(FileDescriptor &fileDescriptor, int actionOnDestroy, size_type maxSize) :
 		BaseBuffer(maxSize),

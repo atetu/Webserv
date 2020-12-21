@@ -15,6 +15,7 @@
 #include <sys/fcntl.h>
 #include <sys/errno.h>
 #include <sys/unistd.h>
+#include <iostream>
 
 FileDescriptor::FileDescriptor(int fd) :
 		m_fd(fd),
@@ -26,6 +27,8 @@ FileDescriptor::FileDescriptor(int fd) :
 
 FileDescriptor::~FileDescriptor()
 {
+	if (!m_closed)
+		::close(m_fd);
 }
 
 void

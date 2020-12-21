@@ -29,6 +29,8 @@ CGIHTTPResponse::CGIHTTPResponse(const HTTPStatusLine &statusLine, CommonGateway
 
 CGIHTTPResponse::~CGIHTTPResponse()
 {
+	std::cout << "~CGIHTTPResponse()" << std::endl;
+
 	m_cgi.exit();
 
 	DeleteHelper::pointer<FileDescriptorBuffer>(m_inBuffer);
@@ -43,12 +45,12 @@ CGIHTTPResponse::write(SocketBuffer &socketBuffer)
 	if (m_state == NONE)
 		m_state = STATUS_LINE;
 
-	static int running = -1;
-	if (m_cgi.running() != running)
-	{
-		running = m_cgi.running();
-		std::cout << "running: " << m_cgi.running() << ", " << m_outBuffer->storage() << std::endl;
-	}
+//	static int running = -1;
+//	if (m_cgi.running() != running)
+//	{
+//		running = m_cgi.running();
+//		std::cout << "running: " << m_cgi.running() << ", " << m_outBuffer->storage() << std::endl;
+//	}
 
 	switch (m_state)
 	{
@@ -64,7 +66,7 @@ CGIHTTPResponse::write(SocketBuffer &socketBuffer)
 			socketBuffer.store(*m_outBuffer);
 			socketBuffer.send();
 
-			if (!m_cgi.running())
+			if (!m_cgi.running() || m_outBuffer->hasReadEverything())
 				m_state = FLUSHING;
 
 			break;

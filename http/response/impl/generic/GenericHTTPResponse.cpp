@@ -102,7 +102,7 @@ bool
 GenericHTTPResponse::write(SocketBuffer &socketBuffer)
 {
 	if (m_state == NONE)
-		m_state = HEADERS;
+		m_state = STATUS_LINE;
 
 	switch (m_state)
 	{
@@ -132,7 +132,7 @@ GenericHTTPResponse::write(SocketBuffer &socketBuffer)
 			break;
 
 		case FLUSHING:
-			if (socketBuffer.send() < 0 || socketBuffer.size() == 0)
+			if (socketBuffer.size() == 0)
 				m_state = FINISHED;
 
 			break;

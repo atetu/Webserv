@@ -92,6 +92,9 @@ class HTTPOrchestrator
 		void
 		removeClient(int fd);
 
+		void
+		removeFileWrite(int fd);
+
 	public:
 		void
 		start();
