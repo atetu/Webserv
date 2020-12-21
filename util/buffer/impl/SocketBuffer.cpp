@@ -16,7 +16,7 @@
 #include <algorithm>
 
 SocketBuffer::SocketBuffer(Socket &socket, int actionOnDestroy, size_type maxSize) :
-		FileBuffer(socket, actionOnDestroy, maxSize)
+		FileDescriptorBuffer(socket, actionOnDestroy, maxSize)
 {
 }
 
@@ -25,7 +25,7 @@ SocketBuffer::~SocketBuffer()
 }
 
 ssize_t
-SocketBuffer::recv(size_t len)
+SocketBuffer::recv(int flags, size_t len)
 {
 	size_t capacity;
 
@@ -37,7 +37,7 @@ SocketBuffer::recv(size_t len)
 	if (capacity)
 	{
 		char rbuffer[capacity];
-		ssize_t r = static_cast<Socket&>(m_fd).recv(rbuffer, std::min(capacity, len), 0);
+		ssize_t r = static_cast<Socket&>(m_fd).recv(rbuffer, std::min(capacity, len), flags);
 
 		if (r >= 0)
 			BaseBuffer::store(rbuffer, r);
@@ -51,9 +51,9 @@ SocketBuffer::recv(size_t len)
 }
 
 ssize_t
-SocketBuffer::send(size_t len)
+SocketBuffer::send(int flags, size_t len)
 {
-	ssize_t r = static_cast<Socket&>(m_fd).send(m_storage.data(), std::min(m_storage.length(), len), 0);
+	ssize_t r = static_cast<Socket&>(m_fd).send(m_storage.data(), std::min(m_storage.length(), len), flags);
 
 	if (r > 0)
 		m_storage.erase(0, r);

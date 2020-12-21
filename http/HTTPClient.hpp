@@ -17,11 +17,13 @@
 #include <io/Socket.hpp>
 #include <net/address/InetSocketAddress.hpp>
 
+class HTTPResponse;
+
 class HTTPServer;
 class SocketBuffer;
 class Socket;
 class HTTPRequest;
-class HTTPResponse;
+class GenericHTTPResponse;
 
 class HTTPClient
 {
@@ -113,6 +115,12 @@ class HTTPClient
 
 		inline HTTPResponse*&
 		response(void)
+		{
+			return (m_response);
+		}
+
+		inline const HTTPResponse*
+		response(void) const
 		{
 			return (m_response);
 		}

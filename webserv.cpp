@@ -13,10 +13,10 @@
 #include <config/Configuration.hpp>
 #include <config/exceptions/ConfigurationBindException.hpp>
 #include <config/exceptions/ConfigurationValidateException.hpp>
-#include <sys/signal.h>
 #include <encoding/default/base64/Base64.hpp>
 #include <exception/IOException.hpp>
 #include <http/HTTPOrchestrator.hpp>
+#include <libs/ft.hpp>
 #include <util/ContainerBuilder.hpp>
 #include <util/Enum.hpp>
 #include <util/Environment.hpp>
@@ -28,11 +28,10 @@
 #include <util/options/CommandLine.hpp>
 #include <util/options/Option.hpp>
 #include <util/options/OptionParser.hpp>
-#include <csignal>
 #include <iostream>
 #include <list>
+#include <signal.h>
 #include <string>
-#include <typeinfo>
 #include <vector>
 
 const Option OPT_HELP('h', "help", "display this help message");
@@ -150,7 +149,7 @@ delegated_main(int argc, char **argv, char **envp)
 
 		try
 		{
-			httpOrchestrator = HTTPOrchestrator::create(*configuration);
+			httpOrchestrator = HTTPOrchestrator::create(*configuration, environment);
 			httpOrchestrator->start();
 		}
 		catch (Exception &exception)
@@ -172,7 +171,7 @@ delegated_main(int argc, char **argv, char **envp)
 int
 main(int argc, char **argv, char **envp)
 {
-	int exitCode;
+	int exitCode = 0;
 
 	try
 	{

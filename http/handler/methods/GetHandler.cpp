@@ -11,17 +11,16 @@
 /* ************************************************************************** */
 
 #include <config/Configuration.hpp>
-#include <sys/stat.h>
 #include <dirent.h>
 #include <http/handler/methods/GetHandler.hpp>
 #include <http/HTTPHeaderFields.hpp>
-#include <http/HTTPResponse.hpp>
 #include <http/HTTPStatus.hpp>
+#include <http/response/impl/generic/GenericHTTPResponse.hpp>
 #include <io/FileDescriptor.hpp>
 #include <sys/fcntl.h>
 #include <dirent.h>
 #include <sys/stat.h>
-#include <util/buffer/impl/FileBuffer.hpp>
+#include <util/buffer/impl/FileDescriptorBuffer.hpp>
 #include <util/URL.hpp>
 #include <string>
 
@@ -33,7 +32,7 @@ GetHandler::~GetHandler()
 {
 }
 
-HTTPResponse*
+GenericHTTPResponse*
 GetHandler::handle(HTTPRequest &request)
 {
 	HTTPHeaderFields headers;
@@ -42,14 +41,14 @@ GetHandler::handle(HTTPRequest &request)
 
 	struct stat st;
 	if (::stat(path.c_str(), &st) != 0)
-		return (HTTPResponse::status(*HTTPStatus::NOT_FOUND));
+		return (GenericHTTPResponse::status(*HTTPStatus::NOT_FOUND));
 
 	if (S_ISREG(st.st_mode))
 	{
 		int fd = ::open(path.c_str(), O_RDONLY);
 
 		if (fd == -1)
-			return (HTTPResponse::status(*HTTPStatus::NOT_FOUND));
+			return (GenericHTTPResponse::status(*HTTPStatus::NOT_FOUND));
 
 		std::string extension;
 		if (request.url().extension(extension))
@@ -57,7 +56,7 @@ GetHandler::handle(HTTPRequest &request)
 
 		headers.contentLength(st.st_size);
 
-		return (new HTTPResponse(*HTTPStatus::OK, headers, new HTTPResponse::FileBody(*FileBuffer::from(*FileDescriptor::wrap(fd), FileBuffer::CLOSE | FileBuffer::DELETE))));
+		return (new GenericHTTPResponse(HTTPStatusLine(*HTTPStatus::OK), headers, new GenericHTTPResponse::FileBody(*FileDescriptorBuffer::from(*FileDescriptor::wrap(fd), FileDescriptorBuffer::CLOSE | FileDescriptorBuffer::DELETE))));
 	}
 
 	if (S_ISDIR(st.st_mode))
@@ -65,7 +64,7 @@ GetHandler::handle(HTTPRequest &request)
 		DIR *dir = ::opendir(path.c_str());
 
 		if (dir == NULL)
-			return (HTTPResponse::status(*HTTPStatus::NOT_FOUND));
+			return (GenericHTTPResponse::status(*HTTPStatus::NOT_FOUND));
 
 		const std::string &directory = request.url().path();
 
@@ -97,10 +96,10 @@ GetHandler::handle(HTTPRequest &request)
 		headers.html();
 		headers.contentLength(listing.size());
 
-		return (new HTTPResponse(*HTTPStatus::OK, headers, new HTTPResponse::StringBody(listing)));
+		return (new GenericHTTPResponse(HTTPStatusLine(*HTTPStatus::OK), headers, new GenericHTTPResponse::StringBody(listing)));
 	}
 
-	return (HTTPResponse::status(*HTTPStatus::NOT_FOUND));
+	return (GenericHTTPResponse::status(*HTTPStatus::NOT_FOUND));
 }
 
 GetHandler&

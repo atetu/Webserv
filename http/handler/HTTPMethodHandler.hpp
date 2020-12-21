@@ -14,7 +14,7 @@
 # define HTTPMETHODHANDLER_HPP_
 
 class HTTPRequest;
-class HTTPResponse;
+class GenericHTTPResponse;
 
 class HTTPMethodHandler
 {
@@ -24,7 +24,7 @@ class HTTPMethodHandler
 		{
 		}
 
-		virtual HTTPResponse*
+		virtual GenericHTTPResponse*
 		handle(HTTPRequest &request) = 0;
 };
 

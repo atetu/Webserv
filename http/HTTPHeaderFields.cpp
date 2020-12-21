@@ -13,8 +13,10 @@
 #include <http/HTTP.hpp>
 #include <http/HTTPHeaderFields.hpp>
 #include <http/HTTPValueParser.hpp>
+#include <http/mime/Mime.hpp>
+#include <http/mime/MimeRegistry.hpp>
 #include <util/Convert.hpp>
-#include <string>
+#include <util/Enum.hpp>
 
 const std::string HTTPHeaderFields::ACCEPT_CHARSETS/*	*/= "Accept-Charsets";
 const std::string HTTPHeaderFields::ACCEPT_LANGUAGE/*	*/= "Accept-Language";

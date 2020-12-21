@@ -43,7 +43,7 @@ namespace ft
 		{
 			if (len >= 8)
 			{
-				unsigned long xval = val << 56 + val << 48 + val << 40 + val << 32 + val << 24 + val << 16 + val << 8 + val;
+				unsigned long xval = ((long)val << 56) + ((long)val << 48) + ((long)val << 40) + ((long)val << 32) + ((long)val << 24) + ((long)val << 16) + ((long)val << 8) + val;
 
 				while (len >= 8)
 				{

@@ -31,13 +31,18 @@ class DeleteHelper
 	public:
 		template<typename T>
 			static void
-			pointers(const T *const*ptrarr)
+			pointers2(T **arr)
 			{
-				if (ptrarr)
+				T **start = arr;
+
+				if (arr)
 				{
-					const T *ptr;
-					while ((ptr = *ptrarr++))
-						pointer<T>(ptr);
+					T *ptr;
+					while ((ptr = *arr++))
+						if (ptr)
+							delete[] ptr;
+
+					delete[] start;
 				}
 			}
 

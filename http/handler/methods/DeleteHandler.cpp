@@ -11,9 +11,10 @@
 /* ************************************************************************** */
 
 #include <http/handler/methods/DeleteHandler.hpp>
-#include <http/HTTPResponse.hpp>
 #include <http/HTTPStatus.hpp>
+#include <http/response/impl/generic/GenericHTTPResponse.hpp>
 #include <sys/stat.h>
+#include <util/URL.hpp>
 #include <cstdio>
 #include <string>
 
@@ -25,7 +26,7 @@ DeleteHandler::~DeleteHandler()
 {
 }
 
-HTTPResponse*
+GenericHTTPResponse*
 DeleteHandler::handle(HTTPRequest &request)
 {
 	const char *filepath = request.url().path().c_str();
@@ -34,12 +35,12 @@ DeleteHandler::handle(HTTPRequest &request)
 	if (::stat(filepath, &st) == 0)
 	{
 		if (::remove(filepath) == 0)
-			return (HTTPResponse::status(*HTTPStatus::OK));
+			return (GenericHTTPResponse::status(*HTTPStatus::OK));
 		else
-			return (HTTPResponse::status(*HTTPStatus::ACCEPTED));
+			return (GenericHTTPResponse::status(*HTTPStatus::ACCEPTED));
 	}
 	else
-		return (HTTPResponse::status(*HTTPStatus::NO_CONTENT));
+		return (GenericHTTPResponse::status(*HTTPStatus::NO_CONTENT));
 }
 
 DeleteHandler&

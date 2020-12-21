@@ -13,34 +13,61 @@
 #ifndef COMMONGATEWAYINTERFACE_HPP_
 # define COMMONGATEWAYINTERFACE_HPP_
 
+#include <config/block/CGIBlock.hpp>
+#include <sys/types.h>
 #include <util/Environment.hpp>
+#include <string>
 
+class FileDescriptor;
 class CGIBlock;
-
 class HTTPClient;
 
 class CommonGatewayInterface
 {
 	private:
-		HTTPClient &m_client;
-		const CGIBlock &m_cgiBlock;
-		const Environment &m_environment;
+		pid_t m_pid;
+		FileDescriptor &m_in;
+		FileDescriptor &m_out;
 
 	private:
 		CommonGatewayInterface();
+		CommonGatewayInterface(pid_t pid, FileDescriptor &in, FileDescriptor &out);
 		CommonGatewayInterface(const CommonGatewayInterface &other);
 
 		CommonGatewayInterface&
 		operator=(const CommonGatewayInterface &other);
 
 	public:
-		CommonGatewayInterface(HTTPClient &client, const CGIBlock &cgiBlock, const Environment &environment);
-
 		virtual
 		~CommonGatewayInterface();
 
 		void
-		execute();
+		exit();
+
+		bool
+		running();
+
+		inline FileDescriptor&
+		in() const
+		{
+			return (m_in);
+		}
+
+		inline FileDescriptor&
+		out() const
+		{
+			return (m_out);
+		}
+
+		inline pid_t
+		pid() const
+		{
+			return (m_pid);
+		}
+
+	public:
+		static CommonGatewayInterface*
+		execute(HTTPClient &client, const CGIBlock &cgiBlock, const Environment &environment);
 
 	public:
 		static const std::string ENV_AUTH_TYPE;

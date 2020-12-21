@@ -10,19 +10,19 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <util/buffer/impl/FileBuffer.hpp>
+#include <io/Socket.hpp>
+#include <util/buffer/impl/FileDescriptorBuffer.hpp>
 #include <algorithm>
 
-FileBuffer::FileBuffer(FileDescriptor &fileDescriptor, int actionOnDestroy, size_type maxSize) :
-		BaseBuffer(),
+FileDescriptorBuffer::FileDescriptorBuffer(FileDescriptor &fileDescriptor, int actionOnDestroy, size_type maxSize) :
+		BaseBuffer(maxSize),
 		m_fd(fileDescriptor),
 		m_actionOnDestroy(actionOnDestroy),
-		m_maxSize(maxSize),
 		m_readEverything(false)
 {
 }
 
-FileBuffer::~FileBuffer()
+FileDescriptorBuffer::~FileDescriptorBuffer()
 {
 	if (m_actionOnDestroy & CLOSE)
 		close();
@@ -32,7 +32,7 @@ FileBuffer::~FileBuffer()
 }
 
 ssize_t
-FileBuffer::read(size_t len)
+FileDescriptorBuffer::read(size_t len)
 {
 	size_t capacity;
 
@@ -58,7 +58,7 @@ FileBuffer::read(size_t len)
 }
 
 ssize_t
-FileBuffer::write(size_t len)
+FileDescriptorBuffer::write(size_t len)
 {
 	ssize_t r = m_fd.write(m_storage.data(), std::min(m_storage.length(), len));
 
@@ -69,38 +69,13 @@ FileBuffer::write(size_t len)
 }
 
 void
-FileBuffer::storeFrom(FileBuffer &buffer, bool andClear)
-{
-	size_type capacity = std::min(this->capacity(), buffer.capacity());
-
-	if (capacity)
-	{
-		m_storage += buffer.storage().substr(0, capacity);
-
-		buffer.storage().erase(0, capacity);
-	}
-
-	if (andClear)
-		buffer.clear();
-}
-
-size_t
-FileBuffer::capacity() const
-{
-	if (m_storage.size() >= m_maxSize)
-		return (0);
-
-	return (m_maxSize - m_storage.size());
-}
-
-void
-FileBuffer::close(void)
+FileDescriptorBuffer::close(void)
 {
 	m_fd.close();
 }
 
-FileBuffer*
-FileBuffer::from(FileDescriptor &fileDescriptor, int actionOnDestroy, size_type maxSize)
+FileDescriptorBuffer*
+FileDescriptorBuffer::from(FileDescriptor &fileDescriptor, int actionOnDestroy, size_type maxSize)
 {
-	return (new FileBuffer(fileDescriptor, actionOnDestroy, maxSize));
+	return (new FileDescriptorBuffer(fileDescriptor, actionOnDestroy, maxSize));
 }

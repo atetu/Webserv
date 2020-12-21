@@ -27,6 +27,7 @@ class BaseBuffer :
 
 	protected:
 		std::string m_storage;
+		size_type m_maxSize;
 
 	private:
 		BaseBuffer(const BaseBuffer &other);
@@ -36,6 +37,8 @@ class BaseBuffer :
 
 	public:
 		BaseBuffer();
+		BaseBuffer(size_type maxSize = std::string::npos);
+		BaseBuffer(const std::string &storage, size_type maxSize = std::string::npos);
 
 		virtual
 		~BaseBuffer();
@@ -48,6 +51,9 @@ class BaseBuffer :
 
 		void
 		store(const void *buffer, size_t len);
+
+		void
+		store(BaseBuffer &buffer, bool andClear = true);
 
 		bool
 		next(char &c);
@@ -66,6 +72,9 @@ class BaseBuffer :
 
 		void
 		clear();
+
+		size_t
+		capacity() const;
 
 		inline std::string&
 		storage()

@@ -12,6 +12,7 @@
 
 #include <libs/ft.hpp>
 #include <util/Environment.hpp>
+#include <iostream>
 #include <utility>
 
 Environment::Environment() :
