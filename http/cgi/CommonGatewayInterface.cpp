@@ -11,7 +11,6 @@
 /* ************************************************************************** */
 
 #include <signal.h>
-#include <sys/wait.h>
 #include <exception/IOException.hpp>
 #include <http/cgi/CommonGatewayInterface.hpp>
 #include <http/HTTPClient.hpp>
@@ -24,13 +23,12 @@
 #include <net/address/InetAddress.hpp>
 #include <net/address/InetSocketAddress.hpp>
 #include <sys/errno.h>
-#include <sys/select.h>
 #include <sys/unistd.h>
-#include <sys/wait.h>
 #include <util/Convert.hpp>
 #include <util/Enum.hpp>
 #include <util/helper/DeleteHelper.hpp>
 #include <util/Optional.hpp>
+#include <util/StringUtils.hpp>
 #include <util/URL.hpp>
 #include <cstdlib>
 #include <cstring>
@@ -136,7 +134,7 @@ CommonGatewayInterface::execute(HTTPClient &client, const CGIBlock &cgiBlock, co
 
 	const HTTPHeaderFields &headerFields = client.request()->headers();
 	for (HTTPHeaderFields::const_iterator it = headerFields.begin(); it != headerFields.end(); it++)
-		env.setProperty("HTTP_" + it->first, it->second);
+		env.setProperty("HTTP_" + StringUtils::toUpperCase(StringUtils::replace(StringUtils::replace(it->first, '=', '_'), '-', '_')), it->second);
 
 	if (errno)
 	{

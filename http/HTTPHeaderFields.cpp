@@ -289,19 +289,13 @@ HTTPHeaderFields::format(void) const
 {
 	std::string str;
 
-	const_iterator it = begin();
-	const_iterator ite = end();
-
-	while (it != ite)
-	{
+	for (const_iterator it = begin(); it != end(); it++)
 		str += it->first + std::string(": ") + it->second + HTTP::CRLF;
-		it++;
-	}
 
 	return (str);
 }
 
-std::map<std::string, std::string> &
+std::map<std::string, std::string>&
 HTTPHeaderFields::storage(void)
 {
 	return (m_storage);
@@ -316,33 +310,33 @@ HTTPHeaderFields::getValueWithWeight(std::string field)
 
 	while (it != ite && it->first != field)
 		it++;
-	
+
 	std::string value = it->second;
-	
+
 	HTTPValueParser *valueParser = new HTTPValueParser(value);
-	
-	char c ;
-	
+
+	char c;
+
 	while (valueParser->next(c))
 		valueParser->consume(c);
 	valueParser->consume('\0');
-	
+
 	// std::map<float, std::list<std::string> > *mmap = valueParser->getMap();
-	
+
 	//  std::map<float,  std::list<std::string> >::iterator itt = mmap->begin();
-    // std::map<float,  std::list<std::string> >::iterator itte = mmap->end();
-    
-    // while (itt != itte)
-    // {
-    //     std::cout << itt->first << " : " ;
+	// std::map<float,  std::list<std::string> >::iterator itte = mmap->end();
+
+	// while (itt != itte)
+	// {
+	//     std::cout << itt->first << " : " ;
 	// std::list<std::string>::iterator it_list =itt->second.begin();
-    // std::list<std::string>::iterator ite_list = itt->second.end();
-      
+	// std::list<std::string>::iterator ite_list = itt->second.end();
+
 	// while (it_list != ite_list)
 	// {
-            
-    // 	  std::cout<< "[value] " << *it_list << std::endl;
-    //       it_list++;
+
+	// 	  std::cout<< "[value] " << *it_list << std::endl;
+	//       it_list++;
 	// }
 	// itt++;
 	// }
@@ -356,7 +350,7 @@ HTTPHeaderFields::create(std::map<std::string, std::string> headerMap)
 	// std::map<std::string, std::string>::iterator ite = headerMap.end();
 
 	HTTPHeaderFields *header = new HTTPHeaderFields(headerMap);
-	
+
 	// while (it != ite)
 	// {
 	// 	header->set(it->getField(), it->getValue());
