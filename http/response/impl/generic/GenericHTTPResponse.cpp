@@ -169,3 +169,15 @@ GenericHTTPResponse::status(HTTPStatus &status)
 {
 	return (new GenericHTTPResponse(HTTPStatusLine(HTTPVersion::HTTP_1_1, status), HTTPHeaderFields(), NULL));
 }
+
+GenericHTTPResponse*
+GenericHTTPResponse::file(HTTPStatus &status, const HTTPHeaderFields &headers, FileDescriptorBuffer &fileBuffer)
+{
+	return (new GenericHTTPResponse(HTTPStatusLine(*HTTPStatus::OK), headers, new GenericHTTPResponse::FileBody(fileBuffer)));
+}
+
+GenericHTTPResponse*
+GenericHTTPResponse::string(HTTPStatus &status, const HTTPHeaderFields &headers, const std::string &string)
+{
+	return (new GenericHTTPResponse(HTTPStatusLine(*HTTPStatus::OK), headers, new GenericHTTPResponse::StringBody(string)));
+}
