@@ -37,6 +37,18 @@ class HTTPStatusLine
 
 		std::string
 		format(void) const;
+
+		const HTTPStatus&
+		status() const
+		{
+			return (m_status);
+		}
+
+		const HTTPVersion&
+		version() const
+		{
+			return (m_version);
+		}
 };
 
 #endif /* HTTPSTATUSLINE_HPP_ */

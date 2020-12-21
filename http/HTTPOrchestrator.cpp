@@ -234,7 +234,7 @@ HTTPOrchestrator::start()
 
 						if (buffer.read() == -1 || buffer.hasReadEverything())
 						{
-							std::cout << "fd-read :: remove(" << fd << " (" << buffer.descriptor().raw() << ")): " << ::strerror(errno) << std::endl;
+//							std::cout << "fd-read :: remove(" << fd << " (" << buffer.descriptor().raw() << ")): " << ::strerror(errno) << std::endl;
 							fdToRemove.insert(fdToRemove.end(), fd);
 						}
 					}
@@ -308,14 +308,6 @@ HTTPOrchestrator::start()
 										client.response() = GenericHTTPResponse::status(*HTTPStatus::NOT_FOUND);
 									else
 									{
-										//std::cout << "location: " << locationBlock->path() << std::endl;
-
-										if (errno)
-										{
-											std::cout << __FILE__ << ":" << __LINE__ << " -- " << ::strerror(errno) << std::endl;
-											errno = 0;
-										}
-
 										const HTTPMethod *methodPtr = HTTPMethod::find(client.parser().method());
 										if (!methodPtr)
 											client.response() = GenericHTTPResponse::status(*HTTPStatus::METHOD_NOT_ALLOWED);
@@ -395,7 +387,7 @@ HTTPOrchestrator::start()
 								client.updateLastAction();
 							else
 							{
-								std::cout << "closing(" << fd << "): " << ::strerror(errno) << std::endl;
+//								std::cout << "closing(" << fd << "): " << ::strerror(errno) << std::endl;
 
 								fdToRemove.insert(fdToRemove.end(), fd);
 
@@ -442,7 +434,7 @@ HTTPOrchestrator::start()
 
 						if (buffer.write() == -1)
 						{
-							std::cout << "fd-write :: remove(" << fd << " (" << buffer.descriptor().raw() << ")): " << ::strerror(errno) << std::endl;
+//							std::cout << "fd-write :: remove(" << fd << " (" << buffer.descriptor().raw() << ")): " << ::strerror(errno) << std::endl;
 							fdToRemove.insert(fdToRemove.end(), fd);
 						}
 					}
@@ -622,6 +614,18 @@ HTTPOrchestrator::removeClient(int fd)
 			client.response()->writeFileDescriptors(buffers);
 			for (HTTPResponse::fdb_iterator it = buffers.begin(); it != buffers.end(); it++)
 				removeFileWrite((*it)->descriptor().raw());
+
+			if (client.request())
+			{
+				LOG.info() << client.socketAddress().hostAddress()
+				/**/<< " - "
+				/**/<< client.request()->method().name()
+				/**/<< " "
+				/**/<< client.request()->url().path()
+				/**/<< " :: "
+				/**/<< client.response()->statusLine().status().code()
+				/**/<< std::endl;
+			}
 		}
 
 		clearFd(fd);

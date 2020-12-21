@@ -43,6 +43,9 @@ class InetSocketAddress :
 		InetAddress*
 		address(void) const;
 
+		std::string
+		hostAddress() const;
+
 		port_t
 		port(void) const;
 

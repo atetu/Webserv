@@ -29,8 +29,6 @@ CGIHTTPResponse::CGIHTTPResponse(const HTTPStatusLine &statusLine, CommonGateway
 
 CGIHTTPResponse::~CGIHTTPResponse()
 {
-	std::cout << "~CGIHTTPResponse()" << std::endl;
-
 	m_cgi.exit();
 
 	DeleteHelper::pointer<FileDescriptorBuffer>(m_inBuffer);

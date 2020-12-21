@@ -70,6 +70,18 @@ InetSocketAddress::address(void) const
 	return (m_address);
 }
 
+std::string
+InetSocketAddress::hostAddress() const
+{
+	std::string out;
+
+	if (m_address)
+		out += m_address->hostAddress();
+
+	return (out + ":" + Convert::toString(m_port));
+}
+
+
 InetSocketAddress::port_t
 InetSocketAddress::port(void) const
 {

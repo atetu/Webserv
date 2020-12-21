@@ -23,12 +23,32 @@
 # error Unknown plateform
 #endif
 
-#ifdef IS_LINUX or IS_MACOS
+#if defined(IS_LINUX) or defined(IS_MACOS)
 # define IS_UNIX 1
 #endif
 
 #ifdef IS_CYGWIN
 # define IS_WINDOWS 1
+#endif
+
+/*
+ * Filling missing
+ */
+
+#ifndef IS_LINUX
+# define IS_LINUX 0
+#endif
+
+#ifndef IS_MACOS
+# define IS_MACOS 0
+#endif
+
+#ifndef IS_CYGWIN
+# define IS_CYGWIN 0
+#endif
+
+#ifndef IS_WINDOWS
+# define IS_WINDOWS 0
 #endif
 
 #endif /* DETECT_PLATFORM_H_ */

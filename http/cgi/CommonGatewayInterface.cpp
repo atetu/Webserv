@@ -22,6 +22,7 @@
 #include <io/FileDescriptor.hpp>
 #include <net/address/InetAddress.hpp>
 #include <net/address/InetSocketAddress.hpp>
+#include <os/detect_platform.h>
 #include <sys/errno.h>
 #include <sys/unistd.h>
 #include <util/Convert.hpp>
@@ -31,8 +32,6 @@
 #include <util/StringUtils.hpp>
 #include <util/URL.hpp>
 #include <cstdlib>
-#include <cstring>
-#include <iostream>
 #include <map>
 
 const std::string CommonGatewayInterface::ENV_AUTH_TYPE = "AUTH_TYPE";
@@ -54,8 +53,10 @@ const std::string CommonGatewayInterface::ENV_SERVER_PORT = "SERVER_PORT";
 const std::string CommonGatewayInterface::ENV_SERVER_PROTOCOL = "SERVER_PROTOCOL";
 const std::string CommonGatewayInterface::ENV_SERVER_SOFTWARE = "SERVER_SOFTWARE";
 
+#if IS_CYGWIN
 extern int
 kill(pid_t pid, int sig);
+#endif
 
 CommonGatewayInterface::CommonGatewayInterface(pid_t pid, FileDescriptor &in, FileDescriptor &out) :
 		m_pid(pid),
@@ -66,8 +67,6 @@ CommonGatewayInterface::CommonGatewayInterface(pid_t pid, FileDescriptor &in, Fi
 
 CommonGatewayInterface::~CommonGatewayInterface()
 {
-	std::cout << "~CommonGatewayInterface()" << std::endl;
-
 	delete &m_in;
 	delete &m_out;
 }
@@ -75,7 +74,7 @@ CommonGatewayInterface::~CommonGatewayInterface()
 void
 CommonGatewayInterface::exit()
 {
-	::kill(m_pid, SIGTERM);
+	::kill(m_pid, SIGKILL);
 }
 
 bool
@@ -96,12 +95,6 @@ CommonGatewayInterface::execute(HTTPClient &client, const CGIBlock &cgiBlock, co
 	if (pipe(inPipe) == -1)
 		throw IOException("pipe (in)", errno);
 
-	if (errno)
-	{
-		std::cout << __FILE__ << ":" << __LINE__ << " -- " << ::strerror(errno) << std::endl;
-		errno = 0;
-	}
-
 	int outPipe[2];
 	if (pipe(outPipe) == -1)
 	{
@@ -111,12 +104,6 @@ CommonGatewayInterface::execute(HTTPClient &client, const CGIBlock &cgiBlock, co
 		::close(inPipe[1]);
 
 		throw IOException("pipe (out)", err);
-	}
-
-	if (errno)
-	{
-		std::cout << __FILE__ << ":" << __LINE__ << " -- " << ::strerror(errno) << std::endl;
-		errno = 0;
 	}
 
 	Environment env = environment;
@@ -136,19 +123,9 @@ CommonGatewayInterface::execute(HTTPClient &client, const CGIBlock &cgiBlock, co
 	for (HTTPHeaderFields::const_iterator it = headerFields.begin(); it != headerFields.end(); it++)
 		env.setProperty("HTTP_" + StringUtils::toUpperCase(StringUtils::replace(StringUtils::replace(it->first, '=', '_'), '-', '_')), it->second);
 
-	if (errno)
-	{
-		std::cout << __FILE__ << ":" << __LINE__ << " -- " << ::strerror(errno) << std::endl;
-		errno = 0;
-	}
-
 	char **envp = env.allocate();
 
 	pid_t pid = ::fork();
-
-	if (errno)
-		std::cout << __FILE__ << ":" << __LINE__ << " -- " << ::strerror(errno) << std::endl;
-
 	if (pid == -1)
 	{
 		int err = errno;
@@ -160,12 +137,6 @@ CommonGatewayInterface::execute(HTTPClient &client, const CGIBlock &cgiBlock, co
 		::close(outPipe[0]);
 		::close(outPipe[1]);
 
-		if (errno)
-		{
-			std::cout << __FILE__ << ":" << __LINE__ << " -- " << ::strerror(errno) << std::endl;
-			errno = 0;
-		}
-
 		throw IOException("fork", err);
 	}
 
@@ -173,12 +144,6 @@ CommonGatewayInterface::execute(HTTPClient &client, const CGIBlock &cgiBlock, co
 	{
 		::dup2(inPipe[0], 0);
 		::dup2(outPipe[1], 1);
-
-		if (errno)
-		{
-			std::cout << __FILE__ << ":" << __LINE__ << " -- " << ::strerror(errno) << std::endl;
-			errno = 0;
-		}
 
 		std::string path = cgiBlock.path().get();
 		std::string file = "." + client.request()->url().path();
@@ -206,65 +171,20 @@ CommonGatewayInterface::execute(HTTPClient &client, const CGIBlock &cgiBlock, co
 		{
 			stdin = FileDescriptor::wrap(inPipe[1]);
 			stdout = FileDescriptor::wrap(outPipe[0]);
-//
-//			errno = 0;
-//			while (::kill(pid, 0) != -1)
-//			{
-//
-//				if (errno)
-//				{
-//					std::cout << __FILE__ << ":" << __LINE__ << " -- " << ::strerror(errno) << std::endl;
-//					errno = 0;
-//				}
-//
-//				fd_set x;
-//				FD_ZERO(&x);
-//				FD_SET(stdout->raw(), &x);
-//
-//				struct timeval timeout = {
-//					.tv_sec = 0,
-//					.tv_usec = 5000 };
-//
-//				if (::select(outPipe[0] + 10, &x, NULL, NULL, &timeout) < 1)
-//					continue;
-//
-//				if (errno)
-//				{
-//					std::cout << __FILE__ << ":" << __LINE__ << " -- " << ::strerror(errno) << std::endl;
-//					errno = 0;
-//				}
-//
-//				char y[100] = {
-//					0 };
-//				stdout->read(y, 99);
-//
-//				if (errno)
-//				{
-//					std::cout << __FILE__ << ":" << __LINE__ << " -- " << ::strerror(errno) << std::endl;
-//					errno = 0;
-//				}
-//
-//				if (::strlen(y))
-//					std::cout << y << std::endl;
-//
-//				int status;
-//				::waitpid(pid, &status, WNOHANG);
-//
-//				if (errno)
-//				{
-//					std::cout << __FILE__ << ":" << __LINE__ << " -- " << ::strerror(errno) << std::endl;
-//					errno = 0;
-//				}
-//			}
-//
-//			std::cout << "ended" << std::endl;
 		}
 		catch (...)
 		{
-			::kill(pid, SIGTERM);
+			::kill(pid, SIGKILL);
 
-			DeleteHelper::pointer<FileDescriptor>(stdin);
-			DeleteHelper::pointer<FileDescriptor>(stdout); /* Just in case, but should not happen. */
+			if (stdin)
+				delete stdin;
+			else
+				::close(inPipe[1]);
+
+			if (stdout) /* Just in case, but should not happen. */
+				delete stdout;
+			else
+				::close(outPipe[0]);
 
 			throw;
 		}

@@ -64,8 +64,6 @@ Configuration::Configuration(const Configuration &other) :
 
 Configuration::~Configuration()
 {
-	std::cout << "~Configuration()" << std::endl;
-
 	DeleteHelper::pointer<MimeRegistry>(m_mimeRegistry);
 	DeleteHelper::pointer<RootBlock>(m_rootBlock);
 }
@@ -115,13 +113,13 @@ Configuration::fromJsonFile(const std::string &path, bool ignoreMimeIncludesErro
 			{
 				const std::list<std::string> &includes = mimeBlock.includes().get();
 
-				LOG.debug() << "From " << includes.size() << " file(s)." << std::endl;
+				LOG.trace() << "From " << includes.size() << " file(s)." << std::endl;
 
 				for (std::list<std::string>::const_iterator it = includes.begin(); it != includes.end(); it++)
 				{
 					const std::string &file = *it;
 
-					LOG.debug() << "Current file: " << file << std::endl;
+					LOG.trace() << "Current file: " << file << std::endl;
 
 					try
 					{
@@ -141,7 +139,7 @@ Configuration::fromJsonFile(const std::string &path, bool ignoreMimeIncludesErro
 			{
 				const std::list<Mime const*> &defines = mimeBlock.defines().get();
 
-				LOG.debug() << "From " << defines.size() << " define(s)." << std::endl;
+				LOG.trace() << "From " << defines.size() << " define(s)." << std::endl;
 
 				for (std::list<Mime const*>::const_iterator it = defines.begin(); it != defines.end(); it++)
 					mimeRegistry->add(*(*it));
