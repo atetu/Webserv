@@ -13,38 +13,51 @@
 #include <config/block/LocationBlock.hpp>
 #include <config/block/RootBlock.hpp>
 #include <config/block/ServerBlock.hpp>
+#include <config/Configuration.hpp>
 #include <exception/IOException.hpp>
+#include <http/cgi/CommonGatewayInterface.hpp>
 #include <http/handler/HTTPMethodHandler.hpp>
+#include <http/HTTPFindLocation.hpp>
 #include <http/HTTPHeaderFields.hpp>
 #include <http/HTTPMethod.hpp>
 #include <http/HTTPOrchestrator.hpp>
 #include <http/HTTPRequest.hpp>
 #include <http/HTTPRequestParser.hpp>
-#include <http/HTTPResponse.hpp>
 #include <http/HTTPStatus.hpp>
 #include <http/HTTPVersion.hpp>
+#include <http/response/HTTPResponse.hpp>
+#include <http/response/HTTPStatusLine.hpp>
+#include <http/response/impl/cgi/CGIHTTPResponse.hpp>
+#include <http/response/impl/generic/GenericHTTPResponse.hpp>
 #include <io/Socket.hpp>
 #include <net/address/InetAddress.hpp>
 #include <net/address/InetSocketAddress.hpp>
 #include <sys/errno.h>
-#include <sys/unistd.h>
+#include <util/buffer/impl/BaseBuffer.hpp>
 #include <util/buffer/impl/SocketBuffer.hpp>
 #include <util/Enum.hpp>
+#include <util/Environment.hpp>
 #include <util/log/Logger.hpp>
 #include <util/log/LoggerFactory.hpp>
 #include <util/Optional.hpp>
 #include <util/System.hpp>
 #include <util/URL.hpp>
+#include <algorithm>
 #include <cstring>
 #include <iostream>
+#include <iterator>
 #include <set>
 #include <string>
 #include <utility>
+#include <vector>
+
+class CommonGatewayInterface;
 
 Logger &HTTPOrchestrator::LOG = LoggerFactory::get("HTTP Orchestrator");
 
-HTTPOrchestrator::HTTPOrchestrator(const Configuration &configuration, const server_container &servers) :
+HTTPOrchestrator::HTTPOrchestrator(const Configuration &configuration, const Environment &environment, const server_container &servers) :
 		m_configuration(configuration),
+		m_environment(environment),
 		m_servers(servers),
 		m_fds(),
 		m_highestFd(0),
@@ -52,7 +65,9 @@ HTTPOrchestrator::HTTPOrchestrator(const Configuration &configuration, const ser
 		serverFds(),
 		fileReadFds(),
 		clientFds(),
-		fileWriteFds()
+		fileWriteFds(),
+		m_running(false),
+		m_stopping(false)
 {
 	FD_ZERO(&m_fds);
 }
@@ -96,7 +111,7 @@ HTTPOrchestrator::setFd(int fd)
 	FD_SET(fd, &m_fds);
 	++m_fdCount;
 
-	LOG.debug() << "setFd(" << fd << " / " << m_fdCount << ")" << std::endl;
+//	LOG.debug() << "setFd(" << fd << " / " << m_fdCount << ")" << std::endl;
 
 	if (fd > m_highestFd)
 		m_highestFd = fd;
@@ -108,7 +123,7 @@ HTTPOrchestrator::clearFd(int fd)
 	FD_CLR(fd, &m_fds);
 	--m_fdCount;
 
-	LOG.debug() << "clearFd(" << fd << " / " << m_fdCount << ")" << std::endl;
+//	LOG.debug() << "clearFd(" << fd << " / " << m_fdCount << ")" << std::endl;
 
 	if (fd == m_highestFd)
 		m_highestFd--;
@@ -151,7 +166,6 @@ HTTPOrchestrator::printSelectOutput(fd_set &readFds, fd_set &writeFds)
 void
 HTTPOrchestrator::start()
 {
-
 	prepare();
 
 	fd_set readFdSet;
@@ -161,14 +175,21 @@ HTTPOrchestrator::start()
 		.tv_sec = 0,
 		.tv_usec = 5000 };
 
-	while (1)
+	m_running = true;
+	while (m_running)
 	{
 		readFdSet = m_fds;
 		writeFdSet = m_fds;
 
 		int fdCount;
 		if ((fdCount = ::select(m_highestFd + 1, &readFdSet, &writeFdSet, NULL, &timeout)) == -1)
+		{
+			std::cout << m_stopping << " " << errno << " " << EINTR << std::endl;
+			if (m_stopping && errno == EINTR)
+				continue;
+
 			throw IOException("select", errno);
+		}
 
 		printSelectOutput(readFdSet, writeFdSet);
 
@@ -199,7 +220,7 @@ HTTPOrchestrator::start()
 
 			try
 			{
-				typedef std::map<int, FileBuffer*>::iterator iterator;
+				typedef std::map<int, FileDescriptorBuffer*>::iterator iterator;
 
 				std::set<int> fdToRemove;
 
@@ -209,11 +230,11 @@ HTTPOrchestrator::start()
 
 					if (FD_ISSET(fd, &readFdSet))
 					{
-						FileBuffer &buffer = *it->second;
+						FileDescriptorBuffer &buffer = *it->second;
 
 						if (buffer.read() == -1 || buffer.hasReadEverything())
 						{
-							std::cout << "fd-read :: remove(" << fd << " (" << buffer.descriptor().raw() << ")): " << ::strerror(errno) << std::endl;
+//							std::cout << "fd-read :: remove(" << fd << " (" << buffer.descriptor().raw() << ")): " << ::strerror(errno) << std::endl;
 							fdToRemove.insert(fdToRemove.end(), fd);
 						}
 					}
@@ -225,6 +246,12 @@ HTTPOrchestrator::start()
 			catch (Exception &exception)
 			{
 				LOG.warn() << "Could not handle file reading: " << exception.message() << std::endl;
+			}
+
+			if (errno)
+			{
+				std::cout << __FILE__ << ":" << __LINE__ << " -- " << ::strerror(errno) << std::endl;
+				errno = 0;
 			}
 
 			try
@@ -258,10 +285,11 @@ HTTPOrchestrator::start()
 								{
 									HTTPHeaderFields header = HTTPHeaderFields(client.parser().header()); // isn't enough actually?
 
-									std::map<std::string, std::string>::iterator header_it = header.storage().find("Host");
-									if (header_it == header.storage().end())
-										throw Exception("No host in header fields");
-									std::string clientHost = header_it->second;
+									std::map<std::string, std::string>::iterator header_it = header.storage().find("host");
+//									if (header_it == header.storage().end())
+//										throw Exception("No host in header fields");
+									std::string clientHost = "localhost";
+//									std::string clientHost = header_it->second;
 									//std::cout << "client : " << clientHost << std::endl;
 
 									const ServerBlock *serverBlock = m_configuration.rootBlock().findServerBlock(clientHost); // ca marche avec inline juste. Pourquoi ?? + explication du const a la fin de fonction?
@@ -270,41 +298,79 @@ HTTPOrchestrator::start()
 									const LocationBlock *locationBlock = NULL;
 									if (serverBlock && serverBlock->locations().present())
 									{
-										std::cout << serverBlock->locations().present() << std::endl;
-
-										HTTPFindLocation findLocation(client.parser().path(),
-
-										serverBlock->locations().get());
+										HTTPFindLocation findLocation(client.parser().path(), serverBlock->locations().get());
 
 										if (findLocation.parse().location().present())
 											locationBlock = findLocation.parse().location().get();
 									}
 
 									if (!serverBlock)
-										client.response() = HTTPResponse::status(*HTTPStatus::NOT_FOUND);
+										client.response() = GenericHTTPResponse::status(*HTTPStatus::NOT_FOUND);
 									else
 									{
-										//std::cout << "location: " << locationBlock->path() << std::endl;
-
-										const HTTPMethod *method = HTTPMethod::find(client.parser().method());
-										if (!method)
-											client.response() = HTTPResponse::status(*HTTPStatus::METHOD_NOT_ALLOWED);
+										const HTTPMethod *methodPtr = HTTPMethod::find(client.parser().method());
+										if (!methodPtr)
+											client.response() = GenericHTTPResponse::status(*HTTPStatus::METHOD_NOT_ALLOWED);
 										else
 										{
-											URL url = URL("http", "locahost", 80, client.parser().path(), Optional<std::map<std::string, std::string> >(), Optional<std::string>());
+											const HTTPMethod &method = *methodPtr;
+
+											URL url = URL("http", "locahost", client.server().port(), client.parser().path(), Optional<std::map<std::string, std::string> >() /* TODO Finish */, Optional<std::string>());
 
 											const RootBlock &rootBlock = m_configuration.rootBlock();
 
 											const HTTPVersion &version = HTTPVersion::HTTP_1_1;
 											const Optional<LocationBlock const*> locationBlockOptional = Optional<LocationBlock const*>::ofNullable(locationBlock);
 
-											client.request() = new HTTPRequest(*method, url, version, header, m_configuration, rootBlock, *serverBlock, locationBlockOptional);
-											client.response() = method->handler().handle(*client.request());
+											client.request() = new HTTPRequest(method, url, version, header, m_configuration, rootBlock, *serverBlock, locationBlockOptional);
 
-											HTTPResponse::FileBody *fileBody = dynamic_cast<HTTPResponse::FileBody*>(client.response()->body());
-											if (fileBody)
-												addFileRead(fileBody->fileBuffer());
+											if (locationBlock)
+											{
+												if (locationBlock->methods().present())
+												{
+													const std::list<std::string> methods = locationBlock->methods().get();
+
+													if (std::find(methods.begin(), methods.end(), method.name()) == methods.end())
+														client.response() = GenericHTTPResponse::status(*HTTPStatus::METHOD_NOT_ALLOWED);
+												}
+
+												if (!client.response() && locationBlock->cgi().present())
+												{
+													const CGIBlock &cgiBlock = rootBlock.getCGI(locationBlock->cgi().get());
+
+													try
+													{
+														CommonGatewayInterface *cgi = CommonGatewayInterface::execute(client, cgiBlock, m_environment);
+
+														client.response() = new CGIHTTPResponse(HTTPStatusLine(*HTTPStatus::OK), *cgi);
+													}
+													catch (Exception &exception)
+													{
+														LOG.error() << "An error occurred while processing CGI: " << exception.message() << std::endl;
+
+														client.response() = GenericHTTPResponse::status(*HTTPStatus::INTERNAL_SERVER_ERROR);
+													}
+												}
+											}
+
+											if (!client.response())
+												client.response() = method.handler().handle(*client.request());
 										}
+									}
+
+									if (client.response())
+									{
+										HTTPResponse::fdb_vector buffers;
+
+										client.response()->readFileDescriptors(buffers);
+										for (HTTPResponse::fdb_iterator it = buffers.begin(); it != buffers.end(); it++)
+											addFileDescriptorBufferRead(*(*it));
+
+										buffers.clear();
+
+										client.response()->writeFileDescriptors(buffers);
+										for (HTTPResponse::fdb_iterator it = buffers.begin(); it != buffers.end(); it++)
+											addFileDescriptorBufferWrite(*(*it));
 									}
 
 									break;
@@ -321,7 +387,7 @@ HTTPOrchestrator::start()
 								client.updateLastAction();
 							else
 							{
-								std::cout << "closing(" << fd << "): " << ::strerror(errno) << std::endl;
+//								std::cout << "closing(" << fd << "): " << ::strerror(errno) << std::endl;
 
 								fdToRemove.insert(fdToRemove.end(), fd);
 
@@ -332,7 +398,7 @@ HTTPOrchestrator::start()
 						}
 					}
 
-					if (!deleted && client.response() && client.response()->state() == HTTPResponse::FINISHED)
+					if (!deleted && client.response() && client.response()->state() == GenericHTTPResponse::FINISHED)
 					{
 						std::cout << "done: " << fd << std::endl;
 
@@ -350,6 +416,44 @@ HTTPOrchestrator::start()
 			catch (Exception &exception)
 			{
 				LOG.warn() << "Could not handle client: " << exception.message() << std::endl;
+			}
+
+			try
+			{
+				typedef std::map<int, FileDescriptorBuffer*>::iterator iterator;
+
+				std::set<int> fdToRemove;
+
+				for (iterator it = fileWriteFds.begin(); it != fileWriteFds.end(); it++)
+				{
+					int fd = it->first;
+
+					if (FD_ISSET(fd, &writeFdSet))
+					{
+						FileDescriptorBuffer &buffer = *it->second;
+
+						if (buffer.write() == -1)
+						{
+//							std::cout << "fd-write :: remove(" << fd << " (" << buffer.descriptor().raw() << ")): " << ::strerror(errno) << std::endl;
+							fdToRemove.insert(fdToRemove.end(), fd);
+						}
+					}
+				}
+
+				for (std::set<int>::iterator it = fdToRemove.begin(); it != fdToRemove.end(); it++)
+					removeFileWrite(*it);
+			}
+			catch (Exception &exception)
+			{
+				LOG.warn() << "Could not handle file reading: " << exception.message() << std::endl;
+			}
+		}
+		else if (m_stopping)
+		{
+			if (clientFds.empty() && fileReadFds.empty() && fileWriteFds.empty())
+			{
+				m_running = false;
+				break;
 			}
 		}
 
@@ -383,6 +487,27 @@ HTTPOrchestrator::start()
 			LOG.warn() << "Could not handle client (timeout): " << exception.message() << std::endl;
 		}
 	}
+
+	m_running = false;
+
+	while (!m_servers.empty())
+	{
+		server_iterator it = m_servers.begin();
+		HTTPServer &httpServer = *(*it);
+
+		try
+		{
+			httpServer.terminate();
+		}
+		catch (Exception &exception)
+		{
+			LOG.error() << "Failed to terminate: " << httpServer.host() << ":" << httpServer.port() << ": " << exception.message() << std::endl;
+		}
+
+		delete &httpServer;
+
+		m_servers.erase(it);
+	}
 }
 
 void
@@ -390,17 +515,32 @@ HTTPOrchestrator::addServer(HTTPServer &server)
 {
 	int fd = server.socket().raw();
 
+	LOG.trace() << "++ server(" << fd << ")" << std::endl;
+
 	setFd(fd);
 	serverFds.insert(serverFds.end(), std::make_pair(fd, &server));
 }
 
 void
-HTTPOrchestrator::addFileRead(FileBuffer &fileBuffer)
+HTTPOrchestrator::addFileDescriptorBufferRead(FileDescriptorBuffer &fileDescriptorBuffer)
 {
-	int fd = fileBuffer.descriptor().raw();
+	int fd = fileDescriptorBuffer.descriptor().raw();
+
+	LOG.trace() << "++ file-read(" << fd << ")" << std::endl;
 
 	setFd(fd);
-	fileReadFds.insert(fileReadFds.end(), std::make_pair(fd, &fileBuffer));
+	fileReadFds.insert(fileReadFds.end(), std::make_pair(fd, &fileDescriptorBuffer));
+}
+
+void
+HTTPOrchestrator::addFileDescriptorBufferWrite(FileDescriptorBuffer &fileDescriptorBuffer)
+{
+	int fd = fileDescriptorBuffer.descriptor().raw();
+
+	LOG.trace() << "++ file-write(" << fd << ")" << std::endl;
+
+	setFd(fd);
+	fileWriteFds.insert(fileWriteFds.end(), std::make_pair(fd, &fileDescriptorBuffer));
 }
 
 void
@@ -408,16 +548,33 @@ HTTPOrchestrator::addClient(HTTPClient &client)
 {
 	int fd = client.socket().raw();
 
-	LOG.info() << client.socketAddress().address()->hostAddress() << std::endl;
+	LOG.trace() << "++ client(" << client.socket().raw() << ") @ " << client.socketAddress().address()->hostAddress() << ":" << client.socketAddress().port() << std::endl;
 
 	setFd(fd);
 	clientFds[fd] = &client;
 }
 
 void
+HTTPOrchestrator::removeServer(int fd)
+{
+	LOG.trace() << "-- server(" << fd << ")" << std::endl;
+
+	typedef std::map<int, HTTPServer const*>::iterator iterator;
+
+	iterator found = serverFds.find(fd);
+	if (found != serverFds.end())
+	{
+		serverFds.erase(found);
+		clearFd(fd);
+	}
+}
+
+void
 HTTPOrchestrator::removeFileRead(int fd)
 {
-	typedef std::map<int, FileBuffer*>::iterator iterator;
+	LOG.trace() << "-- file-read(" << fd << ")" << std::endl;
+
+	typedef std::map<int, FileDescriptorBuffer*>::iterator iterator;
 
 	iterator found = fileReadFds.find(fd);
 
@@ -431,42 +588,86 @@ HTTPOrchestrator::removeFileRead(int fd)
 void
 HTTPOrchestrator::removeClient(int fd)
 {
+	LOG.trace() << "-- client(" << fd << ")" << std::endl;
+
 	typedef std::map<int, HTTPClient*>::iterator iterator;
 
 	iterator found = clientFds.find(fd);
 
 	if (found != clientFds.end())
 	{
-		HTTPClient *client = found->second;
+		HTTPClient &client = *found->second;
 
-		HTTPResponse *response = client->response();
-		if (response)
+		if (client.response())
 		{
-			HTTPResponse::IBody *body = response->body();
+			HTTPResponse::fdb_vector buffers;
 
-			if (body)
+			client.response()->readFileDescriptors(buffers);
+			for (HTTPResponse::fdb_iterator it = buffers.begin(); it != buffers.end(); it++)
 			{
-				HTTPResponse::FileBody *fileBody = dynamic_cast<HTTPResponse::FileBody*>(body);
-				if (fileBody)
-				{
-					FileBuffer &fileBuffer = fileBody->fileBuffer();
-					removeFileRead(fileBuffer.descriptor().raw());
-					delete &fileBuffer;
-				}
+				std::cout << (*it)->storage() << std::endl;
+				removeFileRead((*it)->descriptor().raw());
+			}
+
+			buffers.clear();
+
+			client.response()->writeFileDescriptors(buffers);
+			for (HTTPResponse::fdb_iterator it = buffers.begin(); it != buffers.end(); it++)
+				removeFileWrite((*it)->descriptor().raw());
+
+			if (client.request())
+			{
+				LOG.info() << client.socketAddress().hostAddress()
+				/**/<< " - "
+				/**/<< client.request()->method().name()
+				/**/<< " "
+				/**/<< client.request()->url().path()
+				/**/<< " :: "
+				/**/<< client.response()->statusLine().status().code()
+				/**/<< std::endl;
 			}
 		}
 
-		::close(fd);
-		delete client;
-
 		clearFd(fd);
 
+		delete &client;
 		clientFds.erase(found);
 	}
 }
 
+void
+HTTPOrchestrator::removeFileWrite(int fd)
+{
+	LOG.trace() << "-- file-write(" << fd << ")" << std::endl;
+
+	typedef std::map<int, FileDescriptorBuffer*>::iterator iterator;
+
+	iterator found = fileWriteFds.find(fd);
+
+	if (found != fileWriteFds.end())
+	{
+		fileWriteFds.erase(found);
+		clearFd(fd);
+	}
+}
+
+void
+HTTPOrchestrator::terminate()
+{
+	m_stopping = true;
+
+	typedef std::map<int, HTTPServer const*>::iterator iterator;
+
+	std::set<int> fdToRemove;
+	for (iterator it = serverFds.begin(); it != serverFds.end(); it++)
+		fdToRemove.insert(fdToRemove.end(), it->first);
+
+	for (std::set<int>::iterator it = fdToRemove.begin(); it != fdToRemove.end(); it++)
+		removeServer(*it);
+}
+
 HTTPOrchestrator*
-HTTPOrchestrator::create(const Configuration &configuration)
+HTTPOrchestrator::create(const Configuration &configuration, const Environment &environment)
 {
 	typedef std::map<short, std::list<ServerBlock const*> > port_map;
 	typedef port_map::const_iterator port_iterator;
@@ -504,5 +705,5 @@ HTTPOrchestrator::create(const Configuration &configuration)
 		}
 	}
 
-	return (new HTTPOrchestrator(configuration, httpServers));
+	return (new HTTPOrchestrator(configuration, environment, httpServers));
 }

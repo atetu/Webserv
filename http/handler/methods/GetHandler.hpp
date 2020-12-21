@@ -25,7 +25,7 @@ class GetHandler :
 		virtual
 		~GetHandler();
 
-		HTTPResponse*
+		GenericHTTPResponse*
 		handle(HTTPRequest &request);
 
 	public:

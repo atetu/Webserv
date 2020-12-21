@@ -48,6 +48,15 @@ class HTTPServer
 
 		const Socket&
 		socket(void) const;
+
+		const std::string&
+		host() const;
+
+		short
+		port() const;
+
+		const std::list<const ServerBlock*>&
+		serverBlocks() const;
 };
 
 #endif /* HTTPSERVER_HPP_ */

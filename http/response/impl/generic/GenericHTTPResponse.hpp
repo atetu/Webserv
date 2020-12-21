@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   HTTPResponse.hpp                                   :+:      :+:    :+:   */
+/*   HTTPResponseImpl.hpp                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -10,45 +10,23 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef HTTPRESPONSE_HPP_
-# define HTTPRESPONSE_HPP_
+#ifndef GENERICHTTPRESPONSE_HPP_
+# define GENERICHTTPRESPONSE_HPP_
 
 #include <http/HTTPHeaderFields.hpp>
-#include <http/HTTPStatus.hpp>
 #include <http/HTTPVersion.hpp>
+#include <http/response/HTTPResponse.hpp>
+#include <http/response/HTTPStatusLine.hpp>
 #include <sys/types.h>
 #include <string>
 
-class FileBuffer;
+class FileDescriptorBuffer;
 class SocketBuffer;
 
-# define AWAITING_BUFFER_SIZE 512
-
-class HTTPResponse
+class GenericHTTPResponse :
+		public HTTPResponse
 {
 	public:
-		class StatusLine
-		{
-			private:
-				HTTPVersion m_version;
-				HTTPStatus m_status;
-
-			public:
-				StatusLine(void);
-				StatusLine(const HTTPStatus &status);
-				StatusLine(const HTTPVersion &version, const HTTPStatus &status);
-				StatusLine(const StatusLine &other);
-
-				virtual
-				~StatusLine();
-
-				StatusLine&
-				operator=(const StatusLine &other);
-
-				std::string
-				format(void) const;
-		};
-
 		/**
 		 * Base body class.
 		 */
@@ -79,7 +57,7 @@ class HTTPResponse
 				public IBody
 		{
 			private:
-				FileBuffer &m_fileBuffer;
+				FileDescriptorBuffer &m_fileDescriptorBuffer;
 
 			private:
 				FileBody(void);
@@ -89,7 +67,7 @@ class HTTPResponse
 				operator =(const FileBody &other);
 
 			public:
-				FileBody(FileBuffer &fileBuffer);
+				FileBody(FileDescriptorBuffer &fileBuffer);
 
 				virtual
 				~FileBody();
@@ -97,8 +75,8 @@ class HTTPResponse
 				virtual bool
 				write(SocketBuffer &fd);
 
-				FileBuffer&
-				fileBuffer();
+				FileDescriptorBuffer&
+				fileDescriptorBuffer();
 
 				bool
 				isDone();
@@ -127,28 +105,25 @@ class HTTPResponse
 				isDone();
 		};
 
-		enum State
-		{
-			NONE = 0,
-			HEADERS,
-			BODY,
-			FLUSHING,
-			FINISHED,
-		};
-
 	private:
-		StatusLine m_statusLine;
+		HTTPStatusLine m_statusLine;
 		HTTPHeaderFields m_headers;
 		IBody *m_body;
 		State m_state;
 		ssize_t m_state_index;
 
+	private:
+		GenericHTTPResponse();
+		GenericHTTPResponse(const GenericHTTPResponse &other);
+
+		GenericHTTPResponse&
+		operator=(const GenericHTTPResponse &other);
+
 	public:
-		HTTPResponse(const HTTPStatus &status, const HTTPHeaderFields &headers, IBody *body);
-		HTTPResponse(const HTTPVersion &version, const HTTPStatus &status, const HTTPHeaderFields &headers, IBody *body);
+		GenericHTTPResponse(const HTTPStatusLine statusLine, const HTTPHeaderFields &headers, IBody *body);
 
 		virtual
-		~HTTPResponse();
+		~GenericHTTPResponse();
 
 		bool
 		write(SocketBuffer &socketBuffer);
@@ -159,18 +134,27 @@ class HTTPResponse
 			return (m_body);
 		}
 
+		void
+		readFileDescriptors(fdb_vector &out);
+
+		void
+		writeFileDescriptors(fdb_vector &out);
+
+		HTTPStatusLine
+		statusLine() const;
+
 		State
-		state() const
-		{
-			return (m_state);
-		}
+		state() const;
 
 	public:
-		static inline HTTPResponse*
-		status(HTTPStatus &status)
-		{
-			return (new HTTPResponse(HTTPVersion::HTTP_1_1, status, HTTPHeaderFields(), NULL));
-		}
+		static GenericHTTPResponse*
+		status(HTTPStatus &status);
+
+		static GenericHTTPResponse*
+		file(HTTPStatus &status, const HTTPHeaderFields &headers, FileDescriptorBuffer &fileBuffer);
+
+		static GenericHTTPResponse*
+		string(HTTPStatus &status, const HTTPHeaderFields &headers, const std::string &string);
 };
 
-#endif /* HTTPRESPONSE_HPP_ */
+#endif /* GENERICHTTPRESPONSE_HPP_ */

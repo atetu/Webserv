@@ -25,7 +25,7 @@
 class HTTPRequest
 {
 	private:
-		HTTPMethod m_method;
+		const HTTPMethod &m_method;
 		URL m_url;
 		HTTPVersion m_version;
 		HTTPHeaderFields m_headerFields;

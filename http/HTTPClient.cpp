@@ -12,8 +12,9 @@
 
 #include <http/HTTPClient.hpp>
 #include <http/HTTPRequest.hpp>
-#include <http/HTTPResponse.hpp>
+#include <http/response/HTTPResponse.hpp>
 #include <stddef.h>
+#include <util/buffer/impl/FileDescriptorBuffer.hpp>
 #include <util/buffer/impl/SocketBuffer.hpp>
 #include <util/helper/DeleteHelper.hpp>
 #include <util/System.hpp>
@@ -21,8 +22,8 @@
 HTTPClient::HTTPClient(Socket &socket, InetSocketAddress socketAddress, const HTTPServer &server) :
 		m_socket(socket),
 		m_socketAddress(socketAddress),
-		m_in(*SocketBuffer::from(socket, FileBuffer::NOTHING)),
-		m_out(*SocketBuffer::from(socket, FileBuffer::NOTHING)),
+		m_in(*SocketBuffer::from(socket, FileDescriptorBuffer::NOTHING)),
+		m_out(*SocketBuffer::from(socket, FileDescriptorBuffer::NOTHING)),
 		m_server(server),
 		m_parser(),
 		m_lastAction(),

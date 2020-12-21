@@ -22,6 +22,7 @@ class Environment
 	public:
 		typedef std::map<std::string, std::string> map;
 		typedef map::iterator iterator;
+		typedef map::const_iterator const_iterator;
 
 	private:
 		map m_storage;
@@ -46,6 +47,9 @@ class Environment
 
 		bool
 		setProperty(const std::string &key, const std::string &value, bool onlyIfMissing = false);
+
+		char**
+		allocate() const;
 
 	public:
 		static Environment

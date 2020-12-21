@@ -11,10 +11,24 @@
 /* ************************************************************************** */
 
 #include <util/buffer/impl/BaseBuffer.hpp>
+#include <algorithm>
 #include <iterator>
 
 BaseBuffer::BaseBuffer() :
-		m_storage()
+		m_storage(),
+		m_maxSize(std::string::npos)
+{
+}
+
+BaseBuffer::BaseBuffer(size_type maxSize) :
+		m_storage(),
+		m_maxSize(maxSize)
+{
+}
+
+BaseBuffer::BaseBuffer(const std::string &storage, size_type maxSize) :
+		m_storage(storage),
+		m_maxSize(maxSize)
 {
 }
 
@@ -32,6 +46,22 @@ void
 BaseBuffer::store(const std::string &str)
 {
 	m_storage += str;
+}
+
+void
+BaseBuffer::store(BaseBuffer &buffer, bool andClear)
+{
+	size_type capacity = std::min(this->capacity(), buffer.capacity());
+
+	if (capacity)
+	{
+		m_storage += buffer.storage().substr(0, capacity);
+
+		buffer.storage().erase(0, capacity);
+	}
+
+	if (andClear)
+		buffer.clear();
 }
 
 void
@@ -101,4 +131,13 @@ void
 BaseBuffer::clear()
 {
 	m_storage.clear();
+}
+
+size_t
+BaseBuffer::capacity() const
+{
+	if (m_storage.size() >= m_maxSize)
+		return (0);
+
+	return (m_maxSize - m_storage.size());
 }

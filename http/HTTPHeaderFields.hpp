@@ -15,21 +15,20 @@
 
 #include <http/HTTPDate.hpp>
 #include <http/HTTPMethod.hpp>
-#include <http/HTTPHeaderParser.hpp>
-#include <http/HTTPValueParser.hpp>
-#include <http/mime/Mime.hpp>
-#include <http/mime/MimeRegistry.hpp>
 #include <stddef.h>
-#include <iostream>
 #include <list>
 #include <map>
+#include <string>
 #include <vector>
+
+class HTTPValueParser;
+class Mime;
+class MimeRegistry;
 
 class HTTPHeaderFields
 {
 	public:
 		typedef std::map<std::string, std::string> map;
-		//typedef std::map<std::string, std::map<float, std::list<std::string> > > map; // [header field [preference / value]]
 		typedef map::const_iterator const_iterator;
 
 	private:

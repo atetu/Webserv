@@ -13,13 +13,15 @@
 #ifndef HTTPORCHESTRATOR_HPP_
 # define HTTPORCHESTRATOR_HPP_
 
-#include <config/Configuration.hpp>
 #include <http/HTTPClient.hpp>
 #include <http/HTTPServer.hpp>
 #include <sys/select.h>
-#include <util/buffer/impl/FileBuffer.hpp>
+#include <util/buffer/impl/FileDescriptorBuffer.hpp>
 #include <list>
 #include <map>
+
+class Configuration;
+class Environment;
 
 class Logger;
 
@@ -34,18 +36,21 @@ class HTTPOrchestrator
 
 	private:
 		const Configuration &m_configuration;
+		const Environment &m_environment;
 		server_container m_servers;
 		fd_set m_fds;
 		int m_highestFd;
 		int m_fdCount;
 		std::map<int, HTTPServer const*> serverFds;
-		std::map<int, FileBuffer*> fileReadFds;
+		std::map<int, FileDescriptorBuffer*> fileReadFds;
 		std::map<int, HTTPClient*> clientFds;
-		std::map<int, FileBuffer*> fileWriteFds;
+		std::map<int, FileDescriptorBuffer*> fileWriteFds;
+		bool m_running;
+		bool m_stopping;
 
 	private:
 		HTTPOrchestrator(void);
-		HTTPOrchestrator(const Configuration &configuration, const server_container &servers);
+		HTTPOrchestrator(const Configuration &configuration, const Environment &environment, const server_container &servers);
 		HTTPOrchestrator(const HTTPOrchestrator &other);
 
 		HTTPOrchestrator&
@@ -75,19 +80,25 @@ class HTTPOrchestrator
 		addServer(HTTPServer &server);
 
 		void
-		addFileRead(FileBuffer &fileBuffer);
+		addFileDescriptorBufferRead(FileDescriptorBuffer &fileDescriptorBuffer);
 
 		void
 		addClient(HTTPClient &client);
 
 		void
-		addFileWrite(FileBuffer &fileBuffer);
+		addFileDescriptorBufferWrite(FileDescriptorBuffer &fileDescriptorBuffer);
+
+		void
+		removeServer(int fd);
 
 		void
 		removeFileRead(int fd);
 
 		void
 		removeClient(int fd);
+
+		void
+		removeFileWrite(int fd);
 
 	public:
 		void
@@ -98,7 +109,19 @@ class HTTPOrchestrator
 
 	public:
 		static HTTPOrchestrator*
-		create(const Configuration &configuration);
+		create(const Configuration &configuration, const Environment &environment);
+
+		bool
+		running() const
+		{
+			return (m_running);
+		}
+
+		bool
+		stopping() const
+		{
+			return (m_stopping);
+		}
 };
 
 #endif

@@ -15,6 +15,15 @@
 		},
 		"ruby": {
 			"path": "/path/to/ruby"
+		},
+		"python3": {
+			"path": "/usr/bin/python3"
+		},
+		"bash": {
+			"path": "/bin/bash"
+		},
+		"bash0": {
+			"path": "/bin/ls"
 		}
 	},
 	"servers": [
@@ -31,7 +40,7 @@
 				"500": "500.html",
 				"400": "not-found.html"
 			},
-			"root": "/var/www/html",
+			"root": ".",
 			"locations": {
 				"/favicon.ico": {
 					"methods": [
@@ -39,9 +48,22 @@
 					],
 					"alias": "icon.png"
 				},
+				"/x.py": {
+					"root": ".",
+					"methods": [
+						"GET"
+					],
+					"cgi": "python3"
+				},
+				"/x.sh": {
+					"root": ".",
+					"methods": [
+						"GET"
+					],
+					"cgi": "bash"
+				},
 				"/xx/": {
 					"methods": [
-						"GET",
 						"POST",
 						"PUT"
 					],

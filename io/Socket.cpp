@@ -16,10 +16,10 @@
 #include <sys/socket.h>
 #include <exception/IOException.hpp>
 #include <io/Socket.hpp>
+#include <libs/ft.hpp>
 #include <net/address/InetSocketAddress.hpp>
 #include <sys/errno.h>
 #include <sys/socket.h>
-#include <cstring>
 
 static const int g_true = 1;
 
@@ -52,7 +52,7 @@ void
 Socket::bind(int port)
 {
 	struct sockaddr_in addr;
-	::memset(&addr, 0, sizeof(addr));
+	ft::bzero(&addr, sizeof(addr));
 
 	addr.sin_family = AF_INET;
 	addr.sin_addr.s_addr = htonl(INADDR_ANY);
@@ -66,7 +66,7 @@ void
 Socket::bind(const std::string &host, int port)
 {
 	struct sockaddr_in addr;
-	::memset(&addr, 0, sizeof(addr));
+	ft::bzero(&addr, sizeof(addr));
 
 	addr.sin_family = AF_INET;
 	addr.sin_addr.s_addr = inet_addr(host.c_str());

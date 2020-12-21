@@ -11,9 +11,8 @@
 /* ************************************************************************** */
 
 #include <http/handler/methods/ConnectHandler.hpp>
-#include <http/HTTPRequest.hpp>
-#include <http/HTTPResponse.hpp>
 #include <http/HTTPStatus.hpp>
+#include <http/response/impl/generic/GenericHTTPResponse.hpp>
 
 ConnectHandler::ConnectHandler()
 {
@@ -23,10 +22,10 @@ ConnectHandler::~ConnectHandler()
 {
 }
 
-HTTPResponse*
+GenericHTTPResponse*
 ConnectHandler::handle(HTTPRequest &request)
 {
-	return (HTTPResponse::status(*HTTPStatus::BAD_REQUEST));
+	return (GenericHTTPResponse::status(*HTTPStatus::BAD_REQUEST));
 }
 
 ConnectHandler&

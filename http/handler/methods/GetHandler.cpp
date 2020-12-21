@@ -11,18 +11,18 @@
 /* ************************************************************************** */
 
 #include <config/Configuration.hpp>
-#include <sys/stat.h>
-#include <dirent.h>
 #include <http/handler/methods/GetHandler.hpp>
 #include <http/HTTPHeaderFields.hpp>
-#include <http/HTTPResponse.hpp>
 #include <http/HTTPStatus.hpp>
+#include <http/response/HTTPStatusLine.hpp>
+#include <http/response/impl/generic/GenericHTTPResponse.hpp>
+#include <io/File.hpp>
 #include <io/FileDescriptor.hpp>
+#include <stddef.h>
 #include <sys/fcntl.h>
-#include <dirent.h>
-#include <sys/stat.h>
-#include <util/buffer/impl/FileBuffer.hpp>
+#include <util/buffer/impl/FileDescriptorBuffer.hpp>
 #include <util/URL.hpp>
+#include <list>
 #include <string>
 
 GetHandler::GetHandler()
@@ -33,40 +33,37 @@ GetHandler::~GetHandler()
 {
 }
 
-HTTPResponse*
+GenericHTTPResponse*
 GetHandler::handle(HTTPRequest &request)
 {
 	HTTPHeaderFields headers;
 
 	const std::string &path = request.root() + request.url().path();
+	File file(path);
 
-	struct stat st;
-	if (::stat(path.c_str(), &st) != 0)
-		return (HTTPResponse::status(*HTTPStatus::NOT_FOUND));
+	if (!file.exists())
+		return (GenericHTTPResponse::status(*HTTPStatus::NOT_FOUND));
 
-	if (S_ISREG(st.st_mode))
+	if (file.isFile())
 	{
-		int fd = ::open(path.c_str(), O_RDONLY);
+		size_t length = file.length(); /* On top because it can cause an IOException. */
+
+		int fd = ::open(path.c_str(), O_RDONLY); // TODO Need abstraction
 
 		if (fd == -1)
-			return (HTTPResponse::status(*HTTPStatus::NOT_FOUND));
+			return (GenericHTTPResponse::status(*HTTPStatus::NOT_FOUND));
 
 		std::string extension;
 		if (request.url().extension(extension))
 			headers.contentType(request.configuration().mimeRegistry(), extension);
 
-		headers.contentLength(st.st_size);
+		headers.contentLength(file.length());
 
-		return (new HTTPResponse(*HTTPStatus::OK, headers, new HTTPResponse::FileBody(*FileBuffer::from(*FileDescriptor::wrap(fd), FileBuffer::CLOSE | FileBuffer::DELETE))));
+		return (GenericHTTPResponse::file(*HTTPStatus::OK, headers, *FileDescriptorBuffer::from(*FileDescriptor::wrap(fd), FileDescriptorBuffer::CLOSE | FileDescriptorBuffer::DELETE)));
 	}
 
-	if (S_ISDIR(st.st_mode))
+	if (file.isDirectory())
 	{
-		DIR *dir = ::opendir(path.c_str());
-
-		if (dir == NULL)
-			return (HTTPResponse::status(*HTTPStatus::NOT_FOUND));
-
 		const std::string &directory = request.url().path();
 
 		std::string listing = ""
@@ -76,31 +73,34 @@ GetHandler::handle(HTTPRequest &request)
 				"	</head>\n"
 				"	<body>\n";
 
-		struct dirent *entry;
-		while ((entry = ::readdir(dir)))
+		std::list<File> files = file.list();
+		for (std::list<File>::iterator it = files.begin(); it != files.end(); it++)
 		{
-			std::string file(entry->d_name);
-			std::string absolute = directory + "/" + file;
+			std::string name(it->name());
 
-//			if (::stat(absolute.c_str(), &st) != -1 && S_ISDIR(st.st_mode))
-//				file += '/';
+			if (it->isDirectory())
+				name += '/';
 
-			listing += std::string("		<a href=\"./") + absolute + "\">" + file + "</a><br>\n";
+			std::string path(request.url().path());
+			if (path.empty() || path.at(path.size() - 1) != '/') // TODO Need rework!
+				path += '/';
+
+			path += name;
+
+			listing += std::string("		<a href=\"") + path + "\">" + name + "</a><br>\n";
 		}
 
 		listing += ""
 				"	</body>\n"
 				"</html>\n";
 
-		::closedir(dir);
-
 		headers.html();
 		headers.contentLength(listing.size());
 
-		return (new HTTPResponse(*HTTPStatus::OK, headers, new HTTPResponse::StringBody(listing)));
+		return (GenericHTTPResponse::string(*HTTPStatus::OK, headers, listing));
 	}
 
-	return (HTTPResponse::status(*HTTPStatus::NOT_FOUND));
+	return (GenericHTTPResponse::status(*HTTPStatus::NOT_FOUND));
 }
 
 GetHandler&

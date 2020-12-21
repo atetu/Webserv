@@ -25,7 +25,7 @@ class DeleteHandler :
 		virtual
 		~DeleteHandler();
 
-		HTTPResponse*
+		GenericHTTPResponse*
 		handle(HTTPRequest &request);
 
 	public:

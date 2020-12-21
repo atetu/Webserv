@@ -31,6 +31,23 @@ class DeleteHelper
 	public:
 		template<typename T>
 			static void
+			pointers2(T **arr)
+			{
+				T **start = arr;
+
+				if (arr)
+				{
+					T *ptr;
+					while ((ptr = *arr++))
+						if (ptr)
+							delete[] ptr;
+
+					delete[] start;
+				}
+			}
+
+		template<typename T>
+			static void
 			pointers(Optional<std::list<T*> > &optional)
 			{
 				if (optional.present())
