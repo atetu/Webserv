@@ -13,10 +13,10 @@
 #include <config/Configuration.hpp>
 #include <config/exceptions/ConfigurationBindException.hpp>
 #include <config/exceptions/ConfigurationValidateException.hpp>
+#include <signal.h>
 #include <encoding/default/base64/Base64.hpp>
 #include <exception/IOException.hpp>
 #include <http/HTTPOrchestrator.hpp>
-#include <libs/ft.hpp>
 #include <util/ContainerBuilder.hpp>
 #include <util/Enum.hpp>
 #include <util/Environment.hpp>
@@ -28,10 +28,11 @@
 #include <util/options/CommandLine.hpp>
 #include <util/options/Option.hpp>
 #include <util/options/OptionParser.hpp>
+#include <util/Optional.hpp>
 #include <iostream>
 #include <list>
-#include <signal.h>
 #include <string>
+#include <typeinfo>
 #include <vector>
 
 const Option OPT_HELP('h', "help", "display this help message");
@@ -39,6 +40,22 @@ const Option OPT_LOG_LEVEL('l', "log-level", "change the log-level", "level");
 const Option OPT_CHECK('c', "check", "only check the config file");
 const Option OPT_CONFIG_FILE('f', "config-file", "specify the config file", "file");
 const Option OPT_IGNORE_MIME_INCLUDES_ERROR('m', "ignore-mime-includes-error", "only warn when a MIME file inclusion cause an error");
+const Option OPT_IGNORE_GRACEFUL_STOP('s', "ignore-graceful-stop", "avoid doing a graceful stop when receiving a TERM signal");
+
+static Logger &LOG = LoggerFactory::get("main");
+static Configuration *configuration = NULL;
+static HTTPOrchestrator *httpOrchestrator = NULL;
+
+void
+sighandler_term(int sig)
+{
+	if (httpOrchestrator)
+	{
+		::signal(sig, SIG_DFL);
+		LOG.info() << "Graceful shutdown asked... (do CTRL-C again to quit immediately)" << std::endl;
+		httpOrchestrator->terminate();
+	}
+}
 
 int
 delegated_main(int argc, char **argv, char **envp)
@@ -48,6 +65,7 @@ delegated_main(int argc, char **argv, char **envp)
 	const LogLevel *level = LogLevel::INFO;
 	bool checkOnly = false;
 	bool ignoreMimeIncludesError = false;
+	bool ignoreGracefulStop = false;
 	std::string configFile = "conf.json";
 
 	std::list<const Option*> lst;
@@ -56,6 +74,7 @@ delegated_main(int argc, char **argv, char **envp)
 	lst.push_back(&OPT_CHECK);
 	lst.push_back(&OPT_CONFIG_FILE);
 	lst.push_back(&OPT_IGNORE_MIME_INCLUDES_ERROR);
+	lst.push_back(&OPT_IGNORE_GRACEFUL_STOP);
 
 	OptionParser parser(lst);
 
@@ -88,11 +107,14 @@ delegated_main(int argc, char **argv, char **envp)
 		if (commandLine.has(OPT_CHECK))
 			checkOnly = true;
 
+		if (commandLine.has(OPT_CONFIG_FILE))
+			configFile = commandLine.last(OPT_CONFIG_FILE);
+
 		if (commandLine.has(OPT_IGNORE_MIME_INCLUDES_ERROR))
 			ignoreMimeIncludesError = true;
 
-		if (commandLine.has(OPT_CONFIG_FILE))
-			configFile = commandLine.last(OPT_CONFIG_FILE);
+		if (commandLine.has(OPT_IGNORE_GRACEFUL_STOP))
+			ignoreGracefulStop = true;
 	}
 	catch (Exception &exception)
 	{
@@ -102,14 +124,10 @@ delegated_main(int argc, char **argv, char **envp)
 	}
 
 	LogLevel::ACTIVE = level;
-	Logger &LOG = LoggerFactory::get("main");
 
 	LOG.debug() << "Set log level to: " << level->name() << std::endl;
 
 	Environment environment = Environment::envp(envp);
-
-	Configuration *configuration = NULL;
-	HTTPOrchestrator *httpOrchestrator = NULL;
 
 	try
 	{
@@ -145,6 +163,12 @@ delegated_main(int argc, char **argv, char **envp)
 
 	if (!checkOnly)
 	{
+		if (!ignoreGracefulStop)
+		{
+			::signal(SIGINT, &sighandler_term);
+			LOG.debug() << "Installed signal handler: " << (void*)&sighandler_term << std::endl;
+		}
+
 		Base64::load();
 
 		try

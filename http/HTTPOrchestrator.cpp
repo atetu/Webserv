@@ -33,6 +33,7 @@
 #include <net/address/InetAddress.hpp>
 #include <net/address/InetSocketAddress.hpp>
 #include <sys/errno.h>
+#include <util/buffer/impl/BaseBuffer.hpp>
 #include <util/buffer/impl/SocketBuffer.hpp>
 #include <util/Enum.hpp>
 #include <util/Environment.hpp>
@@ -64,7 +65,9 @@ HTTPOrchestrator::HTTPOrchestrator(const Configuration &configuration, const Env
 		serverFds(),
 		fileReadFds(),
 		clientFds(),
-		fileWriteFds()
+		fileWriteFds(),
+		m_running(false),
+		m_stopping(false)
 {
 	FD_ZERO(&m_fds);
 }
@@ -172,14 +175,21 @@ HTTPOrchestrator::start()
 		.tv_sec = 0,
 		.tv_usec = 5000 };
 
-	while (1)
+	m_running = true;
+	while (m_running)
 	{
 		readFdSet = m_fds;
 		writeFdSet = m_fds;
 
 		int fdCount;
 		if ((fdCount = ::select(m_highestFd + 1, &readFdSet, &writeFdSet, NULL, &timeout)) == -1)
+		{
+			std::cout << m_stopping << " " << errno << " " << EINTR << std::endl;
+			if (m_stopping && errno == EINTR)
+				continue;
+
 			throw IOException("select", errno);
+		}
 
 		printSelectOutput(readFdSet, writeFdSet);
 
@@ -446,6 +456,14 @@ HTTPOrchestrator::start()
 				LOG.warn() << "Could not handle file reading: " << exception.message() << std::endl;
 			}
 		}
+		else if (m_stopping)
+		{
+			if (clientFds.empty() && fileReadFds.empty() && fileWriteFds.empty())
+			{
+				m_running = false;
+				break;
+			}
+		}
 
 		try
 		{
@@ -477,6 +495,27 @@ HTTPOrchestrator::start()
 			LOG.warn() << "Could not handle client (timeout): " << exception.message() << std::endl;
 		}
 	}
+
+	m_running = false;
+
+	while (!m_servers.empty())
+	{
+		server_iterator it = m_servers.begin();
+		HTTPServer &httpServer = *(*it);
+
+		try
+		{
+			httpServer.terminate();
+		}
+		catch (Exception &exception)
+		{
+			LOG.error() << "Failed to terminate: " << httpServer.host() << ":" << httpServer.port() << ": " << exception.message() << std::endl;
+		}
+
+		delete &httpServer;
+
+		m_servers.erase(it);
+	}
 }
 
 void
@@ -484,7 +523,7 @@ HTTPOrchestrator::addServer(HTTPServer &server)
 {
 	int fd = server.socket().raw();
 
-	LOG.info() << "++ server(" << fd << ")" << std::endl;
+	LOG.trace() << "++ server(" << fd << ")" << std::endl;
 
 	setFd(fd);
 	serverFds.insert(serverFds.end(), std::make_pair(fd, &server));
@@ -495,7 +534,7 @@ HTTPOrchestrator::addFileDescriptorBufferRead(FileDescriptorBuffer &fileDescript
 {
 	int fd = fileDescriptorBuffer.descriptor().raw();
 
-	LOG.info() << "++ file-read(" << fd << ")" << std::endl;
+	LOG.trace() << "++ file-read(" << fd << ")" << std::endl;
 
 	setFd(fd);
 	fileReadFds.insert(fileReadFds.end(), std::make_pair(fd, &fileDescriptorBuffer));
@@ -506,7 +545,7 @@ HTTPOrchestrator::addFileDescriptorBufferWrite(FileDescriptorBuffer &fileDescrip
 {
 	int fd = fileDescriptorBuffer.descriptor().raw();
 
-	LOG.info() << "++ file-write(" << fd << ")" << std::endl;
+	LOG.trace() << "++ file-write(" << fd << ")" << std::endl;
 
 	setFd(fd);
 	fileWriteFds.insert(fileWriteFds.end(), std::make_pair(fd, &fileDescriptorBuffer));
@@ -517,16 +556,31 @@ HTTPOrchestrator::addClient(HTTPClient &client)
 {
 	int fd = client.socket().raw();
 
-	LOG.info() << "++ client(" << client.socket().raw() << ") @ " << client.socketAddress().address()->hostAddress() << ":" << client.socketAddress().port() << std::endl;
+	LOG.trace() << "++ client(" << client.socket().raw() << ") @ " << client.socketAddress().address()->hostAddress() << ":" << client.socketAddress().port() << std::endl;
 
 	setFd(fd);
 	clientFds[fd] = &client;
 }
 
 void
+HTTPOrchestrator::removeServer(int fd)
+{
+	LOG.trace() << "-- server(" << fd << ")" << std::endl;
+
+	typedef std::map<int, HTTPServer const*>::iterator iterator;
+
+	iterator found = serverFds.find(fd);
+	if (found != serverFds.end())
+	{
+		serverFds.erase(found);
+		clearFd(fd);
+	}
+}
+
+void
 HTTPOrchestrator::removeFileRead(int fd)
 {
-	LOG.info() << "-- file-read(" << fd << ")" << std::endl;
+	LOG.trace() << "-- file-read(" << fd << ")" << std::endl;
 
 	typedef std::map<int, FileDescriptorBuffer*>::iterator iterator;
 
@@ -542,7 +596,7 @@ HTTPOrchestrator::removeFileRead(int fd)
 void
 HTTPOrchestrator::removeClient(int fd)
 {
-	LOG.info() << "-- client(" << fd << ")" << std::endl;
+	LOG.trace() << "-- client(" << fd << ")" << std::endl;
 
 	typedef std::map<int, HTTPClient*>::iterator iterator;
 
@@ -580,7 +634,7 @@ HTTPOrchestrator::removeClient(int fd)
 void
 HTTPOrchestrator::removeFileWrite(int fd)
 {
-	LOG.info() << "-- file-write(" << fd << ")" << std::endl;
+	LOG.trace() << "-- file-write(" << fd << ")" << std::endl;
 
 	typedef std::map<int, FileDescriptorBuffer*>::iterator iterator;
 
@@ -591,6 +645,21 @@ HTTPOrchestrator::removeFileWrite(int fd)
 		fileWriteFds.erase(found);
 		clearFd(fd);
 	}
+}
+
+void
+HTTPOrchestrator::terminate()
+{
+	m_stopping = true;
+
+	typedef std::map<int, HTTPServer const*>::iterator iterator;
+
+	std::set<int> fdToRemove;
+	for (iterator it = serverFds.begin(); it != serverFds.end(); it++)
+		fdToRemove.insert(fdToRemove.end(), it->first);
+
+	for (std::set<int>::iterator it = fdToRemove.begin(); it != fdToRemove.end(); it++)
+		removeServer(*it);
 }
 
 HTTPOrchestrator*

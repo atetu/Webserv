@@ -30,3 +30,6 @@ for key, value in os.environ.items():
   </tr>""")
 print("</table>")
 print('</html>')
+
+import time
+time.sleep(20)

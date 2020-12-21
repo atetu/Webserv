@@ -23,6 +23,7 @@ HTTPServer::HTTPServer(const std::string &host, short port, const std::list<Serv
 
 HTTPServer::~HTTPServer()
 {
+	delete &m_socket;
 }
 
 void

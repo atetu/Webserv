@@ -45,6 +45,8 @@ class HTTPOrchestrator
 		std::map<int, FileDescriptorBuffer*> fileReadFds;
 		std::map<int, HTTPClient*> clientFds;
 		std::map<int, FileDescriptorBuffer*> fileWriteFds;
+		bool m_running;
+		bool m_stopping;
 
 	private:
 		HTTPOrchestrator(void);
@@ -87,6 +89,9 @@ class HTTPOrchestrator
 		addFileDescriptorBufferWrite(FileDescriptorBuffer &fileDescriptorBuffer);
 
 		void
+		removeServer(int fd);
+
+		void
 		removeFileRead(int fd);
 
 		void
@@ -105,6 +110,18 @@ class HTTPOrchestrator
 	public:
 		static HTTPOrchestrator*
 		create(const Configuration &configuration, const Environment &environment);
+
+		bool
+		running() const
+		{
+			return (m_running);
+		}
+
+		bool
+		stopping() const
+		{
+			return (m_stopping);
+		}
 };
 
 #endif
