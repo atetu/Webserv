@@ -6,7 +6,7 @@
 /*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/27 17:29:02 by ecaceres          #+#    #+#             */
-/*   Updated: 2020/12/22 15:20:04 by alicetetu        ###   ########.fr       */
+/*   Updated: 2020/12/22 16:51:25 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -502,13 +502,13 @@ HTTPRequestParser::lastChar() const
 	return (m_last_char);
 }
 
-const std::map<std::string, std::string> &
+std::map<std::string, std::string> &
 HTTPRequestParser::query()
 {
 	return (m_query);
 }
 
-const std::string &
+std::string &
 HTTPRequestParser::fragment()
 {
 	return (m_fragment);

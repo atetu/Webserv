@@ -6,7 +6,7 @@
 /*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/27 17:29:02 by ecaceres          #+#    #+#             */
-/*   Updated: 2020/12/22 14:54:49 by alicetetu        ###   ########.fr       */
+/*   Updated: 2020/12/22 16:51:43 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -115,10 +115,10 @@ class HTTPRequestParser
 		char
 		lastChar() const;
 
-		const std::map<std::string, std::string> &
+		std::map<std::string, std::string> &
 		query();
 		
-		const std::string &
+		std::string &
 		fragment();
 };
 

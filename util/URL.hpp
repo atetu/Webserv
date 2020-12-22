@@ -30,7 +30,7 @@ class URL
 
 	public:
 		URL();
-		URL(const std::string &protocol, const std::string &host, int port, const std::string &path, Optional<std::map<std::string, std::string> > queryParameters, Optional<std::string> fragment);
+		URL(const std::string &protocol, const std::string &host, int port, const std::string &path, const Optional<std::map<std::string, std::string> > queryParameters, const Optional<std::string> fragment);
 		URL(const URL &other);
 
 		virtual

@@ -6,7 +6,7 @@
 /*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/28 14:34:10 by ecaceres          #+#    #+#             */
-/*   Updated: 2020/12/18 19:01:03 by alicetetu        ###   ########.fr       */
+/*   Updated: 2020/12/22 16:55:36 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -314,8 +314,12 @@ HTTPOrchestrator::start()
 										else
 										{
 											const HTTPMethod &method = *methodPtr;
-
-											URL url = URL("http", "locahost", client.server().port(), client.parser().path(), Optional<std::map<std::string, std::string> >() /* TODO Finish */, Optional<std::string>());
+											
+											const Optional<std::map<std::string, std::string> >queryMap = Optional<std::map<std::string, std::string> >::ofEmpty(client.parser().query());
+											
+											const Optional<std::string> fragmentStr = Optional<std::string>::ofEmpty(client.parser().fragment());
+											
+											URL url = URL("http", "locahost", client.server().port(), client.parser().path(), queryMap, fragmentStr);
 
 											const RootBlock &rootBlock = m_configuration.rootBlock();
 

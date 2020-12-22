@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Optional.hpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ecaceres <ecaceres@student.42.fr>          +#+  +:+       +#+        */
+/*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/28 16:31:16 by ecaceres          #+#    #+#             */
-/*   Updated: 2020/10/28 16:31:16 by ecaceres         ###   ########.fr       */
+/*   Updated: 2020/12/22 16:18:54 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -163,6 +163,15 @@ template<typename T>
 			ofNullable(T &value)
 			{
 				if (value != NULL)
+					return (Optional(value));
+
+				return (Optional());
+			}
+
+			static Optional<T>
+			ofEmpty(T &value)
+			{
+				if (value.empty())
 					return (Optional(value));
 
 				return (Optional());
