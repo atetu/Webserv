@@ -15,6 +15,7 @@
 #include <sys/fcntl.h>
 #include <sys/errno.h>
 #include <sys/unistd.h>
+#include <unistd.h>
 #include <iostream>
 
 FileDescriptor::FileDescriptor(int fd) :

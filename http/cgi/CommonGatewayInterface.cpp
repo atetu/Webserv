@@ -25,6 +25,7 @@
 #include <os/detect_platform.h>
 #include <sys/errno.h>
 #include <sys/unistd.h>
+#include <unistd.h>
 #include <util/Convert.hpp>
 #include <util/Enum.hpp>
 #include <util/helper/DeleteHelper.hpp>

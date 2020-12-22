@@ -6,7 +6,7 @@
 /*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/27 17:29:02 by ecaceres          #+#    #+#             */
-/*   Updated: 2020/12/18 17:06:05 by alicetetu        ###   ########.fr       */
+/*   Updated: 2020/12/22 14:54:49 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,6 +48,10 @@ class HTTPRequestParser
 			S_HTTP_END,
 			S_HTTP_END2,
 			S_HTTP_END3,
+			S_QUERY_STRING_KEY,
+			S_QUERY_STRING_VALUE,
+		//	S_FRAGMENT_START,
+			S_FRAGMENT,
 			S_FIELD,
 			S_COLON,
 			S_SPACES_BEFORE_VALUE,
@@ -68,6 +72,12 @@ class HTTPRequestParser
 		std::string m_field;
 		std::string m_value;
 		std::map<std::string, std::string> m_headerMap;
+		std::map<std::string, std::string> m_query;
+		std::string m_queryKey;
+		std::string m_queryValue;
+		std::string m_fragment;
+		bool m_hexOn;
+		std::string m_hex;
 
 		char m_last_char;
 		char m_last_char2;
@@ -104,6 +114,12 @@ class HTTPRequestParser
 
 		char
 		lastChar() const;
+
+		const std::map<std::string, std::string> &
+		query();
+		
+		const std::string &
+		fragment();
 };
 
 #endif /* HTTPREQUESTPARSER_HPP_ */

@@ -6,7 +6,7 @@
 /*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/27 17:29:02 by ecaceres          #+#    #+#             */
-/*   Updated: 2020/12/18 17:05:50 by alicetetu        ###   ########.fr       */
+/*   Updated: 2020/12/22 15:20:04 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,12 @@ HTTPRequestParser::HTTPRequestParser() :
 		m_field(""),
 		m_value(""),
 		m_headerMap(),
+		m_query(),
+		m_fragment(""),
+		m_queryKey(""),
+		m_queryValue(""),
+		m_hexOn(false),
+		m_hex(""),
 		m_last_char(0),
 		m_last_char2(0)
 {
@@ -35,6 +41,36 @@ HTTPRequestParser::HTTPRequestParser() :
 			m_headerMap[key] = value;				\
 			key = "";								\
 			value = "";								
+
+#define ADD_TO_QUERY_MAP(stateType)												\
+			{																	\
+				m_state = stateType;											\
+				if (m_queryKey.empty() || m_queryValue.empty())					\
+					throw Exception ("Query keys and values cannot be empty");	\
+				m_query[m_queryKey] = m_queryValue;								\
+				m_queryKey = "";												\
+				m_queryValue = "";												\
+			}
+
+#define HEX_CONVERSION(c, str)													\
+			{																	\
+				if (isalnum(c))													\
+					{															\
+						m_hex += c;												\
+						if (m_hex.size() == 2)									\
+						{														\
+							char *p;											\
+							long n = strtol(m_hex.c_str(), &p, 16);				\
+							if (*p != 0)										\
+								throw Exception("Conversion not allowed");		\
+							str += (char)n;										\
+							m_hex = "";											\
+							m_hexOn = false;									\
+						}														\
+					}															\
+				else															\
+						throw Exception("Wrong conversion");					\
+			}
 
 void
 HTTPRequestParser::consume(char c)
@@ -77,11 +113,19 @@ HTTPRequestParser::consume(char c)
 
 		case S_PATH:
 		{
+			std::cout << "c : " << c  << std::endl;
 			if (c == ' ')
 				m_state = S_HTTP_START;
+			else if (c == '?')
+				m_state = S_QUERY_STRING_KEY;
+			else if (c == '#')
+				m_state = S_FRAGMENT;
 			else
+			{
+				std::cout << "path: "<< m_path << std::endl;
+			
 				m_path += c;
-
+			}
 			break;
 		}
 
@@ -219,6 +263,79 @@ HTTPRequestParser::consume(char c)
 
 			break;
 		}
+		
+		case S_QUERY_STRING_KEY:
+		{
+			if (m_hexOn)
+				HEX_CONVERSION(c, m_queryKey)
+			
+			else if (c == '=')
+				m_state = S_QUERY_STRING_VALUE;
+	
+			// else if (c == '&')
+			// 	throw Exception("Query key expected");
+			
+			else if (c == '%')
+				m_hexOn = true;
+			
+			// else if (c == '#')
+			// 	throw Exception("Query key expected"); 
+			
+			else if (c == '+')
+				m_queryKey += ' ';
+			
+			else if (c == ' ')
+				throw Exception("Query key expected"); 
+				
+			else
+				m_queryKey += c;
+
+			break;
+		}
+		
+		case S_QUERY_STRING_VALUE:
+		{
+			if (m_hexOn)
+				HEX_CONVERSION(c, m_queryValue)
+				
+			// else if (c == '=')// or no exception?
+			// 	throw Exception("Query value expected");
+
+			else if (c == '%')
+				m_hexOn = true;
+				
+			else if (c == '&')
+				ADD_TO_QUERY_MAP(S_QUERY_STRING_KEY)
+				
+			else if (c == '#')
+				ADD_TO_QUERY_MAP(S_FRAGMENT)
+
+			else if (c == ' ')
+				ADD_TO_QUERY_MAP(S_HTTP_START)
+				
+			else
+				m_queryValue += c;
+
+			break;
+		}
+		
+		case S_FRAGMENT:
+		{
+			if (m_hexOn)
+				HEX_CONVERSION(c, m_fragment)
+				
+			else if (c == ' ')
+				m_state = S_HTTP_START;
+			
+			else if (c == '%')
+				m_hexOn = true;
+				
+			else
+				m_fragment += c;
+
+			break;
+		}
+		
 		case S_FIELD:
 		{
 			if (c == ' ')
@@ -383,4 +500,16 @@ char
 HTTPRequestParser::lastChar() const
 {
 	return (m_last_char);
+}
+
+const std::map<std::string, std::string> &
+HTTPRequestParser::query()
+{
+	return (m_query);
+}
+
+const std::string &
+HTTPRequestParser::fragment()
+{
+	return (m_fragment);
 }
