@@ -9,7 +9,7 @@
 #include <http/HTTPRequest.hpp>
 #include <http/HTTPRequestParser.hpp>
 #include <http/HTTPValueParser.hpp>
-#include <http/HTTPResponse.hpp>
+//include <http/HTTPResponse.hpp>
 #include <http/HTTPStatus.hpp>
 #include <http/HTTPVersion.hpp>
 #include <encoding/default/chunk/ChunkDecoder.hpp>
@@ -39,10 +39,10 @@ int main()
 
 
 {
-	std::string body = "4\r\n"
+	std::string body = "2\r\n"
 		"Vo\r\n"
 		"1C\r\n"
-		"et voici un second morceau\r\n"
+		"et voici un second morceau\r\n\r\n"
 		"20\r\n"
 		"et voici deux derniers morceaux \r\n"
 		"12\r\n"

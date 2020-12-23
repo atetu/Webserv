@@ -6,7 +6,7 @@
 /*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/19 14:51:33 by alicetetu         #+#    #+#             */
-/*   Updated: 2020/12/21 17:24:09 by alicetetu        ###   ########.fr       */
+/*   Updated: 2020/12/23 18:29:30 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,8 +50,8 @@ ChunkEncoder::encode()
 {
 	while (!m_input.empty())
 	{
-		std::string chunkStr = m_input.substr(0, 48);
-		int chunkSizeNb = chunkStr.size() + 2;
+		std::string chunkStr = m_input.substr(0, 50);
+		int chunkSizeNb = chunkStr.size();
 		std::stringstream stream;
 		stream << std::hex << chunkSizeNb;
 		std::string chunkSikeStr(stream.str());

@@ -6,7 +6,7 @@
 /*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/27 17:29:02 by ecaceres          #+#    #+#             */
-/*   Updated: 2020/12/22 16:51:43 by alicetetu        ###   ########.fr       */
+/*   Updated: 2020/12/23 16:05:04 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,6 +76,7 @@ class HTTPRequestParser
 		std::string m_queryKey;
 		std::string m_queryValue;
 		std::string m_fragment;
+		std::string m_body;
 		bool m_hexOn;
 		std::string m_hex;
 
@@ -120,6 +121,18 @@ class HTTPRequestParser
 		
 		std::string &
 		fragment();
+
+		void
+		body(const std::string & storage);
+		
+		void
+		chunkBody(const std::string & storage);
+		
+		std::string &
+		body();
+
+		void
+		setBody(std::string &storage);
 };
 
 #endif /* HTTPREQUESTPARSER_HPP_ */

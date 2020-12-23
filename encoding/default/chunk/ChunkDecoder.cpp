@@ -6,7 +6,7 @@
 /*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/19 14:51:33 by alicetetu         #+#    #+#             */
-/*   Updated: 2020/12/21 17:25:53 by alicetetu        ###   ########.fr       */
+/*   Updated: 2020/12/23 19:46:39 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 #include <iostream>
 
 ChunkDecoder::ChunkDecoder() :
-	m_input("input"),
+	m_input(""),
 	m_state(S_NOT_STARTED),
 	m_sizeNb(0),
 	m_parsedData(""),
@@ -67,11 +67,12 @@ ChunkDecoder::operator =(const ChunkDecoder &other)
 
 #define SIZE_CONVERSION()											\
 		char *endPtr;												\
-		m_sizeNb = strtol(m_sizeStr.c_str(), &endPtr, 16);			\
-		if (endPtr == m_sizeStr.c_str())							\
+		std::string hex_intro = "0x" + m_sizeStr;\
+		m_sizeNb = strtol(hex_intro.c_str(), &endPtr, 16);			\
+		if (endPtr == hex_intro.c_str())							\
 			throw Exception ("Hexadecimal conversion impossible"); 	\
 		m_sizeStr = "";
-
+	
 std::string
 ChunkDecoder::decode()
 {
@@ -82,7 +83,7 @@ ChunkDecoder::decode()
 	{
 		char c = m_input[in];
 		in++;
-		
+		std::cout << "c : " << c << " - " << (int)c << std::endl;
 		switch (m_state)
 		{
 
@@ -126,6 +127,7 @@ ChunkDecoder::decode()
 						throw Exception ("Too long extensions"); // 4xx error;
 				}
 				
+				break;
 			}
 			
 			case S_SIZE_END:
@@ -142,17 +144,17 @@ ChunkDecoder::decode()
 			
 			case S_CHUNK:
 			{
+				//std::cout << "chunk: \n" << m_parsedChunk << std::endl;
+			//	std::cout << "size: " << m_sizeNb << std::endl;
 				m_parsedChunk += c;
 				m_sizeNb--;
 				if (m_sizeNb == 0)
 				{
 					m_parsedData += m_parsedChunk;
+				//	std::cout << "parsed: \n" << m_parsedData << std::endl;
 					m_parsedChunk = "";
 					m_sizeNb = 0;
-					if (c == '\n' && m_lastChar == '\r')
-						m_state = S_SIZE;
-					else
-						m_state = S_CHUNK_END;
+					m_state = S_CHUNK_END;
 				}
 				else
 					m_state = S_CHUNK;	
@@ -165,6 +167,11 @@ ChunkDecoder::decode()
 			{
 				if (c == '\r')
 					m_state = S_CHUNK_END2;
+			
+				else
+				{
+					throw Exception ("Character not recognized"); // check error
+				}
 			
 				break;
 			}
@@ -208,6 +215,6 @@ ChunkDecoder::decode()
 		}
 		m_lastChar = c ;
 	}
-	
+	// std::cout << "parsed: \n" << m_parsedData << std::endl;
 	return (m_parsedData);
 }

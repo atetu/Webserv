@@ -6,12 +6,13 @@
 /*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/27 17:29:02 by ecaceres          #+#    #+#             */
-/*   Updated: 2020/12/22 16:51:25 by alicetetu        ###   ########.fr       */
+/*   Updated: 2020/12/23 19:49:30 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <exception/Exception.hpp>
 #include <http/HTTPRequestParser.hpp>
+#include <encoding/default/chunk/ChunkDecoder.hpp>
 #include <string>
 
 HTTPRequestParser::HTTPRequestParser() :
@@ -512,4 +513,55 @@ std::string &
 HTTPRequestParser::fragment()
 {
 	return (m_fragment);
+}
+
+void
+HTTPRequestParser::body(const std::string & storage)
+{
+	m_body = storage;
+}
+
+
+void
+HTTPRequestParser::chunkBody(const std::string & storage)
+{
+	m_body = ChunkDecoder(storage).decode();
+}
+
+std::string &
+HTTPRequestParser::body()
+{
+	return(m_body);
+}
+
+void
+HTTPRequestParser::setBody(std::string &storage)
+{
+	std::map<std::string, std::string>::iterator length_it = m_headerMap.find("Content-Length");
+	if (length_it != m_headerMap.end())
+	{
+		int bodySize = std::stoi(length_it->second);
+		m_body = storage.substr(0, bodySize);
+	}
+	else
+	{
+		std::map<std::string, std::string>::iterator encode_it = m_headerMap.find("Transfer-Encoding");
+		if (encode_it == m_headerMap.end())
+		{
+			// check with Nginx if error. RFC = content-length header SHOULD be sent...
+		}
+		else
+		{
+			if (encode_it ->second == "chunked")
+			{
+			//	storage.erase(0,4);
+				std::cout << storage << std::endl;
+				chunkBody(storage);
+			}
+		
+			else
+				throw Exception("transfer_encoding not supported");
+		}
+			
+	}
 }

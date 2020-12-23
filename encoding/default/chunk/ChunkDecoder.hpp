@@ -6,7 +6,7 @@
 /*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/19 14:47:44 by alicetetu         #+#    #+#             */
-/*   Updated: 2020/12/21 17:08:35 by alicetetu        ###   ########.fr       */
+/*   Updated: 2020/12/23 16:57:33 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ class ChunkDecoder
 			S_SIZE_END,
 		//	S_SIZE_END2,
 			S_CHUNK,
-			// S_CHUNK_END_EXPECTED,
+		//	S_CHUNK_END_EXPECTED,
 			S_CHUNK_END,
 			S_CHUNK_END2,
 			S_NULL,

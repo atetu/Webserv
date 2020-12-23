@@ -6,7 +6,7 @@
 /*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/28 14:34:10 by ecaceres          #+#    #+#             */
-/*   Updated: 2020/12/22 16:55:36 by alicetetu        ###   ########.fr       */
+/*   Updated: 2020/12/23 18:24:30 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -234,7 +234,7 @@ HTTPOrchestrator::start()
 
 						if (buffer.read() == -1 || buffer.hasReadEverything())
 						{
-//							std::cout << "fd-read :: remove(" << fd << " (" << buffer.descriptor().raw() << ")): " << ::strerror(errno) << std::endl;
+							//std::cout << "fd-read :: remove(" << fd << " (" << buffer.descriptor().raw() << ")): " << ::strerror(errno) << std::endl;
 							fdToRemove.insert(fdToRemove.end(), fd);
 						}
 					}
@@ -270,21 +270,23 @@ HTTPOrchestrator::start()
 					bool deleted = false;
 
 					HTTPClient &client = *it->second;
-
+					
 					if (canRead && !client.response())
 					{
 						if (client.in().size() != 0 || client.in().recv() > 0)
 						{
 							char c;
-
+							
 							while (client.in().next(c))
 							{
 								client.parser().consume(c);
-
+							
 								if (client.parser().state() == HTTPRequestParser::S_END)
 								{
 									HTTPHeaderFields header = HTTPHeaderFields(client.parser().header()); // isn't enough actually?
 
+									client.parser().setBody(client.in().storage());
+									std::cout << "body: " << client.parser().body() << std::endl;
 									std::map<std::string, std::string>::iterator header_it = header.storage().find("host");
 //									if (header_it == header.storage().end())
 //										throw Exception("No host in header fields");
