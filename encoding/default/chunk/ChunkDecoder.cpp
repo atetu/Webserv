@@ -6,7 +6,7 @@
 /*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/19 14:51:33 by alicetetu         #+#    #+#             */
-/*   Updated: 2020/12/23 19:46:39 by alicetetu        ###   ########.fr       */
+/*   Updated: 2020/12/23 20:11:24 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,7 +72,8 @@ ChunkDecoder::operator =(const ChunkDecoder &other)
 		m_sizeNb = strtol(hex_intro.c_str(), &endPtr, 16);			\
 		if (endPtr == hex_intro.c_str())							\
 			throw Exception ("Hexadecimal conversion impossible"); 	\
-		m_sizeStr = "";
+		m_sizeStr = "";\
+		std::cout << "nb : " << m_sizeNb << std::endl;
 	
 std::string
 ChunkDecoder::decode()
@@ -84,7 +85,7 @@ ChunkDecoder::decode()
 	{
 		char c = m_input[in];
 		in++;
-		std::cout << "c : " << c << " - " << (int)c << std::endl;
+	
 		switch (m_state)
 		{
 
@@ -149,7 +150,7 @@ ChunkDecoder::decode()
 			//	std::cout << "size: " << m_sizeNb << std::endl;
 				m_parsedChunk += c;
 				m_sizeNb--;
-				if (m_sizeNb == 0)
+				if (m_sizeNb == 0 || in_len == 0)
 				{
 					m_parsedData += m_parsedChunk;
 				//	std::cout << "parsed: \n" << m_parsedData << std::endl;

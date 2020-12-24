@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   File.hpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ecaceres <ecaceres@student.42.fr>          +#+  +:+       +#+        */
+/*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/21 23:36:43 by ecaceres          #+#    #+#             */
-/*   Updated: 2020/12/21 23:36:43 by ecaceres         ###   ########.fr       */
+/*   Updated: 2020/12/24 18:40:48 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,6 +42,9 @@ class File
 		bool
 		isDirectory();
 
+		bool
+		create(std::string location);
+
 		size_t
 		length();
 
@@ -56,6 +59,9 @@ class File
 
 		std::list<File>
 		list();
+
+		void
+		setNewPath(std::string path, std::string extension);
 };
 
 #endif /* FILE_HPP_ */
