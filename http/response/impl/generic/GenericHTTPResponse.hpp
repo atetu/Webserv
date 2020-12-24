@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   HTTPResponseImpl.hpp                               :+:      :+:    :+:   */
+/*   GenericHTTPResponse.hpp                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/27 16:38:46 by ecaceres          #+#    #+#             */
-/*   Updated: 2020/12/09 15:51:48 by alicetetu        ###   ########.fr       */
+/*   Updated: 2020/12/24 10:20:36 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -155,6 +155,9 @@ class GenericHTTPResponse :
 
 		static GenericHTTPResponse*
 		string(HTTPStatus &status, const HTTPHeaderFields &headers, const std::string &string);
+
+		static GenericHTTPResponse*
+		noBody(HTTPStatus &status, const HTTPHeaderFields &headers);
 };
 
 #endif /* GENERICHTTPRESPONSE_HPP_ */

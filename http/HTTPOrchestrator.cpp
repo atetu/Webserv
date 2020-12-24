@@ -6,7 +6,7 @@
 /*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/28 14:34:10 by ecaceres          #+#    #+#             */
-/*   Updated: 2020/12/23 18:24:30 by alicetetu        ###   ########.fr       */
+/*   Updated: 2020/12/24 16:28:31 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -286,7 +286,7 @@ HTTPOrchestrator::start()
 									HTTPHeaderFields header = HTTPHeaderFields(client.parser().header()); // isn't enough actually?
 
 									client.parser().setBody(client.in().storage());
-									std::cout << "body: " << client.parser().body() << std::endl;
+									//std::cout << "body: " << client.parser().body() << std::endl;
 									std::map<std::string, std::string>::iterator header_it = header.storage().find("host");
 //									if (header_it == header.storage().end())
 //										throw Exception("No host in header fields");
@@ -305,7 +305,7 @@ HTTPOrchestrator::start()
 										if (findLocation.parse().location().present())
 											locationBlock = findLocation.parse().location().get();
 									}
-
+									
 									if (!serverBlock)
 										client.response() = GenericHTTPResponse::status(*HTTPStatus::NOT_FOUND);
 									else
@@ -328,8 +328,11 @@ HTTPOrchestrator::start()
 											const HTTPVersion &version = HTTPVersion::HTTP_1_1;
 											const Optional<LocationBlock const*> locationBlockOptional = Optional<LocationBlock const*>::ofNullable(locationBlock);
 
-											client.request() = new HTTPRequest(method, url, version, header, m_configuration, rootBlock, *serverBlock, locationBlockOptional);
-
+											const std::string body = client.parser().body();
+											const MimeRegistry *mimeRegistry = new MimeRegistry(m_configuration.mimeRegistry());
+											
+											client.request() = new HTTPRequest(method, url, version, header, body, m_configuration, rootBlock, *serverBlock, locationBlockOptional, *mimeRegistry);
+																					
 											if (locationBlock)
 											{
 												if (locationBlock->methods().present())
@@ -358,7 +361,7 @@ HTTPOrchestrator::start()
 													}
 												}
 											}
-
+											
 											if (!client.response())
 												client.response() = method.handler().handle(*client.request());
 										}

@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   HTTPResponse.cpp                                   :+:      :+:    :+:   */
+/*   GenericHTTPResponse.cpp                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/27 16:38:46 by ecaceres          #+#    #+#             */
-/*   Updated: 2020/12/09 15:52:11 by alicetetu        ###   ########.fr       */
+/*   Updated: 2020/12/24 10:20:00 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -180,4 +180,10 @@ GenericHTTPResponse*
 GenericHTTPResponse::string(HTTPStatus &status, const HTTPHeaderFields &headers, const std::string &string)
 {
 	return (new GenericHTTPResponse(HTTPStatusLine(*HTTPStatus::OK), headers, new GenericHTTPResponse::StringBody(string)));
+}
+
+GenericHTTPResponse*
+GenericHTTPResponse::noBody(HTTPStatus &status, const HTTPHeaderFields &headers)
+{
+	return (new GenericHTTPResponse(HTTPStatusLine(*HTTPStatus::OK), headers, NULL));
 }

@@ -6,7 +6,7 @@
 /*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/27 18:39:24 by ecaceres          #+#    #+#             */
-/*   Updated: 2020/12/18 16:23:45 by alicetetu        ###   ########.fr       */
+/*   Updated: 2020/12/24 12:44:50 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -155,6 +155,15 @@ class HTTPHeaderFields
 
 		map &
 		storage(void);
+
+		const map &
+		storage(void) const;
+
+		// inline const std::map<std::string, std::string> &
+		// storage()
+		// {
+		// 	return (m_storage);
+		// }
 
 		HTTPValueParser*
 		getValueWithWeight(std::string field);

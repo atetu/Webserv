@@ -6,7 +6,7 @@
 /*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/27 17:29:02 by ecaceres          #+#    #+#             */
-/*   Updated: 2020/12/23 19:49:30 by alicetetu        ###   ########.fr       */
+/*   Updated: 2020/12/24 14:33:28 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -114,7 +114,6 @@ HTTPRequestParser::consume(char c)
 
 		case S_PATH:
 		{
-			std::cout << "c : " << c  << std::endl;
 			if (c == ' ')
 				m_state = S_HTTP_START;
 			else if (c == '?')
@@ -122,11 +121,7 @@ HTTPRequestParser::consume(char c)
 			else if (c == '#')
 				m_state = S_FRAGMENT;
 			else
-			{
-				std::cout << "path: "<< m_path << std::endl;
-			
 				m_path += c;
-			}
 			break;
 		}
 
@@ -555,7 +550,7 @@ HTTPRequestParser::setBody(std::string &storage)
 			if (encode_it ->second == "chunked")
 			{
 			//	storage.erase(0,4);
-				std::cout << storage << std::endl;
+			//	std::cout << storage << std::endl;
 				chunkBody(storage);
 			}
 		
