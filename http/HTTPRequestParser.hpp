@@ -13,7 +13,10 @@
 #ifndef HTTPREQUESTPARSER_HPP_
 # define HTTPREQUESTPARSER_HPP_
 
-# include <string>
+#include <http/HTTPHeaderParser.hpp>
+#include <map>
+#include <string>
+#include <vector>
 
 # ifdef major
 #  undef major
@@ -22,10 +25,6 @@
 # ifdef minor
 #  undef minor
 # endif
-# include <iostream>
-# include <vector>
-# include <map>
-#include <http/HTTPHeaderParser.hpp>
 
 class HTTPRequestParser
 {

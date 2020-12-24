@@ -12,6 +12,7 @@
 
 #include <encoding/default/chunk/ChunkDecoder.hpp>
 #include <exception/Exception.hpp>
+#include <cstdlib>
 #include <iostream>
 
 ChunkDecoder::ChunkDecoder() :

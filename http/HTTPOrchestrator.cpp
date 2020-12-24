@@ -184,7 +184,6 @@ HTTPOrchestrator::start()
 		int fdCount;
 		if ((fdCount = ::select(m_highestFd + 1, &readFdSet, &writeFdSet, NULL, &timeout)) == -1)
 		{
-			std::cout << m_stopping << " " << errno << " " << EINTR << std::endl;
 			if (m_stopping && errno == EINTR)
 				continue;
 

@@ -10,10 +10,20 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+#include <encoding/default/chunk/ChunkDecoder.hpp>
 #include <exception/Exception.hpp>
 #include <http/HTTPRequestParser.hpp>
-#include <encoding/default/chunk/ChunkDecoder.hpp>
-#include <string>
+#include <cctype>
+#include <cstdlib>
+#include <iostream>
+
+# ifdef major
+#  undef major
+# endif
+
+# ifdef minor
+#  undef minor
+# endif
 
 HTTPRequestParser::HTTPRequestParser() :
 		m_state(S_NOT_STARTED),
@@ -36,7 +46,6 @@ HTTPRequestParser::HTTPRequestParser() :
 	m_method.reserve(16);
 	m_path.reserve(60);
 }
-
 
 #define ADD_TO_MAP(key, value)						\
 			m_headerMap[key] = value;				\
@@ -76,7 +85,7 @@ HTTPRequestParser::HTTPRequestParser() :
 void
 HTTPRequestParser::consume(char c)
 {
-	
+
 	switch (m_state)
 	{
 		case S_NOT_STARTED:
@@ -114,7 +123,7 @@ HTTPRequestParser::consume(char c)
 
 		case S_PATH:
 		{
-			std::cout << "c : " << c  << std::endl;
+			std::cout << "c : " << c << std::endl;
 			if (c == ' ')
 				m_state = S_HTTP_START;
 			else if (c == '?')
@@ -123,8 +132,8 @@ HTTPRequestParser::consume(char c)
 				m_state = S_FRAGMENT;
 			else
 			{
-				std::cout << "path: "<< m_path << std::endl;
-			
+				std::cout << "path: " << m_path << std::endl;
+
 				m_path += c;
 			}
 			break;
@@ -246,7 +255,7 @@ HTTPRequestParser::consume(char c)
 				m_state = S_FIELD;
 				m_field += c;
 			}
-		
+
 			break;
 		}
 
@@ -264,79 +273,79 @@ HTTPRequestParser::consume(char c)
 
 			break;
 		}
-		
+
 		case S_QUERY_STRING_KEY:
 		{
 			if (m_hexOn)
 				HEX_CONVERSION(c, m_queryKey)
-			
+
 			else if (c == '=')
 				m_state = S_QUERY_STRING_VALUE;
-	
+
 			// else if (c == '&')
 			// 	throw Exception("Query key expected");
-			
+
 			else if (c == '%')
 				m_hexOn = true;
-			
+
 			// else if (c == '#')
 			// 	throw Exception("Query key expected"); 
-			
+
 			else if (c == '+')
 				m_queryKey += ' ';
-			
+
 			else if (c == ' ')
-				throw Exception("Query key expected"); 
-				
+				throw Exception("Query key expected");
+
 			else
 				m_queryKey += c;
 
 			break;
 		}
-		
+
 		case S_QUERY_STRING_VALUE:
 		{
 			if (m_hexOn)
 				HEX_CONVERSION(c, m_queryValue)
-				
+
 			// else if (c == '=')// or no exception?
 			// 	throw Exception("Query value expected");
 
 			else if (c == '%')
 				m_hexOn = true;
-				
+
 			else if (c == '&')
 				ADD_TO_QUERY_MAP(S_QUERY_STRING_KEY)
-				
+
 			else if (c == '#')
 				ADD_TO_QUERY_MAP(S_FRAGMENT)
 
 			else if (c == ' ')
 				ADD_TO_QUERY_MAP(S_HTTP_START)
-				
+
 			else
 				m_queryValue += c;
 
 			break;
 		}
-		
+
 		case S_FRAGMENT:
 		{
 			if (m_hexOn)
 				HEX_CONVERSION(c, m_fragment)
-				
+
 			else if (c == ' ')
 				m_state = S_HTTP_START;
-			
+
 			else if (c == '%')
 				m_hexOn = true;
-				
+
 			else
 				m_fragment += c;
 
 			break;
 		}
-		
+
 		case S_FIELD:
 		{
 			if (c == ' ')
@@ -355,7 +364,7 @@ HTTPRequestParser::consume(char c)
 
 			break;
 		}
-		
+
 		case S_COLON:
 		{
 			if (c == ' ')
@@ -365,7 +374,7 @@ HTTPRequestParser::consume(char c)
 
 			break;
 		}
-			
+
 		case S_SPACES_BEFORE_VALUE:
 		{
 			if (c != ' ')
@@ -382,7 +391,7 @@ HTTPRequestParser::consume(char c)
 			if (c == ' ')
 				m_state = S_SPACES_AFTER_VALUE;
 			else if (c == '\r')
-			{	
+			{
 				ADD_TO_MAP(m_field, m_value);
 				m_state = S_VALUE_END;
 			}
@@ -398,13 +407,13 @@ HTTPRequestParser::consume(char c)
 				m_state = S_SPACES_AFTER_VALUE;
 			else if (c == '\r')
 			{
-				
+
 				ADD_TO_MAP(m_field, m_value);
 				m_state = S_VALUE_END;
 			}
 			else if (c == '\n')
 				m_state = S_VALUE_END2;
-					
+
 			else
 			{
 				m_value += ' ';
@@ -450,12 +459,12 @@ HTTPRequestParser::consume(char c)
 
 			break;
 		}
-		
+
 		case S_END:
 			break;
-		
+
 	}
-	
+
 	m_last_char2 = m_last_char;
 	m_last_char = c;
 }
@@ -490,8 +499,7 @@ HTTPRequestParser::minor() const
 	return (m_minor);
 }
 
-
-const std::map<std::string, std::string> &
+const std::map<std::string, std::string>&
 HTTPRequestParser::header()
 {
 	return (m_headerMap);
@@ -503,35 +511,34 @@ HTTPRequestParser::lastChar() const
 	return (m_last_char);
 }
 
-std::map<std::string, std::string> &
+std::map<std::string, std::string>&
 HTTPRequestParser::query()
 {
 	return (m_query);
 }
 
-std::string &
+std::string&
 HTTPRequestParser::fragment()
 {
 	return (m_fragment);
 }
 
 void
-HTTPRequestParser::body(const std::string & storage)
+HTTPRequestParser::body(const std::string &storage)
 {
 	m_body = storage;
 }
 
-
 void
-HTTPRequestParser::chunkBody(const std::string & storage)
+HTTPRequestParser::chunkBody(const std::string &storage)
 {
 	m_body = ChunkDecoder(storage).decode();
 }
 
-std::string &
+std::string&
 HTTPRequestParser::body()
 {
-	return(m_body);
+	return (m_body);
 }
 
 void
@@ -540,7 +547,7 @@ HTTPRequestParser::setBody(std::string &storage)
 	std::map<std::string, std::string>::iterator length_it = m_headerMap.find("Content-Length");
 	if (length_it != m_headerMap.end())
 	{
-		int bodySize = std::stoi(length_it->second);
+		int bodySize = ::atoi(length_it->second.c_str());
 		m_body = storage.substr(0, bodySize);
 	}
 	else
@@ -552,16 +559,16 @@ HTTPRequestParser::setBody(std::string &storage)
 		}
 		else
 		{
-			if (encode_it ->second == "chunked")
+			if (encode_it->second == "chunked")
 			{
-			//	storage.erase(0,4);
+				//	storage.erase(0,4);
 				std::cout << storage << std::endl;
 				chunkBody(storage);
 			}
-		
+
 			else
 				throw Exception("transfer_encoding not supported");
 		}
-			
+
 	}
 }

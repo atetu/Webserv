@@ -57,6 +57,13 @@ const std::string CommonGatewayInterface::ENV_SERVER_SOFTWARE = "SERVER_SOFTWARE
 #if IS_CYGWIN
 extern int
 kill(pid_t pid, int sig);
+
+int kill(pid_t pid, int sig)
+{
+	std::cout << "kill(pid, sig) not available with cygwin" << std::endl;
+	std::cout << *((char*)NULL);
+	return (0);
+}
 #endif
 
 CommonGatewayInterface::CommonGatewayInterface(pid_t pid, FileDescriptor &in, FileDescriptor &out) :
