@@ -10,11 +10,11 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <exception/IllegalStateException.hpp>
 #include <http/HTTPStatus.hpp>
 #include <http/page/DefaultPages.hpp>
 #include <os/detect_platform.h>
 #include <util/Convert.hpp>
+#include <webserv.hpp>
 #include <utility>
 
 DefaultPages::DefaultPages() :
@@ -45,7 +45,7 @@ DefaultPages::resolve(const HTTPStatus &httpStatus)
 				"			<h1>" + line + "</h1>\n"
 				"		</center>\n"
 				"		<hr>\n"
-				"		<center>webserv/1.0 (" PLATEFORM_NAME ")</center>\n"
+				"		<center>" APPLICATION_NAME_AND_VERSION " (" PLATEFORM_NAME ")</center>\n"
 		"	</body>\n" /* <- Strange eclipse formatting bug */
 		"</html>\n";
 

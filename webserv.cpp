@@ -28,7 +28,8 @@
 #include <util/options/CommandLine.hpp>
 #include <util/options/Option.hpp>
 #include <util/options/OptionParser.hpp>
-#include <util/Optional.hpp>
+#include <webserv.hpp>
+#include <ctime>
 #include <iostream>
 #include <list>
 #include <string>
@@ -36,6 +37,7 @@
 #include <vector>
 
 const Option OPT_HELP('h', "help", "display this help message");
+const Option OPT_VERSION('v', "version", "display application's version");
 const Option OPT_LOG_LEVEL('l', "log-level", "change the log-level", "level");
 const Option OPT_CHECK('c', "check", "only check the config file");
 const Option OPT_CONFIG_FILE('f', "config-file", "specify the config file", "file");
@@ -70,6 +72,7 @@ delegated_main(int argc, char **argv, char **envp)
 
 	std::list<const Option*> lst;
 	lst.push_back(&OPT_HELP);
+	lst.push_back(&OPT_VERSION);
 	lst.push_back(&OPT_LOG_LEVEL);
 	lst.push_back(&OPT_CHECK);
 	lst.push_back(&OPT_CONFIG_FILE);
@@ -90,6 +93,12 @@ delegated_main(int argc, char **argv, char **envp)
 			/**/.build();
 
 			std::cout << parser.help(program, "A small web server", authors) << std::endl;
+			return (0);
+		}
+
+		if (commandLine.has(OPT_VERSION))
+		{
+			std::cout << APPLICATION_NAME_AND_VERSION << std::endl;
 			return (0);
 		}
 
