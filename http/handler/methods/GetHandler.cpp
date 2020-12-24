@@ -14,7 +14,6 @@
 #include <http/handler/methods/GetHandler.hpp>
 #include <http/HTTPHeaderFields.hpp>
 #include <http/HTTPStatus.hpp>
-#include <http/response/HTTPStatusLine.hpp>
 #include <http/response/impl/generic/GenericHTTPResponse.hpp>
 #include <io/File.hpp>
 #include <io/FileDescriptor.hpp>
@@ -42,7 +41,7 @@ GetHandler::handle(HTTPRequest &request)
 	File file(path);
 
 	if (!file.exists())
-		return (GenericHTTPResponse::status(*HTTPStatus::NOT_FOUND));
+		return (error(request, *HTTPStatus::NOT_FOUND));
 
 	if (file.isFile())
 	{
@@ -51,13 +50,13 @@ GetHandler::handle(HTTPRequest &request)
 		int fd = ::open(path.c_str(), O_RDONLY); // TODO Need abstraction
 
 		if (fd == -1)
-			return (GenericHTTPResponse::status(*HTTPStatus::NOT_FOUND));
+			return (error(request, *HTTPStatus::NOT_FOUND));
 
 		std::string extension;
 		if (request.url().extension(extension))
 			headers.contentType(request.configuration().mimeRegistry(), extension);
 
-		headers.contentLength(file.length());
+		headers.contentLength(length);
 
 		return (GenericHTTPResponse::file(*HTTPStatus::OK, headers, *FileDescriptorBuffer::from(*FileDescriptor::wrap(fd), FileDescriptorBuffer::CLOSE | FileDescriptorBuffer::DELETE)));
 	}
@@ -100,7 +99,7 @@ GetHandler::handle(HTTPRequest &request)
 		return (GenericHTTPResponse::string(*HTTPStatus::OK, headers, listing));
 	}
 
-	return (GenericHTTPResponse::status(*HTTPStatus::NOT_FOUND));
+	return (error(request, *HTTPStatus::NOT_FOUND));
 }
 
 GetHandler&

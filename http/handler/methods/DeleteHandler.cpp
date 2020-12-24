@@ -34,13 +34,15 @@ DeleteHandler::handle(HTTPRequest &request)
 
 	if (::stat(filepath, &st) == 0)
 	{
-		if (::remove(filepath) == 0)
-			return (GenericHTTPResponse::status(*HTTPStatus::OK));
+		std::cout << filepath << std::endl;
+		/*if (::remove(filepath) == 0) // TODO Disabled to avoid mistakes
+			return (status(*HTTPStatus::OK));
 		else
-			return (GenericHTTPResponse::status(*HTTPStatus::ACCEPTED));
+			return (status(*HTTPStatus::ACCEPTED));*/
+		return (status(*HTTPStatus::OK));
 	}
 	else
-		return (GenericHTTPResponse::status(*HTTPStatus::NO_CONTENT));
+		return (status(*HTTPStatus::NO_CONTENT));
 }
 
 DeleteHandler&

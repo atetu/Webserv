@@ -15,10 +15,13 @@
 
 #ifdef __linux__
 # define IS_LINUX 1
+# define PLATEFORM_NAME "linux"
 #elif __APPLE__
 # define IS_MACOS 1
+# define PLATEFORM_NAME "apple"
 #elif __CYGWIN__
 # define IS_CYGWIN 1
+# define PLATEFORM_NAME "cygwin"
 #else
 # error Unknown plateform
 #endif

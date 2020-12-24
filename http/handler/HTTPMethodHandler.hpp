@@ -12,6 +12,8 @@
 
 #ifndef HTTPMETHODHANDLER_HPP_
 # define HTTPMETHODHANDLER_HPP_
+class HTTPResponse;
+class HTTPStatus;
 
 class HTTPRequest;
 class GenericHTTPResponse;
@@ -20,12 +22,17 @@ class HTTPMethodHandler
 {
 	public:
 		virtual
-		~HTTPMethodHandler()
-		{
-		}
+		~HTTPMethodHandler();
 
 		virtual GenericHTTPResponse*
 		handle(HTTPRequest &request) = 0;
+
+	public:
+		static GenericHTTPResponse*
+		status(HTTPStatus &status);
+
+		static GenericHTTPResponse*
+		error(const HTTPRequest &request, HTTPStatus &httpStatus);
 };
 
 #endif /* HTTPMETHODHANDLER_HPP_ */

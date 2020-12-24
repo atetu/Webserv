@@ -52,8 +52,13 @@ File::exists()
 	struct stat st;
 	if (::stat(m_path.c_str(), &st) == -1)
 	{
+		int error = errno;
 		errno = 0;
-		return (false);
+
+		if (error == ENOENT)
+			return (false);
+
+		throw IOException(m_path, errno);
 	}
 
 	return (true);

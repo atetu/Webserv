@@ -1,36 +1,29 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   CONNECT.cpp                                        :+:      :+:    :+:   */
+/*   Singleton.hpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ecaceres <ecaceres@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2020/11/25 18:02:05 by ecaceres          #+#    #+#             */
-/*   Updated: 2020/11/25 18:02:05 by ecaceres         ###   ########.fr       */
+/*   Created: 2020/12/24 19:56:28 by ecaceres          #+#    #+#             */
+/*   Updated: 2020/12/24 19:56:28 by ecaceres         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <http/handler/methods/ConnectHandler.hpp>
-#include <http/HTTPStatus.hpp>
+#ifndef SINGLETON_HPP_
+# define SINGLETON_HPP_
 
-ConnectHandler::ConnectHandler()
-{
-}
+template<typename T>
+	class Singleton
+	{
+		public:
+			static T&
+			instance(void)
+			{
+				static T instance;
 
-ConnectHandler::~ConnectHandler()
-{
-}
+				return (instance);
+			}
+	};
 
-GenericHTTPResponse*
-ConnectHandler::handle(HTTPRequest &request)
-{
-	return (error(request, *HTTPStatus::BAD_REQUEST));
-}
-
-ConnectHandler&
-ConnectHandler::get(void)
-{
-	static ConnectHandler handler;
-
-	return (handler);
-}
+#endif /* SINGLETON_HPP_ */
