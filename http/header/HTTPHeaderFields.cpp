@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <http/HTTPHeaderFields.hpp>
+#include <http/header/HTTPHeaderFields.hpp>
 #include <http/mime/Mime.hpp>
 #include <http/mime/MimeRegistry.hpp>
 #include <util/Convert.hpp>

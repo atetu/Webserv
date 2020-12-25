@@ -11,10 +11,10 @@
 /* ************************************************************************** */
 
 #include <config/block/LocationBlock.hpp>
+#include <http/enums/HTTPStatus.hpp>
 #include <http/handler/methods/OptionsHandler.hpp>
-#include <http/HTTPHeaderFields.hpp>
-#include <http/HTTPRequest.hpp>
-#include <http/HTTPStatus.hpp>
+#include <http/header/HTTPHeaderFields.hpp>
+#include <http/request/HTTPRequest.hpp>
 #include <util/Convert.hpp>
 #include <util/Optional.hpp>
 #include <list>

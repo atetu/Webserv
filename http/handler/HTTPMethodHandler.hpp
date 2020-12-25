@@ -13,7 +13,7 @@
 #ifndef HTTPMETHODHANDLER_HPP_
 # define HTTPMETHODHANDLER_HPP_
 
-#include <http/HTTPHeaderFields.hpp>
+#include <http/header/HTTPHeaderFields.hpp>
 #include <io/FileDescriptor.hpp>
 #include <string>
 

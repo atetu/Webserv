@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   TraceHandler.cpp                                 :+:      :+:    :+:   */
+/*   TraceHandler.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -10,10 +10,10 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+#include <http/enums/HTTPStatus.hpp>
 #include <http/handler/methods/TraceHandler.hpp>
-#include <http/HTTPHeaderFields.hpp>
-#include <http/HTTPStatus.hpp>
-#include <http/response/impl/generic/GenericHTTPResponse.hpp>
+#include <http/header/HTTPHeaderFields.hpp>
+#include <http/request/HTTPRequest.hpp>
 #include <string>
 
 TraceHandler::TraceHandler()

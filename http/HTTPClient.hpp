@@ -13,7 +13,7 @@
 #ifndef HTTPCLIENT_HPP_
 # define HTTPCLIENT_HPP_
 
-#include <http/HTTPRequestParser.hpp>
+#include <http/request/parser/HTTPRequestParser.hpp>
 #include <io/Socket.hpp>
 #include <net/address/InetSocketAddress.hpp>
 

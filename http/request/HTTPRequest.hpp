@@ -14,13 +14,16 @@
 # define HTTPREQUEST_HPP_
 
 #include <config/block/LocationBlock.hpp>
-#include <config/block/RootBlock.hpp>
-#include <config/block/ServerBlock.hpp>
-#include <config/Configuration.hpp>
-#include <http/HTTPHeaderFields.hpp>
-#include <http/HTTPMethod.hpp>
-#include <http/HTTPVersion.hpp>
+#include <http/enums/HTTPMethod.hpp>
+#include <http/enums/HTTPVersion.hpp>
+#include <http/header/HTTPHeaderFields.hpp>
+#include <util/Optional.hpp>
 #include <util/URL.hpp>
+#include <string>
+
+class Configuration;
+class RootBlock;
+class ServerBlock;
 
 class HTTPRequest
 {

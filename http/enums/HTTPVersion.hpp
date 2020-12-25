@@ -13,7 +13,7 @@
 #ifndef HTTPVERSION_HPP_
 # define HTTPVERSION_HPP_
 
-# include <iostream>
+#include <string>
 
 # ifdef _SYS_SYSMACROS_H
 #  undef major

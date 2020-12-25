@@ -10,6 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+#include <http/enums/HTTPMethod.hpp>
 #include <http/handler/methods/ConnectHandler.hpp>
 #include <http/handler/methods/DeleteHandler.hpp>
 #include <http/handler/methods/GetHandler.hpp>
@@ -17,7 +18,6 @@
 #include <http/handler/methods/OptionsHandler.hpp>
 #include <http/handler/methods/PutHandler.hpp>
 #include <http/handler/methods/TraceHandler.hpp>
-#include <http/HTTPMethod.hpp>
 
 #define DEFINE_METHOD(name, handler) ENUM_DEFINE(HTTPMethod, name, HTTPMethod(&handler));
 

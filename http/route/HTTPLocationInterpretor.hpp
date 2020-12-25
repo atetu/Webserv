@@ -13,9 +13,8 @@
 #ifndef HTTPLOCATIONINTERPRETOR_HPP_
 # define HTTPLOCATIONINTERPRETOR_HPP_
 
-#include <config/block/ServerBlock.hpp>
 #include <list>
-#include <iostream>
+#include <string>
 
 class HTTPLocationInterpretor
 {

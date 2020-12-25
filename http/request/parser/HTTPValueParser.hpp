@@ -11,14 +11,12 @@
 /* ************************************************************************** */
 
 
-#ifndef HTTPValueParser_HPP_
-# define HTTPValueParser_HPP_
+#ifndef HTTPVALUEPARSER_HPP_
+# define HTTPVALUEPARSER_HPP_
 
-# include <iostream>
-# include <vector>
-# include <map>
-# include <list>
-#include <http/HTTPHeaderParser.hpp>
+#include <list>
+#include <map>
+#include <string>
 
 class HTTPValueParser
 {
@@ -69,4 +67,4 @@ class HTTPValueParser
 		next(char &c);
 };
 
-#endif /* HTTPValueParser_HPP_ */
+#endif /* HTTPVALUEPARSER_HPP_ */

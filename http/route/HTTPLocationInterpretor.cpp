@@ -10,7 +10,9 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <http/HTTPLocationInterpretor.hpp>
+#include <exception/Exception.hpp>
+#include <http/route/HTTPLocationInterpretor.hpp>
+#include <string>
 
 HTTPLocationInterpretor::HTTPLocationInterpretor() :
 		m_state(S_NOT_STARTED),
@@ -88,7 +90,7 @@ HTTPLocationInterpretor::consume(char &c)
 			else if (c == '/')
 			{
 				m_start += c;
-				m_state = S_START; 
+				m_state = S_START;
 			}
 			else if (c == '~')
 			{
@@ -118,10 +120,10 @@ HTTPLocationInterpretor::consume(char &c)
 				m_state = S_MIDDLE_START;
 			else
 				m_start += c;
-			
+
 			break;
 		}
-		
+
 		case S_EXACT_INTRO:
 		{
 			// if (c == ' ')
@@ -133,10 +135,10 @@ HTTPLocationInterpretor::consume(char &c)
 				m_exact += c;
 				m_state = S_EXACT;
 			}
-			
+
 			break;
 		}
-		
+
 		case S_EXACT:
 		{
 			// if (c == ' ')
@@ -152,7 +154,7 @@ HTTPLocationInterpretor::consume(char &c)
 			}
 			break;
 		}
-		
+
 		case S_TILDE:
 		{
 			if (c == ' ')
@@ -170,11 +172,11 @@ HTTPLocationInterpretor::consume(char &c)
 			// }
 			else if (c == '^')
 			{
-				m_state = S_START;	
+				m_state = S_START;
 			}
 			else if (c == '/')
 			{
-				m_state = S_START;	
+				m_state = S_START;
 				m_start += c;
 			}
 			else
@@ -184,7 +186,7 @@ HTTPLocationInterpretor::consume(char &c)
 			}
 			break;
 		}
-		
+
 		case S_SPACE_AFTER_TILDE:
 		{
 			if (c == ' ')
@@ -198,11 +200,11 @@ HTTPLocationInterpretor::consume(char &c)
 			// }
 			else if (c == '^')
 			{
-				m_state = S_START;	
+				m_state = S_START;
 			}
 			else if (c == '/')
 			{
-				m_state = S_START;	
+				m_state = S_START;
 				m_start += c;
 			}
 			else if (c == '*')
@@ -215,7 +217,7 @@ HTTPLocationInterpretor::consume(char &c)
 			break;
 		}
 
-		case S_MIDDLE_START :
+		case S_MIDDLE_START:
 		{
 			if (c == '*')
 				m_state = S_MIDDLE_START;
@@ -223,10 +225,10 @@ HTTPLocationInterpretor::consume(char &c)
 			{
 				m_state = S_MIDDLE;
 				m_middle += c;
-			}	
+			}
 		}
 
-		case S_MIDDLE :
+		case S_MIDDLE:
 		{
 			if (c == '*')
 			{
@@ -238,26 +240,26 @@ HTTPLocationInterpretor::consume(char &c)
 			{
 				m_state = S_MIDDLE;
 				m_middle += c;
-			}	
+			}
 		}
-		
-		case S_END :
+
+		case S_END:
 			break;
-		case S_OVER : // a voir ou supprimer
+		case S_OVER: // a voir ou supprimer
 			break;
-		case S_NO_CASE_MODIFIER :
+		case S_NO_CASE_MODIFIER:
 			break;
-		// {
-		// 	if (c == ' ')
-		// 	{
-		// 		m_state = S_OVER; //check for exceptions if it can happen here
-		// 	}
-		// 	else
-		// 	{
-		// 		m_end += c;
-		// 	}
-		// 	break;
-		// }
+			// {
+			// 	if (c == ' ')
+			// 	{
+			// 		m_state = S_OVER; //check for exceptions if it can happen here
+			// 	}
+			// 	else
+			// 	{
+			// 		m_end += c;
+			// 	}
+			// 	break;
+			// }
 	}
 	m_lastChar = c;
 }

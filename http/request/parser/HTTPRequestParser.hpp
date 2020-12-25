@@ -13,7 +13,7 @@
 #ifndef HTTPREQUESTPARSER_HPP_
 # define HTTPREQUESTPARSER_HPP_
 
-#include <http/HTTPHeaderParser.hpp>
+#include <http/header/HTTPHeaderParser.hpp>
 #include <map>
 #include <string>
 #include <vector>

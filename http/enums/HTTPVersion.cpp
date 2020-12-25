@@ -10,8 +10,14 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <http/HTTPVersion.hpp>
+#include <http/enums/HTTPVersion.hpp>
+#include <sys/sysmacros.h>
 #include <sstream>
+
+# ifdef _SYS_SYSMACROS_H
+#  undef major
+#  undef minor
+# endif
 
 HTTPVersion HTTPVersion::HTTP_1_1 = HTTPVersion(1, 1);
 

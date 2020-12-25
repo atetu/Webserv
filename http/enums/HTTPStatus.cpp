@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <http/HTTPStatus.hpp>
+#include <http/enums/HTTPStatus.hpp>
 
 #define DEFINE_HTTP_STATUS(name, code, phrase) ENUM_DEFINE(HTTPStatus, name, HTTPStatus(code, phrase));
 

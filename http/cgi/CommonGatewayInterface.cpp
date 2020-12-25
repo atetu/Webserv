@@ -13,12 +13,12 @@
 #include <signal.h>
 #include <exception/IOException.hpp>
 #include <http/cgi/CommonGatewayInterface.hpp>
+#include <http/enums/HTTPMethod.hpp>
+#include <http/enums/HTTPVersion.hpp>
+#include <http/header/HTTPHeaderFields.hpp>
 #include <http/HTTPClient.hpp>
-#include <http/HTTPHeaderFields.hpp>
-#include <http/HTTPMethod.hpp>
-#include <http/HTTPRequest.hpp>
 #include <http/HTTPServer.hpp>
-#include <http/HTTPVersion.hpp>
+#include <http/request/HTTPRequest.hpp>
 #include <io/FileDescriptor.hpp>
 #include <net/address/InetAddress.hpp>
 #include <net/address/InetSocketAddress.hpp>

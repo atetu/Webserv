@@ -12,8 +12,7 @@
 
 
 #include <exception/Exception.hpp>
-#include <http/HTTPValueParser.hpp>
-#include <cctype>
+#include <http/request/parser/HTTPValueParser.hpp>
 #include <string>
 
 HTTPValueParser::HTTPValueParser() :

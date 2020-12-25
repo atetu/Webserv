@@ -13,8 +13,8 @@
 #ifndef HTTPSTATUSLINE_HPP_
 # define HTTPSTATUSLINE_HPP_
 
-#include <http/HTTPStatus.hpp>
-#include <http/HTTPVersion.hpp>
+#include <http/enums/HTTPStatus.hpp>
+#include <http/enums/HTTPVersion.hpp>
 #include <string>
 
 class HTTPStatusLine

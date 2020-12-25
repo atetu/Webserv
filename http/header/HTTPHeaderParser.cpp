@@ -11,9 +11,7 @@
 /* ************************************************************************** */
 
 #include <exception/Exception.hpp>
-#include <http/HTTPHeaderParser.hpp>
-#include <cctype>
-#include <string>
+#include <http/header/HTTPHeaderParser.hpp>
 
 HTTPHeaderParser::HTTPHeaderParser() :
 		m_state(S_NOT_STARTED),

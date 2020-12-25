@@ -10,9 +10,9 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+#include <http/enums/HTTPStatus.hpp>
 #include <http/handler/methods/DeleteHandler.hpp>
-#include <http/HTTPRequest.hpp>
-#include <http/HTTPStatus.hpp>
+#include <http/request/HTTPRequest.hpp>
 #include <sys/stat.h>
 #include <util/URL.hpp>
 #include <iostream>

@@ -10,8 +10,8 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+#include <http/enums/HTTPStatus.hpp>
 #include <http/handler/methods/ConnectHandler.hpp>
-#include <http/HTTPStatus.hpp>
 
 ConnectHandler::ConnectHandler()
 {

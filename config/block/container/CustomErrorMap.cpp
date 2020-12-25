@@ -11,8 +11,7 @@
 /* ************************************************************************** */
 
 #include <config/block/container/CustomErrorMap.hpp>
-#include <http/HTTPStatus.hpp>
-#include <utility>
+#include <http/enums/HTTPStatus.hpp>
 
 CustomErrorMap::CustomErrorMap(void) :
 		m_storage()

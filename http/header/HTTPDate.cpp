@@ -11,7 +11,7 @@
 /* ************************************************************************** */
 
 #include <exception/Exception.hpp>
-#include <http/HTTPDate.hpp>
+#include <http/header/HTTPDate.hpp>
 #include <sys/time.h>
 #include <ctime>
 #include <string>

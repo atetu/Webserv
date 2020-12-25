@@ -13,7 +13,7 @@
 #ifndef HTTPHEADERPARSER_HPP_
 # define HTTPHEADERPARSER_HPP_
 
-# include <iostream>
+#include <string>
 
 class HTTPHeaderParser
 {

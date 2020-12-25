@@ -115,11 +115,3 @@ ServerBlock::errors(const CustomErrorMap &errors)
 
 	return (*this);
 }
-
-
-// inline const LocationBlock*
-// ServerBlock::findLocations(const std::string &path) const
-// {
-// 	HTTPFindLocation findLocation(path, m_locations.get());
-// 	return (findLocation.parse().location().get());
-// }

@@ -11,12 +11,12 @@
 /* ************************************************************************** */
 
 #include <exception/Exception.hpp>
+#include <http/enums/HTTPStatus.hpp>
 #include <http/handler/methods/PutHandler.hpp>
-#include <http/HTTPHeaderFields.hpp>
-#include <http/HTTPRequest.hpp>
-#include <http/HTTPStatus.hpp>
+#include <http/header/HTTPHeaderFields.hpp>
 #include <http/mime/Mime.hpp>
 #include <http/mime/MimeRegistry.hpp>
+#include <http/request/HTTPRequest.hpp>
 #include <http/response/impl/generic/GenericHTTPResponse.hpp>
 #include <util/log/Logger.hpp>
 #include <util/log/LoggerFactory.hpp>
@@ -70,7 +70,7 @@ PutHandler::checkExtension(HTTPRequest &request, File &file)
 			{
 				Mime::iterator ext_it = std::find(mime->extensions().begin(), mime->extensions().end(), fileExtension);
 				if (ext_it != mime->extensions().end())
-					;
+					; // TODO Bad conditional
 				else if (ext_it == mime->extensions().end() && file.exists())
 				{
 					LOG.warn() << "Extension conversion not handled(2)" << std::endl;

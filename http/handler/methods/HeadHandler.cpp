@@ -11,10 +11,10 @@
 /* ************************************************************************** */
 
 #include <config/Configuration.hpp>
+#include <http/enums/HTTPStatus.hpp>
 #include <http/handler/methods/HeadHandler.hpp>
-#include <http/HTTPHeaderFields.hpp>
-#include <http/HTTPRequest.hpp>
-#include <http/HTTPStatus.hpp>
+#include <http/header/HTTPHeaderFields.hpp>
+#include <http/request/HTTPRequest.hpp>
 #include <http/response/impl/generic/GenericHTTPResponse.hpp>
 #include <io/File.hpp>
 #include <util/URL.hpp>

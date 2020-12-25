@@ -11,14 +11,13 @@
 /* ************************************************************************** */
 
 #include <config/Configuration.hpp>
+#include <http/enums/HTTPStatus.hpp>
 #include <http/handler/methods/GetHandler.hpp>
-#include <http/HTTPHeaderFields.hpp>
-#include <http/HTTPRequest.hpp>
-#include <http/HTTPStatus.hpp>
-#include <http/response/HTTPResponse.hpp>
+#include <http/header/HTTPHeaderFields.hpp>
+#include <http/request/HTTPRequest.hpp>
 #include <io/File.hpp>
 #include <io/FileDescriptor.hpp>
-#include <sys/_default_fcntl.h>
+#include <sys/fcntl.h>
 #include <util/URL.hpp>
 #include <list>
 #include <string>

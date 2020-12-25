@@ -10,8 +10,12 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <http/HTTPFindLocation.hpp>
-#include <http/HTTPLocationInterpretor.hpp>
+#include <config/block/LocationBlock.hpp>
+#include <http/route/HTTPFindLocation.hpp>
+#include <http/route/HTTPLocationInterpretor.hpp>
+#include <cstddef>
+#include <iostream>
+#include <list>
 #include <string>
 
 HTTPFindLocation::HTTPFindLocation() :

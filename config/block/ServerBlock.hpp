@@ -17,9 +17,7 @@
 #include <config/block/LocationBlock.hpp>
 #include <util/Optional.hpp>
 #include <util/unit/DataSize.hpp>
-#include <http/HTTPFindLocation.hpp>
 #include <list>
-#include <map>
 #include <string>
 
 class ServerBlock
@@ -109,13 +107,6 @@ class ServerBlock
 		{
 			return (m_errors);
 		}
-
-		// inline const LocationBlock*
-		// ServerBlock::findLocation(const std::string &path) const
-		// {
-		// 	HTTPFindLocation findLocation(path, m_locations.get());
-		// 	return (findLocation.parse().location().get());
-		// }
 };
 
 #endif /* SERVERBLOCK_HPP_ */

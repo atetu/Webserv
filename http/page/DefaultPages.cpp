@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <http/HTTPStatus.hpp>
+#include <http/enums/HTTPStatus.hpp>
 #include <http/page/DefaultPages.hpp>
 #include <os/detect_platform.h>
 #include <util/Convert.hpp>

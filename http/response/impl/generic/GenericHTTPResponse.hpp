@@ -13,13 +13,13 @@
 #ifndef GENERICHTTPRESPONSE_HPP_
 # define GENERICHTTPRESPONSE_HPP_
 
-#include <http/HTTPHeaderFields.hpp>
-#include <http/HTTPVersion.hpp>
+#include <http/header/HTTPHeaderFields.hpp>
 #include <http/response/HTTPResponse.hpp>
 #include <http/response/HTTPStatusLine.hpp>
 #include <sys/types.h>
 #include <string>
 
+class HTTPStatus;
 class FileDescriptorBuffer;
 class SocketBuffer;
 

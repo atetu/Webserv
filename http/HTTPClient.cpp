@@ -11,7 +11,7 @@
 /* ************************************************************************** */
 
 #include <http/HTTPClient.hpp>
-#include <http/HTTPRequest.hpp>
+#include <http/request/HTTPRequest.hpp>
 #include <http/response/HTTPResponse.hpp>
 #include <stddef.h>
 #include <util/buffer/impl/FileDescriptorBuffer.hpp>

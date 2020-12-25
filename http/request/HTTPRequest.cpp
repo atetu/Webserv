@@ -10,10 +10,12 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <http/HTTPRequest.hpp>
-#include <util/Optional.hpp>
+#include <config/block/RootBlock.hpp>
+#include <config/block/ServerBlock.hpp>
+#include <http/request/HTTPRequest.hpp>
 #include <map>
-#include <string>
+
+class HTTPVersion;
 
 HTTPRequest::HTTPRequest(const HTTPMethod &method, const URL &url, const HTTPVersion &version, const HTTPHeaderFields &headerFields, const std::string body, const Configuration &configuration, const RootBlock &rootBlock, const ServerBlock &serverBlock, const Optional<LocationBlock const*> &locationBlock, const MimeRegistry &mimeRegistry) :
 		m_method(method),

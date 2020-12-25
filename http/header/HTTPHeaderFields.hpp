@@ -13,9 +13,9 @@
 #ifndef HTTPHEADERFIELDS_HPP_
 # define HTTPHEADERFIELDS_HPP_
 
+#include <http/enums/HTTPMethod.hpp>
+#include <http/header/HTTPDate.hpp>
 #include <http/HTTP.hpp>
-#include <http/HTTPDate.hpp>
-#include <http/HTTPMethod.hpp>
 #include <stddef.h>
 #include <list>
 #include <map>

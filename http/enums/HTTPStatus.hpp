@@ -14,7 +14,7 @@
 # define HTTPSTATUS_HPP_
 
 #include <util/Enum.hpp>
-# include <string>
+#include <string>
 
 class HTTPStatus :
 		public Enum<HTTPStatus>
