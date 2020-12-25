@@ -1,30 +1,30 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   PutHandler.hpp                                     :+:      :+:    :+:   */
+/*   OptionsHandler.hpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2020/12/25 10:43:31 by alicetetu         #+#    #+#             */
-/*   Updated: 2020/12/25 10:43:31 by alicetetu        ###   ########.fr       */
+/*   Created: 2020/12/25 10:42:43 by alicetetu         #+#    #+#             */
+/*   Updated: 2020/12/25 10:42:43 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef PUTHANDLER_HPP_
-# define PUTHANDLER_HPP_
+#ifndef OPTIONSHANDLER_HPP_
+# define OPTIONSHANDLER_HPP_
 
 #include <http/handler/HTTPMethodHandler.hpp>
 #include <http/HTTPRequest.hpp>
 #include <io/File.hpp>
 
-class PutHandler :
+class OptionsHandler :
 		public HTTPMethodHandler
 {
 	public:
-		PutHandler();
+		OptionsHandler();
 
 		virtual
-		~PutHandler();
+		~OptionsHandler();
 
 		GenericHTTPResponse*
 		handle(HTTPRequest &request);
@@ -33,8 +33,8 @@ class PutHandler :
 		checkExtension(HTTPRequest &request, File &file);
 
 	public:
-		static PutHandler&
+		static OptionsHandler&
 		get(void);
 };
 
-#endif /* PutHANDLER_HPP_ */
+#endif /* OptionsHANDLER_HPP_ */
