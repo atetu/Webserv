@@ -15,9 +15,10 @@
 #include <http/HTTPHeaderFields.hpp>
 #include <http/HTTPRequest.hpp>
 #include <http/HTTPStatus.hpp>
+#include <http/response/HTTPResponse.hpp>
 #include <io/File.hpp>
-#include <stddef.h>
-#include <sys/fcntl.h>
+#include <io/FileDescriptor.hpp>
+#include <sys/_default_fcntl.h>
 #include <util/URL.hpp>
 #include <list>
 #include <string>
@@ -43,20 +44,13 @@ GetHandler::handle(HTTPRequest &request)
 
 	if (targetFile.isFile())
 	{
-		size_t length = targetFile.length(); /* On top because it can cause an IOException. */
-
-		int fd = ::open(path.c_str(), O_RDONLY); // TODO Need abstraction
-
-		if (fd == -1)
-			return (error(request, *HTTPStatus::NOT_FOUND));
+		headers.contentLength(targetFile.length());
 
 		std::string extension;
 		if (request.url().extension(extension))
 			headers.contentType(request.configuration().mimeRegistry(), extension);
 
-		headers.contentLength(length);
-
-		return (file(*HTTPStatus::OK, fd, headers));
+		return (file(*HTTPStatus::OK, *targetFile.open(O_RDONLY), headers));
 	}
 
 	if (targetFile.isDirectory())

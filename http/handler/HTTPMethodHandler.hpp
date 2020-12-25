@@ -14,6 +14,7 @@
 # define HTTPMETHODHANDLER_HPP_
 
 #include <http/HTTPHeaderFields.hpp>
+#include <io/FileDescriptor.hpp>
 #include <string>
 
 class HTTPRequest;
@@ -35,6 +36,9 @@ class HTTPMethodHandler
 
 		static HTTPResponse*
 		file(HTTPStatus &httpStatus, int fd, const HTTPHeaderFields &headers = HTTPHeaderFields());
+
+		static HTTPResponse*
+		file(HTTPStatus &httpStatus, FileDescriptor &fileDescriptor, const HTTPHeaderFields &headers = HTTPHeaderFields());
 
 		static HTTPResponse*
 		string(HTTPStatus &httpStatus, const std::string &string, const HTTPHeaderFields &headers = HTTPHeaderFields());

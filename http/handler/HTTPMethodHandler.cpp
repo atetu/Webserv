@@ -12,9 +12,9 @@
 
 #include <http/handler/HTTPMethodHandler.hpp>
 #include <http/HTTPRequest.hpp>
+#include <http/HTTPStatus.hpp>
 #include <http/page/DefaultPages.hpp>
 #include <http/response/impl/generic/GenericHTTPResponse.hpp>
-#include <io/FileDescriptor.hpp>
 #include <util/buffer/impl/FileDescriptorBuffer.hpp>
 #include <util/Singleton.hpp>
 
@@ -31,7 +31,13 @@ HTTPMethodHandler::status(HTTPStatus &status, const HTTPHeaderFields &headers)
 HTTPResponse*
 HTTPMethodHandler::file(HTTPStatus &httpStatus, int fd, const HTTPHeaderFields &headers)
 {
-	return (GenericHTTPResponse::file(httpStatus, headers, *FileDescriptorBuffer::from(*FileDescriptor::wrap(fd), FileDescriptorBuffer::CLOSE | FileDescriptorBuffer::DELETE)));
+	return (file(httpStatus, *FileDescriptor::wrap(fd), headers));
+}
+
+HTTPResponse*
+HTTPMethodHandler::file(HTTPStatus &httpStatus, FileDescriptor &fileDescriptor, const HTTPHeaderFields &headers = HTTPHeaderFields())
+{
+	return (GenericHTTPResponse::file(httpStatus, headers, *FileDescriptorBuffer::from(fileDescriptor, FileDescriptorBuffer::CLOSE | FileDescriptorBuffer::DELETE)));
 }
 
 HTTPResponse*
