@@ -11,15 +11,11 @@
 /* ************************************************************************** */
 
 #include <sys/stat.h>
-#include <fcntl.h>
 #include <dirent.h>
-#include <exception/IOException.hpp>
 #include <io/File.hpp>
-#include <sys/errno.h>
-#include <sys/stat.h>
-#include <unistd.h>
-#include <iostream>
-#include <cstdio>
+#include <io/FileDescriptor.hpp>
+#include <sys/fcntl.h>
+#include <sys/unistd.h>
 
 File::File() :
 		m_path()
@@ -50,7 +46,7 @@ File::operator =(const File &other)
 }
 
 bool
-File::exists()
+File::exists() const
 {
 	struct stat st;
 	if (::stat(m_path.c_str(), &st) == -1)
@@ -61,61 +57,59 @@ File::exists()
 		if (error == ENOENT)
 			return (false);
 
-		throw IOException(m_path, errno);
+		throw ioException();
 	}
 
 	return (true);
 }
 
 bool
-File::isFile()
+File::isFile() const
 {
 	struct stat st;
 	if (::stat(m_path.c_str(), &st) == -1)
-		throw IOException(m_path, errno);
+		throw ioException();
 
 	return (S_ISREG(st.st_mode));
 }
 
 bool
-File::isDirectory()
+File::isDirectory() const
 {
 	struct stat st;
 	if (::stat(m_path.c_str(), &st) == -1)
-		throw IOException(m_path, errno);
+		throw ioException();
 
 	return (S_ISDIR(st.st_mode));
 }
 
 bool
-File::create(std::string location)
+File::create(mode_t mode) const
 {
 	int fd;
-	// char buf[512];
-	// char *current;
-	// current = ::getcwd(buf, 512);
-	// std::cout << "location: " << location << std::endl;
-	// if (chdir(location.c_str()) == -1)
-	// 	throw Exception("Location unknown");
-	if((fd = (::open(m_path.c_str(), O_CREAT|O_WRONLY|O_NONBLOCK, 0666)) == -1))
-		throw Exception("Could not create the ressource");
+	if ((fd = (::open(m_path.c_str(), O_CREAT, mode)) == -1))
+	{
+		errno = 0;
+		return (false);
+	}
+
 	close(fd);
-	// chdir (current);
+
 	return (true);
 }
 
 size_t
-File::length()
+File::length() const
 {
 	struct stat st;
 	if (::stat(m_path.c_str(), &st) == -1)
-		throw IOException(m_path, errno);
+		throw ioException();
 
 	return (st.st_size);
 }
 
 std::string
-File::name()
+File::name() const
 {
 	std::string::size_type n = m_path.rfind('/');
 	std::string::size_type pos = n == std::string::npos ? 0 : n + 1; // TODO Need fix
@@ -123,19 +117,29 @@ File::name()
 	return (m_path.substr(pos, m_path.length() - pos));
 }
 
+FileDescriptor*
+File::open(int flags, mode_t mode)
+{
+	int fd;
+	if ((fd = (::open(m_path.c_str(), flags, mode)) == -1))
+		throw ioException();
+
+	return (FileDescriptor::wrap(fd));
+}
+
 std::list<File>
-File::list()
+File::list() const
 {
 	struct stat st;
 	if (::stat(m_path.c_str(), &st) == -1)
-		throw IOException(m_path, errno);
+		throw ioException();
 
 	if (!S_ISDIR(st.st_mode))
 		throw IOException(m_path, ENOTDIR);
 
 	DIR *dir = ::opendir(m_path.c_str());
 	if (!dir)
-		throw IOException(m_path, errno);
+		throw ioException();
 
 	std::list<File> files;
 
@@ -146,11 +150,4 @@ File::list()
 	::closedir(dir);
 
 	return (files);
-}
-
-void
-File::setNewPath(std::string path, std::string extension)
-{
-	std::string newName = path + '.' + extension;
-	m_path = newName;
 }

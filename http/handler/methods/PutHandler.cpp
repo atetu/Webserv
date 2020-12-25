@@ -78,12 +78,12 @@ PutHandler::checkExtension(HTTPRequest &request, File &file)
 				}
 				else
 				{
-					file.setNewPath(path.substr(0, found), *(mime->extensions().begin()));
+					file = File(path.substr(0, found) + "." + *(mime->extensions().begin()));
 				}
 			}
 		}
 		else if (!file.exists())
-			file.setNewPath(path, *(mime->extensions().begin()));
+			file = File(path + "." + *(mime->extensions().begin()));
 	}
 	return (1);
 }
@@ -94,7 +94,7 @@ PutHandler::handle(HTTPRequest &request)
 	HTTPHeaderFields headers;
 
 	const std::string &path = request.root() + request.url().path();
-	File file(path);
+	File file(path + "/" + request.getLocation());
 
 	if (!checkExtension(request, file))
 		return (GenericHTTPResponse::status(*HTTPStatus::UNSUPPORTED_MEDIA_TYPE));
@@ -103,7 +103,7 @@ PutHandler::handle(HTTPRequest &request)
 	{
 		try
 		{
-			file.create(request.getLocation());
+			file.create();
 		}
 		catch (Exception &exception)
 		{

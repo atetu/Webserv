@@ -13,9 +13,14 @@
 #ifndef FILE_HPP_
 # define FILE_HPP_
 
+#include <exception/IOException.hpp>
 #include <stddef.h>
+#include <sys/errno.h>
+#include <sys/types.h>
 #include <list>
 #include <string>
+
+class FileDescriptor;
 
 class File
 {
@@ -34,22 +39,25 @@ class File
 		operator=(const File &other);
 
 		bool
-		exists();
+		exists() const;
 
 		bool
-		isFile();
+		isFile() const;
 
 		bool
-		isDirectory();
+		isDirectory() const;
 
 		bool
-		create(std::string location);
+		create(mode_t mode = 0666) const;
+
+		FileDescriptor*
+		open(int flags, mode_t mode = 0);
 
 		size_t
-		length();
+		length() const;
 
 		std::string
-		name();
+		name() const;
 
 		inline const std::string&
 		path()
@@ -58,10 +66,16 @@ class File
 		}
 
 		std::list<File>
-		list();
+		list() const;
 
-		void
-		setNewPath(std::string path, std::string extension);
+	private:
+		inline IOException
+		ioException() const
+		{
+			int err = errno;
+			errno = 0;
+			return (IOException(m_path, err));
+		}
 };
 
 #endif /* FILE_HPP_ */
