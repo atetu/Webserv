@@ -6,7 +6,7 @@
 /*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/21 23:36:43 by ecaceres          #+#    #+#             */
-/*   Updated: 2020/12/24 18:41:13 by alicetetu        ###   ########.fr       */
+/*   Updated: 2020/12/25 10:23:31 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,16 +86,16 @@ bool
 File::create(std::string location)
 {
 	int fd;
-	char buf[512];
-	char *current;
-	current = ::getcwd(buf, 512);
-	std::cout << "location: " << location << std::endl;
-	if (chdir(location.c_str()) == -1)
-		throw Exception("Location unknown");
+	// char buf[512];
+	// char *current;
+	// current = ::getcwd(buf, 512);
+	// std::cout << "location: " << location << std::endl;
+	// if (chdir(location.c_str()) == -1)
+	// 	throw Exception("Location unknown");
 	if((fd = (::open(m_path.c_str(), O_CREAT|O_WRONLY|O_NONBLOCK, 0666)) == -1))
 		throw Exception("Could not create the ressource");
 	close(fd);
-	chdir (current);
+	// chdir (current);
 	return (true);
 }
 

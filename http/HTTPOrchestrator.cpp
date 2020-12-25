@@ -6,7 +6,7 @@
 /*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/28 14:34:10 by ecaceres          #+#    #+#             */
-/*   Updated: 2020/12/24 16:28:31 by alicetetu        ###   ########.fr       */
+/*   Updated: 2020/12/25 13:47:02 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -296,7 +296,7 @@ HTTPOrchestrator::start()
 
 									const ServerBlock *serverBlock = m_configuration.rootBlock().findServerBlock(clientHost); // ca marche avec inline juste. Pourquoi ?? + explication du const a la fin de fonction?
 									//std::cout << "server : " << serverBlock->host().get() << std::endl;
-
+									
 									const LocationBlock *locationBlock = NULL;
 									if (serverBlock && serverBlock->locations().present())
 									{
@@ -310,6 +310,7 @@ HTTPOrchestrator::start()
 										client.response() = GenericHTTPResponse::status(*HTTPStatus::NOT_FOUND);
 									else
 									{
+										
 										const HTTPMethod *methodPtr = HTTPMethod::find(client.parser().method());
 										if (!methodPtr)
 											client.response() = GenericHTTPResponse::status(*HTTPStatus::METHOD_NOT_ALLOWED);
@@ -342,7 +343,6 @@ HTTPOrchestrator::start()
 													if (std::find(methods.begin(), methods.end(), method.name()) == methods.end())
 														client.response() = GenericHTTPResponse::status(*HTTPStatus::METHOD_NOT_ALLOWED);
 												}
-
 												if (!client.response() && locationBlock->cgi().present())
 												{
 													const CGIBlock &cgiBlock = rootBlock.getCGI(locationBlock->cgi().get());
@@ -361,9 +361,11 @@ HTTPOrchestrator::start()
 													}
 												}
 											}
+											std::cout << method.name() << std::endl;
 											
 											if (!client.response())
 												client.response() = method.handler().handle(*client.request());
+											
 										}
 									}
 

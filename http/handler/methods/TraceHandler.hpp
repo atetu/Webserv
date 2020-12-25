@@ -1,30 +1,30 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   PutHandler.hpp                                     :+:      :+:    :+:   */
+/*   TraceHandler.hpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2020/12/25 10:43:31 by alicetetu         #+#    #+#             */
-/*   Updated: 2020/12/25 10:43:31 by alicetetu        ###   ########.fr       */
+/*   Created: 2020/12/25 10:42:43 by alicetetu         #+#    #+#             */
+/*   Updated: 2020/12/25 10:42:43 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef PUTHANDLER_HPP_
-# define PUTHANDLER_HPP_
+#ifndef TRACEHANDLER_HPP_
+# define TRACEHANDLER_HPP_
 
 #include <http/handler/HTTPMethodHandler.hpp>
 #include <http/HTTPRequest.hpp>
 #include <io/File.hpp>
 
-class PutHandler :
+class TraceHandler :
 		public HTTPMethodHandler
 {
 	public:
-		PutHandler();
+		TraceHandler();
 
 		virtual
-		~PutHandler();
+		~TraceHandler();
 
 		GenericHTTPResponse*
 		handle(HTTPRequest &request);
@@ -33,8 +33,8 @@ class PutHandler :
 		checkExtension(HTTPRequest &request, File &file);
 
 	public:
-		static PutHandler&
+		static TraceHandler&
 		get(void);
 };
 
-#endif /* PutHANDLER_HPP_ */
+#endif /* TraceHANDLER_HPP_ */
