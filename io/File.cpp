@@ -10,11 +10,11 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <sys/stat.h>
 #include <dirent.h>
 #include <io/File.hpp>
 #include <io/FileDescriptor.hpp>
 #include <sys/fcntl.h>
+#include <sys/stat.h>
 #include <sys/unistd.h>
 
 File::File() :
@@ -87,7 +87,7 @@ bool
 File::create(mode_t mode) const
 {
 	int fd;
-	if ((fd = (::open(m_path.c_str(), O_CREAT, mode)) == -1))
+	if ((fd = ::open(m_path.c_str(), O_CREAT, mode)) == -1)
 	{
 		errno = 0;
 		return (false);
@@ -121,7 +121,7 @@ FileDescriptor*
 File::open(int flags, mode_t mode)
 {
 	int fd;
-	if ((fd = (::open(m_path.c_str(), flags, mode)) == -1))
+	if ((fd = ::open(m_path.c_str(), flags, mode)) == -1)
 		throw ioException();
 
 	return (FileDescriptor::wrap(fd));
