@@ -174,7 +174,7 @@ JsonTokenizer::nextToken(void)
 
 		case 'f':
 			expectRead("false" + 1); /* 'f' has already been read */
-			return (JsonToken::TRUE);
+			return (JsonToken::FALSE);
 
 		case 'n':
 			expectRead("null" + 1); /* 'n' has already been read */
