@@ -46,8 +46,47 @@ class Logger
 		virtual std::ostream&
 		log(LogLevel &level) const = 0;
 
+		virtual bool
+		isEnabled(LogLevel &logLevel) const = 0;
+
 		virtual const std::string&
 		tag() const = 0;
+
+		virtual inline bool
+		isTraceEnabled() const
+		{
+			return (isEnabled(*LogLevel::TRACE));
+		}
+
+		virtual inline bool
+		isDebugEnabled() const
+		{
+			return (isEnabled(*LogLevel::DEBUG));
+		}
+
+		virtual inline bool
+		isInfoEnabled() const
+		{
+			return (isEnabled(*LogLevel::INFO));
+		}
+
+		virtual inline bool
+		isWarnEnabled() const
+		{
+			return (isEnabled(*LogLevel::WARN));
+		}
+
+		virtual inline bool
+		isErrorEnabled() const
+		{
+			return (isEnabled(*LogLevel::ERROR));
+		}
+
+		virtual inline bool
+		isFatalEnabled() const
+		{
+			return (isEnabled(*LogLevel::FATAL));
+		}
 };
 
 #endif /* LOGGER_HPP_ */

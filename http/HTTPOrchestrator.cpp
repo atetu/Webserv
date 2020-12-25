@@ -526,7 +526,7 @@ HTTPOrchestrator::addServer(HTTPServer &server)
 {
 	int fd = server.socket().raw();
 
-	LOG.trace() << "++ server(" << fd << ")" << std::endl;
+	LOG.trace() << "++ server(fd=" << fd << ")" << std::endl;
 
 	setFd(fd);
 	serverFds.insert(serverFds.end(), std::make_pair(fd, &server));
@@ -537,7 +537,7 @@ HTTPOrchestrator::addFileDescriptorBufferRead(FileDescriptorBuffer &fileDescript
 {
 	int fd = fileDescriptorBuffer.descriptor().raw();
 
-	LOG.trace() << "++ file-read(" << fd << ")" << std::endl;
+	LOG.trace() << "++ file-read(fd=" << fd << ")" << std::endl;
 
 	setFd(fd);
 	fileReadFds.insert(fileReadFds.end(), std::make_pair(fd, &fileDescriptorBuffer));
@@ -548,7 +548,7 @@ HTTPOrchestrator::addFileDescriptorBufferWrite(FileDescriptorBuffer &fileDescrip
 {
 	int fd = fileDescriptorBuffer.descriptor().raw();
 
-	LOG.trace() << "++ file-write(" << fd << ")" << std::endl;
+	LOG.trace() << "++ file-write(fd=" << fd << ")" << std::endl;
 
 	setFd(fd);
 	fileWriteFds.insert(fileWriteFds.end(), std::make_pair(fd, &fileDescriptorBuffer));
@@ -559,7 +559,7 @@ HTTPOrchestrator::addClient(HTTPClient &client)
 {
 	int fd = client.socket().raw();
 
-	LOG.trace() << "++ client(" << client.socket().raw() << ") @ " << client.socketAddress().address()->hostAddress() << ":" << client.socketAddress().port() << std::endl;
+	LOG.trace() << "++ client(fd=" << client.socket().raw() << ") @ " << client.socketAddress().address()->hostAddress() << ":" << client.socketAddress().port() << std::endl;
 
 	setFd(fd);
 	clientFds[fd] = &client;
@@ -568,7 +568,7 @@ HTTPOrchestrator::addClient(HTTPClient &client)
 void
 HTTPOrchestrator::removeServer(int fd)
 {
-	LOG.trace() << "-- server(" << fd << ")" << std::endl;
+	LOG.trace() << "-- server(fd=" << fd << ")" << std::endl;
 
 	typedef std::map<int, HTTPServer const*>::iterator iterator;
 
@@ -583,7 +583,7 @@ HTTPOrchestrator::removeServer(int fd)
 void
 HTTPOrchestrator::removeFileRead(int fd)
 {
-	LOG.trace() << "-- file-read(" << fd << ")" << std::endl;
+	LOG.trace() << "-- file-read(fd=" << fd << ")" << std::endl;
 
 	typedef std::map<int, FileDescriptorBuffer*>::iterator iterator;
 
@@ -599,7 +599,7 @@ HTTPOrchestrator::removeFileRead(int fd)
 void
 HTTPOrchestrator::removeClient(int fd)
 {
-	LOG.trace() << "-- client(" << fd << ")" << std::endl;
+	LOG.trace() << "-- client(fd=" << fd << ")" << std::endl;
 
 	typedef std::map<int, HTTPClient*>::iterator iterator;
 
@@ -649,7 +649,7 @@ HTTPOrchestrator::removeClient(int fd)
 void
 HTTPOrchestrator::removeFileWrite(int fd)
 {
-	LOG.trace() << "-- file-write(" << fd << ")" << std::endl;
+	LOG.trace() << "-- file-write(fd=" << fd << ")" << std::endl;
 
 	typedef std::map<int, FileDescriptorBuffer*>::iterator iterator;
 

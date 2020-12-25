@@ -80,7 +80,7 @@ LoggerImpl::fatal() const
 std::ostream&
 LoggerImpl::log(LogLevel &level) const
 {
-	if (LogLevel::ACTIVE == NULL || LogLevel::ACTIVE->ordinal() > level.ordinal())
+	if (!isEnabled(level))
 		return (VOID);
 
 	return (std::cout << "[" << std::setw(5) << level.name() << std::setw(0) << "] " << std::setw(LONGEST_NAME) << m_tag << ": ");
@@ -90,4 +90,10 @@ const std::string&
 LoggerImpl::tag() const
 {
 	return (m_tag);
+}
+
+bool
+LoggerImpl::isEnabled(LogLevel &level) const
+{
+	return (!(LogLevel::ACTIVE == NULL || LogLevel::ACTIVE->ordinal() > level.ordinal()));
 }

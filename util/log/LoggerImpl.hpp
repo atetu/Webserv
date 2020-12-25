@@ -76,6 +76,9 @@ class LoggerImpl :
 
 		const std::string&
 		tag() const;
+
+		bool
+		isEnabled(LogLevel &logLevel) const;
 };
 
 #endif /* LOGGERIMPL_HPP_ */
