@@ -13,13 +13,11 @@
 #include <config/Configuration.hpp>
 #include <http/handler/methods/GetHandler.hpp>
 #include <http/HTTPHeaderFields.hpp>
+#include <http/HTTPRequest.hpp>
 #include <http/HTTPStatus.hpp>
-#include <http/response/impl/generic/GenericHTTPResponse.hpp>
 #include <io/File.hpp>
-#include <io/FileDescriptor.hpp>
 #include <stddef.h>
 #include <sys/fcntl.h>
-#include <util/buffer/impl/FileDescriptorBuffer.hpp>
 #include <util/URL.hpp>
 #include <list>
 #include <string>
@@ -32,20 +30,20 @@ GetHandler::~GetHandler()
 {
 }
 
-GenericHTTPResponse*
+HTTPResponse*
 GetHandler::handle(HTTPRequest &request)
 {
 	HTTPHeaderFields headers;
 
 	const std::string &path = request.root() + request.url().path();
-	File file(path);
+	File targetFile(path);
 
-	if (!file.exists())
+	if (!targetFile.exists())
 		return (error(request, *HTTPStatus::NOT_FOUND));
 
-	if (file.isFile())
+	if (targetFile.isFile())
 	{
-		size_t length = file.length(); /* On top because it can cause an IOException. */
+		size_t length = targetFile.length(); /* On top because it can cause an IOException. */
 
 		int fd = ::open(path.c_str(), O_RDONLY); // TODO Need abstraction
 
@@ -58,10 +56,10 @@ GetHandler::handle(HTTPRequest &request)
 
 		headers.contentLength(length);
 
-		return (GenericHTTPResponse::file(*HTTPStatus::OK, headers, *FileDescriptorBuffer::from(*FileDescriptor::wrap(fd), FileDescriptorBuffer::CLOSE | FileDescriptorBuffer::DELETE)));
+		return (file(*HTTPStatus::OK, fd, headers));
 	}
 
-	if (file.isDirectory())
+	if (targetFile.isDirectory())
 	{
 		const std::string &directory = request.url().path();
 
@@ -72,7 +70,7 @@ GetHandler::handle(HTTPRequest &request)
 				"	</head>\n"
 				"	<body>\n";
 
-		std::list<File> files = file.list();
+		std::list<File> files = targetFile.list();
 		for (std::list<File>::iterator it = files.begin(); it != files.end(); it++)
 		{
 			std::string name(it->name());
@@ -96,7 +94,7 @@ GetHandler::handle(HTTPRequest &request)
 		headers.html();
 		headers.contentLength(listing.size());
 
-		return (GenericHTTPResponse::string(*HTTPStatus::OK, headers, listing));
+		return (string(*HTTPStatus::OK, listing, headers));
 	}
 
 	return (error(request, *HTTPStatus::NOT_FOUND));

@@ -12,11 +12,13 @@
 
 #ifndef HTTPMETHODHANDLER_HPP_
 # define HTTPMETHODHANDLER_HPP_
-class HTTPResponse;
-class HTTPStatus;
+
+#include <http/HTTPHeaderFields.hpp>
+#include <string>
 
 class HTTPRequest;
-class GenericHTTPResponse;
+class HTTPResponse;
+class HTTPStatus;
 
 class HTTPMethodHandler
 {
@@ -24,15 +26,21 @@ class HTTPMethodHandler
 		virtual
 		~HTTPMethodHandler();
 
-		virtual GenericHTTPResponse*
+		virtual HTTPResponse*
 		handle(HTTPRequest &request) = 0;
 
-	public:
-		static GenericHTTPResponse*
-		status(HTTPStatus &status);
+	protected:
+		static HTTPResponse*
+		status(HTTPStatus &status, const HTTPHeaderFields &headers = HTTPHeaderFields());
 
-		static GenericHTTPResponse*
-		error(const HTTPRequest &request, HTTPStatus &httpStatus);
+		static HTTPResponse*
+		file(HTTPStatus &httpStatus, int fd, const HTTPHeaderFields &headers = HTTPHeaderFields());
+
+		static HTTPResponse*
+		string(HTTPStatus &httpStatus, const std::string &string, const HTTPHeaderFields &headers = HTTPHeaderFields());
+
+		static HTTPResponse*
+		error(const HTTPRequest &request, HTTPStatus &httpStatus, const HTTPHeaderFields &headers = HTTPHeaderFields());
 };
 
 #endif /* HTTPMETHODHANDLER_HPP_ */

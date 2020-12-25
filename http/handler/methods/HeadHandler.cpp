@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   HeadHandler.cpp                                     :+:      :+:    :+:   */
+/*   HeadHandler.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ecaceres <ecaceres@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -13,14 +13,10 @@
 #include <config/Configuration.hpp>
 #include <http/handler/methods/HeadHandler.hpp>
 #include <http/HTTPHeaderFields.hpp>
+#include <http/HTTPRequest.hpp>
 #include <http/HTTPStatus.hpp>
-#include <http/response/HTTPStatusLine.hpp>
 #include <http/response/impl/generic/GenericHTTPResponse.hpp>
 #include <io/File.hpp>
-#include <io/FileDescriptor.hpp>
-#include <stddef.h>
-#include <sys/fcntl.h>
-#include <util/buffer/impl/FileDescriptorBuffer.hpp>
 #include <util/URL.hpp>
 #include <list>
 #include <string>
@@ -33,7 +29,7 @@ HeadHandler::~HeadHandler()
 {
 }
 
-GenericHTTPResponse*
+HTTPResponse*
 HeadHandler::handle(HTTPRequest &request)
 {
 	HTTPHeaderFields headers;
@@ -46,20 +42,13 @@ HeadHandler::handle(HTTPRequest &request)
 
 	if (file.isFile())
 	{
-		size_t length = file.length(); /* On top because it can cause an IOException. */
-
-		int fd = ::open(path.c_str(), O_RDONLY); // TODO Need abstraction
-
-		if (fd == -1)
-			return (GenericHTTPResponse::status(*HTTPStatus::NOT_FOUND));
+		headers.contentLength(file.length());
 
 		std::string extension;
 		if (request.url().extension(extension))
 			headers.contentType(request.configuration().mimeRegistry(), extension);
 
-		headers.contentLength(file.length());
-
-		return (GenericHTTPResponse::noBody(*HTTPStatus::OK, headers));
+		return (status(*HTTPStatus::OK, headers));
 	}
 
 	if (file.isDirectory())
@@ -97,10 +86,10 @@ HeadHandler::handle(HTTPRequest &request)
 		headers.html();
 		headers.contentLength(listing.size());
 
-		return (GenericHTTPResponse::noBody(*HTTPStatus::OK, headers));
+		return (status(*HTTPStatus::OK, headers));
 	}
 
-	return (GenericHTTPResponse::status(*HTTPStatus::NOT_FOUND));
+	return (status(*HTTPStatus::NOT_FOUND));
 }
 
 HeadHandler&

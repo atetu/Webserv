@@ -48,6 +48,4 @@ class HTTPMethod :
 		static HTTPMethod *TRACE;
 };
 
-#include <http/handler/HTTPMethodHandler.hpp>
-
 #endif /* HTTPMETHOD_HPP_ */

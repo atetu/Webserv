@@ -10,30 +10,15 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <config/Configuration.hpp>
+#include <config/block/LocationBlock.hpp>
 #include <http/handler/methods/OptionsHandler.hpp>
 #include <http/HTTPHeaderFields.hpp>
+#include <http/HTTPRequest.hpp>
 #include <http/HTTPStatus.hpp>
-#include <http/response/HTTPStatusLine.hpp>
-#include <http/response/impl/generic/GenericHTTPResponse.hpp>
-#include <io/File.hpp>
-#include <io/FileDescriptor.hpp>
-#include <util/log/Logger.hpp>
-#include <util/log/LoggerFactory.hpp>
-#include <util/log/LogLevel.hpp>
-#include <stddef.h>
-#include <sys/fcntl.h>
-#include <util/buffer/impl/FileDescriptorBuffer.hpp>
-#include <http/mime/MimeRegistry.hpp>
-#include <http/mime/Mime.hpp>
-#include <util/URL.hpp>
+#include <util/Convert.hpp>
+#include <util/Optional.hpp>
 #include <list>
 #include <string>
-#include <iostream>
-#include <fstream>
-
-
-static Logger &LOG = LoggerFactory::get("Options");
 
 OptionsHandler::OptionsHandler()
 {
@@ -43,38 +28,23 @@ OptionsHandler::~OptionsHandler()
 {
 }
 
-GenericHTTPResponse*
+HTTPResponse*
 OptionsHandler::handle(HTTPRequest &request)
 {
-	HTTPHeaderFields headers;
-	std::string allowValue;
-	int present = 0;
+	static std::string comaAndSpace = ", ";
 
-	if (request.location().present())
-	{
-		if (request.location().get()->methods().present())
-		{
-			present = 1;
-			std::list<std::string> methodList = request.location().get()->methods().get();
-			std::list<std::string>::iterator it = methodList.begin();
-			std::list<std::string>::iterator ite = methodList.end();
-			while (it != ite)
-			{
-				allowValue += *it;
-				it++;
-				if (it != ite)
-					allowValue += ", ";
-			}
-		}	
-	}
-	
-	if (!present)
+	std::string allowValue;
+
+	if (request.location().present() && request.location().get()->methods().present())
+		allowValue = Convert::join(request.location().get()->methods().get(), comaAndSpace);
+	else
 		allowValue = "GET, PUT, POST, CONNECT, DELETE, HEAD, TRACE, OPTIONS";
 
+	HTTPHeaderFields headers;
 	headers.contentLength(0);
 	headers.allow(allowValue);
-	
-	return (GenericHTTPResponse::noBody(*HTTPStatus::CREATED, headers));
+
+	return (status(*HTTPStatus::CREATED, headers));
 }
 
 OptionsHandler&

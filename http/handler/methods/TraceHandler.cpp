@@ -10,30 +10,11 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <config/Configuration.hpp>
 #include <http/handler/methods/TraceHandler.hpp>
 #include <http/HTTPHeaderFields.hpp>
 #include <http/HTTPStatus.hpp>
-#include <http/response/HTTPStatusLine.hpp>
 #include <http/response/impl/generic/GenericHTTPResponse.hpp>
-#include <io/File.hpp>
-#include <io/FileDescriptor.hpp>
-#include <util/log/Logger.hpp>
-#include <util/log/LoggerFactory.hpp>
-#include <util/log/LogLevel.hpp>
-#include <stddef.h>
-#include <sys/fcntl.h>
-#include <util/buffer/impl/FileDescriptorBuffer.hpp>
-#include <http/mime/MimeRegistry.hpp>
-#include <http/mime/Mime.hpp>
-#include <util/URL.hpp>
-#include <list>
 #include <string>
-#include <iostream>
-#include <fstream>
-
-
-static Logger &LOG = LoggerFactory::get("Trace");
 
 TraceHandler::TraceHandler()
 {
@@ -43,36 +24,25 @@ TraceHandler::~TraceHandler()
 {
 }
 
-GenericHTTPResponse*
+HTTPResponse*
 TraceHandler::handle(HTTPRequest &request)
 {
 	HTTPHeaderFields headers;
 
-	std::string body;
-
+#if 0 // TODO The 'status line' variable is never used
 	std::string method = request.method().name();
 	std::string host = request.url().host();
 	std::string path = request.url().path(); // TODO check queries and fragments with Nginx
 	std::string version = "HTTTP/1.1";
 	std::string statusLine = method + ' ' + host + path + ' ' + version + '\n';
-	
-	const HTTPHeaderFields::map & requestHeaders = request.headers().storage();
-	std::map<std::string, std::string>::const_iterator it = requestHeaders.begin();
-	std::map<std::string, std::string>::const_iterator ite = requestHeaders.end();
-	while (it != ite)
-	{
-		body += it->first;
-		body += ": ";
-		body += it->second;
-		it++;
-		if (it != ite)
-			body += '\n';
+#endif
 
-	}
-	headers.contentType("message/http");
+	std::string body = request.headers().format("\n");
+
+	headers.httpMessage();
 	headers.contentLength(body.size());
-	std::cout << body << std::endl;
-	return (GenericHTTPResponse::string(*HTTPStatus::OK, headers, body));
+
+	return (string(*HTTPStatus::OK, body, headers));
 }
 
 TraceHandler&

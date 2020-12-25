@@ -14,7 +14,6 @@
 # define HEADHANDLER_HPP_
 
 #include <http/handler/HTTPMethodHandler.hpp>
-#include <http/HTTPRequest.hpp>
 
 class HeadHandler :
 		public HTTPMethodHandler
@@ -25,7 +24,7 @@ class HeadHandler :
 		virtual
 		~HeadHandler();
 
-		GenericHTTPResponse*
+		HTTPResponse*
 		handle(HTTPRequest &request);
 
 	public:

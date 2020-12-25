@@ -14,7 +14,6 @@
 # define PUTHANDLER_HPP_
 
 #include <http/handler/HTTPMethodHandler.hpp>
-#include <http/HTTPRequest.hpp>
 #include <io/File.hpp>
 
 class PutHandler :
@@ -26,7 +25,7 @@ class PutHandler :
 		virtual
 		~PutHandler();
 
-		GenericHTTPResponse*
+		HTTPResponse*
 		handle(HTTPRequest &request);
 
 		int

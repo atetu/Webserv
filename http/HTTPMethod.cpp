@@ -14,8 +14,8 @@
 #include <http/handler/methods/DeleteHandler.hpp>
 #include <http/handler/methods/GetHandler.hpp>
 #include <http/handler/methods/HeadHandler.hpp>
-#include <http/handler/methods/PutHandler.hpp>
 #include <http/handler/methods/OptionsHandler.hpp>
+#include <http/handler/methods/PutHandler.hpp>
 #include <http/handler/methods/TraceHandler.hpp>
 #include <http/HTTPMethod.hpp>
 

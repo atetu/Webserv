@@ -14,7 +14,6 @@
 # define GETHANDLER_HPP_
 
 #include <http/handler/HTTPMethodHandler.hpp>
-#include <http/HTTPRequest.hpp>
 
 class GetHandler :
 		public HTTPMethodHandler
@@ -25,7 +24,7 @@ class GetHandler :
 		virtual
 		~GetHandler();
 
-		GenericHTTPResponse*
+		HTTPResponse*
 		handle(HTTPRequest &request);
 
 	public:

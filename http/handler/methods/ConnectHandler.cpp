@@ -21,7 +21,7 @@ ConnectHandler::~ConnectHandler()
 {
 }
 
-GenericHTTPResponse*
+HTTPResponse*
 ConnectHandler::handle(HTTPRequest &request)
 {
 	return (error(request, *HTTPStatus::BAD_REQUEST));

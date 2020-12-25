@@ -25,7 +25,6 @@
 #include <os/detect_platform.h>
 #include <sys/errno.h>
 #include <sys/unistd.h>
-#include <unistd.h>
 #include <util/Convert.hpp>
 #include <util/Enum.hpp>
 #include <util/helper/DeleteHelper.hpp>
@@ -33,6 +32,7 @@
 #include <util/StringUtils.hpp>
 #include <util/URL.hpp>
 #include <cstdlib>
+#include <iostream>
 #include <map>
 
 const std::string CommonGatewayInterface::ENV_AUTH_TYPE = "AUTH_TYPE";
@@ -61,7 +61,7 @@ kill(pid_t pid, int sig);
 int kill(pid_t pid, int sig)
 {
 	std::cout << "kill(pid, sig) not available with cygwin" << std::endl;
-	std::cout << *((char*)NULL);
+	std::cout << *((char*)NULL); /* Crash */
 	return (0);
 }
 #endif

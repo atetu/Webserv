@@ -11,25 +11,38 @@
 /* ************************************************************************** */
 
 #include <http/handler/HTTPMethodHandler.hpp>
-#include <http/HTTPHeaderFields.hpp>
 #include <http/HTTPRequest.hpp>
 #include <http/page/DefaultPages.hpp>
 #include <http/response/impl/generic/GenericHTTPResponse.hpp>
+#include <io/FileDescriptor.hpp>
+#include <util/buffer/impl/FileDescriptorBuffer.hpp>
 #include <util/Singleton.hpp>
 
 HTTPMethodHandler::~HTTPMethodHandler()
 {
 }
 
-GenericHTTPResponse*
-HTTPMethodHandler::status(HTTPStatus &status)
+HTTPResponse*
+HTTPMethodHandler::status(HTTPStatus &status, const HTTPHeaderFields &headers)
 {
 	return (GenericHTTPResponse::string(status, HTTPHeaderFields(), DefaultPages::instance().resolve(status)));
 }
 
-GenericHTTPResponse*
-HTTPMethodHandler::error(const HTTPRequest &request, HTTPStatus &httpStatus)
+HTTPResponse*
+HTTPMethodHandler::file(HTTPStatus &httpStatus, int fd, const HTTPHeaderFields &headers)
+{
+	return (GenericHTTPResponse::file(httpStatus, headers, *FileDescriptorBuffer::from(*FileDescriptor::wrap(fd), FileDescriptorBuffer::CLOSE | FileDescriptorBuffer::DELETE)));
+}
+
+HTTPResponse*
+HTTPMethodHandler::string(HTTPStatus &httpStatus, const std::string &string, const HTTPHeaderFields &headers)
+{
+	return (GenericHTTPResponse::string(httpStatus, headers, string));
+}
+
+HTTPResponse*
+HTTPMethodHandler::error(const HTTPRequest &request, HTTPStatus &httpStatus, const HTTPHeaderFields &headers)
 {
 	(void)request; // TODO Need to handle custom error pages if necessary
-	return (status(httpStatus));
+	return (status(httpStatus, headers));
 }

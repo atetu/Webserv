@@ -14,8 +14,6 @@
 # define OPTIONSHANDLER_HPP_
 
 #include <http/handler/HTTPMethodHandler.hpp>
-#include <http/HTTPRequest.hpp>
-#include <io/File.hpp>
 
 class OptionsHandler :
 		public HTTPMethodHandler
@@ -26,11 +24,8 @@ class OptionsHandler :
 		virtual
 		~OptionsHandler();
 
-		GenericHTTPResponse*
+		HTTPResponse*
 		handle(HTTPRequest &request);
-
-		int
-		checkExtension(HTTPRequest &request, File &file);
 
 	public:
 		static OptionsHandler&

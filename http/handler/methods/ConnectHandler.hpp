@@ -24,7 +24,7 @@ class ConnectHandler :
 		virtual
 		~ConnectHandler();
 
-		GenericHTTPResponse*
+		HTTPResponse*
 		handle(HTTPRequest &request);
 
 	public:

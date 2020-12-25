@@ -14,7 +14,6 @@
 # define DELETEHANDLER_HPP_
 
 #include <http/handler/HTTPMethodHandler.hpp>
-#include <http/HTTPRequest.hpp>
 
 class DeleteHandler :
 		public HTTPMethodHandler
@@ -25,7 +24,7 @@ class DeleteHandler :
 		virtual
 		~DeleteHandler();
 
-		GenericHTTPResponse*
+		HTTPResponse*
 		handle(HTTPRequest &request);
 
 	public:

@@ -13,6 +13,7 @@
 #ifndef HTTPHEADERFIELDS_HPP_
 # define HTTPHEADERFIELDS_HPP_
 
+#include <http/HTTP.hpp>
 #include <http/HTTPDate.hpp>
 #include <http/HTTPMethod.hpp>
 #include <stddef.h>
@@ -142,6 +143,9 @@ class HTTPHeaderFields
 		html(void);
 
 		HTTPHeaderFields&
+		httpMessage(void);
+
+		HTTPHeaderFields&
 		set(const std::string &key, const std::string &value);
 
 		const_iterator
@@ -151,26 +155,13 @@ class HTTPHeaderFields
 		end(void) const;
 
 		std::string
-		format(void) const;
+		format(const std::string &seperator = HTTP::CRLF) const;
 
-		map &
+		map&
 		storage(void);
 
-		const map &
+		const map&
 		storage(void) const;
-
-		// inline const std::map<std::string, std::string> &
-		// storage()
-		// {
-		// 	return (m_storage);
-		// }
-
-		HTTPValueParser*
-		getValueWithWeight(std::string field);
-		
-	public:
-		static HTTPHeaderFields*
-		create(std::map<std::string, std::string> headerMap);
 
 	public:
 		static const std::string ACCEPT_CHARSETS;
@@ -191,7 +182,9 @@ class HTTPHeaderFields
 		static const std::string TRANSFER_ENCODING;
 		static const std::string USER_AGENT;
 		static const std::string WWW_AUTHENTICATE;
+
 		static const std::string MIME_HTML;
+		static const std::string MIME_HTTP;
 };
 
 #endif /* HTTPHEADERFIELDS_HPP_ */

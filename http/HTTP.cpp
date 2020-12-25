@@ -11,7 +11,6 @@
 /* ************************************************************************** */
 
 #include <http/HTTP.hpp>
-#include <iostream>
 
 const std::string HTTP::SP = " ";
 const std::string HTTP::CRLF = "\r\n";

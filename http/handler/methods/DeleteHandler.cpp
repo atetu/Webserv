@@ -11,11 +11,11 @@
 /* ************************************************************************** */
 
 #include <http/handler/methods/DeleteHandler.hpp>
+#include <http/HTTPRequest.hpp>
 #include <http/HTTPStatus.hpp>
-#include <http/response/impl/generic/GenericHTTPResponse.hpp>
 #include <sys/stat.h>
 #include <util/URL.hpp>
-#include <cstdio>
+#include <iostream>
 #include <string>
 
 DeleteHandler::DeleteHandler()
@@ -26,7 +26,7 @@ DeleteHandler::~DeleteHandler()
 {
 }
 
-GenericHTTPResponse*
+HTTPResponse*
 DeleteHandler::handle(HTTPRequest &request)
 {
 	const char *filepath = request.url().path().c_str();

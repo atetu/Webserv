@@ -165,9 +165,9 @@ GenericHTTPResponse::state() const
 }
 
 GenericHTTPResponse*
-GenericHTTPResponse::status(HTTPStatus &status)
+GenericHTTPResponse::status(HTTPStatus &status, const HTTPHeaderFields &headers)
 {
-	return (new GenericHTTPResponse(HTTPStatusLine(HTTPVersion::HTTP_1_1, status), HTTPHeaderFields(), NULL));
+	return (new GenericHTTPResponse(HTTPStatusLine(HTTPVersion::HTTP_1_1, status), headers, NULL));
 }
 
 GenericHTTPResponse*
@@ -180,10 +180,4 @@ GenericHTTPResponse*
 GenericHTTPResponse::string(HTTPStatus &status, const HTTPHeaderFields &headers, const std::string &string)
 {
 	return (new GenericHTTPResponse(HTTPStatusLine(*HTTPStatus::OK), headers, new GenericHTTPResponse::StringBody(string)));
-}
-
-GenericHTTPResponse*
-GenericHTTPResponse::noBody(HTTPStatus &status, const HTTPHeaderFields &headers)
-{
-	return (new GenericHTTPResponse(HTTPStatusLine(*HTTPStatus::OK), headers, NULL));
 }

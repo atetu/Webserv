@@ -13,6 +13,7 @@
 #include <exception/Exception.hpp>
 #include <http/handler/methods/PutHandler.hpp>
 #include <http/HTTPHeaderFields.hpp>
+#include <http/HTTPRequest.hpp>
 #include <http/HTTPStatus.hpp>
 #include <http/mime/Mime.hpp>
 #include <http/mime/MimeRegistry.hpp>
@@ -26,7 +27,6 @@
 #include <list>
 #include <map>
 #include <string>
-
 
 static Logger &LOG = LoggerFactory::get("PUT");
 
@@ -57,15 +57,15 @@ PutHandler::checkExtension(HTTPRequest &request, File &file)
 			LOG.warn() << "Extension conversion not handled (1)" << std::endl;
 			return (0);
 		}
-	
+
 		std::string path = file.path();
 		std::size_t found = path.find_last_of('.');
-		std::string fileExtension ;
+		std::string fileExtension;
 
 		if (path[found + 1] != '/')
-		{	
+		{
 			fileExtension = path.substr(found + 1);
-		
+
 			if (!fileExtension.empty())
 			{
 				Mime::iterator ext_it = std::find(mime->extensions().begin(), mime->extensions().end(), fileExtension);
@@ -80,23 +80,22 @@ PutHandler::checkExtension(HTTPRequest &request, File &file)
 				{
 					file.setNewPath(path.substr(0, found), *(mime->extensions().begin()));
 				}
-					
 			}
 		}
 		else if (!file.exists())
-			file.setNewPath(path, *(mime->extensions().begin()));			
+			file.setNewPath(path, *(mime->extensions().begin()));
 	}
 	return (1);
 }
 
-GenericHTTPResponse*
+HTTPResponse*
 PutHandler::handle(HTTPRequest &request)
 {
 	HTTPHeaderFields headers;
 
 	const std::string &path = request.root() + request.url().path();
 	File file(path);
-	
+
 	if (!checkExtension(request, file))
 		return (GenericHTTPResponse::status(*HTTPStatus::UNSUPPORTED_MEDIA_TYPE));
 
@@ -106,17 +105,17 @@ PutHandler::handle(HTTPRequest &request)
 		{
 			file.create(request.getLocation());
 		}
-		catch(Exception &exception)
+		catch (Exception &exception)
 		{
 			LOG.warn() << exception.what() << std::endl;
-			return (GenericHTTPResponse::status(*HTTPStatus::NOT_FOUND));			
+			return (GenericHTTPResponse::status(*HTTPStatus::NOT_FOUND));
 		}
 	}
 	if (file.isFile())
 	{
 		std::ofstream stream;
 		stream.open(file.path().c_str(), std::ios::out | std::ios::app);
-		stream << request.body();
+		stream << request.body(); // TODO Blocking IO is against subject
 		stream.close();
 		std::string created = "Ressource created";
 		headers.contentLength(created.size());

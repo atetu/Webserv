@@ -148,16 +148,13 @@ class GenericHTTPResponse :
 
 	public:
 		static GenericHTTPResponse*
-		status(HTTPStatus &status);
+		status(HTTPStatus &status, const HTTPHeaderFields &headers = HTTPHeaderFields());
 
 		static GenericHTTPResponse*
 		file(HTTPStatus &status, const HTTPHeaderFields &headers, FileDescriptorBuffer &fileBuffer);
 
 		static GenericHTTPResponse*
 		string(HTTPStatus &status, const HTTPHeaderFields &headers, const std::string &string);
-
-		static GenericHTTPResponse*
-		noBody(HTTPStatus &status, const HTTPHeaderFields &headers);
 };
 
 #endif /* GENERICHTTPRESPONSE_HPP_ */

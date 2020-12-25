@@ -26,11 +26,8 @@ class TraceHandler :
 		virtual
 		~TraceHandler();
 
-		GenericHTTPResponse*
+		HTTPResponse*
 		handle(HTTPRequest &request);
-
-		int
-		checkExtension(HTTPRequest &request, File &file);
 
 	public:
 		static TraceHandler&
