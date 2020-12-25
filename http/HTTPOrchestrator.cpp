@@ -270,17 +270,17 @@ HTTPOrchestrator::start()
 					bool deleted = false;
 
 					HTTPClient &client = *it->second;
-					
+
 					if (canRead && !client.response())
 					{
 						if (client.in().size() != 0 || client.in().recv() > 0)
 						{
 							char c;
-							
+
 							while (client.in().next(c))
 							{
 								client.parser().consume(c);
-							
+
 								if (client.parser().state() == HTTPRequestParser::S_END)
 								{
 									HTTPHeaderFields header = HTTPHeaderFields(client.parser().header()); // isn't enough actually?
@@ -296,7 +296,7 @@ HTTPOrchestrator::start()
 
 									const ServerBlock *serverBlock = m_configuration.rootBlock().findServerBlock(clientHost); // ca marche avec inline juste. Pourquoi ?? + explication du const a la fin de fonction?
 									//std::cout << "server : " << serverBlock->host().get() << std::endl;
-									
+
 									const LocationBlock *locationBlock = NULL;
 									if (serverBlock && serverBlock->locations().present())
 									{
@@ -305,23 +305,23 @@ HTTPOrchestrator::start()
 										if (findLocation.parse().location().present())
 											locationBlock = findLocation.parse().location().get();
 									}
-									
+
 									if (!serverBlock)
 										client.response() = GenericHTTPResponse::status(*HTTPStatus::NOT_FOUND);
 									else
 									{
-										
+
 										const HTTPMethod *methodPtr = HTTPMethod::find(client.parser().method());
 										if (!methodPtr)
 											client.response() = GenericHTTPResponse::status(*HTTPStatus::METHOD_NOT_ALLOWED);
 										else
 										{
 											const HTTPMethod &method = *methodPtr;
-											
-											const Optional<std::map<std::string, std::string> >queryMap = Optional<std::map<std::string, std::string> >::ofEmpty(client.parser().query());
-											
+
+											const Optional<std::map<std::string, std::string> > queryMap = Optional<std::map<std::string, std::string> >::ofEmpty(client.parser().query());
+
 											const Optional<std::string> fragmentStr = Optional<std::string>::ofEmpty(client.parser().fragment());
-											
+
 											URL url = URL("http", "locahost", client.server().port(), client.parser().path(), queryMap, fragmentStr);
 
 											const RootBlock &rootBlock = m_configuration.rootBlock();
@@ -331,9 +331,9 @@ HTTPOrchestrator::start()
 
 											const std::string body = client.parser().body();
 											const MimeRegistry *mimeRegistry = new MimeRegistry(m_configuration.mimeRegistry());
-											
+
 											client.request() = new HTTPRequest(method, url, version, header, body, m_configuration, rootBlock, *serverBlock, locationBlockOptional, *mimeRegistry);
-																					
+
 											if (locationBlock)
 											{
 												if (locationBlock->methods().present())
@@ -343,6 +343,7 @@ HTTPOrchestrator::start()
 													if (std::find(methods.begin(), methods.end(), method.name()) == methods.end())
 														client.response() = GenericHTTPResponse::status(*HTTPStatus::METHOD_NOT_ALLOWED);
 												}
+
 												if (!client.response() && locationBlock->cgi().present())
 												{
 													const CGIBlock &cgiBlock = rootBlock.getCGI(locationBlock->cgi().get());
@@ -361,11 +362,9 @@ HTTPOrchestrator::start()
 													}
 												}
 											}
-											std::cout << method.name() << std::endl;
-											
+
 											if (!client.response())
 												client.response() = method.handler().handle(*client.request());
-											
 										}
 									}
 
