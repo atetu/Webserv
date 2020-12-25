@@ -83,6 +83,7 @@ class CommonGatewayInterface
 		static const std::string ENV_REMOTE_USER;
 		static const std::string ENV_REQUEST_METHOD;
 		static const std::string ENV_REQUEST_URI;
+		static const std::string ENV_SCRIPT_FILENAME;
 		static const std::string ENV_SCRIPT_NAME;
 		static const std::string ENV_SERVER_NAME;
 		static const std::string ENV_SERVER_PORT;

@@ -24,6 +24,12 @@
 		},
 		"bash0": {
 			"path": "/bin/ls"
+		},
+		"php-cgi": {
+			"path": "/usr/bin/php-cgi",
+			"environment": {
+				"REDIRECT_STATUS": "1"
+			}
 		}
 	},
 	"servers": [
@@ -54,6 +60,10 @@
 						"GET"
 					],
 					"cgi": "python3"
+				},
+				"/x.php": {
+					"root": ".",
+					"cgi": "php-cgi"
 				},
 				"/x.sh": {
 					"root": ".",

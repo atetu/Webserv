@@ -38,6 +38,22 @@ class File
 		File
 		operator=(const File &other);
 
+	private:
+		template<typename T>
+			inline static IOException
+			resetErrnoAndReturn(const T &t)
+			{
+				errno = 0;
+				return (t);
+			}
+
+		inline IOException
+		ioException() const
+		{
+			return (resetErrnoAndReturn(IOException(m_path, errno)));
+		}
+
+	public:
 		bool
 		exists() const;
 
@@ -59,6 +75,9 @@ class File
 		std::string
 		name() const;
 
+		File
+		absolute() const;
+
 		inline const std::string&
 		path()
 		{
@@ -68,14 +87,9 @@ class File
 		std::list<File>
 		list() const;
 
-	private:
-		inline IOException
-		ioException() const
-		{
-			int err = errno;
-			errno = 0;
-			return (IOException(m_path, err));
-		}
+	public:
+		static File
+		currentDirectory();
 };
 
 #endif /* FILE_HPP_ */

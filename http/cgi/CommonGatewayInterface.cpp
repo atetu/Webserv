@@ -19,6 +19,7 @@
 #include <http/HTTPClient.hpp>
 #include <http/HTTPServer.hpp>
 #include <http/request/HTTPRequest.hpp>
+#include <io/File.hpp>
 #include <io/FileDescriptor.hpp>
 #include <net/address/InetAddress.hpp>
 #include <net/address/InetSocketAddress.hpp>
@@ -31,6 +32,7 @@
 #include <util/Optional.hpp>
 #include <util/StringUtils.hpp>
 #include <util/URL.hpp>
+#include <webserv.hpp>
 #include <cstdlib>
 #include <iostream>
 #include <map>
@@ -48,6 +50,7 @@ const std::string CommonGatewayInterface::ENV_REMOTE_IDENT = "REMOTE_IDENT";
 const std::string CommonGatewayInterface::ENV_REMOTE_USER = "REMOTE_USER";
 const std::string CommonGatewayInterface::ENV_REQUEST_METHOD = "REQUEST_METHOD";
 const std::string CommonGatewayInterface::ENV_REQUEST_URI = "REQUEST_URI";
+const std::string CommonGatewayInterface::ENV_SCRIPT_FILENAME = "SCRIPT_FILENAME";
 const std::string CommonGatewayInterface::ENV_SCRIPT_NAME = "SCRIPT_NAME";
 const std::string CommonGatewayInterface::ENV_SERVER_NAME = "SERVER_NAME";
 const std::string CommonGatewayInterface::ENV_SERVER_PORT = "SERVER_PORT";
@@ -58,7 +61,8 @@ const std::string CommonGatewayInterface::ENV_SERVER_SOFTWARE = "SERVER_SOFTWARE
 extern int
 kill(pid_t pid, int sig);
 
-int kill(pid_t pid, int sig)
+int
+kill(pid_t pid, int sig)
 {
 	std::cout << "kill(pid, sig) not available with cygwin" << std::endl;
 	std::cout << *((char*)NULL); /* Crash */
@@ -116,16 +120,27 @@ CommonGatewayInterface::execute(HTTPClient &client, const CGIBlock &cgiBlock, co
 
 	Environment env = environment;
 
+	if (cgiBlock.environment().present())
+	{
+		typedef std::map<std::string, std::string> env_map;
+
+		const env_map &customEnvVars = cgiBlock.environment().get();
+
+		for (env_map::const_iterator it = customEnvVars.begin(); it != customEnvVars.end(); it++)
+			env.setProperty(it->first, it->second);
+	}
+
 	env.setProperty(ENV_GATEWAY_INTERFACE, "CGI/1.1");
 	env.setProperty(ENV_REMOTE_ADDR, client.socketAddress().address()->hostAddress());
 	env.setProperty(ENV_REMOTE_PORT, Convert::toString(client.socketAddress().port()));
 	env.setProperty(ENV_REQUEST_METHOD, client.request()->method().name());
 	env.setProperty(ENV_REQUEST_URI, client.request()->url().path());
-	env.setProperty(ENV_SCRIPT_NAME, cgiBlock.path().get());
+	env.setProperty(ENV_SCRIPT_FILENAME, File::currentDirectory().path() + client.request()->url().path());
+	env.setProperty(ENV_SCRIPT_NAME, client.request()->url().path());
 	env.setProperty(ENV_SERVER_NAME, client.server().host());
 	env.setProperty(ENV_SERVER_PORT, Convert::toString(client.server().port()));
 	env.setProperty(ENV_SERVER_PROTOCOL, client.request()->version().format());
-	env.setProperty(ENV_SERVER_SOFTWARE, "webserv/1.0");
+	env.setProperty(ENV_SERVER_SOFTWARE, APPLICATION_NAME_AND_VERSION);
 
 	const HTTPHeaderFields &headerFields = client.request()->headers();
 	for (HTTPHeaderFields::const_iterator it = headerFields.begin(); it != headerFields.end(); it++)
@@ -150,8 +165,13 @@ CommonGatewayInterface::execute(HTTPClient &client, const CGIBlock &cgiBlock, co
 
 	if (pid == 0)
 	{
+		::chdir(client.request()->root().c_str());
+
 		::dup2(inPipe[0], 0);
 		::dup2(outPipe[1], 1);
+
+//		if (cgiBlock.redirectErrToOut().orElse(true)) // TODO Need debug
+//			::dup2(1, 2);
 
 		std::string path = cgiBlock.path().get();
 		std::string file = "." + client.request()->url().path();

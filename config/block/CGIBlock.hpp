@@ -13,16 +13,19 @@
 #ifndef CGIBLOCK_HPP_
 # define CGIBLOCK_HPP_
 
+#include <sys/errno.h>
 #include <sys/stat.h>
 #include <util/Optional.hpp>
+#include <map>
 #include <string>
-#include <cerrno>
 
 class CGIBlock
 {
 	private:
 		std::string m_name;
 		Optional<std::string> m_path;
+		Optional<bool> m_redirectErrToOut;
+		Optional<std::map<std::string, std::string> > m_environment;
 
 	public:
 		CGIBlock();
@@ -38,6 +41,12 @@ class CGIBlock
 		CGIBlock&
 		path(const std::string &path);
 
+		CGIBlock&
+		redirectErrToOut(bool redirectErrToOut);
+
+		CGIBlock&
+		environment(std::map<std::string, std::string> environment);
+
 		inline const std::string&
 		name(void) const
 		{
@@ -48,6 +57,18 @@ class CGIBlock
 		path(void) const
 		{
 			return (m_path);
+		}
+
+		inline const Optional<bool>&
+		redirectErrToOut(void) const
+		{
+			return (m_redirectErrToOut);
+		}
+
+		inline const Optional<std::map<std::string, std::string> >&
+		environment(void) const
+		{
+			return (m_environment);
 		}
 
 		inline bool

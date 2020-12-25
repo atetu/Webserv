@@ -117,6 +117,27 @@ class JsonBinderHelper
 				return (items);
 			}
 
+		template<typename JT, typename T>
+			static std::map<std::string, T>
+			buildSimpleMap(const std::string &path, const JsonObject &jsonObject)
+			{
+				std::map<std::string, T> items;
+
+				int index = 0;
+				for (JsonObject::const_iterator it = jsonObject.begin(); it != jsonObject.end(); it++)
+				{
+					const std::string &key = it->first;
+
+					std::string ipath = path + KEY_DOT + key;
+					const JT &jsonType = jsonCast<JT>(ipath, it->second);
+
+					T item = jsonType; /* Automatic type operator cast. */
+					items.insert(items.end(), std::make_pair<std::string, T>(key, item));
+				}
+
+				return (items);
+			}
+
 		template<typename T>
 			static const T&
 			jsonCast(const std::string &path, const JsonValue *jsonValue)

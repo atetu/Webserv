@@ -54,3 +54,19 @@ CGIBlock::path(const std::string &path)
 
 	return (*this);
 }
+
+CGIBlock&
+CGIBlock::redirectErrToOut(bool redirectErrToOut)
+{
+	m_redirectErrToOut.set(redirectErrToOut);
+
+	return (*this);
+}
+
+CGIBlock&
+CGIBlock::environment(std::map<std::string, std::string> environment)
+{
+	m_environment.set(environment);
+
+	return (*this);
+}

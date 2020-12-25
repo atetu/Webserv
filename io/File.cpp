@@ -13,6 +13,7 @@
 #include <dirent.h>
 #include <io/File.hpp>
 #include <io/FileDescriptor.hpp>
+#include <stdlib.h>
 #include <sys/fcntl.h>
 #include <sys/stat.h>
 #include <sys/unistd.h>
@@ -127,6 +128,12 @@ File::open(int flags, mode_t mode)
 	return (FileDescriptor::wrap(fd));
 }
 
+File
+File::absolute() const
+{
+	return (currentDirectory().path() + "/" + m_path);
+}
+
 std::list<File>
 File::list() const
 {
@@ -150,4 +157,18 @@ File::list() const
 	::closedir(dir);
 
 	return (files);
+}
+
+File
+File::currentDirectory()
+{
+	char *cwd = ::getcwd(NULL, 0);
+
+	if (!cwd)
+		throw resetErrnoAndReturn(IOException("getcwd", errno));
+
+	std::string str = cwd;
+	free(cwd);
+
+	return (File(str));
 }
