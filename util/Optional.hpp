@@ -155,6 +155,24 @@ template<typename T>
 				return (value);
 			}
 
+			Optional<T>&
+			otherwise(Optional<T> &optional)
+			{
+				if (m_present)
+					return (*this);
+
+				return (optional);
+			}
+
+			const Optional<T>&
+			otherwise(const Optional<T> &optional) const
+			{
+				if (m_present)
+					return (*this);
+
+				return (optional);
+			}
+
 		public:
 			static Optional<T>
 			onlyIf(bool present, T &value)

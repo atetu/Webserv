@@ -10,6 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+#include <config/Configuration.hpp>
 #include <exception/Exception.hpp>
 #include <http/enums/HTTPStatus.hpp>
 #include <http/handler/methods/PutHandler.hpp>
@@ -51,7 +52,7 @@ PutHandler::checkExtension(HTTPRequest &request, File &file)
 
 	if (!type.empty())
 	{
-		const Mime *mime = request.mimeRegistry().findByMimeType(type);
+		const Mime *mime = request.configuration().mimeRegistry().findByMimeType(type);
 		if (mime == NULL)
 		{
 			LOG.warn() << "Extension conversion not handled (1)" << std::endl;

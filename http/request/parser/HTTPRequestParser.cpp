@@ -32,7 +32,7 @@ HTTPRequestParser::HTTPRequestParser() :
 		m_minor(-1),
 		m_field(""),
 		m_value(""),
-		m_headerMap(),
+		m_headerFields(),
 		m_query(),
 		m_fragment(""),
 		m_queryKey(""),
@@ -47,7 +47,7 @@ HTTPRequestParser::HTTPRequestParser() :
 }
 
 #define ADD_TO_MAP(key, value)						\
-			m_headerMap[key] = value;				\
+			m_headerFields.set(key, value);			\
 			key = "";								\
 			value = "";								
 
@@ -493,10 +493,10 @@ HTTPRequestParser::minor() const
 	return (m_minor);
 }
 
-const std::map<std::string, std::string>&
-HTTPRequestParser::header()
+const HTTPHeaderFields&
+HTTPRequestParser::headerFields()
 {
-	return (m_headerMap);
+	return (m_headerFields);
 }
 
 char
@@ -523,12 +523,6 @@ HTTPRequestParser::body(const std::string &storage)
 	m_body = storage;
 }
 
-void
-HTTPRequestParser::chunkBody(const std::string &storage)
-{
-	m_body = ChunkDecoder(storage).decode();
-}
-
 std::string&
 HTTPRequestParser::body()
 {
@@ -536,33 +530,29 @@ HTTPRequestParser::body()
 }
 
 void
-HTTPRequestParser::setBody(std::string &storage)
+HTTPRequestParser::body(std::string &storage)
 {
-	std::map<std::string, std::string>::iterator length_it = m_headerMap.find("Content-Length");
-	if (length_it != m_headerMap.end())
+	const Optional<std::string> contentLengthOptional = m_headerFields.get(HTTPHeaderFields::CONTENT_LENGTH);
+	if (contentLengthOptional.present())
 	{
-		int bodySize = ::atoi(length_it->second.c_str());
+		int bodySize = ::atoi(contentLengthOptional.get().c_str());
 		m_body = storage.substr(0, bodySize);
 	}
 	else
 	{
-		std::map<std::string, std::string>::iterator encode_it = m_headerMap.find("Transfer-Encoding");
-		if (encode_it == m_headerMap.end())
+		const Optional<std::string> transfertEncodingOptional = m_headerFields.get(HTTPHeaderFields::TRANSFER_ENCODING);
+		if (transfertEncodingOptional.present())
 		{
-			// check with Nginx if error. RFC = content-length header SHOULD be sent...
-		}
-		else
-		{
-			if (encode_it->second == "chunked")
-			{
-				//	storage.erase(0,4);
-				//	std::cout << storage << std::endl;
-				chunkBody(storage);
-			}
+			const std::string &encoding = transfertEncodingOptional.get();
 
+			if (encoding == "chunked")
+				m_body = ChunkDecoder(storage).decode();
 			else
 				throw Exception("transfer_encoding not supported");
 		}
-
+		else
+		{
+			// check with Nginx if error. RFC = content-length header SHOULD be sent...
+		}
 	}
 }

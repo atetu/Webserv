@@ -17,7 +17,7 @@
 
 class HTTPVersion;
 
-HTTPRequest::HTTPRequest(const HTTPMethod &method, const URL &url, const HTTPVersion &version, const HTTPHeaderFields &headerFields, const std::string body, const Configuration &configuration, const RootBlock &rootBlock, const ServerBlock &serverBlock, const Optional<LocationBlock const*> &locationBlock, const MimeRegistry &mimeRegistry) :
+HTTPRequest::HTTPRequest(const HTTPMethod &method, const URL &url, const HTTPVersion &version, const HTTPHeaderFields &headerFields, const std::string body, const Configuration &configuration, const RootBlock &rootBlock, const ServerBlock &serverBlock, const Optional<LocationBlock const*> &locationBlock) :
 		m_method(method),
 		m_url(url),
 		m_version(version),
@@ -26,8 +26,7 @@ HTTPRequest::HTTPRequest(const HTTPMethod &method, const URL &url, const HTTPVer
 		m_configuration(configuration),
 		m_rootBlock(rootBlock),
 		m_serverBlock(serverBlock),
-		m_locationBlock(locationBlock),
-		m_mimeRegistry(mimeRegistry)
+		m_locationBlock(locationBlock)
 {
 }
 

@@ -13,10 +13,13 @@
 #ifndef HTTPREQUESTPARSER_HPP_
 # define HTTPREQUESTPARSER_HPP_
 
+#include <http/header/HTTPHeaderFields.hpp>
 #include <http/header/HTTPHeaderParser.hpp>
 #include <map>
 #include <string>
 #include <vector>
+
+class HTTPHeaderFields;
 
 # ifdef major
 #  undef major
@@ -49,7 +52,7 @@ class HTTPRequestParser
 			S_HTTP_END3,
 			S_QUERY_STRING_KEY,
 			S_QUERY_STRING_VALUE,
-		//	S_FRAGMENT_START,
+			//	S_FRAGMENT_START,
 			S_FRAGMENT,
 			S_FIELD,
 			S_COLON,
@@ -70,7 +73,7 @@ class HTTPRequestParser
 		int m_minor;
 		std::string m_field;
 		std::string m_value;
-		std::map<std::string, std::string> m_headerMap;
+		HTTPHeaderFields m_headerFields;
 		std::map<std::string, std::string> m_query;
 		std::string m_queryKey;
 		std::string m_queryValue;
@@ -103,8 +106,8 @@ class HTTPRequestParser
 		int
 		minor() const;
 
-		const std::map<std::string, std::string>&
-		header();
+		const HTTPHeaderFields&
+		headerFields();
 
 		void
 		header(HTTPHeaderParser headerParser);
@@ -115,23 +118,20 @@ class HTTPRequestParser
 		char
 		lastChar() const;
 
-		std::map<std::string, std::string> &
+		std::map<std::string, std::string>&
 		query();
-		
-		std::string &
+
+		std::string&
 		fragment();
 
 		void
-		body(const std::string & storage);
-		
-		void
-		chunkBody(const std::string & storage);
-		
-		std::string &
+		body(const std::string &storage);
+
+		std::string&
 		body();
 
 		void
-		setBody(std::string &storage);
+		body(std::string &storage);
 };
 
 #endif /* HTTPREQUESTPARSER_HPP_ */

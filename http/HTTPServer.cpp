@@ -10,8 +10,33 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+#include <config/block/LocationBlock.hpp>
+#include <config/block/RootBlock.hpp>
+#include <exception/Exception.hpp>
+#include <http/cgi/CommonGatewayInterface.hpp>
+#include <http/enums/HTTPMethod.hpp>
+#include <http/enums/HTTPStatus.hpp>
+#include <http/enums/HTTPVersion.hpp>
+#include <http/handler/HTTPMethodHandler.hpp>
+#include <http/header/HTTPHeaderFields.hpp>
+#include <http/HTTPClient.hpp>
 #include <http/HTTPServer.hpp>
+#include <http/mime/MimeRegistry.hpp>
+#include <http/request/HTTPRequest.hpp>
+#include <http/request/parser/HTTPRequestParser.hpp>
+#include <http/response/HTTPStatusLine.hpp>
+#include <http/response/impl/cgi/CGIHTTPResponse.hpp>
+#include <http/response/impl/generic/GenericHTTPResponse.hpp>
+#include <http/route/HTTPFindLocation.hpp>
 #include <io/Socket.hpp>
+#include <util/buffer/impl/BaseBuffer.hpp>
+#include <util/buffer/impl/SocketBuffer.hpp>
+#include <util/Enum.hpp>
+#include <util/Environment.hpp>
+#include <util/Optional.hpp>
+#include <util/URL.hpp>
+#include <algorithm>
+#include <map>
 
 HTTPServer::HTTPServer(const std::string &host, short port, const std::list<ServerBlock const*> &serverBlocks) :
 		m_host(host),
@@ -21,7 +46,7 @@ HTTPServer::HTTPServer(const std::string &host, short port, const std::list<Serv
 {
 }
 
-HTTPServer::~HTTPServer()
+HTTPServer::~HTTPServer(void)
 {
 	delete &m_socket;
 }
@@ -47,19 +72,33 @@ HTTPServer::socket(void) const
 }
 
 const std::string&
-HTTPServer::host() const
+HTTPServer::host(void) const
 {
-	return m_host;
+	return (m_host);
 }
 
 short
-HTTPServer::port() const
+HTTPServer::port(void) const
 {
-	return m_port;
+	return (m_port);
 }
 
 const std::list<const ServerBlock*>&
-HTTPServer::serverBlocks() const
+HTTPServer::serverBlocks(void) const
 {
-	return m_serverBlocks;
+	return (m_serverBlocks);
+}
+
+const ServerBlock*
+HTTPServer::defaultServerBlock(void) const
+{
+	for (std::list<const ServerBlock*>::const_iterator it = m_serverBlocks.begin(); it != m_serverBlocks.end(); it++)
+	{
+		const ServerBlock &serverBlock = *(*it);
+
+		if (serverBlock.isDefault().orElse(false))
+			return (&serverBlock);
+	}
+
+	return (NULL);
 }

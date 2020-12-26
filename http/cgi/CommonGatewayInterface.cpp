@@ -135,7 +135,7 @@ CommonGatewayInterface::execute(HTTPClient &client, const CGIBlock &cgiBlock, co
 	env.setProperty(ENV_REMOTE_PORT, Convert::toString(client.socketAddress().port()));
 	env.setProperty(ENV_REQUEST_METHOD, client.request()->method().name());
 	env.setProperty(ENV_REQUEST_URI, client.request()->url().path());
-	env.setProperty(ENV_SCRIPT_FILENAME, File::currentDirectory().path() + client.request()->url().path());
+	env.setProperty(ENV_SCRIPT_FILENAME, client.request()->root() + client.request()->url().path());
 	env.setProperty(ENV_SCRIPT_NAME, client.request()->url().path());
 	env.setProperty(ENV_SERVER_NAME, client.server().host());
 	env.setProperty(ENV_SERVER_PORT, Convert::toString(client.server().port()));

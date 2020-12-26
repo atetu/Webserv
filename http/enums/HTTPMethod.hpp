@@ -21,11 +21,12 @@ class HTTPMethod :
 		public Enum<HTTPMethod>
 {
 	private:
+		bool m_hasBody;
 		HTTPMethodHandler *m_handler;
 
 	public:
 		HTTPMethod(void);
-		HTTPMethod(HTTPMethodHandler *handler);
+		HTTPMethod(bool hasBody, HTTPMethodHandler *handler);
 		HTTPMethod(const HTTPMethod &other);
 
 		virtual
@@ -33,6 +34,9 @@ class HTTPMethod :
 
 		HTTPMethod&
 		operator =(const HTTPMethod &other);
+
+		bool
+		hasBody(void) const;
 
 		HTTPMethodHandler&
 		handler(void) const;

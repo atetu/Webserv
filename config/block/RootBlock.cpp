@@ -83,3 +83,40 @@ RootBlock::cgiBlocks(const std::list<const CGIBlock*> &cgiBlocks)
 
 	return (*this);
 }
+
+bool
+RootBlock::hasCGI(const std::string &name) const
+{
+	typedef std::list<const CGIBlock*> list;
+
+	if (m_cgiBlocks.present())
+	{
+		const list &cgiBlocks = m_cgiBlocks.get();
+
+		for (list::const_iterator it = cgiBlocks.begin(); it != cgiBlocks.end(); it++)
+		{
+			if ((*it)->name() == name)
+				return (true);
+		}
+	}
+
+	return (false);
+}
+
+const CGIBlock&
+RootBlock::getCGI(const std::string &name) const
+{
+	typedef std::list<const CGIBlock*> list;
+
+	const list &cgiBlocks = m_cgiBlocks.get();
+
+	for (list::const_iterator it = cgiBlocks.begin(); it != cgiBlocks.end(); it++)
+	{
+		const CGIBlock &cgiBlock = *(*it);
+
+		if (cgiBlock.name() == name)
+			return (cgiBlock);
+	}
+
+	throw NullPointerException("No CGI found with name: " + name);
+}

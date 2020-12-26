@@ -29,11 +29,15 @@ class ServerBlock
 	private:
 		Optional<int> m_port;
 		Optional<std::string> m_host;
+		Optional<bool> m_isDefault;
 		Optional<std::list<std::string> > m_names;
 		Optional<DataSize> m_maxBodySize;
 		Optional<std::string> m_root;
 		Optional<std::list<LocationBlock const*> > m_locations;
 		Optional<CustomErrorMap> m_errors;
+		Optional<std::list<std::string> > m_methods;
+		Optional<bool> m_listing;
+		Optional<std::list<std::string> > m_indexFiles;
 
 	public:
 		ServerBlock();
@@ -49,7 +53,10 @@ class ServerBlock
 		port(int port);
 
 		ServerBlock&
-		host(std::string host);
+		host(const std::string &host);
+
+		ServerBlock&
+		isDefault(bool isDefault);
 
 		ServerBlock&
 		names(const std::list<std::string> &names);
@@ -66,6 +73,15 @@ class ServerBlock
 		ServerBlock&
 		errors(const CustomErrorMap &errors);
 
+		ServerBlock&
+		methods(const std::list<std::string> &methods);
+
+		ServerBlock&
+		listing(bool listing);
+
+		ServerBlock&
+		index(const std::list<std::string> &files);
+
 		inline const Optional<int>
 		port(void) const
 		{
@@ -76,6 +92,12 @@ class ServerBlock
 		host(void) const
 		{
 			return (m_host);
+		}
+
+		inline const Optional<bool>&
+		isDefault(void) const
+		{
+			return (m_isDefault);
 		}
 
 		inline const Optional<std::list<std::string> >
@@ -107,6 +129,30 @@ class ServerBlock
 		{
 			return (m_errors);
 		}
+
+		inline const Optional<std::list<std::string> >&
+		methods(void) const
+		{
+			return (m_methods);
+		}
+
+		inline const Optional<bool>&
+		listing(void) const
+		{
+			return (m_listing);
+		}
+
+		inline const Optional<std::list<std::string> >&
+		index(void) const
+		{
+			return (m_indexFiles);
+		}
+
+		bool
+		hasName(const std::string &name) const;
+
+		bool
+		hasMethod(const std::string &name) const;
 };
 
 #endif /* SERVERBLOCK_HPP_ */

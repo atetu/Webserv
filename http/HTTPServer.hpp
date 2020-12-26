@@ -17,6 +17,8 @@
 #include <list>
 #include <string>
 
+class HTTPClient;
+
 class Socket;
 
 class HTTPServer
@@ -38,7 +40,7 @@ class HTTPServer
 		HTTPServer(const std::string &host, short port, const std::list<ServerBlock const*> &serverBlocks);
 
 		virtual
-		~HTTPServer();
+		~HTTPServer(void);
 
 		void
 		start(void);
@@ -50,13 +52,16 @@ class HTTPServer
 		socket(void) const;
 
 		const std::string&
-		host() const;
+		host(void) const;
 
 		short
-		port() const;
+		port(void) const;
 
 		const std::list<const ServerBlock*>&
-		serverBlocks() const;
+		serverBlocks(void) const;
+
+		ServerBlock const*
+		defaultServerBlock(void) const;
 };
 
 #endif /* HTTPSERVER_HPP_ */

@@ -12,6 +12,7 @@
 
 #include <config/block/ServerBlock.hpp>
 #include <util/helper/DeleteHelper.hpp>
+#include <algorithm>
 
 const std::string ServerBlock::DEFAULT_HOST = "0.0.0.0";
 const short ServerBlock::DEFAULT_PORT = 80;
@@ -69,9 +70,17 @@ ServerBlock::port(int port)
 }
 
 ServerBlock&
-ServerBlock::host(std::string host)
+ServerBlock::host(const std::string &host)
 {
 	m_host.set(host);
+
+	return (*this);
+}
+
+ServerBlock&
+ServerBlock::isDefault(bool isDefault)
+{
+	m_isDefault.set(isDefault);
 
 	return (*this);
 }
@@ -114,4 +123,52 @@ ServerBlock::errors(const CustomErrorMap &errors)
 	m_errors.set(errors);
 
 	return (*this);
+}
+
+ServerBlock&
+ServerBlock::methods(const std::list<std::string> &methods)
+{
+	m_methods.set(methods);
+
+	return (*this);
+}
+
+ServerBlock&
+ServerBlock::listing(bool listing)
+{
+	m_listing.set(listing);
+
+	return (*this);
+}
+
+ServerBlock&
+ServerBlock::index(const std::list<std::string> &files)
+{
+	m_indexFiles.set(files);
+
+	return (*this);
+}
+
+bool
+ServerBlock::hasName(const std::string &name) const
+{
+	if (m_names.present())
+	{
+		const std::list<std::string> &names = m_names.get();
+
+		return (std::find(names.begin(), names.end(), name) != names.end());
+	}
+
+	return (false);
+}
+
+bool
+ServerBlock::hasMethod(const std::string &name) const
+{
+	if (!m_methods.present())
+		return (false);
+
+	const std::list<std::string> &methods = m_methods.get();
+
+	return (std::find(methods.begin(), methods.end(), name) != methods.end());
 }

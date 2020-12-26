@@ -48,11 +48,9 @@
 			},
 			"root": ".",
 			"locations": {
-				"/favicon.ico": {
-					"methods": [
-						"GET"
-					],
-					"alias": "icon.png"
+				"/wordpress": {
+					"root": "/root/",
+					"cgi": "php-cgi"
 				},
 				"/x.py": {
 					"root": ".",

@@ -10,26 +10,18 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <config/block/LocationBlock.hpp>
 #include <config/block/RootBlock.hpp>
 #include <config/block/ServerBlock.hpp>
 #include <config/Configuration.hpp>
 #include <exception/IOException.hpp>
-#include <http/cgi/CommonGatewayInterface.hpp>
 #include <http/enums/HTTPMethod.hpp>
 #include <http/enums/HTTPStatus.hpp>
-#include <http/enums/HTTPVersion.hpp>
-#include <http/handler/HTTPMethodHandler.hpp>
-#include <http/header/HTTPHeaderFields.hpp>
 #include <http/HTTPOrchestrator.hpp>
-#include <http/mime/MimeRegistry.hpp>
 #include <http/request/HTTPRequest.hpp>
+#include <http/request/HTTPRequestProcessor.hpp>
 #include <http/request/parser/HTTPRequestParser.hpp>
 #include <http/response/HTTPResponse.hpp>
 #include <http/response/HTTPStatusLine.hpp>
-#include <http/response/impl/cgi/CGIHTTPResponse.hpp>
-#include <http/response/impl/generic/GenericHTTPResponse.hpp>
-#include <http/route/HTTPFindLocation.hpp>
 #include <io/Socket.hpp>
 #include <net/address/InetAddress.hpp>
 #include <net/address/InetSocketAddress.hpp>
@@ -43,7 +35,6 @@
 #include <util/Optional.hpp>
 #include <util/System.hpp>
 #include <util/URL.hpp>
-#include <algorithm>
 #include <cstring>
 #include <iostream>
 #include <iterator>
@@ -51,8 +42,6 @@
 #include <string>
 #include <utility>
 #include <vector>
-
-class CommonGatewayInterface;
 
 Logger &HTTPOrchestrator::LOG = LoggerFactory::get("HTTP Orchestrator");
 
@@ -283,90 +272,7 @@ HTTPOrchestrator::start()
 
 								if (client.parser().state() == HTTPRequestParser::S_END)
 								{
-									HTTPHeaderFields header = HTTPHeaderFields(client.parser().header()); // isn't enough actually?
-
-									client.parser().setBody(client.in().storage());
-									//std::cout << "body: " << client.parser().body() << std::endl;
-									std::map<std::string, std::string>::iterator header_it = header.storage().find("host");
-//									if (header_it == header.storage().end())
-//										throw Exception("No host in header fields");
-									std::string clientHost = "localhost";
-//									std::string clientHost = header_it->second;
-									//std::cout << "client : " << clientHost << std::endl;
-
-									const ServerBlock *serverBlock = m_configuration.rootBlock().findServerBlock(clientHost); // ca marche avec inline juste. Pourquoi ?? + explication du const a la fin de fonction?
-									//std::cout << "server : " << serverBlock->host().get() << std::endl;
-
-									const LocationBlock *locationBlock = NULL;
-									if (serverBlock && serverBlock->locations().present())
-									{
-										HTTPFindLocation findLocation(client.parser().path(), serverBlock->locations().get());
-
-										if (findLocation.parse().location().present())
-											locationBlock = findLocation.parse().location().get();
-									}
-
-									if (!serverBlock)
-										client.response() = GenericHTTPResponse::status(*HTTPStatus::NOT_FOUND);
-									else
-									{
-
-										const HTTPMethod *methodPtr = HTTPMethod::find(client.parser().method());
-										if (!methodPtr)
-											client.response() = GenericHTTPResponse::status(*HTTPStatus::METHOD_NOT_ALLOWED);
-										else
-										{
-											const HTTPMethod &method = *methodPtr;
-
-											const Optional<std::map<std::string, std::string> > queryMap = Optional<std::map<std::string, std::string> >::ofEmpty(client.parser().query());
-
-											const Optional<std::string> fragmentStr = Optional<std::string>::ofEmpty(client.parser().fragment());
-
-											URL url = URL("http", "locahost", client.server().port(), client.parser().path(), queryMap, fragmentStr);
-
-											const RootBlock &rootBlock = m_configuration.rootBlock();
-
-											const HTTPVersion &version = HTTPVersion::HTTP_1_1;
-											const Optional<LocationBlock const*> locationBlockOptional = Optional<LocationBlock const*>::ofNullable(locationBlock);
-
-											const std::string body = client.parser().body();
-											const MimeRegistry *mimeRegistry = new MimeRegistry(m_configuration.mimeRegistry());
-
-											client.request() = new HTTPRequest(method, url, version, header, body, m_configuration, rootBlock, *serverBlock, locationBlockOptional, *mimeRegistry);
-
-											if (locationBlock)
-											{
-												if (locationBlock->methods().present())
-												{
-													const std::list<std::string> methods = locationBlock->methods().get();
-
-													if (std::find(methods.begin(), methods.end(), method.name()) == methods.end())
-														client.response() = GenericHTTPResponse::status(*HTTPStatus::METHOD_NOT_ALLOWED);
-												}
-
-												if (!client.response() && locationBlock->cgi().present())
-												{
-													const CGIBlock &cgiBlock = rootBlock.getCGI(locationBlock->cgi().get());
-
-													try
-													{
-														CommonGatewayInterface *cgi = CommonGatewayInterface::execute(client, cgiBlock, m_environment);
-
-														client.response() = new CGIHTTPResponse(HTTPStatusLine(*HTTPStatus::OK), *cgi);
-													}
-													catch (Exception &exception)
-													{
-														LOG.error() << "An error occurred while processing CGI: " << exception.message() << std::endl;
-
-														client.response() = GenericHTTPResponse::status(*HTTPStatus::INTERNAL_SERVER_ERROR);
-													}
-												}
-											}
-
-											if (!client.response())
-												client.response() = method.handler().handle(*client.request());
-										}
-									}
+									HTTPRequestProcessor(m_configuration, m_environment).process(client);
 
 									if (client.response())
 									{
@@ -408,7 +314,7 @@ HTTPOrchestrator::start()
 						}
 					}
 
-					if (!deleted && client.response() && client.response()->state() == GenericHTTPResponse::FINISHED)
+					if (!deleted && client.response() && client.response()->state() == HTTPResponse::FINISHED)
 					{
 						std::cout << "done: " << fd << std::endl;
 

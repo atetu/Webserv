@@ -14,6 +14,7 @@
 # define LOCATIONBLOCK_HPP_
 
 #include <util/Optional.hpp>
+#include <algorithm>
 #include <list>
 #include <string>
 
@@ -98,6 +99,9 @@ class LocationBlock
 		{
 			return (m_cgi);
 		}
+
+		bool
+		hasMethod(const std::string &name) const;
 
 	public:
 		static LocationBlock DEFAULT;

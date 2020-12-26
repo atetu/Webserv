@@ -81,78 +81,11 @@ class RootBlock
 			return (m_cgiBlocks);
 		}
 
-		inline const ServerBlock*
-		findServerBlock(const std::string &clientHost) const
-		{
-			const ServerBlock *serverBlock = NULL;
-			std::list<const ServerBlock*> serverBlockList = m_serverBlocks.get(); // ici ref
-			std::list<const ServerBlock*>::iterator server_it = serverBlockList.begin();
-			std::list<const ServerBlock*>::iterator server_ite = serverBlockList.end();
-			int found = 0;
-		//	std::cout << "ici\n";
-			while (server_it != server_ite)
-			{
-				if ((*server_it)->names().present())
-				{
-					std::list<std::string> serverNames = (*server_it)->names().get();
-					std::list<std::string>::iterator serverNames_it = serverNames.begin();
-					std::list<std::string>::iterator serverNames_ite = serverNames.end();
+		bool
+		hasCGI(const std::string &name) const;
 
-					while (serverNames_it != serverNames_ite)
-					{
-						if (serverNames_it->compare(clientHost) == 0)
-						{
-							serverBlock = *server_it;
-							found = 1;
-							break;
-						}
-						serverNames_it++;
-					}
-
-				}
-				if (found)
-					break;
-				server_it++;
-			}
-			return (serverBlock); // what happens if does not exit?
-		}
-
-		inline bool
-		hasCGI(const std::string &name) const
-		{
-			typedef std::list<const CGIBlock*> list;
-
-			if (m_cgiBlocks.present())
-			{
-				const list &cgiBlocks = m_cgiBlocks.get();
-
-				for (list::const_iterator it = cgiBlocks.begin(); it != cgiBlocks.end(); it++)
-				{
-					if ((*it)->name() == name)
-						return (true);
-				}
-			}
-
-			return (false);
-		}
-
-		inline const CGIBlock&
-		getCGI(const std::string &name) const
-		{
-			typedef std::list<const CGIBlock*> list;
-
-			const list &cgiBlocks = m_cgiBlocks.get();
-
-			for (list::const_iterator it = cgiBlocks.begin(); it != cgiBlocks.end(); it++)
-			{
-				const CGIBlock &cgiBlock = *(*it);
-
-				if (cgiBlock.name() == name)
-					return (cgiBlock);
-			}
-
-			throw NullPointerException("No CGI found with name: " + name);
-		}
+		const CGIBlock&
+		getCGI(const std::string &name) const;
 };
 
 #endif /* ROOTBLOCK_HPP_ */

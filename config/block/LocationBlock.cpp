@@ -115,3 +115,14 @@ LocationBlock::cgi(const std::string &cgi)
 
 	return (*this);
 }
+
+bool
+LocationBlock::hasMethod(const std::string &name) const
+{
+	if (!m_methods.present())
+		return (false);
+
+	const std::list<std::string> &methods = m_methods.get();
+
+	return (std::find(methods.begin(), methods.end(), name) != methods.end());
+}

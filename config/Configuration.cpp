@@ -310,7 +310,9 @@ Configuration::JsonBuilder::buildServerBlock(const std::string &path, const Json
 	{
 		BIND(jsonObject, KEY_SERVER_PORT, JsonNumber, int, serverBlock, port);
 		BIND(jsonObject, KEY_SERVER_HOST, JsonString, std::string, serverBlock, host);
+		BIND(jsonObject, KEY_SERVER_DEFAULT, JsonBoolean, bool, serverBlock, isDefault);
 		BIND(jsonObject, KEY_SERVER_ROOT, JsonString, std::string, serverBlock, root);
+		BIND(jsonObject, KEY_SERVER_LISTING, JsonBoolean, bool, serverBlock, listing);
 
 		if (jsonObject.has(KEY_SERVER_NAME))
 		{
@@ -359,6 +361,22 @@ Configuration::JsonBuilder::buildServerBlock(const std::string &path, const Json
 			const JsonObject &object = JsonBinderHelper::jsonCast<JsonObject>(ipath, jsonObject.get(KEY_SERVER_ERRORS));
 
 			serverBlock->errors(buildCustomErrorMap(ipath, object));
+		}
+
+		if (jsonObject.has(KEY_SERVER_METHODS))
+		{
+			std::string ipath = path + KEY_DOT KEY_SERVER_METHODS;
+			const JsonArray &array = JsonBinderHelper::jsonCast<JsonArray>(ipath, jsonObject.get(KEY_SERVER_METHODS));
+
+			serverBlock->methods(JsonBinderHelper::buildCollection<JsonString, std::string>(ipath, array));
+		}
+
+		if (jsonObject.has(KEY_SERVER_INDEX_FILES))
+		{
+			std::string ipath = path + KEY_DOT KEY_SERVER_INDEX_FILES;
+			const JsonArray &array = JsonBinderHelper::jsonCast<JsonArray>(ipath, jsonObject.get(KEY_SERVER_INDEX_FILES));
+
+			serverBlock->index(JsonBinderHelper::buildCollection<JsonString, std::string>(ipath, array));
 		}
 	}
 	catch (...)

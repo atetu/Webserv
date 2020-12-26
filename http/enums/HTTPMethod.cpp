@@ -19,28 +19,31 @@
 #include <http/handler/methods/PutHandler.hpp>
 #include <http/handler/methods/TraceHandler.hpp>
 
-#define DEFINE_METHOD(name, handler) ENUM_DEFINE(HTTPMethod, name, HTTPMethod(&handler));
+#define DEFINE_METHOD(name, hasBody, handler) ENUM_DEFINE(HTTPMethod, name, HTTPMethod(hasBody, &handler));
 
-DEFINE_METHOD(GET,/*     */GetHandler::get());
-DEFINE_METHOD(HEAD,/*    */HeadHandler::get());
-DEFINE_METHOD(POST,/*    */GetHandler::get());
-DEFINE_METHOD(PUT,/*     */PutHandler::get());
-DEFINE_METHOD(DELETE,/*  */DeleteHandler::get());
-DEFINE_METHOD(CONNECT,/* */ConnectHandler::get());
-DEFINE_METHOD(OPTIONS,/* */OptionsHandler::get());
-DEFINE_METHOD(TRACE,/*   */TraceHandler::get());
+DEFINE_METHOD(GET,/*     */false, GetHandler::get());
+DEFINE_METHOD(HEAD,/*    */false, HeadHandler::get());
+DEFINE_METHOD(POST,/*     */true, GetHandler::get());
+DEFINE_METHOD(PUT,/*      */true, PutHandler::get());
+DEFINE_METHOD(DELETE,/*  */false, DeleteHandler::get());
+DEFINE_METHOD(CONNECT,/* */false, ConnectHandler::get());
+DEFINE_METHOD(OPTIONS,/* */false, OptionsHandler::get());
+DEFINE_METHOD(TRACE,/*   */false, TraceHandler::get());
 
 HTTPMethod::HTTPMethod(void) :
+		m_hasBody(),
 		m_handler()
 {
 }
 
-HTTPMethod::HTTPMethod(HTTPMethodHandler *handler) :
+HTTPMethod::HTTPMethod(bool hasBody, HTTPMethodHandler *handler) :
+		m_hasBody(hasBody),
 		m_handler(handler)
 {
 }
 
 HTTPMethod::HTTPMethod(const HTTPMethod &other) :
+		m_hasBody(other.m_hasBody),
 		m_handler(other.m_handler)
 {
 }
@@ -55,9 +58,18 @@ HTTPMethod::operator =(const HTTPMethod &other)
 	Enum::operator=(other);
 
 	if (this != &other)
+	{
+		m_hasBody = other.m_hasBody;
 		m_handler = other.m_handler;
+	}
 
 	return (*this);
+}
+
+bool
+HTTPMethod::hasBody(void) const
+{
+	return (m_hasBody);
 }
 
 HTTPMethodHandler&

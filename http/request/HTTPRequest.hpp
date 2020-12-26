@@ -37,7 +37,6 @@ class HTTPRequest
 		const RootBlock &m_rootBlock;
 		const ServerBlock &m_serverBlock;
 		const Optional<LocationBlock const*> &m_locationBlock;
-		const MimeRegistry &m_mimeRegistry;
 
 	private:
 		HTTPRequest(void);
@@ -47,7 +46,7 @@ class HTTPRequest
 		operator =(const HTTPRequest &other);
 
 	public:
-		HTTPRequest(const HTTPMethod &method, const URL &url, const HTTPVersion &version, const HTTPHeaderFields &headerFields, const std::string body, const Configuration &configuration, const RootBlock &rootBlock, const ServerBlock &serverBlock, const Optional<LocationBlock const*> &locationBlock, const MimeRegistry &mimeRegistry);
+		HTTPRequest(const HTTPMethod &method, const URL &url, const HTTPVersion &version, const HTTPHeaderFields &headerFields, const std::string body, const Configuration &configuration, const RootBlock &rootBlock, const ServerBlock &serverBlock, const Optional<LocationBlock const*> &locationBlock);
 
 		virtual
 		~HTTPRequest(void);
@@ -102,12 +101,6 @@ class HTTPRequest
 
 		std::string
 		root(void) const;
-
-		inline const MimeRegistry&
-		mimeRegistry()
-		{
-			return (m_mimeRegistry);
-		}
 
 		std::string
 		getLocation();
