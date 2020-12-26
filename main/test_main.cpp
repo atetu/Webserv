@@ -11,7 +11,7 @@
 /* ************************************************************************** */
 
 #include <exception/Exception.hpp>
-#include <tests/test_unit.hpp>
+#include <tests/case/TestCase.hpp>
 #include <util/ContainerBuilder.hpp>
 #include <util/Enum.hpp>
 #include <util/log/Logger.hpp>
@@ -21,13 +21,17 @@
 #include <util/options/Option.hpp>
 #include <util/options/OptionParser.hpp>
 #include <iostream>
+#include <list>
+#include <map>
+#include <string>
 #include <vector>
 
-static Logger &LOG = LoggerFactory::get("main");
+static Logger &LOG = LoggerFactory::get("test-main");
 
 std::map<std::string, std::list<TestCase> > g_test_units_and_cases;
 
 const Option OPT_HELP('h', "help", "display this help message");
+const Option OPT_VERSION('v', "version", "display application's version");
 const Option OPT_LOG_LEVEL('l', "log-level", "change the log-level", "level");
 const Option OPT_CONTINUE('c', "continue", "don't stop at an error");
 const Option OPT_PRINT_LOCATION('p', "print-location", "print test's location");

@@ -34,10 +34,15 @@
 
 # define FILE_LOCATION __FILE__ ":" TOSTRING(__LINE__)
 
-# define CASE(unit, name) \
+# if RUN_TESTS
+#  define CASE(unit, name) \
 	static int CASE_METHOD_NAME(int argc, char **argv, char **envp); \
 	static TestCase CASE_OBJECT_NAME(unit, name, FILE_LOCATION, &CASE_METHOD_NAME); \
 	static int CASE_METHOD_NAME(int argc, char **argv, char **envp)
+# else
+#  define CASE(unit, name) \
+	static int CASE_METHOD_NAME(int argc, char **argv, char **envp)
+# endif
 
 # define ASSERT(cond) \
 	if (!(cond)) \

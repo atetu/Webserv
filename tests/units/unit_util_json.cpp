@@ -45,6 +45,8 @@ CASE("json", "parsing number")
 	ASSERT(json("42").cast<JsonNumber>()->operator int() == 42);
 	ASSERT(json("-42").cast<JsonNumber>()->operator int() == -42);
 
+	&autoDelete(NULL);
+
 	return (0);
 }
 
@@ -58,6 +60,8 @@ CASE("json", "parsing decimal")
 	ASSERT(json("4.2").cast<JsonDecimal>()->operator double() == 4.2);
 	ASSERT(json("-4.2").cast<JsonDecimal>()->operator double() == -4.2);
 
+	&autoDelete(NULL);
+
 	return (0);
 }
 
@@ -65,6 +69,8 @@ CASE("json", "parsing true")
 {
 	ASSERT(json("true").instanceOf<JsonBoolean>());
 	ASSERT(json("true").cast<JsonBoolean>()->operator bool() == true);
+
+	&autoDelete(NULL);
 
 	return (0);
 }
@@ -74,12 +80,16 @@ CASE("json", "parsing false")
 	ASSERT(json("false").instanceOf<JsonBoolean>());
 	ASSERT(json("false").cast<JsonBoolean>()->operator bool() == false);
 
+	&autoDelete(NULL);
+
 	return (0);
 }
 
 CASE("json", "parsing null")
 {
 	ASSERT(json("null").instanceOf<JsonNull>());
+
+	&autoDelete(NULL);
 
 	return (0);
 }
@@ -90,6 +100,8 @@ CASE("json", "parsing string")
 
 	ASSERT(json("\"Hello\"").cast<JsonString>()->operator std::string() == "Hello");
 
+	&autoDelete(NULL);
+
 	return (0);
 }
 
@@ -99,6 +111,8 @@ CASE("json", "parsing string")
 //
 //	ASSERT(json("\"Hello\\\"\"").cast<JsonString>()->operator std::string() == "Hello\\\"");
 //
+//	&autoDelete(NULL);
+//
 //	return (0);
 //}
 
@@ -107,6 +121,8 @@ CASE("json", "parsing empty object")
 	ASSERT(json("{}").instanceOf<JsonObject>());
 	ASSERT(json("{}").cast<JsonObject>()->empty());
 
+	&autoDelete(NULL);
+
 	return (0);
 }
 
@@ -114,6 +130,8 @@ CASE("json", "parsing empty array")
 {
 	ASSERT(json("[]").instanceOf<JsonArray>());
 	ASSERT(json("[]").cast<JsonArray>()->empty());
+
+	&autoDelete(NULL);
 
 	return (0);
 }
