@@ -29,15 +29,15 @@ TraceHandler::handle(HTTPRequest &request)
 {
 	HTTPHeaderFields headers;
 
-#if 0 // TODO The 'status line' variable is never used
+//#if 0 // TODO The 'status line' variable is never used
 	std::string method = request.method().name();
 	std::string host = request.url().host();
 	std::string path = request.url().path(); // TODO check queries and fragments with Nginx
 	std::string version = "HTTTP/1.1";
 	std::string statusLine = method + ' ' + host + path + ' ' + version + '\n';
-#endif
+//#endif
 
-	std::string body = request.headers().format("\n");
+	std::string body = statusLine + request.headers().format("\n");
 
 	headers.httpMessage();
 	headers.contentLength(body.size());

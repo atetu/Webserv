@@ -6,7 +6,7 @@
 /*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/27 16:38:46 by ecaceres          #+#    #+#             */
-/*   Updated: 2020/12/24 10:20:00 by alicetetu        ###   ########.fr       */
+/*   Updated: 2020/12/26 17:21:57 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,6 +75,50 @@ bool
 GenericHTTPResponse::StringBody::isDone(void)
 {
 	return (m_sent);
+}
+
+GenericHTTPResponse::FileAndStringBody::FileAndStringBody(FileDescriptorBuffer &fileBuffer, std::string string) :
+		m_fileDescriptorBuffer(fileBuffer),
+		m_fdSent(false),
+		m_string(string),
+		m_strSent(false)
+{
+}
+
+GenericHTTPResponse::FileAndStringBody::~FileAndStringBody()
+{
+}
+
+FileDescriptorBuffer&
+GenericHTTPResponse::FileAndStringBody::fileDescriptorBuffer()
+{
+	return (m_fileDescriptorBuffer);
+}
+
+bool
+GenericHTTPResponse::FileAndStringBody::write(SocketBuffer &socketBuffer)
+{
+	if (!m_strSent)
+	{
+		socketBuffer.store(m_string);
+		m_strSent = true;
+	}
+
+	return (true);
+}
+
+bool
+GenericHTTPResponse::FileAndStringBody::writeFd(SocketBuffer &socketBuffer)
+{
+	socketBuffer.store(m_fileDescriptorBuffer);
+
+	return (isDone());
+}
+
+bool
+GenericHTTPResponse::FileAndStringBody::isDone(void)
+{
+	return (m_strSent);// a revoir
 }
 
 GenericHTTPResponse::GenericHTTPResponse(const HTTPStatusLine statusLine, const HTTPHeaderFields &headers, IBody *body) :
@@ -155,7 +199,10 @@ GenericHTTPResponse::readFileDescriptors(fdb_vector &out)
 void
 GenericHTTPResponse::writeFileDescriptors(fdb_vector &out)
 {
-	(void)out;
+	FileAndStringBody *fileAndStringBody = dynamic_cast<FileAndStringBody*>(m_body);
+	if (fileAndStringBody)
+		out.push_back(&fileAndStringBody->fileDescriptorBuffer());
+//	(void)out;
 }
 
 GenericHTTPResponse::State
@@ -180,4 +227,10 @@ GenericHTTPResponse*
 GenericHTTPResponse::string(HTTPStatus &status, const HTTPHeaderFields &headers, const std::string &string)
 {
 	return (new GenericHTTPResponse(HTTPStatusLine(*HTTPStatus::OK), headers, new GenericHTTPResponse::StringBody(string)));
+}
+
+GenericHTTPResponse*
+GenericHTTPResponse::fileAndString(HTTPStatus &status, const HTTPHeaderFields &headers, FileDescriptorBuffer &fileBuffer, const std::string &string)
+{
+	return (new GenericHTTPResponse(HTTPStatusLine(*HTTPStatus::OK), headers, new GenericHTTPResponse::FileAndStringBody(fileBuffer, string)));
 }

@@ -45,6 +45,7 @@ class FileDescriptorBuffer :
 
 	protected:
 		FileDescriptorBuffer(FileDescriptor &fileDescriptor, int actionOnDestroy, size_type maxSize);
+		FileDescriptorBuffer(FileDescriptor &fileDescriptor, const std::string body, int actionOnDestroy, size_type maxSize);
 
 	public:
 		virtual
@@ -74,6 +75,9 @@ class FileDescriptorBuffer :
 	public:
 		static FileDescriptorBuffer*
 		from(FileDescriptor &fileDescriptor, int actionOnDestroy = CLOSE, size_type maxSize = std::string::npos);
+
+		static FileDescriptorBuffer*
+		fromAndStore(FileDescriptor &fileDescriptor, const std::string &body, int actionOnDestroy = CLOSE, size_type maxSize = std::string::npos);
 
 };
 

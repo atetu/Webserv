@@ -22,12 +22,14 @@
 #include <util/log/Logger.hpp>
 #include <util/log/LoggerFactory.hpp>
 #include <util/URL.hpp>
+#include <io/FileDescriptor.hpp>
 #include <algorithm>
 #include <cstddef>
 #include <fstream>
 #include <list>
 #include <map>
 #include <string>
+#include <sys/fcntl.h>
 
 static Logger &LOG = LoggerFactory::get("PUT");
 
@@ -95,8 +97,8 @@ PutHandler::handle(HTTPRequest &request)
 	HTTPHeaderFields headers;
 
 	const std::string &path = request.root() + request.url().path();
-	File file(path + "/" + request.getLocation());
-
+	//File file(path + "/" + request.getLocation());
+	File file(path);
 	if (!checkExtension(request, file))
 		return (GenericHTTPResponse::status(*HTTPStatus::UNSUPPORTED_MEDIA_TYPE));
 
@@ -114,13 +116,9 @@ PutHandler::handle(HTTPRequest &request)
 	}
 	if (file.isFile())
 	{
-		std::ofstream stream;
-		stream.open(file.path().c_str(), std::ios::out | std::ios::app);
-		stream << request.body(); // TODO Blocking IO is against subject
-		stream.close();
 		std::string created = "Ressource created";
 		headers.contentLength(created.size());
-		return (GenericHTTPResponse::string(*HTTPStatus::CREATED, headers, created));
+		return (HTTPMethodHandler::filePut(*HTTPStatus::OK, *file.open(O_CREAT|O_WRONLY), request.body(), created, headers));
 	}
 
 	if (file.isDirectory())

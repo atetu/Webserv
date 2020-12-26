@@ -36,6 +36,7 @@
 #include <cstdlib>
 #include <iostream>
 #include <map>
+#include <unistd.h>
 
 const std::string CommonGatewayInterface::ENV_AUTH_TYPE = "AUTH_TYPE";
 const std::string CommonGatewayInterface::ENV_CONTENT_LENGTH = "CONTENT_LENGTH";
