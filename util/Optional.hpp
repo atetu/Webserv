@@ -36,6 +36,12 @@ template<typename T>
 			{
 			}
 
+			Optional(const T &value) :
+					m_present(true),
+					m_value(value)
+			{
+			}
+
 			Optional(const Optional &other) :
 					m_present(other.m_present),
 					m_value(other.m_value)

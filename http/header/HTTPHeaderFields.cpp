@@ -277,6 +277,17 @@ HTTPHeaderFields::set(const std::string &key, const std::string &value)
 	return (*this);
 }
 
+const Optional<std::string>
+HTTPHeaderFields::get(const std::string &key) const
+{
+	const_iterator it = m_storage.find(key);
+
+	if (it == m_storage.end())
+		return (Optional<std::string>());
+
+	return (Optional<std::string>(it->second));
+}
+
 HTTPHeaderFields::const_iterator
 HTTPHeaderFields::begin(void) const
 {

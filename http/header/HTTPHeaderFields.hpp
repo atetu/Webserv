@@ -17,6 +17,7 @@
 #include <http/header/HTTPDate.hpp>
 #include <http/HTTP.hpp>
 #include <stddef.h>
+#include <util/Optional.hpp>
 #include <list>
 #include <map>
 #include <string>
@@ -147,6 +148,9 @@ class HTTPHeaderFields
 
 		HTTPHeaderFields&
 		set(const std::string &key, const std::string &value);
+
+		const Optional<std::string>
+		get(const std::string &key) const;
 
 		const_iterator
 		begin(void) const;
