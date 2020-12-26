@@ -3,15 +3,15 @@
 /*                                                        :::      ::::::::   */
 /*   HTTPVersion.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ecaceres <ecaceres@student.42.fr>          +#+  +:+       +#+        */
+/*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/27 16:43:16 by ecaceres          #+#    #+#             */
-/*   Updated: 2020/10/27 16:43:16 by ecaceres         ###   ########.fr       */
+/*   Updated: 2020/12/26 15:09:47 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <http/enums/HTTPVersion.hpp>
-#include <sys/sysmacros.h>
+//#include <sys/sysmacros.h>
 #include <sstream>
 
 # ifdef _SYS_SYSMACROS_H

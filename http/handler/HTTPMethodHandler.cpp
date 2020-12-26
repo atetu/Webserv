@@ -46,6 +46,12 @@ HTTPMethodHandler::string(HTTPStatus &httpStatus, const std::string &string, con
 }
 
 HTTPResponse*
+HTTPMethodHandler::filePut(HTTPStatus &httpStatus, FileDescriptor &fileDescriptor, const std::string &body, const std::string &string, const HTTPHeaderFields &headers)
+{
+	return (GenericHTTPResponse::fileAndString(httpStatus, headers, *FileDescriptorBuffer::fromAndStore(fileDescriptor, body, FileDescriptorBuffer::CLOSE | FileDescriptorBuffer::DELETE), string));
+}
+
+HTTPResponse*
 HTTPMethodHandler::error(const HTTPRequest &request, HTTPStatus &httpStatus, const HTTPHeaderFields &headers)
 {
 	(void)request; // TODO Need to handle custom error pages if necessary

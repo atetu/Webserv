@@ -6,7 +6,7 @@
 /*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/28 14:34:10 by ecaceres          #+#    #+#             */
-/*   Updated: 2020/12/25 13:47:02 by alicetetu        ###   ########.fr       */
+/*   Updated: 2020/12/26 17:16:46 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -437,14 +437,14 @@ HTTPOrchestrator::start()
 				for (iterator it = fileWriteFds.begin(); it != fileWriteFds.end(); it++)
 				{
 					int fd = it->first;
-
+					
 					if (FD_ISSET(fd, &writeFdSet))
 					{
 						FileDescriptorBuffer &buffer = *it->second;
 
 						if (buffer.write() == -1)
 						{
-//							std::cout << "fd-write :: remove(" << fd << " (" << buffer.descriptor().raw() << ")): " << ::strerror(errno) << std::endl;
+							// std::cout << "fd-write :: remove(" << fd << " (" << buffer.descriptor().raw() << ")): " << ::strerror(errno) << std::endl;
 							fdToRemove.insert(fdToRemove.end(), fd);
 						}
 					}

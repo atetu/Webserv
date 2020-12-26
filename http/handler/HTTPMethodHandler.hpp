@@ -44,6 +44,9 @@ class HTTPMethodHandler
 		string(HTTPStatus &httpStatus, const std::string &string, const HTTPHeaderFields &headers = HTTPHeaderFields());
 
 		static HTTPResponse*
+		filePut(HTTPStatus &httpStatus, FileDescriptor &fileDescriptor, const std::string &body, const std::string &string, const HTTPHeaderFields &headers);
+
+		static HTTPResponse*
 		error(const HTTPRequest &request, HTTPStatus &httpStatus, const HTTPHeaderFields &headers = HTTPHeaderFields());
 };
 

@@ -6,7 +6,7 @@
 /*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/27 16:38:46 by ecaceres          #+#    #+#             */
-/*   Updated: 2020/12/24 10:20:36 by alicetetu        ###   ########.fr       */
+/*   Updated: 2020/12/26 15:26:55 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -105,6 +105,34 @@ class GenericHTTPResponse :
 				isDone();
 		};
 
+		class FileAndStringBody :
+				public IBody
+		{
+			private:
+				FileDescriptorBuffer &m_fileDescriptorBuffer;
+				bool m_fdSent;
+				std::string m_string;
+				bool m_strSent;
+
+			public:
+				FileAndStringBody(FileDescriptorBuffer &fileBuffer, std::string string);
+
+				virtual
+				~FileAndStringBody();
+	
+				FileDescriptorBuffer&
+				fileDescriptorBuffer();
+
+				virtual bool
+				write(SocketBuffer &socketBuffer);
+				
+				bool
+				writeFd(SocketBuffer &socketBuffer);
+				
+				bool
+				isDone();
+		};
+
 	private:
 		HTTPStatusLine m_statusLine;
 		HTTPHeaderFields m_headers;
@@ -155,6 +183,9 @@ class GenericHTTPResponse :
 
 		static GenericHTTPResponse*
 		string(HTTPStatus &status, const HTTPHeaderFields &headers, const std::string &string);
+
+		static GenericHTTPResponse*
+		fileAndString(HTTPStatus &status, const HTTPHeaderFields &headers, FileDescriptorBuffer &fileBuffer, const std::string &string);
 };
 
 #endif /* GENERICHTTPRESPONSE_HPP_ */
