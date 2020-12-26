@@ -21,7 +21,7 @@ ChunkEncoder::ChunkEncoder() :
 {
 }
 
-ChunkEncoder::ChunkEncoder(std::string &input) :
+ChunkEncoder::ChunkEncoder(const std::string &input) :
 	m_input(input),
 	m_parsedData("")
 {

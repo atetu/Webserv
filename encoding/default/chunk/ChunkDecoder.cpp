@@ -26,7 +26,7 @@ ChunkDecoder::ChunkDecoder() :
 {
 }
 
-ChunkDecoder::ChunkDecoder(std::string input) :
+ChunkDecoder::ChunkDecoder(const std::string &input) :
 	m_input(input),
 	m_state(S_NOT_STARTED),
 	m_sizeNb(0),
@@ -73,7 +73,7 @@ ChunkDecoder::operator =(const ChunkDecoder &other)
 		if (endPtr == hex_intro.c_str())							\
 			throw Exception ("Hexadecimal conversion impossible"); 	\
 		m_sizeStr = "";\
-		std::cout << "nb : " << m_sizeNb << std::endl;
+//		std::cout << "nb : " << m_sizeNb << std::endl;
 	
 std::string
 ChunkDecoder::decode()

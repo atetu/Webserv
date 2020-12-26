@@ -36,7 +36,7 @@ class ChunkDecoder
 		};
 
 		ChunkDecoder();
-		ChunkDecoder(std::string input);
+		ChunkDecoder(const std::string &input);
 		ChunkDecoder(const ChunkDecoder &other);
 
 		virtual

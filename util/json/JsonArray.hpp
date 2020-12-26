@@ -120,10 +120,22 @@ class JsonArray :
 			iterator it = m_value.begin();
 			iterator ite = m_value.end();
 
-			for (; it != ite; it++)
+			for (; it != ite; it++) // TODO Use simple for-loop...
 				delete *it;
 
 			return (m_value.clear());
+		}
+
+		inline bool
+		empty() const
+		{
+			return (m_value.empty());
+		}
+
+		inline Container::size_type
+		size() const
+		{
+			return (m_value.size());
 		}
 
 		JsonValue*

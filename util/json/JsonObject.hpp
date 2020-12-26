@@ -154,6 +154,18 @@ class JsonObject :
 			return (m_value.clear());
 		}
 
+		inline bool
+		empty() const
+		{
+			return (m_value.empty());
+		}
+
+		inline Container::size_type
+		size() const
+		{
+			return (m_value.size());
+		}
+
 		JsonValue*
 		clone(void) const
 		{

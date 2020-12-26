@@ -17,6 +17,7 @@
 #include <encoding/default/base64/Base64.hpp>
 #include <exception/IOException.hpp>
 #include <http/HTTPOrchestrator.hpp>
+#include <tests/test_unit.hpp>
 #include <util/ContainerBuilder.hpp>
 #include <util/Enum.hpp>
 #include <util/Environment.hpp>
@@ -209,7 +210,12 @@ main(int argc, char **argv, char **envp)
 	try
 	{
 		signal(SIGPIPE, SIG_IGN);
+
+#if RUN_TESTS
+		exitCode = test_main(argc, argv, envp);
+#else
 		exitCode = delegated_main(argc, argv, envp);
+#endif
 	}
 	catch (std::exception &exception)
 	{

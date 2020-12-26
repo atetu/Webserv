@@ -118,6 +118,7 @@ JsonTokenizer::readString(void)
 
 	while ((c = read()) != -1)
 	{
+		// TODO Support escape
 		if (c == '"')
 			break;
 	}
