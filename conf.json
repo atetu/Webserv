@@ -10,12 +10,6 @@
 		}
 	},
 	"cgi": {
-		"php": {
-			"path": "/path/to/php"
-		},
-		"ruby": {
-			"path": "/path/to/ruby"
-		},
 		"python3": {
 			"path": "/usr/bin/python3"
 		},
@@ -37,8 +31,7 @@
 			"port": 80,
 			"host": "0.0.0.0",
 			"name": [
-				"boxplay.io",
-				"localhost"
+				"boxplay.io"
 			],
 			"default": true,
 			"maxBodySize": "1MB",
@@ -94,12 +87,6 @@
 						"index.html",
 						"index-webserv.html"
 					]
-				},
-				"~.php": {
-					"cgi": "php"
-				},
-				"~.rb": {
-					"cgi": "ruby"
 				}
 			}
 		}

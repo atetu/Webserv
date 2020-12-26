@@ -22,6 +22,7 @@
 #include <http/request/parser/HTTPRequestParser.hpp>
 #include <http/response/HTTPResponse.hpp>
 #include <http/response/HTTPStatusLine.hpp>
+#include <http/response/impl/generic/GenericHTTPResponse.hpp>
 #include <io/Socket.hpp>
 #include <net/address/InetAddress.hpp>
 #include <net/address/InetSocketAddress.hpp>
@@ -268,26 +269,41 @@ HTTPOrchestrator::start()
 
 							while (client.in().next(c))
 							{
-								client.parser().consume(c);
-
-								if (client.parser().state() == HTTPRequestParser::S_END)
+								try
 								{
-									HTTPRequestProcessor(m_configuration, m_environment).process(client);
+									client.parser().consume(c);
+								}
+								catch (Exception &exception)
+								{
+									client.response() = GenericHTTPResponse::status(*HTTPStatus::BAD_REQUEST);
+								}
 
-									if (client.response())
+								if (!client.response())
+								{
+									try
 									{
-										HTTPResponse::fdb_vector buffers;
-
-										client.response()->readFileDescriptors(buffers);
-										for (HTTPResponse::fdb_iterator it = buffers.begin(); it != buffers.end(); it++)
-											addFileDescriptorBufferRead(*(*it));
-
-										buffers.clear();
-
-										client.response()->writeFileDescriptors(buffers);
-										for (HTTPResponse::fdb_iterator it = buffers.begin(); it != buffers.end(); it++)
-											addFileDescriptorBufferWrite(*(*it));
+										if (client.parser().state() == HTTPRequestParser::S_END)
+											HTTPRequestProcessor(m_configuration, m_environment).process(client);
 									}
+									catch (Exception &exception)
+									{
+										client.response() = GenericHTTPResponse::status(*HTTPStatus::INTERNAL_SERVER_ERROR);
+									}
+								}
+
+								if (client.response())
+								{
+									HTTPResponse::fdb_vector buffers;
+
+									client.response()->readFileDescriptors(buffers);
+									for (HTTPResponse::fdb_iterator it = buffers.begin(); it != buffers.end(); it++)
+										addFileDescriptorBufferRead(*(*it));
+
+									buffers.clear();
+
+									client.response()->writeFileDescriptors(buffers);
+									for (HTTPResponse::fdb_iterator it = buffers.begin(); it != buffers.end(); it++)
+										addFileDescriptorBufferWrite(*(*it));
 
 									break;
 								}
@@ -343,7 +359,7 @@ HTTPOrchestrator::start()
 				for (iterator it = fileWriteFds.begin(); it != fileWriteFds.end(); it++)
 				{
 					int fd = it->first;
-					
+
 					if (FD_ISSET(fd, &writeFdSet))
 					{
 						FileDescriptorBuffer &buffer = *it->second;

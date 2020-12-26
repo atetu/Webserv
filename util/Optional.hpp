@@ -195,7 +195,16 @@ template<typename T>
 			static Optional<T>
 			ofEmpty(T &value)
 			{
-				if (value.empty())
+				if (!value.empty())
+					return (Optional(value));
+
+				return (Optional());
+			}
+
+			static Optional<T>
+			ofEmpty(const T &value)
+			{
+				if (!value.empty())
 					return (Optional(value));
 
 				return (Optional());

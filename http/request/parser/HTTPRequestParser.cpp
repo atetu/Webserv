@@ -13,8 +13,13 @@
 #include <encoding/default/chunk/ChunkDecoder.hpp>
 #include <exception/Exception.hpp>
 #include <http/request/parser/HTTPRequestParser.hpp>
+#include <util/Optional.hpp>
 #include <cctype>
 #include <cstdlib>
+
+#if 1
+#include <util/URL.hpp> /* Eclipse does not import it. */
+#endif
 
 # ifdef major
 #  undef major
@@ -93,12 +98,15 @@ HTTPRequestParser::consume(char c)
 			if (c == ' ')
 			{
 				if (m_state == S_NOT_STARTED)
-					throw Exception("No method: ");
+					throw Exception("No method");
 
 				m_state = S_SPACES_BEFORE_PATH;
 			}
 			else
 			{
+				if (!::isupper(c))
+					throw Exception("Method is only upper-case letter");
+
 				m_state = S_METHOD;
 				m_method += c;
 			}
@@ -130,6 +138,74 @@ HTTPRequestParser::consume(char c)
 				m_state = S_FRAGMENT;
 			else
 				m_path += c;
+
+			break;
+		}
+
+		case S_QUERY_STRING_KEY:
+		{
+			if (m_hexOn)
+				HEX_CONVERSION(c, m_queryKey)
+
+			else if (c == '=')
+				m_state = S_QUERY_STRING_VALUE;
+
+			// else if (c == '&')
+			// 	throw Exception("Query key expected");
+
+			else if (c == '%')
+				m_hexOn = true;
+
+			// else if (c == '#')
+			// 	throw Exception("Query key expected");
+
+			else if (c == '+')
+				m_queryKey += ' ';
+
+			else if (c == ' ')
+				throw Exception("Query key expected");
+
+			else
+				m_queryKey += c;
+
+			break;
+		}
+
+		case S_QUERY_STRING_VALUE:
+		{
+			if (m_hexOn)
+				HEX_CONVERSION(c, m_queryValue)
+			else if (c == '%')
+				m_hexOn = true;
+			else if (c == '&')
+				ADD_TO_QUERY_MAP(S_QUERY_STRING_KEY)
+
+			else if (c == '#')
+				ADD_TO_QUERY_MAP(S_FRAGMENT)
+
+			else if (c == ' ')
+				ADD_TO_QUERY_MAP(S_HTTP_START)
+
+			else
+				m_queryValue += c;
+
+			break;
+		}
+
+		case S_FRAGMENT:
+		{
+			if (m_hexOn)
+				HEX_CONVERSION(c, m_fragment)
+
+			else if (c == ' ')
+				m_state = S_HTTP_START;
+
+			else if (c == '%')
+				m_hexOn = true;
+
+			else
+				m_fragment += c;
+
 			break;
 		}
 
@@ -268,93 +344,14 @@ HTTPRequestParser::consume(char c)
 			break;
 		}
 
-		case S_QUERY_STRING_KEY:
-		{
-			if (m_hexOn)
-				HEX_CONVERSION(c, m_queryKey)
-
-			else if (c == '=')
-				m_state = S_QUERY_STRING_VALUE;
-
-			// else if (c == '&')
-			// 	throw Exception("Query key expected");
-
-			else if (c == '%')
-				m_hexOn = true;
-
-			// else if (c == '#')
-			// 	throw Exception("Query key expected"); 
-
-			else if (c == '+')
-				m_queryKey += ' ';
-
-			else if (c == ' ')
-				throw Exception("Query key expected");
-
-			else
-				m_queryKey += c;
-
-			break;
-		}
-
-		case S_QUERY_STRING_VALUE:
-		{
-			if (m_hexOn)
-				HEX_CONVERSION(c, m_queryValue)
-
-			// else if (c == '=')// or no exception?
-			// 	throw Exception("Query value expected");
-
-			else if (c == '%')
-				m_hexOn = true;
-
-			else if (c == '&')
-				ADD_TO_QUERY_MAP(S_QUERY_STRING_KEY)
-
-			else if (c == '#')
-				ADD_TO_QUERY_MAP(S_FRAGMENT)
-
-			else if (c == ' ')
-				ADD_TO_QUERY_MAP(S_HTTP_START)
-
-			else
-				m_queryValue += c;
-
-			break;
-		}
-
-		case S_FRAGMENT:
-		{
-			if (m_hexOn)
-				HEX_CONVERSION(c, m_fragment)
-
-			else if (c == ' ')
-				m_state = S_HTTP_START;
-
-			else if (c == '%')
-				m_hexOn = true;
-
-			else
-				m_fragment += c;
-
-			break;
-		}
-
 		case S_FIELD:
 		{
 			if (c == ' ')
-			{
-				throw Exception("Space after Field"); // not sure aboyt that to check
-			}
+				throw Exception("Space after Field");
 			else if (c == ':')
-			{
 				m_state = S_COLON;
-			}
 			else
-			{
-				m_state = S_FIELD;
 				m_field += c;
-			}
 
 			break;
 		}
@@ -364,7 +361,10 @@ HTTPRequestParser::consume(char c)
 			if (c == ' ')
 				m_state = S_SPACES_BEFORE_VALUE;
 			else
+			{
 				m_state = S_VALUE;
+				m_value += c;
+			}
 
 			break;
 		}
@@ -523,8 +523,8 @@ HTTPRequestParser::body(const std::string &storage)
 	m_body = storage;
 }
 
-std::string&
-HTTPRequestParser::body()
+const std::string&
+HTTPRequestParser::body() const
 {
 	return (m_body);
 }
@@ -555,4 +555,13 @@ HTTPRequestParser::body(std::string &storage)
 			// check with Nginx if error. RFC = content-length header SHOULD be sent...
 		}
 	}
+}
+
+URL
+HTTPRequestParser::url()
+{
+	const Optional<std::map<std::string, std::string> > queryMap = Optional<std::map<std::string, std::string> >::ofEmpty(query());
+	const Optional<std::string> fragmentStr = Optional<std::string>::ofEmpty(fragment());
+
+	return (URL("http", "locahost", 80 /* TODO */, path(), queryMap, fragmentStr));
 }

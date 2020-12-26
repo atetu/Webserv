@@ -23,7 +23,6 @@
 #include <http/header/HTTPHeaderFields.hpp>
 #include <http/HTTPClient.hpp>
 #include <http/HTTPServer.hpp>
-#include <http/mime/MimeRegistry.hpp>
 #include <http/request/HTTPRequest.hpp>
 #include <http/request/HTTPRequestProcessor.hpp>
 #include <http/request/parser/HTTPRequestParser.hpp>
@@ -41,7 +40,6 @@
 #include <util/URL.hpp>
 #include <iostream>
 #include <list>
-#include <map>
 #include <string>
 
 Logger &HTTPRequestProcessor::LOG = LoggerFactory::get("HTTP Request Processor");
@@ -105,18 +103,15 @@ HTTPRequestProcessor::process(HTTPClient &client)
 	if (method.hasBody())
 		client.parser().body(client.in().storage());
 
-	const Optional<std::map<std::string, std::string> > queryMap = Optional<std::map<std::string, std::string> >::ofEmpty(client.parser().query());
-	const Optional<std::string> fragmentStr = Optional<std::string>::ofEmpty(client.parser().fragment());
-
-	URL url = URL("http", "locahost", client.server().port(), client.parser().path(), queryMap, fragmentStr); // TODO Move to parser::getUrl()
-
 	const RootBlock &rootBlock = m_configuration.rootBlock();
 
 	const HTTPVersion &version = HTTPVersion::HTTP_1_1;
 	const HTTPHeaderFields &headerFields = client.parser().headerFields();
 	const Optional<LocationBlock const*> locationBlockOptional = Optional<LocationBlock const*>::ofNullable(locationBlockPtr);
 
-	const std::string body = client.parser().body();
+	const std::string &body = client.parser().body();
+
+	URL url = client.parser().url(); // TODO Need fix
 
 	client.request() = new HTTPRequest(method, url, version, headerFields, body, m_configuration, rootBlock, *serverBlockPtr, locationBlockOptional);
 

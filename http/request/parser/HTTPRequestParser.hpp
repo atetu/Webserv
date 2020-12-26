@@ -19,7 +19,7 @@
 #include <string>
 #include <vector>
 
-class HTTPHeaderFields;
+class URL;
 
 # ifdef major
 #  undef major
@@ -127,11 +127,14 @@ class HTTPRequestParser
 		void
 		body(const std::string &storage);
 
-		std::string&
-		body();
+		const std::string&
+		body() const;
 
 		void
 		body(std::string &storage);
+
+		URL
+		url();
 };
 
 #endif /* HTTPREQUESTPARSER_HPP_ */
