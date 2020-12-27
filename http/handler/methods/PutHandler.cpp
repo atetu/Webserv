@@ -106,7 +106,7 @@ PutHandler::handle(HTTPRequest &request)
 	{
 		try
 		{
-			file.create();
+			file.create(0666);
 		}
 		catch (Exception &exception)
 		{
@@ -118,7 +118,12 @@ PutHandler::handle(HTTPRequest &request)
 	{
 		std::string created = "Ressource created";
 		headers.contentLength(created.size());
-		return (HTTPMethodHandler::filePut(*HTTPStatus::OK, *file.open(O_CREAT|O_WRONLY), request.body(), created, headers));
+		if (request.method().name() == "POST")
+		{
+			return (HTTPMethodHandler::filePut(*HTTPStatus::OK, *file.open(O_WRONLY|O_APPEND), request.body(), created, headers));
+		}
+		else if (request.method().name() == "PUT")
+			return (HTTPMethodHandler::filePut(*HTTPStatus::OK, *file.open(O_WRONLY), request.body(), created, headers));
 	}
 
 	if (file.isDirectory())
