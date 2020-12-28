@@ -17,81 +17,39 @@
 #include <sstream>
 #include <string>
 
-class JsonNumber: public JsonValue
+class JsonNumber :
+		public JsonValue
 {
 	private:
 		long m_value;
 
 	public:
-		JsonNumber() :
-				m_value(0)
-		{
-		}
-
-		JsonNumber(long value) :
-				m_value(value)
-		{
-		}
-
-		JsonNumber(const JsonNumber &other) :
-				m_value(other.m_value)
-		{
-		}
+		JsonNumber();
+		JsonNumber(long value);
+		JsonNumber(const JsonNumber &other);
 
 		virtual
-		~JsonNumber()
-		{
-		}
+		~JsonNumber();
 
 		JsonNumber&
-		operator =(const JsonNumber &other)
-		{
-			if (this != &other)
-				m_value = other.m_value;
+		operator =(const JsonNumber &other);
 
-			return (*this);
-		}
-
-		operator int()
-		{
-			return (m_value);
-		}
-
-		operator int() const
-		{
-			return (m_value);
-		}
-
-		operator long()
-		{
-			return (m_value);
-		}
-
-		operator long() const
-		{
-			return (m_value);
-		}
+		operator int();
+		operator int() const;
+		operator long();
+		operator long() const;
 
 		JsonValue*
-		clone() const
-		{
-			return (new JsonNumber(*this));
-		}
+		clone() const;
 
 		const Type
-		type() const
-		{
-			return (TYPE_NUMBER);
-		}
+		type() const;
 
 		const std::string
-		toJsonString() const
-		{
-			std::stringstream sstream;
-			sstream << m_value;
+		toJsonString() const;
 
-			return (sstream.str());
-		}
+		bool
+		equals(const JsonValue &other) const;
 };
 
 #endif /* JSONNUMBER_HPP_ */

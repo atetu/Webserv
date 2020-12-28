@@ -71,6 +71,18 @@ class JsonArray :
 			return (*this);
 		}
 
+		JsonValue&
+		operator [](int index)
+		{
+			return (*(m_value[index]));
+		}
+
+		const JsonValue&
+		operator [](int index) const
+		{
+			return (*(m_value[index]));
+		}
+
 		operator Container(void)
 		{
 			return (m_value);
@@ -152,6 +164,28 @@ class JsonArray :
 
 		const std::string
 		toJsonString(void) const;
+
+		bool
+		equals(const JsonValue &other) const
+		{
+			const JsonArray *casted = dynamic_cast<JsonArray const*>(&other);
+			if (casted)
+			{
+				size_type size = this->size();
+				if (size != casted->size())
+					return (false);
+
+				for (size_type index = 0; index < size; index++)
+				{
+					if (this->operator [](index) != casted->operator [](index))
+						return (false);
+				}
+
+				return (true);
+			}
+
+			return (false);
+		}
 };
 
 #endif /* JSONARRAY_HPP_ */

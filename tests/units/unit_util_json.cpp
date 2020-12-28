@@ -10,11 +10,18 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <stddef.h>
 #include <tests/test_unit.hpp>
+#include <util/json/JsonArray.hpp>
+#include <util/json/JsonBoolean.hpp>
+#include <util/json/JsonDecimal.hpp>
+#include <util/json/JsonNull.hpp>
+#include <util/json/JsonNumber.hpp>
+#include <util/json/JsonObject.hpp>
 #include <util/json/JsonReader.hpp>
+#include <util/json/JsonString.hpp>
 #include <util/json/JsonValue.hpp>
 #include <util/log/LoggerFactory.hpp>
+#include <string>
 
 static Logger &LOG = LoggerFactory::get("util/json/*");
 
@@ -105,17 +112,6 @@ CASE("json", "parsing string")
 	return (0);
 }
 
-//CASE("json", "parsing string with escape")
-//{
-//	ASSERT(json("\"Hello\\\"\"").instanceOf<JsonString>());
-//
-//	ASSERT(json("\"Hello\\\"\"").cast<JsonString>()->operator std::string() == "Hello\\\"");
-//
-//	&autoDelete(NULL);
-//
-//	return (0);
-//}
-
 CASE("json", "parsing empty object")
 {
 	ASSERT(json("{}").instanceOf<JsonObject>());
@@ -136,3 +132,44 @@ CASE("json", "parsing empty array")
 	return (0);
 }
 
+CASE("json", "simple object")
+{
+	JsonObject aTemplate;
+
+	aTemplate.put("hello", new JsonString("world"));
+	ASSERT(json("{\"hello\": \"world\"}") == aTemplate);
+
+	aTemplate.put("hello", new JsonNumber(42));
+	ASSERT(json("{\"hello\": 42}") == aTemplate);
+
+	aTemplate.put("hello", new JsonBoolean(true));
+	ASSERT(json("{\"hello\": true}") == aTemplate);
+
+	aTemplate.put("another", new JsonNull());
+	ASSERT(json("{\"hello\": true, \"another\": null}") == aTemplate);
+
+	&autoDelete(NULL);
+
+	return (0);
+}
+
+CASE("json", "simple array")
+{
+	JsonArray aTemplate;
+
+	aTemplate.add(new JsonString("hello"));
+	ASSERT(json("[\"hello\"]") == aTemplate);
+
+	aTemplate.add(new JsonNumber(42));
+	ASSERT(json("[\"hello\", 42]") == aTemplate);
+
+	aTemplate.add(new JsonBoolean(true));
+	ASSERT(json("[\"hello\", 42, true]") == aTemplate);
+
+	aTemplate.add(new JsonNull());
+	ASSERT(json("[\"hello\", 42, true, null]") == aTemplate);
+
+	&autoDelete(NULL);
+
+	return (0);
+}

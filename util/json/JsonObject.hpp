@@ -14,172 +14,86 @@
 # define JSONOBJECT_HPP_
 
 #include <util/json/JsonStructure.hpp>
-#include <util/json/JsonValue.hpp>
 #include <map>
 #include <string>
-#include <utility>
 
 class JsonObject :
 		public JsonStructure
 {
 	public:
 		typedef std::map<std::string, JsonValue*> Container;
-		typedef typename Container::size_type size_type;
-		typedef typename Container::iterator iterator;
-		typedef typename Container::const_iterator const_iterator;
+		typedef Container::size_type size_type;
+		typedef Container::iterator iterator;
+		typedef Container::const_iterator const_iterator;
 
 	private:
 		Container m_value;
 
 	public:
-		JsonObject(void) :
-				m_value()
-		{
-		}
-
-		JsonObject(Container value) :
-				m_value(value)
-		{
-		}
-
-		JsonObject(const JsonObject &other) :
-				m_value()
-		{
-			operator =(other);
-		}
+		JsonObject(void);
+		JsonObject(Container value);
+		JsonObject(const JsonObject &other);
 
 		virtual
-		~JsonObject(void)
-		{
-			clear();
-		}
+		~JsonObject(void);
 
 		JsonObject&
-		operator =(const JsonObject &other)
-		{
-			if (this != &other)
-			{
-				const_iterator it = other.m_value.begin();
-				const_iterator ite = other.m_value.end();
+		operator =(const JsonObject &other);
 
-				clear();
+		operator Container(void);
 
-				for (; it != ite; it++)
-					m_value.insert(m_value.end(), std::make_pair(it->first, it->second->clone()));
-			}
-
-			return (*this);
-		}
-
-		operator Container(void)
-		{
-			return (m_value);
-		}
-
-		operator Container(void) const
-		{
-			return (m_value);
-		}
+		operator Container(void) const;
 
 		void
-		put(const std::string &name, JsonValue *value)
-		{
-			m_value.insert(m_value.end(), std::make_pair(name, value));
-		}
+		put(const std::string &name, JsonValue *value);
 
 		bool
-		has(const std::string &name) const
-		{
-			return (m_value.find(name) != m_value.end());
-		}
+		has(const std::string &name) const;
 
 		JsonValue*
-		get(const std::string &name)
-		{
-			const_iterator it = m_value.find(name);
-
-			if (it == m_value.end())
-				return (NULL);
-
-			return (it->second);
-		}
+		get(const std::string &name);
 
 		const JsonValue*
-		get(const std::string &name) const
-		{
-			const_iterator it = m_value.find(name);
+		get(const std::string &name) const;
 
-			if (it == m_value.end())
-				return (NULL);
+		iterator
+		begin();
 
-			return (it->second);
-		}
+		iterator
+		end();
 
-		inline iterator
-		begin()
-		{
-			return (m_value.begin());
-		}
+		const_iterator
+		begin() const;
 
-		inline iterator
-		end()
-		{
-			return (m_value.end());
-		}
+		const_iterator
+		end() const;
 
-		inline const_iterator
-		begin() const
-		{
-			return (m_value.begin());
-		}
+		iterator
+		find(const std::string &key);
 
-		inline const_iterator
-		end() const
-		{
-			return (m_value.end());
-		}
+		const_iterator
+		find(const std::string &key) const;
 
-		virtual void
-		clear(void)
-		{
-			if (m_value.empty())
-				return;
+		void
+		clear(void);
 
-			iterator it = m_value.begin();
-			iterator ite = m_value.end();
+		bool
+		empty() const;
 
-			for (; it != ite; it++)
-				delete it->second;
-
-			return (m_value.clear());
-		}
-
-		inline bool
-		empty() const
-		{
-			return (m_value.empty());
-		}
-
-		inline Container::size_type
-		size() const
-		{
-			return (m_value.size());
-		}
+		Container::size_type
+		size() const;
 
 		JsonValue*
-		clone(void) const
-		{
-			return (new JsonObject(*this));
-		}
+		clone(void) const;
 
 		const Type
-		type(void) const
-		{
-			return (TYPE_OBJECT);
-		}
+		type(void) const;
 
 		const std::string
 		toJsonString(void) const;
+
+		bool
+		equals(const JsonValue &other) const;
 };
 
 #endif /* JSONOBJECT_HPP_ */

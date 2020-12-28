@@ -83,6 +83,16 @@ class JsonBoolean :
 		{
 			return (m_value ? TRUE : FALSE);
 		}
+
+		bool
+		equals(const JsonValue &other) const
+		{
+			const JsonBoolean *casted = dynamic_cast<JsonBoolean const*>(&other);
+			if (casted)
+				return (m_value == casted->m_value);
+
+			return (false);
+		}
 };
 
 #endif /* JSONBOOLEAN_HPP_ */

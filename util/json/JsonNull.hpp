@@ -16,51 +16,33 @@
 #include <util/json/JsonValue.hpp>
 #include <string>
 
-class JsonNull: public JsonValue
+class JsonNull :
+		public JsonValue
 {
 	public:
 		static const std::string STRING;
 
 	public:
-		JsonNull()
-		{
-		}
-
-		JsonNull(const JsonNull &other)
-		{
-			(void)other;
-		}
+		JsonNull();
+		JsonNull(const JsonNull &other);
 
 		virtual
-		~JsonNull()
-		{
-		}
+		~JsonNull();
 
 		JsonNull&
-		operator =(const JsonNull &other)
-		{
-			(void)other;
-
-			return (*this);
-		}
+		operator =(const JsonNull &other);
 
 		JsonValue*
-		clone() const
-		{
-			return (new JsonNull(*this));
-		}
+		clone() const;
 
 		const Type
-		type() const
-		{
-			return (TYPE_NULL);
-		}
+		type() const;
 
 		const std::string
-		toJsonString() const
-		{
-			return (STRING);
-		}
+		toJsonString() const;
+
+		bool
+		equals(const JsonValue &other) const;
 };
 
 #endif /* JSONNULL_HPP_ */

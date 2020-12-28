@@ -44,28 +44,28 @@ class JsonValue
 		type() const = 0;
 
 		const std::string&
-		typeString() const
-		{
-			return (typeStringStorage()[type()]);
-		}
-
-		static const std::string*
-		typeStringStorage()
-		{
-			static std::string strings[TYPE__SIZE] = {
-				[TYPE_ARRAY] = "ARRAY",
-				[TYPE_OBJECT] = "OBJECT",
-				[TYPE_STRING] = "STRING",
-				[TYPE_NUMBER] = "NUMBER",
-				[TYPE_DECIMAL] = "DECIMAL",
-				[TYPE_BOOLEAN] = "BOOLEAN",
-				[TYPE_NULL] = "NULL" };
-
-			return ((std::string*)strings);
-		}
+		typeString() const;
 
 		virtual const std::string
 		toJsonString() const = 0;
+
+		virtual bool
+		equals(const JsonValue &other) const = 0;
+
+		inline bool
+		operator==(const JsonValue &other) const
+		{
+			if (type() != other.type())
+				return (false);
+
+			return (equals(other));
+		}
+
+		inline bool
+		operator!=(const JsonValue &other) const
+		{
+			return (!operator==(other));
+		}
 
 		template<typename T>
 			inline bool
@@ -87,6 +87,10 @@ class JsonValue
 			{
 				return (dynamic_cast<const T*>(this));
 			}
+
+	public:
+		static const std::string*
+		typeStringStorage();
 };
 
 template<typename T>

@@ -20,9 +20,7 @@ class JsonStructure :
 {
 	public:
 		virtual
-		~JsonStructure(void)
-		{
-		}
+		~JsonStructure(void);
 
 		virtual void
 		clear(void) = 0;

@@ -106,6 +106,16 @@ class JsonDecimal :
 
 			return (sstream.str());
 		}
+
+		bool
+		equals(const JsonValue &other) const
+		{
+			const JsonDecimal *casted = dynamic_cast<JsonDecimal const*>(&other);
+			if (casted)
+				return (m_value == casted->m_value);
+
+			return (false);
+		}
 };
 
 #endif /* JSONDECIMAL_HPP_ */

@@ -77,8 +77,15 @@ JsonParseException::expectedChar(char got, char expected, const JsonLocation &lo
 	std::stringstream sstream;
 
 	sstream << "Unexpected character `";
-	sstream << got;
-	sstream << "` at ";
+
+	if (got == -1)
+		sstream << "EOF";
+	else if (got)
+		sstream << got;
+	else
+		sstream << "\\0";
+
+	sstream << "` (" << ((int)got) << ")` at ";
 	sstream << location;
 	sstream << ", expected `";
 	sstream << expected;

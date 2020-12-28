@@ -24,67 +24,31 @@ class JsonString :
 		std::string m_value;
 
 	public:
-		JsonString() :
-				m_value()
-		{
-		}
-
-		JsonString(const char *value) :
-				m_value(value)
-		{
-		}
-
-		JsonString(const std::string &value) :
-				m_value(value)
-		{
-		}
-
-		JsonString(const JsonString &other) :
-				m_value(other.m_value)
-		{
-		}
+		JsonString();
+		JsonString(const char *value);
+		JsonString(const std::string &value);
+		JsonString(const JsonString &other);
 
 		virtual
-		~JsonString()
-		{
-		}
+		~JsonString();
 
 		JsonString&
-		operator =(const JsonString &other)
-		{
-			if (this != &other)
-				m_value = other.m_value;
+		operator =(const JsonString &other);
 
-			return (*this);
-		}
-
-		operator std::string()
-		{
-			return (m_value);
-		}
-
-		operator std::string() const
-		{
-			return (m_value);
-		}
+		operator std::string();
+		operator std::string() const;
 
 		JsonValue*
-		clone() const
-		{
-			return (new JsonString(*this));
-		}
+		clone() const;
 
 		const Type
-		type() const
-		{
-			return (TYPE_STRING);
-		}
+		type() const;
 
 		const std::string
-		toJsonString() const
-		{
-			return (JsonUtils::escapeString(m_value));
-		}
+		toJsonString() const;
+
+		bool
+		equals(const JsonValue &other) const;
 };
 
 #endif /* JSONSTRING_HPP_ */
