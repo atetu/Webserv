@@ -30,6 +30,7 @@ class File
 	public:
 		File();
 		File(std::string path);
+		File(const File &parent, std::string path);
 		File(const File &other);
 
 		virtual
@@ -64,10 +65,13 @@ class File
 		isDirectory() const;
 
 		bool
-		create(mode_t mode = 0666) const;
+		createNewFile(mode_t mode = 0666) const;
 
 		FileDescriptor*
-		open(int flags, mode_t mode = 0);
+		open(int flags, mode_t mode = 0) const;
+
+		void
+		remove(void) const;
 
 		size_t
 		length() const;
@@ -79,7 +83,7 @@ class File
 		absolute() const;
 
 		inline const std::string&
-		path()
+		path() const
 		{
 			return (m_path);
 		}

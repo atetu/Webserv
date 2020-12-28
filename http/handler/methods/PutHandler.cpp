@@ -106,7 +106,7 @@ PutHandler::handle(HTTPRequest &request)
 	{
 		try
 		{
-			file.create(0666);
+			file.createNewFile(0666);
 		}
 		catch (Exception &exception)
 		{

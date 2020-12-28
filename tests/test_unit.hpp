@@ -47,7 +47,29 @@
 # define ASSERT(cond) \
 	if (!(cond)) \
 	{ \
-		LOG.fatal() << __FILE__ << ":" << __LINE__ << " -- " << #cond << std::endl; \
+		LOG.fatal() << "ASSERT() " << __FILE__ << ":" << __LINE__ << " -- " << #cond << std::endl; \
+		return (1); \
+	}
+
+# define ASSERT_EXCEPT(code) \
+	try \
+	{ \
+		code; \
+		LOG.fatal() << "ASSERT_EXCEPT() " << __FILE__ << ":" << __LINE__ << " -- " << #code << std::endl; \
+		return (1); \
+	} \
+	catch (...) \
+	{ \
+	}
+
+# define ASSERT_NO_EXCEPT(code) \
+	try \
+	{ \
+		code;\
+	} \
+	catch (std::exception &exception) \
+	{ \
+		LOG.fatal() << "ASSERT_NO_EXCEPT() " << __FILE__ << ":" << __LINE__ << " -- " << #code << " -- " << exception.what() << std::endl; \
 		return (1); \
 	}
 

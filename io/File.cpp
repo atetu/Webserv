@@ -17,7 +17,7 @@
 #include <sys/fcntl.h>
 #include <sys/stat.h>
 #include <sys/unistd.h>
-#include <unistd.h>
+#include <cstdio>
 
 File::File() :
 		m_path()
@@ -26,6 +26,11 @@ File::File() :
 
 File::File(std::string path) :
 		m_path(path)
+{
+}
+
+File::File(const File &parent, std::string path) :
+		m_path(parent.path() + "/" + path)
 {
 }
 
@@ -86,7 +91,7 @@ File::isDirectory() const
 }
 
 bool
-File::create(mode_t mode) const
+File::createNewFile(mode_t mode) const
 {
 	int fd;
 	if ((fd = ::open(m_path.c_str(), O_CREAT, mode)) == -1)
@@ -120,13 +125,20 @@ File::name() const
 }
 
 FileDescriptor*
-File::open(int flags, mode_t mode)
+File::open(int flags, mode_t mode) const
 {
 	int fd;
 	if ((fd = ::open(m_path.c_str(), flags, mode)) == -1)
 		throw ioException();
 
 	return (FileDescriptor::wrap(fd));
+}
+
+void
+File::remove(void) const
+{
+	if (::remove(m_path.c_str()) == -1)
+		throw ioException();
 }
 
 File
