@@ -25,13 +25,13 @@ class IWritableBuffer :
 		{
 		}
 
-		virtual void
+		virtual IWritableBuffer&
 		store(char c) = 0;
 
-		virtual void
+		virtual IWritableBuffer&
 		store(const std::string &str) = 0;
 
-		virtual void
+		virtual IWritableBuffer&
 		store(const void *buffer, size_t len) = 0;
 
 		virtual size_t

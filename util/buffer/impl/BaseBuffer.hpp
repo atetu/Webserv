@@ -37,22 +37,22 @@ class BaseBuffer :
 
 	public:
 		BaseBuffer();
-		BaseBuffer(size_type maxSize = std::string::npos);
+		BaseBuffer(size_type maxSize);
 		BaseBuffer(const std::string &storage, size_type maxSize = std::string::npos);
 
 		virtual
 		~BaseBuffer();
 
-		void
+		BaseBuffer&
 		store(char c);
 
-		void
+		BaseBuffer&
 		store(const std::string &str);
 
-		void
+		BaseBuffer&
 		store(const void *buffer, size_t len);
 
-		void
+		BaseBuffer&
 		store(BaseBuffer &buffer, bool andClear = true);
 
 		bool

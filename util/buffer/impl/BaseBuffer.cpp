@@ -36,19 +36,23 @@ BaseBuffer::~BaseBuffer()
 {
 }
 
-void
+BaseBuffer&
 BaseBuffer::store(char c)
 {
 	m_storage += c;
+
+	return (*this);
 }
 
-void
+BaseBuffer&
 BaseBuffer::store(const std::string &str)
 {
 	m_storage += str;
+
+	return (*this);
 }
 
-void
+BaseBuffer&
 BaseBuffer::store(BaseBuffer &buffer, bool andClear)
 {
 	size_type capacity = std::min(this->capacity(), buffer.capacity());
@@ -62,12 +66,16 @@ BaseBuffer::store(BaseBuffer &buffer, bool andClear)
 
 	if (andClear)
 		buffer.clear();
+
+	return (*this);
 }
 
-void
+BaseBuffer&
 BaseBuffer::store(const void *buffer, size_t len)
 {
 	m_storage += std::string(static_cast<const char*>(buffer), len);
+
+	return (*this);
 }
 
 bool
