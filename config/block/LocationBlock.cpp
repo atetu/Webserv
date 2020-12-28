@@ -11,6 +11,7 @@
 /* ************************************************************************** */
 
 #include <config/block/LocationBlock.hpp>
+#include <algorithm>
 
 LocationBlock LocationBlock::DEFAULT;
 
@@ -112,6 +113,14 @@ LocationBlock&
 LocationBlock::cgi(const std::string &cgi)
 {
 	m_cgi.set(cgi);
+
+	return (*this);
+}
+
+LocationBlock&
+LocationBlock::auth(const AuthBlock &auth)
+{
+	m_auth.set(&auth);
 
 	return (*this);
 }

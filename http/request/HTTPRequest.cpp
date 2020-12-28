@@ -26,7 +26,8 @@ HTTPRequest::HTTPRequest(const HTTPMethod &method, const URL &url, const HTTPVer
 		m_configuration(configuration),
 		m_rootBlock(rootBlock),
 		m_serverBlock(serverBlock),
-		m_locationBlock(locationBlock)
+		m_locationBlock(locationBlock),
+		m_authorization(NULL)
 {
 }
 
@@ -52,6 +53,21 @@ HTTPRequest::root(void) const
 		return (m_rootBlock.root().get());
 
 	return ("./");
+}
+
+bool
+HTTPRequest::needAuth() const
+{
+	return (m_serverBlock.auth().present() || (m_locationBlock.present() && m_locationBlock.get()->auth().present()));
+}
+
+const AuthBlock*
+HTTPRequest::auth() const
+{
+	if (m_locationBlock.present() && m_locationBlock.get()->auth().present())
+		return (m_locationBlock.get()->auth().get());
+
+	return (m_serverBlock.auth().get());
 }
 
 std::string

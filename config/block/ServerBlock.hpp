@@ -38,6 +38,7 @@ class ServerBlock
 		Optional<std::list<std::string> > m_methods;
 		Optional<bool> m_listing;
 		Optional<std::list<std::string> > m_indexFiles;
+		Optional<AuthBlock const*> m_auth;
 
 	public:
 		ServerBlock();
@@ -81,6 +82,9 @@ class ServerBlock
 
 		ServerBlock&
 		index(const std::list<std::string> &files);
+
+		ServerBlock&
+		auth(const AuthBlock &auth);
 
 		inline const Optional<int>
 		port(void) const
@@ -146,6 +150,12 @@ class ServerBlock
 		index(void) const
 		{
 			return (m_indexFiles);
+		}
+
+		inline const Optional<AuthBlock const*>&
+		auth(void) const
+		{
+			return (m_auth);
 		}
 
 		bool

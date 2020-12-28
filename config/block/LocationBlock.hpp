@@ -13,8 +13,8 @@
 #ifndef LOCATIONBLOCK_HPP_
 # define LOCATIONBLOCK_HPP_
 
+#include <config/block/AuthBlock.hpp>
 #include <util/Optional.hpp>
-#include <algorithm>
 #include <list>
 #include <string>
 
@@ -28,6 +28,7 @@ class LocationBlock
 		Optional<bool> m_listing;
 		Optional<std::list<std::string> > m_indexFiles;
 		Optional<std::string> m_cgi;
+		Optional<AuthBlock const*> m_auth;
 
 	public:
 		LocationBlock(void);
@@ -57,6 +58,9 @@ class LocationBlock
 
 		LocationBlock&
 		cgi(const std::string &cgi);
+
+		LocationBlock&
+		auth(const AuthBlock &auth);
 
 		inline const std::string&
 		path(void) const
@@ -98,6 +102,12 @@ class LocationBlock
 		cgi(void) const
 		{
 			return (m_cgi);
+		}
+
+		inline const Optional<AuthBlock const*>&
+		auth(void) const
+		{
+			return (m_auth);
 		}
 
 		bool

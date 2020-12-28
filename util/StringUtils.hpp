@@ -35,6 +35,9 @@ class StringUtils
 
 		static std::string
 		replace(const std::string &in, char c, char to);
+
+		static bool
+		equalsIgnoreCase(const std::string &a, const std::string &b);
 };
 
 #endif /* STRINGUTILS_HPP_ */

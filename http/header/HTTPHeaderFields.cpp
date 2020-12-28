@@ -252,9 +252,24 @@ HTTPHeaderFields::userAgent(const std::string &value)
 }
 
 HTTPHeaderFields&
-HTTPHeaderFields::wwwAuthenticate(const std::string &value)
+HTTPHeaderFields::wwwAuthenticate(const std::string &type)
 {
-	return (set(WWW_AUTHENTICATE, value));
+	return (set(WWW_AUTHENTICATE, type));
+}
+
+HTTPHeaderFields&
+HTTPHeaderFields::wwwAuthenticate(const std::string &type, const std::string &realm)
+{
+	return (set(WWW_AUTHENTICATE, type + " realm=\"" + realm + "\""));
+}
+
+HTTPHeaderFields&
+HTTPHeaderFields::wwwAuthenticate(const std::string &type, const Optional<std::string> realm)
+{
+	if (realm.present())
+		return (wwwAuthenticate(type, realm.get()));
+
+	return (wwwAuthenticate(type));
 }
 
 HTTPHeaderFields&
@@ -311,6 +326,12 @@ HTTPHeaderFields::format(const std::string &separator) const
 		str += it->first + dotAndASpace + it->second + separator;
 
 	return (str);
+}
+
+bool
+HTTPHeaderFields::empty(void)
+{
+	return (m_storage.empty());
 }
 
 std::map<std::string, std::string>&

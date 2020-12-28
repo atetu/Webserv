@@ -10,6 +10,8 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+#include <config/block/auth/BasicAuthBlock.hpp>
+#include <config/block/auth/BearerAuthBlock.hpp>
 #include <config/block/container/CustomErrorMap.hpp>
 #include <config/block/CGIBlock.hpp>
 #include <config/block/LocationBlock.hpp>
@@ -378,6 +380,14 @@ Configuration::JsonBuilder::buildServerBlock(const std::string &path, const Json
 
 			serverBlock->index(JsonBinderHelper::buildCollection<JsonString, std::string>(ipath, array));
 		}
+
+		if (jsonObject.has(KEY_SERVER_AUTH))
+		{
+			std::string ipath = path + KEY_DOT KEY_SERVER_AUTH;
+			const JsonObject &object = JsonBinderHelper::jsonCast<JsonObject>(ipath, jsonObject.get(KEY_SERVER_AUTH));
+
+			serverBlock->auth(*buildAuthBlock(ipath, object));
+		}
 	}
 	catch (...)
 	{
@@ -415,6 +425,14 @@ Configuration::JsonBuilder::buildLocationBlock(const std::string &path, const st
 
 			locationBlock->index(JsonBinderHelper::buildCollection<JsonString, std::string>(ipath, array));
 		}
+
+		if (jsonObject.has(KEY_LOCATION_AUTH))
+		{
+			std::string ipath = path + KEY_DOT KEY_LOCATION_AUTH;
+			const JsonObject &object = JsonBinderHelper::jsonCast<JsonObject>(ipath, jsonObject.get(KEY_LOCATION_AUTH));
+
+			locationBlock->auth(*buildAuthBlock(ipath, object));
+		}
 	}
 	catch (...)
 	{
@@ -423,6 +441,61 @@ Configuration::JsonBuilder::buildLocationBlock(const std::string &path, const st
 	}
 
 	return (locationBlock);
+}
+
+AuthBlock*
+Configuration::JsonBuilder::buildAuthBlock(const std::string &path, const JsonObject &jsonObject)
+{
+	AuthBlock *authBlock = NULL;
+
+	try
+	{
+		std::string ipath = path + KEY_DOT KEY_AUTH_TYPE;
+
+		if (!jsonObject.has(KEY_AUTH_TYPE))
+			throw ConfigurationBindException("auth require a type (" + ipath + ")");
+
+		std::string type = JsonBinderHelper::jsonCast<JsonString>(ipath, jsonObject.get(KEY_AUTH_TYPE));
+
+		if (type == BasicAuthBlock::TYPE)
+		{
+			ipath = path + KEY_DOT KEY_AUTH_BASIC_USER;
+
+			if (!jsonObject.has(KEY_AUTH_BASIC_USER))
+				throw ConfigurationBindException("`basic` authentication require a user (" + ipath + ")");
+
+			std::string user = JsonBinderHelper::jsonCast<JsonString>(ipath, jsonObject.get(KEY_AUTH_BASIC_USER));
+
+			BasicAuthBlock *basicAuthBlock = new BasicAuthBlock(user);
+			authBlock = basicAuthBlock;
+
+			BIND(jsonObject, KEY_AUTH_BASIC_PASSWORD, JsonString, std::string, basicAuthBlock, password);
+		}
+		else if (type == BearerAuthBlock::TYPE)
+		{
+			ipath = path + KEY_DOT KEY_AUTH_BEARER_TOKEN;
+
+			if (!jsonObject.has(KEY_AUTH_BEARER_TOKEN))
+				throw ConfigurationBindException("`bearer` authentication require a token (" + ipath + ")");
+
+			std::string token = JsonBinderHelper::jsonCast<JsonString>(ipath, jsonObject.get(KEY_AUTH_BEARER_TOKEN));
+
+			authBlock = new BearerAuthBlock(token);
+		}
+		else
+			throw ConfigurationBindException("only `basic` or `bearer` authentication supported (" + ipath + ")");
+
+		BIND(jsonObject, KEY_AUTH_REALM, JsonString, std::string, authBlock, realm);
+	}
+	catch (...)
+	{
+		if (authBlock)
+			delete authBlock;
+
+		throw;
+	}
+
+	return (authBlock);
 }
 
 CustomErrorMap

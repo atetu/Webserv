@@ -138,7 +138,13 @@ class HTTPHeaderFields
 		userAgent(const std::string &value);
 
 		HTTPHeaderFields&
-		wwwAuthenticate(const std::string &value);
+		wwwAuthenticate(const std::string &type);
+
+		HTTPHeaderFields&
+		wwwAuthenticate(const std::string &type, const std::string &realm);
+
+		HTTPHeaderFields&
+		wwwAuthenticate(const std::string &type, const Optional<std::string> realm);
 
 		HTTPHeaderFields&
 		html(void);
@@ -160,6 +166,9 @@ class HTTPHeaderFields
 
 		std::string
 		format(const std::string &seperator = HTTP::CRLF) const;
+
+		bool
+		empty(void);
 
 		map&
 		storage(void);

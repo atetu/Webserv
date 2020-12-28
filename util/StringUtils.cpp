@@ -60,3 +60,17 @@ StringUtils::replace(const std::string &in, char c, char to)
 
 	return (out);
 }
+
+bool
+StringUtils::equalsIgnoreCase(const std::string &a, const std::string &b)
+{
+	std::string::size_type size = a.size();
+	if (b.size() != size)
+		return (false);
+
+	for (std::string::size_type index = 0; index < size; ++index)
+		if (tolower(a[index]) != tolower(b[index]))
+			return (false);
+
+	return (true);
+}

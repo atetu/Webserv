@@ -30,7 +30,7 @@ class HTTPMethodHandler
 		virtual HTTPResponse*
 		handle(HTTPRequest &request) = 0;
 
-	protected:
+	public:
 		static HTTPResponse*
 		status(HTTPStatus &status, const HTTPHeaderFields &headers = HTTPHeaderFields());
 

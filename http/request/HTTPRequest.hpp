@@ -14,12 +14,13 @@
 # define HTTPREQUEST_HPP_
 
 #include <config/block/LocationBlock.hpp>
-#include <http/enums/HTTPMethod.hpp>
 #include <http/enums/HTTPVersion.hpp>
 #include <http/header/HTTPHeaderFields.hpp>
 #include <util/Optional.hpp>
 #include <util/URL.hpp>
 #include <string>
+
+class Authorization;
 
 class Configuration;
 class RootBlock;
@@ -37,6 +38,7 @@ class HTTPRequest
 		const RootBlock &m_rootBlock;
 		const ServerBlock &m_serverBlock;
 		const Optional<LocationBlock const*> &m_locationBlock;
+		Authorization *m_authorization;
 
 	private:
 		HTTPRequest(void);
@@ -101,6 +103,12 @@ class HTTPRequest
 
 		std::string
 		root(void) const;
+
+		bool
+		needAuth() const;
+
+		const AuthBlock*
+		auth() const;
 
 		std::string
 		getLocation();

@@ -43,12 +43,19 @@
 #define KEY_SERVER_METHODS "methods"
 #define KEY_SERVER_LISTING "listing"
 #define KEY_SERVER_INDEX_FILES "index"
+#define KEY_SERVER_AUTH "auth"
 #define KEY_LOCATION_METHODS "methods"
 #define KEY_LOCATION_ALIAS "alias"
 #define KEY_LOCATION_ROOT "root"
 #define KEY_LOCATION_LISTING "listing"
 #define KEY_LOCATION_INDEX_FILES "index"
 #define KEY_LOCATION_CGI "cgi"
+#define KEY_LOCATION_AUTH "auth"
+#define KEY_AUTH_TYPE "type"
+#define KEY_AUTH_REALM "realm"
+#define KEY_AUTH_BASIC_USER "user"
+#define KEY_AUTH_BASIC_PASSWORD "password"
+#define KEY_AUTH_BEARER_TOKEN "token"
 
 class Configuration
 {
@@ -114,6 +121,9 @@ class Configuration
 
 				static LocationBlock*
 				buildLocationBlock(const std::string &path, const std::string &key, const JsonObject &jsonObject);
+
+				static AuthBlock*
+				buildAuthBlock(const std::string &path, const JsonObject &jsonObject);
 
 				static CustomErrorMap
 				buildCustomErrorMap(const std::string &path, const JsonObject &jsonObject);

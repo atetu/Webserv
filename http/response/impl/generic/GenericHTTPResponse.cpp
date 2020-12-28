@@ -10,11 +10,13 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+#include <http/enums/HTTPStatus.hpp>
 #include <http/HTTP.hpp>
 #include <http/response/impl/generic/GenericHTTPResponse.hpp>
 #include <util/buffer/impl/FileDescriptorBuffer.hpp>
 #include <util/buffer/impl/SocketBuffer.hpp>
-#include <sstream>
+#include <iostream>
+#include <vector>
 
 GenericHTTPResponse::IBody::~IBody()
 {
@@ -118,7 +120,7 @@ GenericHTTPResponse::FileAndStringBody::writeFd(SocketBuffer &socketBuffer)
 bool
 GenericHTTPResponse::FileAndStringBody::isDone(void)
 {
-	return (m_strSent);// a revoir
+	return (m_strSent); // a revoir
 }
 
 GenericHTTPResponse::GenericHTTPResponse(const HTTPStatusLine statusLine, const HTTPHeaderFields &headers, IBody *body) :
@@ -159,8 +161,11 @@ GenericHTTPResponse::write(SocketBuffer &socketBuffer)
 			break;
 
 		case HEADERS:
-			socketBuffer.store(m_headers.format());
-			socketBuffer.store(HTTP::CRLF);
+			if (!m_headers.empty())
+			{
+				socketBuffer.store(m_headers.format());
+				socketBuffer.store(HTTP::CRLF);
+			}
 
 			if (m_body)
 				m_state = BODY;
@@ -202,7 +207,6 @@ GenericHTTPResponse::writeFileDescriptors(fdb_vector &out)
 	FileAndStringBody *fileAndStringBody = dynamic_cast<FileAndStringBody*>(m_body);
 	if (fileAndStringBody)
 		out.push_back(&fileAndStringBody->fileDescriptorBuffer());
-//	(void)out;
 }
 
 GenericHTTPResponse::State
@@ -214,7 +218,7 @@ GenericHTTPResponse::state() const
 GenericHTTPResponse*
 GenericHTTPResponse::status(HTTPStatus &status, const HTTPHeaderFields &headers)
 {
-	return (new GenericHTTPResponse(HTTPStatusLine(HTTPVersion::HTTP_1_1, status), headers, NULL));
+	return (new GenericHTTPResponse(HTTPStatusLine(status), headers, NULL));
 }
 
 GenericHTTPResponse*
@@ -226,7 +230,7 @@ GenericHTTPResponse::file(HTTPStatus &status, const HTTPHeaderFields &headers, F
 GenericHTTPResponse*
 GenericHTTPResponse::string(HTTPStatus &status, const HTTPHeaderFields &headers, const std::string &string)
 {
-	return (new GenericHTTPResponse(HTTPStatusLine(*HTTPStatus::OK), headers, new GenericHTTPResponse::StringBody(string)));
+	return (new GenericHTTPResponse(HTTPStatusLine(status), headers, new GenericHTTPResponse::StringBody(string)));
 }
 
 GenericHTTPResponse*

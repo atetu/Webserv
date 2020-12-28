@@ -10,6 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+#include <config/block/AuthBlock.hpp>
 #include <config/block/LocationBlock.hpp>
 #include <config/block/RootBlock.hpp>
 #include <config/block/ServerBlock.hpp>
@@ -30,6 +31,7 @@
 #include <http/response/impl/cgi/CGIHTTPResponse.hpp>
 #include <http/response/impl/generic/GenericHTTPResponse.hpp>
 #include <http/route/HTTPFindLocation.hpp>
+#include <stddef.h>
 #include <util/buffer/impl/BaseBuffer.hpp>
 #include <util/buffer/impl/SocketBuffer.hpp>
 #include <util/Enum.hpp>
@@ -37,6 +39,7 @@
 #include <util/log/Logger.hpp>
 #include <util/log/LoggerFactory.hpp>
 #include <util/Optional.hpp>
+#include <util/StringUtils.hpp>
 #include <util/URL.hpp>
 #include <iostream>
 #include <list>
@@ -60,14 +63,14 @@ HTTPRequestProcessor::process(HTTPClient &client)
 	const ServerBlock *serverBlockPtr = findServerBlock(client);
 	if (!serverBlockPtr)
 	{
-		client.response() = GenericHTTPResponse::status(*HTTPStatus::NOT_FOUND);
+		client.response() = HTTPMethodHandler::error(*client.request(), *HTTPStatus::NOT_FOUND);
 		return;
 	}
 
 	const HTTPMethod *methodPtr = HTTPMethod::find(client.parser().method());
 	if (!methodPtr)
 	{
-		client.response() = GenericHTTPResponse::status(*HTTPStatus::METHOD_NOT_ALLOWED);
+		client.response() = HTTPMethodHandler::error(*client.request(), *HTTPStatus::METHOD_NOT_ALLOWED);
 		return;
 	}
 
@@ -76,7 +79,7 @@ HTTPRequestProcessor::process(HTTPClient &client)
 
 	if (serverBlock.methods().present() && !serverBlock.hasMethod(method.name()))
 	{
-		client.response() = GenericHTTPResponse::status(*HTTPStatus::METHOD_NOT_ALLOWED);
+		client.response() = HTTPMethodHandler::error(*client.request(), *HTTPStatus::METHOD_NOT_ALLOWED);
 		return;
 	}
 
@@ -95,7 +98,7 @@ HTTPRequestProcessor::process(HTTPClient &client)
 
 		if (locationBlock.methods().present() && !locationBlock.hasMethod(method.name()))
 		{
-			client.response() = GenericHTTPResponse::status(*HTTPStatus::METHOD_NOT_ALLOWED);
+			client.response() = HTTPMethodHandler::error(*client.request(), *HTTPStatus::METHOD_NOT_ALLOWED);
 			return;
 		}
 	}
@@ -115,6 +118,36 @@ HTTPRequestProcessor::process(HTTPClient &client)
 
 	client.request() = new HTTPRequest(method, url, version, headerFields, body, m_configuration, rootBlock, *serverBlockPtr, locationBlockOptional);
 
+	if (client.request()->needAuth()) // TODO Need to be moved
+	{
+		const AuthBlock *authBlock = client.request()->auth();
+
+		Optional<std::string> authorizationOptional = client.request()->headers().get(HTTPHeaderFields::AUTHORIZATION);
+
+		bool authorized = false;
+
+		if (authorizationOptional.present())
+		{
+			const std::string &authorization = authorizationOptional.get();
+
+			size_t pos = authorization.find(' ');
+			if (pos != std::string::npos)
+			{
+				std::string type = authorization.substr(0, pos);
+				std::string credentials = authorization.substr(pos + 1);
+
+				if (StringUtils::equalsIgnoreCase(authBlock->type(), type) && authBlock->authorize(credentials))
+					authorized = true;
+			}
+		}
+
+		if (!authorized)
+		{
+			client.response() = HTTPMethodHandler::error(*client.request(), *HTTPStatus::UNAUTHORIZED, HTTPHeaderFields().wwwAuthenticate(authBlock->prettyType(), authBlock->realm()));
+			return;
+		}
+	}
+
 	if (locationBlockPtr)
 	{
 		const LocationBlock &locationBlock = *locationBlockPtr;
@@ -123,7 +156,7 @@ HTTPRequestProcessor::process(HTTPClient &client)
 		{
 			if (!locationBlock.hasMethod(method.name()))
 			{
-				client.response() = GenericHTTPResponse::status(*HTTPStatus::METHOD_NOT_ALLOWED);
+				client.response() = HTTPMethodHandler::error(*client.request(), *HTTPStatus::METHOD_NOT_ALLOWED);
 				return;
 			}
 		}
@@ -142,7 +175,7 @@ HTTPRequestProcessor::process(HTTPClient &client)
 			{
 				LOG.debug() << "An error occurred while processing CGI: " << exception.message() << std::endl;
 
-				client.response() = GenericHTTPResponse::status(*HTTPStatus::BAD_GATEWAY);
+				client.response() = HTTPMethodHandler::error(*client.request(), *HTTPStatus::BAD_GATEWAY);
 			}
 		}
 	}

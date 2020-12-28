@@ -149,6 +149,14 @@ ServerBlock::index(const std::list<std::string> &files)
 	return (*this);
 }
 
+ServerBlock&
+ServerBlock::auth(const AuthBlock &auth)
+{
+	m_auth.set(&auth);
+
+	return (*this);
+}
+
 bool
 ServerBlock::hasName(const std::string &name) const
 {

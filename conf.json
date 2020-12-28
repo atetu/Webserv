@@ -40,6 +40,12 @@
 				"400": "not-found.html"
 			},
 			"root": ".",
+			"auth": {
+				"type": "basic",
+				"realm": "Restricted Area",
+				"user": "user",
+				"password": "password"
+			},
 			"locations": {
 				"/wordpress": {
 					"root": "/root/",

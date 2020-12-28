@@ -123,7 +123,6 @@ class JsonBinderHelper
 			{
 				std::map<std::string, T> items;
 
-				int index = 0;
 				for (JsonObject::const_iterator it = jsonObject.begin(); it != jsonObject.end(); it++)
 				{
 					const std::string &key = it->first;
