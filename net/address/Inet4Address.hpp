@@ -27,6 +27,7 @@ class Inet4Address :
 	public:
 		Inet4Address();
 		Inet4Address(byte address[4]);
+		Inet4Address(byte a, byte b, byte c, byte d);
 		Inet4Address(const Inet4Address &other);
 
 		virtual

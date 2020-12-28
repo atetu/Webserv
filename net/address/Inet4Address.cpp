@@ -26,6 +26,15 @@ Inet4Address::Inet4Address(byte address[4]) :
 	ft::memcpy(m_address, address, sizeof(m_address));
 }
 
+Inet4Address::Inet4Address(byte a, byte b, byte c, byte d) :
+		m_address()
+{
+	m_address[0] = a;
+	m_address[1] = b;
+	m_address[2] = c;
+	m_address[3] = d;
+}
+
 Inet4Address::Inet4Address(const Inet4Address &other) :
 		m_address()
 {

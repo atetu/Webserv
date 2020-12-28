@@ -21,12 +21,16 @@
 class Inet6Address :
 		public InetAddress
 {
+	public:
+		typedef unsigned short ushort;
+
 	private:
 		byte m_address[16];
 
 	public:
 		Inet6Address();
 		Inet6Address(byte address[16]);
+		Inet6Address(ushort a, ushort b, ushort c, ushort d, ushort e, ushort f, ushort g, ushort h);
 		Inet6Address(const Inet6Address &other);
 
 		virtual

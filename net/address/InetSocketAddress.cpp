@@ -23,7 +23,7 @@
 
 InetSocketAddress::InetSocketAddress() :
 		m_address(),
-		m_port(-1)
+		m_port(0)
 {
 }
 
@@ -76,7 +76,17 @@ InetSocketAddress::hostAddress() const
 	std::string out;
 
 	if (m_address)
+	{
+		bool is6 = dynamic_cast<Inet6Address*>(m_address) != NULL;
+
+		if (is6)
+			out += '[';
+
 		out += m_address->hostAddress();
+
+		if (is6)
+			out += ']';
+	}
 
 	return (out + ":" + Convert::toString(m_port));
 }
