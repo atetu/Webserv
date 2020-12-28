@@ -179,7 +179,7 @@ HTTPRequestProcessor::process(HTTPClient &client)
 			}
 		}
 	}
-
+	
 	if (!client.response())
 		client.response() = method.handler().handle(*client.request());
 }

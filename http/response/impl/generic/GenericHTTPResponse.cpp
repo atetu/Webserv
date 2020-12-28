@@ -6,7 +6,7 @@
 /*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/27 16:38:46 by ecaceres          #+#    #+#             */
-/*   Updated: 2020/12/26 17:21:57 by alicetetu        ###   ########.fr       */
+/*   Updated: 2020/12/27 11:09:27 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -109,13 +109,13 @@ GenericHTTPResponse::FileAndStringBody::write(SocketBuffer &socketBuffer)
 	return (true);
 }
 
-bool
-GenericHTTPResponse::FileAndStringBody::writeFd(SocketBuffer &socketBuffer)
-{
-	socketBuffer.store(m_fileDescriptorBuffer);
+// bool
+// GenericHTTPResponse::FileAndStringBody::writeFd(SocketBuffer &socketBuffer)
+// {
+// 	socketBuffer.store(m_fileDescriptorBuffer);
 
-	return (isDone());
-}
+// 	return (isDone());
+// }
 
 bool
 GenericHTTPResponse::FileAndStringBody::isDone(void)

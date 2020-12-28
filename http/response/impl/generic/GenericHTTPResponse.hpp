@@ -6,7 +6,7 @@
 /*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/27 16:38:46 by ecaceres          #+#    #+#             */
-/*   Updated: 2020/12/26 15:26:55 by alicetetu        ###   ########.fr       */
+/*   Updated: 2020/12/27 10:20:29 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -126,8 +126,8 @@ class GenericHTTPResponse :
 				virtual bool
 				write(SocketBuffer &socketBuffer);
 				
-				bool
-				writeFd(SocketBuffer &socketBuffer);
+				// bool
+				// writeFd(SocketBuffer &socketBuffer);
 				
 				bool
 				isDone();
