@@ -138,21 +138,21 @@ template<typename T>
 			}
 
 			T&
-			orElse(const T &value)
+			orElse(const T &defaultValue)
 			{
 				if (m_present)
 					return (m_value);
 
-				return (value);
+				return (defaultValue);
 			}
 
 			const T&
-			orElse(const T &value) const
+			orElse(const T &defaultValue) const
 			{
 				if (m_present)
 					return (m_value);
 
-				return (value);
+				return (defaultValue);
 			}
 
 			Optional<T>&

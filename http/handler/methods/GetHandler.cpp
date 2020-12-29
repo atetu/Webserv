@@ -90,6 +90,9 @@ GetHandler::handle(HTTPRequest &request)
 					return (file(*HTTPStatus::OK, *indexTargetFile.open(O_RDONLY), headers));
 				}
 			}
+
+			if (!locationBlock.listing().orElse(false))
+				return (error(request, *HTTPStatus::FORBIDDEN));
 		}
 
 		std::string content = listing(request.url(), targetFile);

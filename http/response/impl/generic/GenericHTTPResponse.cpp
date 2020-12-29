@@ -231,7 +231,7 @@ GenericHTTPResponse::file(HTTPStatus &status, const HTTPHeaderFields &headers, F
 GenericHTTPResponse*
 GenericHTTPResponse::string(HTTPStatus &status, const HTTPHeaderFields &headers, const std::string &string)
 {
-	return (new GenericHTTPResponse(HTTPStatusLine(status), headers, new GenericHTTPResponse::StringBody(string)));
+	return (new GenericHTTPResponse(HTTPStatusLine(status), HTTPHeaderFields(headers).contentLength(string.length()), new GenericHTTPResponse::StringBody(string)));
 }
 
 GenericHTTPResponse*
