@@ -11,6 +11,7 @@
 /* ************************************************************************** */
 
 #include <config/block/LocationBlock.hpp>
+#include <util/helper/DeleteHelper.hpp>
 #include <algorithm>
 
 LocationBlock LocationBlock::DEFAULT;
@@ -50,6 +51,7 @@ LocationBlock::LocationBlock(const LocationBlock &other) :
 
 LocationBlock::~LocationBlock()
 {
+	DeleteHelper::pointer<AuthBlock>(m_auth);
 }
 
 LocationBlock&

@@ -42,6 +42,7 @@ ServerBlock::ServerBlock(const ServerBlock &other) :
 ServerBlock::~ServerBlock()
 {
 	DeleteHelper::pointers<LocationBlock>(m_locations);
+	DeleteHelper::pointer<AuthBlock>(m_auth);
 }
 
 ServerBlock&
