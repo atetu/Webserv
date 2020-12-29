@@ -66,19 +66,19 @@ DataSize::ofKilobytes(long kilobytes)
 DataSize
 DataSize::ofMegabytes(long megabytes)
 {
-	return (DataSize(megabytes * BYTES_PER_KB));
+	return (DataSize(megabytes * BYTES_PER_MB));
 }
 
 DataSize
 DataSize::ofGigabytes(long gigabytes)
 {
-	return (DataSize(gigabytes * BYTES_PER_KB));
+	return (DataSize(gigabytes * BYTES_PER_GB));
 }
 
 DataSize
 DataSize::ofTerabytes(long terabytes)
 {
-	return (DataSize(terabytes * BYTES_PER_KB));
+	return (DataSize(terabytes * BYTES_PER_TB));
 }
 
 DataSize

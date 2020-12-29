@@ -72,15 +72,10 @@ DataUnit::size() const
 DataUnit*
 DataUnit::fromSuffix(const std::string &suffix)
 {
-	iterator it = values().begin();
-	iterator ite = values().end();
-
-	while (it != ite)
+	for (iterator it = values().begin(); it != values().end(); it++)
 	{
 		if ((*it)->suffix() == suffix)
 			return (*it);
-
-		it++;
 	}
 
 	throw IllegalArgumentException("unknown data unit prefix: " + suffix);

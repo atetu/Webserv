@@ -10,9 +10,6 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <encoding/default/base64/Base64.hpp>
-#include <encoding/default/base64/Base64Decoder.hpp>
-#include <encoding/default/base64/Base64Encoder.hpp>
 #include <tests/test_unit.hpp>
 #include <util/log/LoggerFactory.hpp>
 #include <util/StringUtils.hpp>
@@ -42,6 +39,16 @@ CASE("string-util", "equalsIgnoreCase")
 CASE("string-util", "replace")
 {
 	ASSERT(StringUtils::replace("Hetto", 't', 'l') == "Hello");
+
+	return (0);
+}
+
+CASE("string-util", "first")
+{
+	ASSERT(StringUtils::first("Hello") == 'H');
+	ASSERT(StringUtils::first("World") == 'W');
+	ASSERT(StringUtils::first("x") == 'x');
+	ASSERT(StringUtils::first("") == '\0');
 
 	return (0);
 }

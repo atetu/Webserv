@@ -42,6 +42,12 @@ class DataSize
 		long long
 		toBytes() const;
 
+		inline bool
+		operator==(const DataSize &other) const
+		{
+			return (m_bytes == other.m_bytes);
+		}
+
 	public:
 		static DataSize
 		ofBytes(long bytes);
