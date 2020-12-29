@@ -57,6 +57,41 @@ GetHandler::handle(HTTPRequest &request)
 		if (StringUtils::last(request.url().path()) != '/')
 			return (redirect(*HTTPStatus::MOVED_PERMANENTLY, request.url().builder().appendToPath("/").build()));
 
+		if (request.location().present())
+		{
+			const LocationBlock &locationBlock = *request.location().get();
+
+			if (locationBlock.index().present())
+			{
+				const std::list<std::string> &indexFiles = locationBlock.index().get();
+
+				Optional<File> validIndexFile;
+				for (std::list<std::string>::const_iterator it = indexFiles.begin(); it != indexFiles.end(); it++)
+				{
+					File anIndex(targetFile, *it);
+
+					if (anIndex.exists() && anIndex.isFile())
+					{
+						validIndexFile.set(anIndex);
+						break;
+					}
+				}
+
+				if (validIndexFile.present())
+				{
+					File &indexTargetFile = validIndexFile.get();
+
+					headers.contentLength(indexTargetFile.length());
+
+					std::string extension;
+					if (request.url().extension(extension))
+						headers.contentType(request.configuration().mimeRegistry(), extension);
+
+					return (file(*HTTPStatus::OK, *indexTargetFile.open(O_RDONLY), headers));
+				}
+			}
+		}
+
 		std::string content = listing(request.url(), targetFile);
 
 		headers.html();

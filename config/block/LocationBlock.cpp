@@ -17,13 +17,14 @@
 LocationBlock LocationBlock::DEFAULT;
 
 LocationBlock::LocationBlock(void) :
-		m_path(""),
+		m_path(),
 		m_methods(),
 		m_alias(),
 		m_root(),
 		m_listing(),
-		m_indexFiles(),
-		m_cgi()
+		m_index(),
+		m_cgi(),
+		m_auth()
 {
 }
 
@@ -33,8 +34,9 @@ LocationBlock::LocationBlock(std::string path) :
 		m_alias(),
 		m_root(),
 		m_listing(),
-		m_indexFiles(),
-		m_cgi()
+		m_index(),
+		m_cgi(),
+		m_auth()
 {
 }
 
@@ -44,8 +46,9 @@ LocationBlock::LocationBlock(const LocationBlock &other) :
 		m_alias(other.m_alias),
 		m_root(other.m_root),
 		m_listing(other.m_listing),
-		m_indexFiles(other.m_indexFiles),
-		m_cgi(other.m_cgi)
+		m_index(other.m_index),
+		m_cgi(other.m_cgi),
+		m_auth(other.m_auth)
 {
 }
 
@@ -64,8 +67,9 @@ LocationBlock::operator =(const LocationBlock &other)
 		m_alias = other.m_alias;
 		m_root = other.m_root;
 		m_listing = other.m_listing;
-		m_indexFiles = other.m_indexFiles;
+		m_index = other.m_index;
 		m_cgi = other.m_cgi;
+		m_auth = other.m_auth;
 	}
 
 	return (*this);
@@ -106,7 +110,7 @@ LocationBlock::listing(bool listing)
 LocationBlock&
 LocationBlock::index(const std::list<std::string> &files)
 {
-	m_indexFiles.set(files);
+	m_index.set(files);
 
 	return (*this);
 }

@@ -64,6 +64,16 @@
 						"GET"
 					],
 					"cgi": "bash"
+				},
+				"/_tests": {
+					"root": ".",
+					"methods": [
+						"GET"
+					],
+					"index": [
+						"index.html",
+						"index.default.html"
+					]
 				}
 			}
 		}

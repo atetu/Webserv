@@ -26,7 +26,7 @@ class LocationBlock
 		Optional<std::string> m_alias;
 		Optional<std::string> m_root;
 		Optional<bool> m_listing;
-		Optional<std::list<std::string> > m_indexFiles;
+		Optional<std::list<std::string> > m_index;
 		Optional<std::string> m_cgi;
 		Optional<AuthBlock const*> m_auth;
 
@@ -95,7 +95,7 @@ class LocationBlock
 		inline const Optional<std::list<std::string> >&
 		index(void) const
 		{
-			return (m_indexFiles);
+			return (m_index);
 		}
 
 		inline const Optional<std::string>&
