@@ -77,7 +77,7 @@ BasicAuthBlock::authorize(const std::string &credentials) const
 	std::string user = decoded.substr(0, pos);
 	std::string password = pos != std::string::npos ? decoded.erase(0, pos + 1) : "";
 
-	if (user == m_user && ((password.empty() && m_password.empty()) || (m_password.present() && m_password.get() == password)))
+	if (user == m_user && ((password.empty() && m_password.absent()) || (m_password.present() && m_password.get() == password)))
 		return (true);
 
 	return (false);

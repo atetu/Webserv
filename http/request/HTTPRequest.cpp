@@ -13,6 +13,7 @@
 #include <config/block/RootBlock.hpp>
 #include <config/block/ServerBlock.hpp>
 #include <http/request/HTTPRequest.hpp>
+#include <io/File.hpp>
 #include <map>
 
 class HTTPVersion;
@@ -26,8 +27,7 @@ HTTPRequest::HTTPRequest(const HTTPMethod &method, const URL &url, const HTTPVer
 		m_configuration(configuration),
 		m_rootBlock(rootBlock),
 		m_serverBlock(serverBlock),
-		m_locationBlock(locationBlock),
-		m_authorization(NULL)
+		m_locationBlock(locationBlock)
 {
 }
 
@@ -52,7 +52,7 @@ HTTPRequest::root(void) const
 	if (m_rootBlock.root().present())
 		return (m_rootBlock.root().get());
 
-	return ("./");
+	return (File::currentDirectory().path());
 }
 
 bool
@@ -68,14 +68,4 @@ HTTPRequest::auth() const
 		return (m_locationBlock.get()->auth().get());
 
 	return (m_serverBlock.auth().get());
-}
-
-std::string
-HTTPRequest::getLocation()
-{
-	std::map<std::string, std::string>::const_iterator it = m_headerFields.storage().find("Location");
-	if (it != m_headerFields.storage().end())
-		return (it->second);
-	else
-		return (this->root());
 }

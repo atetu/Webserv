@@ -51,6 +51,9 @@ class URL
 		std::string
 		format(void) const;
 
+		std::string
+		queryString(void) const;
+
 		bool
 		filename(std::string &out) const;
 

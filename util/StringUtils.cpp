@@ -76,6 +76,12 @@ StringUtils::equalsIgnoreCase(const std::string &a, const std::string &b)
 }
 
 char
+StringUtils::first(const std::string &string)
+{
+	return (string.c_str()[0]);
+}
+
+char
 StringUtils::last(const std::string &string)
 {
 	std::string::size_type len = string.length();

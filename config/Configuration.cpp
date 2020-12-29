@@ -286,6 +286,14 @@ Configuration::JsonBuilder::buildCGIBlock(const std::string &path, const std::st
 		BIND(jsonObject, KEY_CGI_PATH, JsonString, std::string, cgiBlock, path);
 		BIND(jsonObject, KEY_CGI_REDIRECT_ERR_TO_OUT, JsonBoolean, bool, cgiBlock, redirectErrToOut);
 
+		if (jsonObject.has(KEY_CGI_EXTENSIONS))
+		{
+			std::string ipath = path + KEY_DOT KEY_CGI_EXTENSIONS;
+			const JsonArray &array = JsonBinderHelper::jsonCast<JsonArray>(ipath, jsonObject.get(KEY_CGI_EXTENSIONS));
+
+			cgiBlock->extensions(JsonBinderHelper::buildCollection<JsonString, std::string>(path, array));
+		}
+
 		if (jsonObject.has(KEY_CGI_ENVIRONMENT))
 		{
 			std::string ipath = path + KEY_DOT KEY_CGI_ENVIRONMENT;

@@ -536,10 +536,7 @@ HTTPOrchestrator::removeClient(int fd)
 
 			client.response()->readFileDescriptors(buffers);
 			for (HTTPResponse::fdb_iterator it = buffers.begin(); it != buffers.end(); it++)
-			{
-				std::cout << (*it)->storage() << std::endl;
 				removeFileRead((*it)->descriptor().raw());
-			}
 
 			buffers.clear();
 

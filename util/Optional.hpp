@@ -81,7 +81,7 @@ template<typename T>
 			}
 
 			bool
-			empty() const
+			absent() const
 			{
 				return (!m_present);
 			}

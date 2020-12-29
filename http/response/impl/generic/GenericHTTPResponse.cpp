@@ -35,6 +35,7 @@ GenericHTTPResponse::FileBody::fileDescriptorBuffer()
 
 GenericHTTPResponse::FileBody::~FileBody()
 {
+	delete &m_fileDescriptorBuffer;
 }
 
 bool

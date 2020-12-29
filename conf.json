@@ -21,6 +21,9 @@
 		},
 		"php-cgi": {
 			"path": "/usr/bin/php-cgi",
+			"extensions": [
+				"php"
+			],
 			"environment": {
 				"REDIRECT_STATUS": "1"
 			}
@@ -39,20 +42,13 @@
 				"500": "500.html",
 				"400": "not-found.html"
 			},
-			"root": ".",
-			"auth": {
-				"type": "basic",
-				"realm": "Restricted Area",
-				"user": "user",
-				"password": "password"
-			},
 			"locations": {
 				"/wordpress": {
 					"root": "/root/",
 					"cgi": "php-cgi"
 				},
 				"/x.py": {
-					"root": ".",
+					"root": "/mnt/c/Users/cacer/OneDrive/Developments/Workspace/webserv",
 					"methods": [
 						"GET"
 					],
@@ -68,31 +64,6 @@
 						"GET"
 					],
 					"cgi": "bash"
-				},
-				"/xx/": {
-					"methods": [
-						"POST",
-						"PUT"
-					],
-					"root": "/var/www/html",
-					"listing": true,
-					"index": [
-						"index.html",
-						"index-webserv.html"
-					]
-				},
-				"/yy/": {
-					"methods": [
-						"GET",
-						"POST",
-						"PUT"
-					],
-					"root": "/var/www/mmorp",
-					"listing": true,
-					"index": [
-						"index.html",
-						"index-webserv.html"
-					]
 				}
 			}
 		}

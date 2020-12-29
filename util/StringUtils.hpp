@@ -40,6 +40,9 @@ class StringUtils
 		equalsIgnoreCase(const std::string &a, const std::string &b);
 
 		static char
+		first(const std::string &string);
+
+		static char
 		last(const std::string &string);
 };
 

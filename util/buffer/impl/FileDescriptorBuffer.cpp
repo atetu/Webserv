@@ -22,14 +22,6 @@ FileDescriptorBuffer::FileDescriptorBuffer(FileDescriptor &fileDescriptor, int a
 {
 }
 
-// FileDescriptorBuffer::FileDescriptorBuffer(FileDescriptor &fileDescriptor, const std::string body, int actionOnDestroy, size_type maxSize) :
-// 		BaseBuffer(body, maxSize),
-// 		m_fd(fileDescriptor),
-// 		m_actionOnDestroy(actionOnDestroy),
-// 		m_readEverything(false)
-// {
-// }
-
 FileDescriptorBuffer::~FileDescriptorBuffer()
 {
 	if (m_actionOnDestroy & CLOSE)

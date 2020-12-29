@@ -62,3 +62,36 @@ CASE("file", "create, write, close, length, and remove")
 
 	return (0);
 }
+
+CASE("file", "concat-paths")
+{
+	ASSERT(File::concatPaths("a", "b") == "a/b");
+	ASSERT(File::concatPaths("a/", "b") == "a/b");
+	ASSERT(File::concatPaths("a", "/b") == "a/b");
+	ASSERT(File::concatPaths("a/", "/b") == "a/b");
+
+	return (0);
+}
+
+CASE("file", "parent")
+{
+	ASSERT(File("/").parent().path() == "/");
+	ASSERT(File("/a").parent().path() == "/");
+	ASSERT(File("/a/").parent().path() == "/");
+	ASSERT(File("/a/b").parent().path() == "/a");
+	ASSERT(File("/a/b/").parent().path() == "/a");
+	ASSERT(File("/a/b/c").parent().path() == "/a/b");
+	ASSERT(File("/a/b/c/").parent().path() == "/a/b");
+
+	ASSERT(File("/////").parent().path() == "/");
+	ASSERT(File("/a/////").parent().path() == "/");
+	ASSERT(File("/a/b/////").parent().path() == "/a");
+
+	ASSERT(File().parent().path() == "/");
+
+	ASSERT(File("/a/b/c/").parent().path() == "/a/b");
+	ASSERT(File("/a/b/c/").parent().parent().path() == "/a");
+	ASSERT(File("/a/b/c/").parent().parent().parent().path() == "/");
+
+	return (0);
+}

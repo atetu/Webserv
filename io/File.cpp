@@ -10,27 +10,39 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <dirent.h>
 #include <io/File.hpp>
 #include <io/FileDescriptor.hpp>
 #include <stdlib.h>
 #include <sys/fcntl.h>
+#include <dirent.h>
 #include <sys/stat.h>
 #include <sys/unistd.h>
 #include <cstdio>
+#include <iostream>
+#include <util/StringUtils.hpp>
 
 File::File() :
 		m_path()
 {
 }
 
-File::File(std::string path) :
+File::File(const std::string &path) :
 		m_path(path)
 {
 }
 
-File::File(const File &parent, std::string path) :
-		m_path(parent.path() + "/" + path)
+File::File(const File &parent, const std::string &path) :
+		m_path(concatPaths(parent.path(), path))
+{
+}
+
+File::File(const File &parent, const File &child) :
+		m_path(concatPaths(parent.path(), child.path()))
+{
+}
+
+File::File(const std::string &parent, const std::string &path) :
+		m_path(concatPaths(parent, path))
 {
 }
 
@@ -147,6 +159,40 @@ File::absolute() const
 	return (currentDirectory().path() + "/" + m_path);
 }
 
+File
+File::parent() const
+{
+	if (m_path.empty())
+		return (std::string("/"));
+
+	std::string::size_type stopAt = std::string::npos;
+
+	if (StringUtils::last(m_path) == '/')
+	{
+		stopAt = 0;
+
+		for (std::string::size_type n = m_path.size(); n != 0; n--)
+		{
+			std::string::size_type index = n - 1;
+
+			if (m_path[index] != '/')
+			{
+				stopAt = index;
+				break;
+			}
+		}
+	}
+
+	std::string::size_type lastAt;
+	if (stopAt == 0 || (lastAt = m_path.rfind('/', stopAt)) == 0)
+		return (std::string("/")); /* root */
+
+	if (lastAt == std::string::npos)
+		return (m_path + "/../");
+
+	return (m_path.substr(0, lastAt));
+}
+
 std::list<File>
 File::list() const
 {
@@ -170,6 +216,21 @@ File::list() const
 	::closedir(dir);
 
 	return (files);
+}
+
+std::string
+File::concatPaths(const std::string &a, const std::string &b)
+{
+	bool aEnd = StringUtils::last(a) == '/';
+	bool bStart = StringUtils::first(b) == '/';
+
+	if (aEnd && bStart)
+		return (a + b.substr(1));
+
+	if (aEnd ^ bStart)
+		return (a + b);
+
+	return (a + '/' + b);
 }
 
 File

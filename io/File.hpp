@@ -29,8 +29,10 @@ class File
 
 	public:
 		File();
-		File(std::string path);
-		File(const File &parent, std::string path);
+		File(const std::string &path);
+		File(const File &parent, const std::string &path);
+		File(const File &parent, const File &child);
+		File(const std::string &parent, const std::string &path);
 		File(const File &other);
 
 		virtual
@@ -82,6 +84,9 @@ class File
 		File
 		absolute() const;
 
+		File
+		parent() const;
+
 		inline const std::string&
 		path() const
 		{
@@ -90,6 +95,10 @@ class File
 
 		std::list<File>
 		list() const;
+
+	public:
+		static std::string
+		concatPaths(const std::string &a, const std::string &b);
 
 	public:
 		static File

@@ -13,9 +13,8 @@
 #ifndef CGIBLOCK_HPP_
 # define CGIBLOCK_HPP_
 
-#include <sys/errno.h>
-#include <sys/stat.h>
 #include <util/Optional.hpp>
+#include <list>
 #include <map>
 #include <string>
 
@@ -25,6 +24,7 @@ class CGIBlock
 		std::string m_name;
 		Optional<std::string> m_path;
 		Optional<bool> m_redirectErrToOut;
+		Optional<std::list<std::string> > m_extensions;
 		Optional<std::map<std::string, std::string> > m_environment;
 
 	public:
@@ -45,7 +45,10 @@ class CGIBlock
 		redirectErrToOut(bool redirectErrToOut);
 
 		CGIBlock&
-		environment(std::map<std::string, std::string> environment);
+		extensions(const std::list<std::string> &extensions);
+
+		CGIBlock&
+		environment(const std::map<std::string, std::string> &environment);
 
 		inline const std::string&
 		name(void) const
@@ -65,27 +68,23 @@ class CGIBlock
 			return (m_redirectErrToOut);
 		}
 
+		inline const Optional<std::list<std::string> >&
+		extensions(void) const
+		{
+			return (m_extensions);
+		}
+
 		inline const Optional<std::map<std::string, std::string> >&
 		environment(void) const
 		{
 			return (m_environment);
 		}
 
-		inline bool
-		exists() const
-		{
-			if (m_path.present())
-			{
-				struct stat st;
-				bool exists = ::stat(m_path.get().c_str(), &st) == 0;
+		bool
+		exists(void) const;
 
-				errno = 0;
-
-				return (exists);
-			}
-
-			return (false);
-		}
+		bool
+		hasExtension(const std::string &extension) const;
 };
 
 #endif /* CGIBLOCK_HPP_ */

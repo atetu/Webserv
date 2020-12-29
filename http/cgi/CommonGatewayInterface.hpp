@@ -14,16 +14,21 @@
 # define COMMONGATEWAYINTERFACE_HPP_
 
 #include <config/block/CGIBlock.hpp>
+#include <io/FileDescriptor.hpp>
 #include <sys/types.h>
 #include <util/Environment.hpp>
 #include <string>
 
+class Logger;
 class FileDescriptor;
 class CGIBlock;
 class HTTPClient;
 
 class CommonGatewayInterface
 {
+	public:
+		static Logger &LOG;
+
 	private:
 		pid_t m_pid;
 		FileDescriptor &m_in;

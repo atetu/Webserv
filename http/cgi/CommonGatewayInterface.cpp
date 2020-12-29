@@ -10,6 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+#include <config/block/auth/BasicAuthBlock.hpp>
 #include <signal.h>
 #include <exception/IOException.hpp>
 #include <http/cgi/CommonGatewayInterface.hpp>
@@ -20,7 +21,6 @@
 #include <http/HTTPServer.hpp>
 #include <http/request/HTTPRequest.hpp>
 #include <io/File.hpp>
-#include <io/FileDescriptor.hpp>
 #include <net/address/InetAddress.hpp>
 #include <net/address/InetSocketAddress.hpp>
 #include <os/detect_platform.h>
@@ -29,14 +29,15 @@
 #include <util/Convert.hpp>
 #include <util/Enum.hpp>
 #include <util/helper/DeleteHelper.hpp>
+#include <util/log/LoggerFactory.hpp>
 #include <util/Optional.hpp>
 #include <util/StringUtils.hpp>
 #include <util/URL.hpp>
 #include <webserv.hpp>
 #include <cstdlib>
+#include <cstring>
 #include <iostream>
 #include <map>
-#include <unistd.h>
 
 const std::string CommonGatewayInterface::ENV_AUTH_TYPE = "AUTH_TYPE";
 const std::string CommonGatewayInterface::ENV_CONTENT_LENGTH = "CONTENT_LENGTH";
@@ -71,6 +72,8 @@ kill(pid_t pid, int sig)
 }
 #endif
 
+Logger &CommonGatewayInterface::LOG = LoggerFactory::get("CGI");
+
 CommonGatewayInterface::CommonGatewayInterface(pid_t pid, FileDescriptor &in, FileDescriptor &out) :
 		m_pid(pid),
 		m_in(in),
@@ -100,6 +103,8 @@ CommonGatewayInterface::running()
 
 	return (false);
 }
+
+#define HERE __FUNCTION__ << ':' << __LINE__
 
 CommonGatewayInterface*
 CommonGatewayInterface::execute(HTTPClient &client, const CGIBlock &cgiBlock, const Environment &environment)
@@ -131,20 +136,54 @@ CommonGatewayInterface::execute(HTTPClient &client, const CGIBlock &cgiBlock, co
 			env.setProperty(it->first, it->second);
 	}
 
+	HTTPRequest &request = *client.request();
+
+	File scriptFile(request.url().path());
+	File scriptAbsoluteFile(request.root(), scriptFile);
+
 	env.setProperty(ENV_GATEWAY_INTERFACE, "CGI/1.1");
 	env.setProperty(ENV_REMOTE_ADDR, client.socketAddress().address()->hostAddress());
 	env.setProperty(ENV_REMOTE_PORT, Convert::toString(client.socketAddress().port()));
-	env.setProperty(ENV_REQUEST_METHOD, client.request()->method().name());
-	env.setProperty(ENV_REQUEST_URI, client.request()->url().path());
-	env.setProperty(ENV_SCRIPT_FILENAME, client.request()->root() + client.request()->url().path());
-	env.setProperty(ENV_SCRIPT_NAME, client.request()->url().path());
+	env.setProperty(ENV_REQUEST_METHOD, request.method().name());
+	env.setProperty(ENV_REQUEST_URI, request.url().path());
+	env.setProperty(ENV_SCRIPT_FILENAME, scriptAbsoluteFile.path());
+	env.setProperty(ENV_SCRIPT_NAME, scriptFile.path());
 	env.setProperty(ENV_SERVER_NAME, client.server().host());
 	env.setProperty(ENV_SERVER_PORT, Convert::toString(client.server().port()));
-	env.setProperty(ENV_SERVER_PROTOCOL, client.request()->version().format());
+	env.setProperty(ENV_SERVER_PROTOCOL, request.version().format());
 	env.setProperty(ENV_SERVER_SOFTWARE, APPLICATION_NAME_AND_VERSION);
+	env.setProperty(ENV_PATH_INFO, scriptFile.parent().path());
+	env.setProperty(ENV_PATH_TRANSLATED, scriptAbsoluteFile.parent().path());
+	env.setProperty(ENV_QUERY_STRING, request.url().queryString());
 
-	const HTTPHeaderFields &headerFields = client.request()->headers();
-	for (HTTPHeaderFields::const_iterator it = headerFields.begin(); it != headerFields.end(); it++)
+	if (request.method().hasBody())
+	{
+		env.setProperty(ENV_CONTENT_LENGTH, Convert::toString(request.body().length()));
+
+		Optional<std::string> optional = request.headers().get(HTTPHeaderFields::CONTENT_TYPE);
+		if (optional.present())
+			env.setProperty(ENV_CONTENT_TYPE, optional.get());
+	}
+
+	if (request.needAuth()) // TODO Need to be changed to authorization objects
+	{
+		const AuthBlock *authBlock = request.auth();
+
+		if (authBlock)
+		{
+			env.setProperty(ENV_AUTH_TYPE, authBlock->prettyType());
+
+			const BasicAuthBlock *basicAuthBlock = dynamic_cast<BasicAuthBlock const*>(authBlock);
+			if (basicAuthBlock)
+			{
+				env.setProperty(ENV_REMOTE_USER, basicAuthBlock->user());
+				env.setProperty(ENV_REMOTE_IDENT, basicAuthBlock->user());
+			}
+		}
+	}
+
+	const HTTPHeaderFields &headers = request.headers();
+	for (HTTPHeaderFields::const_iterator it = headers.begin(); it != headers.end(); it++)
 		env.setProperty("HTTP_" + StringUtils::toUpperCase(StringUtils::replace(StringUtils::replace(it->first, '=', '_'), '-', '_')), it->second);
 
 	char **envp = env.allocate();
@@ -166,7 +205,7 @@ CommonGatewayInterface::execute(HTTPClient &client, const CGIBlock &cgiBlock, co
 
 	if (pid == 0)
 	{
-		::chdir(client.request()->root().c_str());
+		::chdir(request.root().c_str());
 
 		::dup2(inPipe[0], 0);
 		::dup2(outPipe[1], 1);
@@ -175,14 +214,14 @@ CommonGatewayInterface::execute(HTTPClient &client, const CGIBlock &cgiBlock, co
 //			::dup2(1, 2);
 
 		std::string path = cgiBlock.path().get();
-		std::string file = "." + client.request()->url().path();
+		std::string file = "." + request.url().path();
 
 		char *const argv[] = {
 			const_cast<char*>(path.c_str()), /* Dangerous, but kernel allocate it anyway... */
 			const_cast<char*>(file.c_str()),
 			NULL };
 
-		::execve(cgiBlock.path().get().c_str(), argv, envp);
+		::execve(path.c_str(), argv, envp);
 		::exit(1);
 		return (NULL); /* Should not happen. */
 	}
@@ -218,6 +257,11 @@ CommonGatewayInterface::execute(HTTPClient &client, const CGIBlock &cgiBlock, co
 			throw;
 		}
 
-		return (new CommonGatewayInterface(pid, *stdin, *stdout));
+		CommonGatewayInterface *cgi = new CommonGatewayInterface(pid, *stdin, *stdout);
+
+		if (request.method().hasBody()) // TODO Operation is blocking
+			cgi->in().write(request.body().c_str(), request.body().length());
+
+		return (cgi);
 	}
 }

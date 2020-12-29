@@ -74,24 +74,30 @@ URL::format(void) const
 	std::string out(m_path);
 
 	if (m_queryParameters.present())
+		out += "?" + queryString();
+
+	if (m_fragment.present())
+		out += "#" + m_fragment.get();
+
+	return (out);
+}
+
+std::string
+URL::queryString(void) const
+{
+	std::string out;
+
+	if (m_queryParameters.present())
 	{
 		typedef std::map<std::string, std::string> map;
 
 		const map &queryParams = m_queryParameters.get();
-
-		out += "?";
 
 		for (map::const_iterator it = queryParams.begin(); it != queryParams.end(); it++)
 		{
 			out += encode(it->first) + "=" + encode(it->second);
 			out += "&";
 		}
-	}
-
-	if (m_fragment.present())
-	{
-		out += "#";
-		out += m_fragment.get();
 	}
 
 	return (out);

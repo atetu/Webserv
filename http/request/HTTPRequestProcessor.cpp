@@ -165,17 +165,24 @@ HTTPRequestProcessor::process(HTTPClient &client)
 		{
 			const CGIBlock &cgiBlock = rootBlock.getCGI(locationBlockPtr->cgi().get());
 
-			try
+			std::string extension;
+			if (client.request()->url().extension(extension))
 			{
-				CommonGatewayInterface *cgi = CommonGatewayInterface::execute(client, cgiBlock, m_environment);
+				if (cgiBlock.hasExtension(extension))
+				{
+					try
+					{
+						CommonGatewayInterface *cgi = CommonGatewayInterface::execute(client, cgiBlock, m_environment);
 
-				client.response() = new CGIHTTPResponse(HTTPStatusLine(*HTTPStatus::OK), *cgi);
-			}
-			catch (Exception &exception)
-			{
-				LOG.debug() << "An error occurred while processing CGI: " << exception.message() << std::endl;
+						client.response() = new CGIHTTPResponse(HTTPStatusLine(*HTTPStatus::OK), *cgi);
+					}
+					catch (Exception &exception)
+					{
+						LOG.debug() << "An error occurred while processing CGI: " << exception.message() << std::endl;
 
-				client.response() = HTTPMethodHandler::error(*client.request(), *HTTPStatus::BAD_GATEWAY);
+						client.response() = HTTPMethodHandler::error(*client.request(), *HTTPStatus::BAD_GATEWAY);
+					}
+				}
 			}
 		}
 	}

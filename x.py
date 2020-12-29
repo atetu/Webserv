@@ -31,7 +31,7 @@ for key, value in os.environ.items():
 print("</table>")
 print('</html>')
 
-import time
-time.sleep(3)
-print("Hello")
-time.sleep(30)
+#import time
+#time.sleep(3)
+#print("Hello")
+#time.sleep(30)
