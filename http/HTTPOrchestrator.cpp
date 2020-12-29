@@ -544,9 +544,10 @@ HTTPOrchestrator::removeClient(int fd)
 			for (HTTPResponse::fdb_iterator it = buffers.begin(); it != buffers.end(); it++)
 				removeFileWrite((*it)->descriptor().raw());
 
-			if (client.request())
+			if (client.request() && LOG.isInfoEnabled())
 			{
-				LOG.info() << client.socketAddress().hostAddress()
+				LOG.info() << '[' << HTTPDate::now().format() << "] "
+				/**/<< client.socketAddress().hostAddress()
 				/**/<< " - "
 				/**/<< client.request()->method().name()
 				/**/<< " "
