@@ -31,10 +31,9 @@ TraceHandler::handle(HTTPRequest &request)
 
 //#if 0 // TODO The 'status line' variable is never used
 	std::string method = request.method().name();
-	std::string host = request.url().host();
 	std::string path = request.url().path(); // TODO check queries and fragments with Nginx
 	std::string version = "HTTTP/1.1";
-	std::string statusLine = method + ' ' + host + path + ' ' + version + '\n';
+	std::string statusLine = method + ' ' + path + ' ' + version + '\n';
 //#endif
 
 	std::string body = statusLine + request.headers().format("\n");

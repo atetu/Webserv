@@ -38,6 +38,9 @@ class StringUtils
 
 		static bool
 		equalsIgnoreCase(const std::string &a, const std::string &b);
+
+		static char
+		last(const std::string &string);
 };
 
 #endif /* STRINGUTILS_HPP_ */

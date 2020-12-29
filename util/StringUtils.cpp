@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   StringUtils.cpp                                       :+:      :+:    :+:   */
+/*   StringUtils.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ecaceres <ecaceres@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -73,4 +73,12 @@ StringUtils::equalsIgnoreCase(const std::string &a, const std::string &b)
 			return (false);
 
 	return (true);
+}
+
+char
+StringUtils::last(const std::string &string)
+{
+	std::string::size_type len = string.length();
+
+	return (string.c_str()[len ? len - 1 : 0]);
 }

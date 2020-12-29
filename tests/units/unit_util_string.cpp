@@ -45,3 +45,13 @@ CASE("string-util", "replace")
 
 	return (0);
 }
+
+CASE("string-util", "last")
+{
+	ASSERT(StringUtils::last("Hello") == 'o');
+	ASSERT(StringUtils::last("World") == 'd');
+	ASSERT(StringUtils::last("x") == 'x');
+	ASSERT(StringUtils::last("") == '\0');
+
+	return (0);
+}

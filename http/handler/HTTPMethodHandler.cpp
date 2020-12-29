@@ -16,6 +16,7 @@
 #include <http/response/impl/generic/GenericHTTPResponse.hpp>
 #include <util/buffer/impl/FileDescriptorBuffer.hpp>
 #include <util/Singleton.hpp>
+#include <util/URL.hpp>
 
 HTTPMethodHandler::~HTTPMethodHandler()
 {
@@ -58,4 +59,10 @@ HTTPMethodHandler::error(const HTTPRequest &request, HTTPStatus &httpStatus, con
 {
 	(void)request; // TODO Need to handle custom error pages if necessary
 	return (status(httpStatus, headers));
+}
+
+HTTPResponse*
+HTTPMethodHandler::redirect(HTTPStatus &httpStatus, const URL &to, const HTTPHeaderFields &headers)
+{
+	return (status(httpStatus, HTTPHeaderFields(headers).location(to)));
 }

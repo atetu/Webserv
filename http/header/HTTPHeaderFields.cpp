@@ -15,6 +15,7 @@
 #include <http/mime/MimeRegistry.hpp>
 #include <util/Convert.hpp>
 #include <util/Enum.hpp>
+#include <util/URL.hpp>
 
 const std::string HTTPHeaderFields::ACCEPT_CHARSETS/*	*/= "Accept-Charsets";
 const std::string HTTPHeaderFields::ACCEPT_LANGUAGE/*	*/= "Accept-Language";
@@ -195,6 +196,12 @@ HTTPHeaderFields&
 HTTPHeaderFields::location(const std::string &value)
 {
 	return (set(LOCATION, value));
+}
+
+HTTPHeaderFields&
+HTTPHeaderFields::location(const URL &url)
+{
+	return (location(url.format()));
 }
 
 HTTPHeaderFields&

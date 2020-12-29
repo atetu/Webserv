@@ -20,17 +20,17 @@
 
 class URL
 {
+	public:
+		class Builder;
+
 	private:
-		std::string m_protocol;
-		std::string m_host;
-		int m_port;
 		std::string m_path;
 		Optional<std::map<std::string, std::string> > m_queryParameters;
 		Optional<std::string> m_fragment;
 
 	public:
 		URL();
-		URL(const std::string &protocol, const std::string &host, int port, const std::string &path, const Optional<std::map<std::string, std::string> > queryParameters, const Optional<std::string> fragment);
+		URL(const std::string &path, const Optional<std::map<std::string, std::string> > queryParameters, const Optional<std::string> fragment);
 		URL(const URL &other);
 
 		virtual
@@ -40,16 +40,7 @@ class URL
 		operator =(const URL &other);
 
 		const std::string&
-		host() const;
-
-		const std::string&
 		path() const;
-
-		int
-		port() const;
-
-		const std::string&
-		protocol() const;
 
 		const Optional<std::map<std::string, std::string> >&
 		queryParameters() const;
@@ -57,11 +48,56 @@ class URL
 		const Optional<std::string>&
 		fragment() const;
 
+		std::string
+		format(void) const;
+
 		bool
 		filename(std::string &out) const;
 
 		bool
 		extension(std::string &out) const;
+
+		Builder
+		builder(void) const;
+
+	public:
+		static std::string
+		encode(const std::string &input);
+
+	public:
+		class Builder
+		{
+			private:
+				std::string m_path;
+				Optional<std::map<std::string, std::string> > m_queryParameters;
+				Optional<std::string> m_fragment;
+
+			public:
+				Builder();
+				Builder(const URL &url);
+				Builder(const Builder &other);
+
+				virtual
+				~Builder();
+
+				Builder&
+				operator =(const Builder &other);
+
+				Builder&
+				path(const std::string &path);
+
+				Builder&
+				appendToPath(const std::string &content);
+
+				Builder&
+				queryParameters(const std::map<std::string, std::string> &queryParameters);
+
+				Builder&
+				fragment(const std::string &fragment);
+
+				URL
+				build();
+		};
 };
 
 #endif /* URL_HPP_ */

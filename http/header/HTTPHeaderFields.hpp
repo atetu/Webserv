@@ -23,6 +23,8 @@
 #include <string>
 #include <vector>
 
+class URL;
+
 class HTTPValueParser;
 class Mime;
 class MimeRegistry;
@@ -109,6 +111,9 @@ class HTTPHeaderFields
 
 		HTTPHeaderFields&
 		location(const std::string &value);
+
+		HTTPHeaderFields&
+		location(const URL &url);
 
 		HTTPHeaderFields&
 		referer(const std::string &value);

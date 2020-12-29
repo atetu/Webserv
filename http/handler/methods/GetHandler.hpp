@@ -14,6 +14,8 @@
 # define GETHANDLER_HPP_
 
 #include <http/handler/HTTPMethodHandler.hpp>
+#include <io/File.hpp>
+#include <string>
 
 class GetHandler :
 		public HTTPMethodHandler
@@ -26,6 +28,10 @@ class GetHandler :
 
 		HTTPResponse*
 		handle(HTTPRequest &request);
+
+	private:
+		std::string
+		listing(const URL &url, const File &file);
 
 	public:
 		static GetHandler&

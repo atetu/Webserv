@@ -563,5 +563,5 @@ HTTPRequestParser::url()
 	const Optional<std::map<std::string, std::string> > queryMap = Optional<std::map<std::string, std::string> >::ofEmpty(query());
 	const Optional<std::string> fragmentStr = Optional<std::string>::ofEmpty(fragment());
 
-	return (URL("http", "locahost", 80 /* TODO */, path(), queryMap, fragmentStr));
+	return (URL(path(), queryMap, fragmentStr));
 }

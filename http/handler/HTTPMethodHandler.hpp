@@ -17,6 +17,7 @@
 #include <io/FileDescriptor.hpp>
 #include <string>
 
+class URL;
 class HTTPRequest;
 class HTTPResponse;
 class HTTPStatus;
@@ -48,6 +49,9 @@ class HTTPMethodHandler
 
 		static HTTPResponse*
 		error(const HTTPRequest &request, HTTPStatus &httpStatus, const HTTPHeaderFields &headers = HTTPHeaderFields());
+
+		static HTTPResponse*
+		redirect(HTTPStatus &httpStatus, const URL &to, const HTTPHeaderFields &headers = HTTPHeaderFields());
 };
 
 #endif /* HTTPMETHODHANDLER_HPP_ */

@@ -13,19 +13,13 @@
 #include <util/URL.hpp>
 
 URL::URL() :
-		m_protocol(),
-		m_host(),
-		m_port(),
 		m_path(),
 		m_queryParameters(),
 		m_fragment()
 {
 }
 
-URL::URL(const std::string &protocol, const std::string &host, int port, const std::string &path, const Optional<std::map<std::string, std::string> > queryParameters, const Optional<std::string> fragment) :
-		m_protocol(protocol),
-		m_host(host),
-		m_port(port),
+URL::URL(const std::string &path, const Optional<std::map<std::string, std::string> > queryParameters, const Optional<std::string> fragment) :
 		m_path(path),
 		m_queryParameters(queryParameters),
 		m_fragment(fragment)
@@ -33,9 +27,6 @@ URL::URL(const std::string &protocol, const std::string &host, int port, const s
 }
 
 URL::URL(const URL &other) :
-		m_protocol(other.m_protocol),
-		m_host(other.m_host),
-		m_port(other.m_port),
 		m_path(other.m_path),
 		m_queryParameters(other.m_queryParameters),
 		m_fragment(other.m_fragment)
@@ -46,22 +37,17 @@ URL::~URL()
 {
 }
 
-const std::string&
-URL::protocol() const
+URL&
+URL::operator =(const URL &other)
 {
-	return (m_protocol);
-}
+	if (this != &other)
+	{
+		m_path = other.m_path;
+		m_queryParameters = other.m_queryParameters;
+		m_fragment = other.m_fragment;
+	}
 
-int
-URL::port() const
-{
-	return (m_port);
-}
-
-const std::string&
-URL::host() const
-{
-	return (m_host);
+	return (*this);
 }
 
 const std::string&
@@ -82,20 +68,33 @@ URL::fragment() const
 	return (m_fragment);
 }
 
-URL&
-URL::operator =(const URL &other)
+std::string
+URL::format(void) const
 {
-	if (this != &other)
+	std::string out(m_path);
+
+	if (m_queryParameters.present())
 	{
-		m_protocol = other.m_protocol;
-		m_host = other.m_host;
-		m_port = other.m_port;
-		m_path = other.m_path;
-		m_queryParameters = other.m_queryParameters;
-		m_fragment = other.m_fragment;
+		typedef std::map<std::string, std::string> map;
+
+		const map &queryParams = m_queryParameters.get();
+
+		out += "?";
+
+		for (map::const_iterator it = queryParams.begin(); it != queryParams.end(); it++)
+		{
+			out += encode(it->first) + "=" + encode(it->second);
+			out += "&";
+		}
 	}
 
-	return (*this);
+	if (m_fragment.present())
+	{
+		out += "#";
+		out += m_fragment.get();
+	}
+
+	return (out);
 }
 
 bool
@@ -129,4 +128,92 @@ URL::extension(std::string &out) const
 	out = filename.substr(lastDotPos + 1);
 
 	return (true);
+}
+
+URL::Builder
+URL::builder(void) const
+{
+	return (Builder(*this));
+}
+
+URL::Builder::Builder() :
+		m_path(),
+		m_queryParameters(),
+		m_fragment()
+{
+}
+
+URL::Builder::Builder(const URL &url) :
+		m_path(url.m_path),
+		m_queryParameters(url.m_queryParameters),
+		m_fragment(url.m_fragment)
+{
+}
+
+URL::Builder::Builder(const Builder &other) :
+		m_path(other.m_path),
+		m_queryParameters(other.m_queryParameters),
+		m_fragment(other.m_fragment)
+{
+}
+
+URL::Builder::~Builder()
+{
+}
+
+URL::Builder&
+URL::Builder::operator =(const Builder &other)
+{
+	if (this != &other)
+	{
+		m_path = other.m_path;
+		m_queryParameters = other.m_queryParameters;
+		m_fragment = other.m_fragment;
+	}
+
+	return (*this);
+}
+
+URL::Builder&
+URL::Builder::path(const std::string &path)
+{
+	m_path = path;
+
+	return (*this);
+}
+
+URL::Builder&
+URL::Builder::appendToPath(const std::string &content)
+{
+	m_path += content;
+
+	return (*this);
+}
+
+URL::Builder&
+URL::Builder::queryParameters(const std::map<std::string, std::string> &queryParameters)
+{
+	m_queryParameters.set(queryParameters);
+
+	return (*this);
+}
+
+URL::Builder&
+URL::Builder::fragment(const std::string &fragment)
+{
+	m_fragment.set(fragment);
+
+	return (*this);
+}
+
+URL
+URL::Builder::build()
+{
+	return (URL(m_path, m_queryParameters, m_fragment));
+}
+
+std::string
+URL::encode(const std::string &input)
+{
+	return (input);
 }
