@@ -285,6 +285,8 @@ HTTPOrchestrator::start()
 									}
 									catch (Exception &exception)
 									{
+										LOG.debug() << exception.message() << std::endl;
+
 										client.response() = GenericHTTPResponse::status(*HTTPStatus::BAD_REQUEST);
 									}
 

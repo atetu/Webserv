@@ -34,7 +34,7 @@ class HTTPRequestParser
 	public:
 		enum State
 		{
-			S_NOT_STARTED,
+			S_NOT_STARTED = 0,
 			S_METHOD,
 			S_SPACES_BEFORE_PATH,
 			S_PATH,
@@ -52,8 +52,9 @@ class HTTPRequestParser
 			S_HTTP_END3,
 			S_QUERY_STRING_KEY,
 			S_QUERY_STRING_VALUE,
-			//	S_FRAGMENT_START,
 			S_FRAGMENT,
+			S_HEX_START,
+			S_HEX_END,
 			S_FIELD,
 			S_COLON,
 			S_SPACES_BEFORE_VALUE,
@@ -79,7 +80,8 @@ class HTTPRequestParser
 		std::string m_queryValue;
 		std::string m_fragment;
 		std::string m_body;
-		bool m_hexOn;
+		State m_hexBeforeState;
+		std::string *m_hexStoreTarget;
 		std::string m_hex;
 
 		char m_last_char;
@@ -135,6 +137,15 @@ class HTTPRequestParser
 
 		URL
 		url();
+
+	private:
+		inline void
+		hexStart(std::string *storeInto)
+		{
+			m_hexBeforeState = m_state;
+			m_state = S_HEX_START;
+			m_hexStoreTarget = storeInto;
+		}
 };
 
 #endif /* HTTPREQUESTPARSER_HPP_ */

@@ -260,7 +260,10 @@ CommonGatewayInterface::execute(HTTPClient &client, const CGIBlock &cgiBlock, co
 		CommonGatewayInterface *cgi = new CommonGatewayInterface(pid, *stdin, *stdout);
 
 		if (request.method().hasBody()) // TODO Operation is blocking
+		{
 			cgi->in().write(request.body().c_str(), request.body().length());
+			//::write(1, request.body().c_str(), request.body().length());
+		}
 
 		return (cgi);
 	}
