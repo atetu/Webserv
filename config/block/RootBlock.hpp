@@ -29,11 +29,15 @@ class RootBlock
 		typedef std::list<const CGIBlock*> clist;
 		typedef clist::const_iterator cciterator;
 
+	public:
+		static const int DEFAULT_MAX_ACTIVE_CLIENT;
+
 	private:
 		Optional<std::string> m_root;
 		Optional<const MimeBlock*> m_mimeBlock;
 		Optional<slist> m_serverBlocks;
 		Optional<clist> m_cgiBlocks;
+		Optional<long> m_maxActiveClient;
 
 	public:
 		RootBlock();
@@ -57,6 +61,9 @@ class RootBlock
 		RootBlock&
 		cgiBlocks(const std::list<const CGIBlock*> &cgiBlocks);
 
+		RootBlock&
+		maxActiveClient(long maxActiveClient);
+
 		inline const Optional<std::string>&
 		root(void) const
 		{
@@ -79,6 +86,12 @@ class RootBlock
 		cgiBlocks(void) const
 		{
 			return (m_cgiBlocks);
+		}
+
+		inline const Optional<long>&
+		maxActiveClient(void) const
+		{
+			return (m_maxActiveClient);
 		}
 
 		bool

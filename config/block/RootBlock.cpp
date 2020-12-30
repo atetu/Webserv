@@ -13,11 +13,14 @@
 #include <config/block/RootBlock.hpp>
 #include <util/helper/DeleteHelper.hpp>
 
+const int RootBlock::DEFAULT_MAX_ACTIVE_CLIENT = 60;
+
 RootBlock::RootBlock() :
 		m_root(),
 		m_mimeBlock(),
 		m_serverBlocks(),
-		m_cgiBlocks()
+		m_cgiBlocks(),
+		m_maxActiveClient()
 {
 }
 
@@ -25,14 +28,13 @@ RootBlock::RootBlock(const RootBlock &other) :
 		m_root(other.m_root),
 		m_mimeBlock(other.m_mimeBlock),
 		m_serverBlocks(other.m_serverBlocks),
-		m_cgiBlocks(other.m_cgiBlocks)
+		m_cgiBlocks(other.m_cgiBlocks),
+		m_maxActiveClient(other.m_maxActiveClient)
 {
 }
 
 RootBlock::~RootBlock()
 {
-//	std::cout << (char)*((char*)NULL) << std::endl;
-
 	DeleteHelper::pointers<ServerBlock>(m_serverBlocks);
 	DeleteHelper::pointers<CGIBlock>(m_cgiBlocks);
 	DeleteHelper::pointer<MimeBlock>(m_mimeBlock);
@@ -42,11 +44,12 @@ RootBlock&
 RootBlock::operator =(const RootBlock &other)
 {
 	if (this != &other)
-	{
+	{ // TODO Need deep-copy
 		m_root = other.m_root;
 		m_mimeBlock = other.m_mimeBlock;
 		m_serverBlocks = other.m_serverBlocks;
 		m_cgiBlocks = other.m_cgiBlocks;
+		m_maxActiveClient = other.m_maxActiveClient;
 	}
 
 	return (*this);
@@ -80,6 +83,14 @@ RootBlock&
 RootBlock::cgiBlocks(const std::list<const CGIBlock*> &cgiBlocks)
 {
 	m_cgiBlocks.set(cgiBlocks);
+
+	return (*this);
+}
+
+RootBlock&
+RootBlock::maxActiveClient(long maxActiveClient)
+{
+	m_maxActiveClient.set(maxActiveClient);
 
 	return (*this);
 }

@@ -16,6 +16,9 @@
 #include <exception/IOException.hpp>
 #include <http/enums/HTTPMethod.hpp>
 #include <http/enums/HTTPStatus.hpp>
+#include <http/handler/HTTPMethodHandler.hpp>
+#include <http/header/HTTPDate.hpp>
+#include <http/header/HTTPHeaderFields.hpp>
 #include <http/HTTPOrchestrator.hpp>
 #include <http/request/HTTPRequest.hpp>
 #include <http/request/HTTPRequestProcessor.hpp>
@@ -27,7 +30,7 @@
 #include <net/address/InetAddress.hpp>
 #include <net/address/InetSocketAddress.hpp>
 #include <sys/errno.h>
-#include <util/buffer/impl/BaseBuffer.hpp>
+#include <sys/types.h>
 #include <util/buffer/impl/SocketBuffer.hpp>
 #include <util/Enum.hpp>
 #include <util/Environment.hpp>
@@ -199,7 +202,12 @@ HTTPOrchestrator::start()
 						InetSocketAddress socketAddress;
 						Socket *socket = httpServer.socket().accept(&socketAddress);
 
-						addClient(*(new HTTPClient(*socket, socketAddress, httpServer)));
+						HTTPClient &httpClient = *(new HTTPClient(*socket, socketAddress, httpServer));
+
+						if (clientFds.size() >= m_configuration.rootBlock().maxActiveClient().orElse(RootBlock::DEFAULT_MAX_ACTIVE_CLIENT))
+							httpClient.response() = HTTPMethodHandler::status(*HTTPStatus::SERVICE_UNAVAILABLE, HTTPHeaderFields().retryAfter(10));
+
+						addClient(httpClient);
 					}
 				}
 			}

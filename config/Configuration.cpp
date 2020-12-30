@@ -203,6 +203,12 @@ Configuration::JsonBuilder::buildRootBlock(const JsonObject &jsonObject)
 
 	try
 	{
+		{
+			std::string path = KEY_ROOT;
+
+			BIND(jsonObject, KEY_ROOT_MAX_ACTIVE_CLIENT, JsonNumber, int, rootBlock, maxActiveClient);
+		}
+
 		if (jsonObject.has(KEY_ROOT_ROOT))
 		{
 			std::string ipath = KEY_ROOT KEY_DOT KEY_ROOT_ROOT;
@@ -537,11 +543,21 @@ Configuration::JsonBuilder::buildCustomErrorMap(const std::string &path, const J
 	return (CustomErrorMap(map));
 }
 
+#include <limits.h>
+
 void
 Configuration::Validator::validate(const RootBlock &rootBlock)
 {
 	typedef std::list<const ServerBlock*> slist;
 	typedef std::list<const LocationBlock*> llist;
+
+	if (rootBlock.maxActiveClient().present())
+	{
+		long n = rootBlock.maxActiveClient().get();
+
+		if (n < 1)
+			throw ConfigurationValidateException("maxActiveClient is under one (<= 1)");
+	}
 
 	if (rootBlock.serverBlocks().present())
 	{
