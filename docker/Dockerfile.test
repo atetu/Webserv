@@ -1,0 +1,3 @@
+FROM webserv-base
+
+ENTRYPOINT cd /app/source && valgrind --track-fds=yes /app/source/webserv

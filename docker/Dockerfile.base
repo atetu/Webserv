@@ -1,0 +1,31 @@
+FROM ubuntu:18.04
+
+ARG DEBIAN_FRONTEND=noninteractive
+
+RUN apt update
+RUN apt install -y nano git wget zsh valgrind g++ nginx
+
+RUN sh -c "$(wget -O- https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+
+RUN apt install -y php php-cgi php-mysql
+
+RUN apt install -y unzip
+RUN cd /root && \
+	wget https://wordpress.org/latest.zip && \
+	unzip latest.zip
+
+RUN apt install -y mysql-server-5.7 mysql-client-5.7
+RUN service mysql start; \
+	mysql -u root -e "CREATE DATABASE wordpress;"; \
+	mysql -u root -e "UPDATE mysql.user SET plugin='mysql_native_password';"; \
+	mysql -u root -e "UPDATE mysql.user SET host = '%' WHERE USER = 'root';"; \
+	mysql -u root -e "UPDATE mysql.user SET password=PASSWORD(\"password\") WHERE user='root';"; \
+	mysql -u root -e "SELECT host, user, plugin, password FROM mysql.user WHERE user='root';"; \
+	mysql -u root -e "FLUSH PRIVILEGES;";
+
+RUN mkdir /app
+
+WORKDIR /app
+EXPOSE 80
+
+ONBUILD COPY . /app

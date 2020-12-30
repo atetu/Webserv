@@ -16,6 +16,12 @@ RUN_TESTS				= 0
 SOURCE_DIR				= source
 PROJECT_MAKE			= make -s -C $(SOURCE_DIR) USE_FSANITIZE=$(USE_FSANITIZE) RUN_TESTS=$(RUN_TESTS)
 
+ifeq ($(shell if grep -q Microsoft /proc/version; then echo "wsl"; else echo "linux"; fi),wsl)
+    DOCKER := /mnt/c/Windows/System32/cmd.exe /c docker
+else
+    DOCKER := docker
+endif
+
 all: touch_test_files
 	@$(PROJECT_MAKE) all
     
@@ -41,11 +47,26 @@ run: all
 test: RUN_TESTS=1
 test: all
 	@$(PROJECT_MAKE) ARGS="$(ARGS)" run
-	
+
+docker-build-base:
+	@$(DOCKER) build -t webserv-base -f docker/Dockerfile.base .
+
+docker-build-run: all docker-build-base
+	@$(DOCKER) build -t webserv-run -f docker/Dockerfile.run .
+
+docker-build-test: all docker-build-base
+	@$(DOCKER) build -t webserv-test -f docker/Dockerfile.test .
+
+docker-run: docker-build-run
+	@$(DOCKER) run --rm -it -p 80:80 webserv-run $(ARGS)
+
+docker-test: docker-build-test
+	@$(DOCKER) run --rm -it -p 80:80 webserv-test $(ARGS)
+
 touch_test_files:
 	@#echo ${RUN_TESTS} $$(bash -c "test -f '.test'; echo $$?") # DEBUG
 	@bash -c "if [[ ('${RUN_TESTS}' = 0 && -f '.test') || ('${RUN_TESTS}' != 0 && ! -f '.test') ]]; then touch source/main.cpp source/tests/units/*.cpp; fi"
 	@bash -c "if [[ '${RUN_TESTS}' = 0 && -f '.test' ]]; then rm .test; fi"
 	@bash -c "if [[ '${RUN_TESTS}' != 0 && ! -f '.test' ]]; then touch .test; fi"
 
-.PHONY: all clean fclean re norm update test
+.PHONY: all clean fclean re norm update run test docker
