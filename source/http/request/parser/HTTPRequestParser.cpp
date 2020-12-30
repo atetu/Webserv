@@ -153,8 +153,8 @@ HTTPRequestParser::consume(char c)
 				hexStart(&m_queryKey);
 //			else if (c == '+')
 //				m_queryKey += ' '; // TODO @atetu can you explain???
-//			else if (c == ' ') // TODO Need check
-//				throw Exception("Query key expected");
+			else if (c == ' ')
+				m_state = S_HTTP_START;
 			else
 				m_queryKey += c;
 
@@ -462,6 +462,8 @@ HTTPRequestParser::consume(char c)
 			break;
 
 	}
+
+//	std::cout << m_state << " -- " << c << std::endl;
 
 	m_last_char2 = m_last_char;
 	m_last_char = c;
