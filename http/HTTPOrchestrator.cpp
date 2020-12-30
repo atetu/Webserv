@@ -315,7 +315,8 @@ HTTPOrchestrator::start()
 					{
 						if (client.response())
 						{
-							if (client.out().send() > 0 || !client.response()->write(client.out()))
+							ssize_t sent = client.out().send();
+							if (sent != -1 && (sent > 0 || !client.response()->write(client.out())))
 								client.updateLastAction();
 							else
 							{
