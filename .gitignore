@@ -221,3 +221,5 @@ $RECYCLE.BIN/
 /gather.py
 /updater.py
 /find_libs_bin.py
+
+.test

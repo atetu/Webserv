@@ -43,7 +43,7 @@
 				"500": "500.html",
 				"400": "not-found.html"
 			},
-			"root": ".",
+			"root": "../",
 			"locations": {
 				"/wordpress": {
 					"root": "/root/",

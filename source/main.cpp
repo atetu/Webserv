@@ -10,7 +10,6 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-//#include <bits/exception.h>
 #include <signal.h>
 #include <main/normal_main.hpp>
 #include <tests/test_unit.hpp>

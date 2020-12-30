@@ -12,6 +12,6 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: make
-      run: make re RUN_TESTS=1
+      run: make
     - name: run
-      run: ./webserv
+      run: make test
