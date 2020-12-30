@@ -169,87 +169,235 @@ HTTPOrchestrator::start()
 		.tv_sec = 0,
 		.tv_usec = 5000 };
 
-	m_running = true;
-	while (m_running)
+	try
 	{
-		readFdSet = m_fds;
-		writeFdSet = m_fds;
-
-		int fdCount;
-		if ((fdCount = ::select(m_highestFd + 1, &readFdSet, &writeFdSet, NULL, &timeout)) == -1)
+		m_running = true;
+		while (m_running)
 		{
-			if (m_stopping && errno == EINTR)
-				continue;
+			readFdSet = m_fds;
+			writeFdSet = m_fds;
 
-			throw IOException("select", errno);
-		}
-
-		printSelectOutput(readFdSet, writeFdSet);
-
-		if (fdCount)
-		{
-			try
+			int fdCount;
+			if ((fdCount = ::select(m_highestFd + 1, &readFdSet, &writeFdSet, NULL, &timeout)) == -1)
 			{
-				typedef std::map<int, HTTPServer const*>::iterator iterator;
+				if (m_stopping && errno == EINTR)
+					continue;
 
-				for (iterator it = serverFds.begin(); it != serverFds.end(); it++)
-				{
-					int fd = it->first;
-					const HTTPServer &httpServer = *it->second;
-
-					if (FD_ISSET(fd, &readFdSet))
-					{
-						InetSocketAddress socketAddress;
-						Socket *socket = httpServer.socket().accept(&socketAddress);
-
-						HTTPClient &httpClient = *(new HTTPClient(*socket, socketAddress, httpServer));
-
-						if (clientFds.size() >= m_configuration.rootBlock().maxActiveClient().orElse(RootBlock::DEFAULT_MAX_ACTIVE_CLIENT))
-							httpClient.response() = HTTPMethodHandler::status(*HTTPStatus::SERVICE_UNAVAILABLE, HTTPHeaderFields().retryAfter(10));
-
-						addClient(httpClient);
-					}
-				}
-			}
-			catch (Exception &exception)
-			{
-				LOG.warn() << "Could not accept connection: " << exception.message() << std::endl;
+				throw IOException("select", errno);
 			}
 
-			try
+			printSelectOutput(readFdSet, writeFdSet);
+
+			if (fdCount)
 			{
-				typedef std::map<int, FileDescriptorBuffer*>::iterator iterator;
-
-				std::set<int> fdToRemove;
-
-				for (iterator it = fileReadFds.begin(); it != fileReadFds.end(); it++)
+				try
 				{
-					int fd = it->first;
+					typedef std::map<int, HTTPServer const*>::iterator iterator;
 
-					if (FD_ISSET(fd, &readFdSet))
+					for (iterator it = serverFds.begin(); it != serverFds.end(); it++)
 					{
-						FileDescriptorBuffer &buffer = *it->second;
+						int fd = it->first;
+						const HTTPServer &httpServer = *it->second;
 
-						if (buffer.read() == -1 || buffer.hasReadEverything())
+						if (FD_ISSET(fd, &readFdSet))
 						{
-							//std::cout << "fd-read :: remove(" << fd << " (" << buffer.descriptor().raw() << ")): " << ::strerror(errno) << std::endl;
-							fdToRemove.insert(fdToRemove.end(), fd);
+							InetSocketAddress socketAddress;
+							Socket *socket = httpServer.socket().accept(&socketAddress);
+
+							HTTPClient &httpClient = *(new HTTPClient(*socket, socketAddress, httpServer));
+
+							if (clientFds.size() >= m_configuration.rootBlock().maxActiveClient().orElse(RootBlock::DEFAULT_MAX_ACTIVE_CLIENT))
+								httpClient.response() = HTTPMethodHandler::status(*HTTPStatus::SERVICE_UNAVAILABLE, HTTPHeaderFields().retryAfter(10));
+
+							addClient(httpClient);
 						}
 					}
 				}
+				catch (Exception &exception)
+				{
+					LOG.warn() << "Could not accept connection: " << exception.message() << std::endl;
+				}
 
-				for (std::set<int>::iterator it = fdToRemove.begin(); it != fdToRemove.end(); it++)
-					removeFileRead(*it);
-			}
-			catch (Exception &exception)
-			{
-				LOG.warn() << "Could not handle file reading: " << exception.message() << std::endl;
-			}
+				try
+				{
+					typedef std::map<int, FileDescriptorBuffer*>::iterator iterator;
 
-			if (errno)
+					std::set<int> fdToRemove;
+
+					for (iterator it = fileReadFds.begin(); it != fileReadFds.end(); it++)
+					{
+						int fd = it->first;
+
+						if (FD_ISSET(fd, &readFdSet))
+						{
+							FileDescriptorBuffer &buffer = *it->second;
+
+							if (buffer.read() == -1 || buffer.hasReadEverything())
+							{
+								//std::cout << "fd-read :: remove(" << fd << " (" << buffer.descriptor().raw() << ")): " << ::strerror(errno) << std::endl;
+								fdToRemove.insert(fdToRemove.end(), fd);
+							}
+						}
+					}
+
+					for (std::set<int>::iterator it = fdToRemove.begin(); it != fdToRemove.end(); it++)
+						removeFileRead(*it);
+				}
+				catch (Exception &exception)
+				{
+					LOG.warn() << "Could not handle file reading: " << exception.message() << std::endl;
+				}
+
+				if (errno)
+				{
+					std::cout << __FILE__ << ":" << __LINE__ << " -- " << ::strerror(errno) << std::endl;
+					errno = 0;
+				}
+
+				try
+				{
+					typedef std::map<int, HTTPClient*>::iterator iterator;
+
+					std::set<int> fdToRemove;
+
+					for (iterator it = clientFds.begin(); it != clientFds.end(); it++)
+					{
+						int fd = it->first;
+
+						bool canRead = FD_ISSET(fd, &readFdSet);
+						bool canWrite = FD_ISSET(fd, &writeFdSet);
+
+						bool deleted = false;
+
+						HTTPClient &client = *it->second;
+
+						if (canRead && !client.response())
+						{
+							if (client.in().size() != 0 || client.in().recv() > 0)
+							{
+								char c;
+
+								while (client.in().next(c))
+								{
+									try
+									{
+										client.parser().consume(c);
+									}
+									catch (Exception &exception)
+									{
+										client.response() = GenericHTTPResponse::status(*HTTPStatus::BAD_REQUEST);
+									}
+
+									if (!client.response())
+									{
+										try
+										{
+											if (client.parser().state() == HTTPRequestParser::S_END)
+												HTTPRequestProcessor(m_configuration, m_environment).process(client);
+										}
+										catch (Exception &exception)
+										{
+											client.response() = GenericHTTPResponse::status(*HTTPStatus::INTERNAL_SERVER_ERROR);
+										}
+									}
+
+									if (client.response())
+									{
+										HTTPResponse::fdb_vector buffers;
+
+										client.response()->readFileDescriptors(buffers);
+										for (HTTPResponse::fdb_iterator it = buffers.begin(); it != buffers.end(); it++)
+											addFileDescriptorBufferRead(*(*it));
+
+										buffers.clear();
+
+										client.response()->writeFileDescriptors(buffers);
+										for (HTTPResponse::fdb_iterator it = buffers.begin(); it != buffers.end(); it++)
+											addFileDescriptorBufferWrite(*(*it));
+
+										break;
+									}
+								}
+							}
+						}
+
+						if (canWrite && !deleted)
+						{
+							if (client.response())
+							{
+								ssize_t sent = client.out().send();
+								if (sent != -1 && (sent > 0 || !client.response()->write(client.out())))
+									client.updateLastAction();
+								else
+								{
+									//								std::cout << "closing(" << fd << "): " << ::strerror(errno) << std::endl;
+
+									fdToRemove.insert(fdToRemove.end(), fd);
+
+									deleted = true;
+
+									continue;
+								}
+							}
+						}
+
+						if (!deleted && client.response() && client.response()->state() == HTTPResponse::FINISHED)
+						{
+							std::cout << "done: " << fd << std::endl;
+
+							fdToRemove.insert(fdToRemove.end(), fd);
+
+							deleted = true;
+
+							continue;
+						}
+					}
+
+					for (std::set<int>::iterator it = fdToRemove.begin(); it != fdToRemove.end(); it++)
+						removeClient(*it);
+				}
+				catch (Exception &exception)
+				{
+					LOG.warn() << "Could not handle client: " << exception.message() << std::endl;
+				}
+
+				try
+				{
+					typedef std::map<int, FileDescriptorBuffer*>::iterator iterator;
+
+					std::set<int> fdToRemove;
+
+					for (iterator it = fileWriteFds.begin(); it != fileWriteFds.end(); it++)
+					{
+						int fd = it->first;
+
+						if (FD_ISSET(fd, &writeFdSet))
+						{
+							FileDescriptorBuffer &buffer = *it->second;
+
+							if (buffer.write() == -1)
+							{
+								// std::cout << "fd-write :: remove(" << fd << " (" << buffer.descriptor().raw() << ")): " << ::strerror(errno) << std::endl;
+								fdToRemove.insert(fdToRemove.end(), fd);
+							}
+						}
+					}
+
+					for (std::set<int>::iterator it = fdToRemove.begin(); it != fdToRemove.end(); it++)
+						removeFileWrite(*it);
+				}
+				catch (Exception &exception)
+				{
+					LOG.warn() << "Could not handle file reading: " << exception.message() << std::endl;
+				}
+			}
+			else if (m_stopping)
 			{
-				std::cout << __FILE__ << ":" << __LINE__ << " -- " << ::strerror(errno) << std::endl;
-				errno = 0;
+				if (clientFds.empty() && fileReadFds.empty() && fileWriteFds.empty())
+				{
+					m_running = false;
+					break;
+				}
 			}
 
 			try
@@ -258,94 +406,17 @@ HTTPOrchestrator::start()
 
 				std::set<int> fdToRemove;
 
+				unsigned long now = System::currentTimeSeconds();
 				for (iterator it = clientFds.begin(); it != clientFds.end(); it++)
 				{
 					int fd = it->first;
-
-					bool canRead = FD_ISSET(fd, &readFdSet);
-					bool canWrite = FD_ISSET(fd, &writeFdSet);
-
-					bool deleted = false;
-
 					HTTPClient &client = *it->second;
 
-					if (canRead && !client.response())
+					if (client.lastAction() + 5 < now)
 					{
-						if (client.in().size() != 0 || client.in().recv() > 0)
-						{
-							char c;
-
-							while (client.in().next(c))
-							{
-								try
-								{
-									client.parser().consume(c);
-								}
-								catch (Exception &exception)
-								{
-									client.response() = GenericHTTPResponse::status(*HTTPStatus::BAD_REQUEST);
-								}
-
-								if (!client.response())
-								{
-									try
-									{
-										if (client.parser().state() == HTTPRequestParser::S_END)
-											HTTPRequestProcessor(m_configuration, m_environment).process(client);
-									}
-									catch (Exception &exception)
-									{
-										client.response() = GenericHTTPResponse::status(*HTTPStatus::INTERNAL_SERVER_ERROR);
-									}
-								}
-
-								if (client.response())
-								{
-									HTTPResponse::fdb_vector buffers;
-
-									client.response()->readFileDescriptors(buffers);
-									for (HTTPResponse::fdb_iterator it = buffers.begin(); it != buffers.end(); it++)
-										addFileDescriptorBufferRead(*(*it));
-
-									buffers.clear();
-
-									client.response()->writeFileDescriptors(buffers);
-									for (HTTPResponse::fdb_iterator it = buffers.begin(); it != buffers.end(); it++)
-										addFileDescriptorBufferWrite(*(*it));
-
-									break;
-								}
-							}
-						}
-					}
-
-					if (canWrite && !deleted)
-					{
-						if (client.response())
-						{
-							ssize_t sent = client.out().send();
-							if (sent != -1 && (sent > 0 || !client.response()->write(client.out())))
-								client.updateLastAction();
-							else
-							{
-//								std::cout << "closing(" << fd << "): " << ::strerror(errno) << std::endl;
-
-								fdToRemove.insert(fdToRemove.end(), fd);
-
-								deleted = true;
-
-								continue;
-							}
-						}
-					}
-
-					if (!deleted && client.response() && client.response()->state() == HTTPResponse::FINISHED)
-					{
-						std::cout << "done: " << fd << std::endl;
+						std::cout << "timeout: " << fd << std::endl;
 
 						fdToRemove.insert(fdToRemove.end(), fd);
-
-						deleted = true;
 
 						continue;
 					}
@@ -356,80 +427,16 @@ HTTPOrchestrator::start()
 			}
 			catch (Exception &exception)
 			{
-				LOG.warn() << "Could not handle client: " << exception.message() << std::endl;
-			}
-
-			try
-			{
-				typedef std::map<int, FileDescriptorBuffer*>::iterator iterator;
-
-				std::set<int> fdToRemove;
-
-				for (iterator it = fileWriteFds.begin(); it != fileWriteFds.end(); it++)
-				{
-					int fd = it->first;
-
-					if (FD_ISSET(fd, &writeFdSet))
-					{
-						FileDescriptorBuffer &buffer = *it->second;
-
-						if (buffer.write() == -1)
-						{
-							// std::cout << "fd-write :: remove(" << fd << " (" << buffer.descriptor().raw() << ")): " << ::strerror(errno) << std::endl;
-							fdToRemove.insert(fdToRemove.end(), fd);
-						}
-					}
-				}
-
-				for (std::set<int>::iterator it = fdToRemove.begin(); it != fdToRemove.end(); it++)
-					removeFileWrite(*it);
-			}
-			catch (Exception &exception)
-			{
-				LOG.warn() << "Could not handle file reading: " << exception.message() << std::endl;
-			}
-		}
-		else if (m_stopping)
-		{
-			if (clientFds.empty() && fileReadFds.empty() && fileWriteFds.empty())
-			{
-				m_running = false;
-				break;
+				LOG.warn() << "Could not handle client (timeout): " << exception.message() << std::endl;
 			}
 		}
 
-		try
-		{
-			typedef std::map<int, HTTPClient*>::iterator iterator;
-
-			std::set<int> fdToRemove;
-
-			unsigned long now = System::currentTimeSeconds();
-			for (iterator it = clientFds.begin(); it != clientFds.end(); it++)
-			{
-				int fd = it->first;
-				HTTPClient &client = *it->second;
-
-				if (client.lastAction() + 5 < now)
-				{
-					std::cout << "timeout: " << fd << std::endl;
-
-					fdToRemove.insert(fdToRemove.end(), fd);
-
-					continue;
-				}
-			}
-
-			for (std::set<int>::iterator it = fdToRemove.begin(); it != fdToRemove.end(); it++)
-				removeClient(*it);
-		}
-		catch (Exception &exception)
-		{
-			LOG.warn() << "Could not handle client (timeout): " << exception.message() << std::endl;
-		}
+		m_running = false;
 	}
-
-	m_running = false;
+	catch (std::bad_alloc &exception)
+	{
+		LOG.error() << "Failed to allocate (std::bad_alloc): " << exception.what() << std::endl;
+	}
 
 	while (!m_servers.empty())
 	{
