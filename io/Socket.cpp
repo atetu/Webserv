@@ -11,7 +11,6 @@
 /* ************************************************************************** */
 
 #include <arpa/inet.h>
-//#include <asm/byteorder.h>
 #include <netinet/in.h>
 #include <sys/socket.h>
 #include <exception/IOException.hpp>
@@ -20,6 +19,7 @@
 #include <net/address/InetSocketAddress.hpp>
 #include <sys/errno.h>
 #include <sys/socket.h>
+#include <util/helper/DeleteHelper.hpp>
 
 static const int g_true = 1;
 
@@ -119,14 +119,19 @@ Socket::accept(InetSocketAddress *socketAddress) const
 	socklen_t len = sizeof(addr);
 
 	int fd = ::accept(raw(), (struct sockaddr*)&addr, &len);
+	if (fd == -1)
+		throw IOException("accept", errno);
 
 	if (socketAddress)
 		*socketAddress = InetSocketAddress::from((struct sockaddr*)&addr, len);
 
-	if (fd == -1)
-		throw IOException("accept", errno);
+	try {
+		return (new Socket(fd));
+	} catch (...) {
+		DeleteHelper::pointer<InetSocketAddress>(socketAddress);
 
-	return (new Socket(fd));
+		throw;
+	}
 }
 
 Socket*
