@@ -1,1 +1,5 @@
 /webserv
+/find_libs.py
+/find_libs_bin.py
+/gather.py
+/updater.py
