@@ -26,7 +26,7 @@
 #include <http/HTTPServer.hpp>
 #include <http/request/HTTPRequest.hpp>
 #include <http/request/HTTPRequestProcessor.hpp>
-#include <http/request/parser/HTTPRequestParser.hpp>
+#include <http/parser/HTTPRequestParser.hpp>
 #include <http/response/HTTPStatusLine.hpp>
 #include <http/response/impl/cgi/CGIHTTPResponse.hpp>
 #include <http/response/impl/generic/GenericHTTPResponse.hpp>
@@ -45,7 +45,7 @@
 #include <list>
 #include <string>
 
-Logger &HTTPRequestProcessor::LOG = LoggerFactory::get("HTTP Request Processor");
+Logger &HTTPRequestProcessor::LOG = LoggerFactory::get("Req. Processor");
 
 HTTPRequestProcessor::HTTPRequestProcessor(const Configuration &configuration, const Environment &environment) :
 		m_configuration(configuration),
@@ -86,7 +86,7 @@ HTTPRequestProcessor::process(HTTPClient &client)
 	const LocationBlock *locationBlockPtr = NULL;
 	if (serverBlockPtr && serverBlockPtr->locations().present())
 	{
-		HTTPFindLocation findLocation(client.parser().path(), serverBlockPtr->locations().get());
+		HTTPFindLocation findLocation(client.parser().pathParser().path(), serverBlockPtr->locations().get());
 
 		if (findLocation.parse().location().present())
 			locationBlockPtr = findLocation.parse().location().get();

@@ -11,10 +11,7 @@
 /* ************************************************************************** */
 
 #include <tests/test_unit.hpp>
-#include <util/log/LoggerFactory.hpp>
 #include <util/unit/DataSize.hpp>
-
-static Logger &LOG = LoggerFactory::get("util/unit/DataSize");
 
 CASE("datasize", "parse-invalid")
 {
@@ -80,9 +77,9 @@ CASE("datasize", "convert")
 {
 	ASSERT(DataSize::ofBytes(1).toBytes() == 1);
 	ASSERT(DataSize::ofKilobytes(1).toBytes() == 1024);
-	ASSERT(DataSize::ofMegabytes(1).toBytes() == (long long)1024 * 1024);
-	ASSERT(DataSize::ofGigabytes(1).toBytes() == (long long)1024 * 1024 * 1024);
-	ASSERT(DataSize::ofTerabytes(1).toBytes() == (long long)1024 * 1024 * 1024 * 1024);
+	ASSERT(DataSize::ofMegabytes(1).toBytes() == (long long )1024 * 1024);
+	ASSERT(DataSize::ofGigabytes(1).toBytes() == (long long )1024 * 1024 * 1024);
+	ASSERT(DataSize::ofTerabytes(1).toBytes() == (long long )1024 * 1024 * 1024 * 1024);
 
 	return (0);
 }

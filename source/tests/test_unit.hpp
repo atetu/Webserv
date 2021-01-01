@@ -13,6 +13,8 @@
 #ifndef TEST_UNIT_HPP_
 # define TEST_UNIT_HPP_
 
+#include <util/log/LoggerFactory.hpp>
+
 # ifndef RUN_TESTS
 #  define RUN_TESTS 0
 # endif
@@ -44,10 +46,12 @@
 	static int CASE_METHOD_NAME(int argc, char **argv, char **envp)
 # endif
 
+static Logger &TEST_CASE_LOG = LoggerFactory::get("test-case");
+
 # define ASSERT(cond) \
 	if (!(cond)) \
 	{ \
-		LOG.fatal() << "ASSERT() " << __FILE__ << ":" << __LINE__ << " -- " << #cond << std::endl; \
+		TEST_CASE_LOG.fatal() << "ASSERT() " << __FILE__ << ":" << __LINE__ << " -- " << #cond << std::endl; \
 		return (1); \
 	}
 
@@ -55,7 +59,7 @@
 	try \
 	{ \
 		code; \
-		LOG.fatal() << "ASSERT_EXCEPT() " << __FILE__ << ":" << __LINE__ << " -- " << #code << std::endl; \
+		TEST_CASE_LOG.fatal() << "ASSERT_EXCEPT() " << __FILE__ << ":" << __LINE__ << " -- " << #code << std::endl; \
 		return (1); \
 	} \
 	catch (...) \
@@ -69,7 +73,7 @@
 	} \
 	catch (std::exception &exception) \
 	{ \
-		LOG.fatal() << "ASSERT_NO_EXCEPT() " << __FILE__ << ":" << __LINE__ << " -- " << #code << " -- " << exception.what() << std::endl; \
+		TEST_CASE_LOG.fatal() << "ASSERT_NO_EXCEPT() " << __FILE__ << ":" << __LINE__ << " -- " << #code << " -- " << exception.what() << std::endl; \
 		return (1); \
 	}
 

@@ -11,10 +11,7 @@
 /* ************************************************************************** */
 
 #include <tests/test_unit.hpp>
-#include <util/log/LoggerFactory.hpp>
 #include <util/Number.hpp>
-
-static Logger &LOG = LoggerFactory::get("util/Number");
 
 CASE("number", "parse-invalid")
 {

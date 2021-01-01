@@ -15,8 +15,6 @@
 #include <tests/test_unit.hpp>
 #include <util/log/LoggerFactory.hpp>
 
-static Logger &LOG = LoggerFactory::get("encoding/Base64");
-
 static std::string
 encode(const char *str)
 {

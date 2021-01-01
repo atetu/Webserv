@@ -22,7 +22,7 @@
 #include <http/HTTPOrchestrator.hpp>
 #include <http/request/HTTPRequest.hpp>
 #include <http/request/HTTPRequestProcessor.hpp>
-#include <http/request/parser/HTTPRequestParser.hpp>
+#include <http/parser/HTTPRequestParser.hpp>
 #include <http/response/HTTPResponse.hpp>
 #include <http/response/HTTPStatusLine.hpp>
 #include <http/response/impl/generic/GenericHTTPResponse.hpp>
@@ -47,7 +47,7 @@
 #include <utility>
 #include <vector>
 
-Logger &HTTPOrchestrator::LOG = LoggerFactory::get("HTTP Orchestrator");
+Logger &HTTPOrchestrator::LOG = LoggerFactory::get("Orchestrator");
 
 HTTPOrchestrator::HTTPOrchestrator(const Configuration &configuration, const Environment &environment, const server_container &servers) :
 		m_configuration(configuration),

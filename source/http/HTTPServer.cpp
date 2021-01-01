@@ -23,7 +23,7 @@
 #include <http/HTTPServer.hpp>
 #include <http/mime/MimeRegistry.hpp>
 #include <http/request/HTTPRequest.hpp>
-#include <http/request/parser/HTTPRequestParser.hpp>
+#include <http/parser/HTTPRequestParser.hpp>
 #include <http/response/HTTPStatusLine.hpp>
 #include <http/response/impl/cgi/CGIHTTPResponse.hpp>
 #include <http/response/impl/generic/GenericHTTPResponse.hpp>

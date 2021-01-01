@@ -105,6 +105,14 @@ template<typename T>
 			}
 
 			Optional&
+			set(void)
+			{
+				m_present = true;
+
+				return (*this);
+			}
+
+			Optional&
 			set(const T &value)
 			{
 				m_present = true;

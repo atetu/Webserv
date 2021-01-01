@@ -20,10 +20,7 @@
 #include <util/json/JsonReader.hpp>
 #include <util/json/JsonString.hpp>
 #include <util/json/JsonValue.hpp>
-#include <util/log/LoggerFactory.hpp>
 #include <string>
-
-static Logger &LOG = LoggerFactory::get("util/json/*");
 
 static JsonValue *g_temporary_storage = NULL;
 

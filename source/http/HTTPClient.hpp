@@ -13,12 +13,11 @@
 #ifndef HTTPCLIENT_HPP_
 # define HTTPCLIENT_HPP_
 
-#include <http/request/parser/HTTPRequestParser.hpp>
+#include <http/parser/HTTPRequestParser.hpp>
 #include <io/Socket.hpp>
 #include <net/address/InetSocketAddress.hpp>
 
 class HTTPResponse;
-
 class HTTPServer;
 class SocketBuffer;
 class Socket;
@@ -52,12 +51,6 @@ class HTTPClient
 
 		void
 		updateLastAction();
-
-		void
-		header(HTTPHeaderParser headerParser);
-
-		// std::vector<HTTPHeaderParser> 
-		// getHeader();
 
 		inline Socket&
 		socket(void)

@@ -16,8 +16,6 @@
 #include <util/log/LoggerFactory.hpp>
 #include <string>
 
-static Logger &LOG = LoggerFactory::get("encoding/Chunked");
-
 static std::string
 encode(const char *str)
 {

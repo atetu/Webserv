@@ -11,11 +11,8 @@
 /* ************************************************************************** */
 
 #include <tests/test_unit.hpp>
-#include <util/log/LoggerFactory.hpp>
 #include <util/StringUtils.hpp>
 #include <string>
-
-static Logger &LOG = LoggerFactory::get("util/StringUtils");
 
 CASE("string-util", "toUpperCase")
 {

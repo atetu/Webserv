@@ -13,14 +13,11 @@
 #include <io/File.hpp>
 #include <io/FileDescriptor.hpp>
 #include <tests/test_unit.hpp>
-#include <util/log/LoggerFactory.hpp>
 #include <string>
 
 #ifndef O_WRONLY
 #include <fcntl.h>
 #endif
-
-static Logger &LOG = LoggerFactory::get("io/File");
 
 CASE("file", "constructor path")
 {

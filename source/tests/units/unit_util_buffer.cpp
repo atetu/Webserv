@@ -12,10 +12,7 @@
 
 #include <tests/test_unit.hpp>
 #include <util/buffer/impl/BaseBuffer.hpp>
-#include <util/log/LoggerFactory.hpp>
 #include <string>
-
-static Logger &LOG = LoggerFactory::get("util/buffer/*");
 
 CASE("buffer", "base-store")
 {

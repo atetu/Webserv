@@ -49,6 +49,12 @@ class HTTPHeaderFields
 		HTTPHeaderFields&
 		operator=(const HTTPHeaderFields &other);
 
+		inline bool
+		operator ==(const HTTPHeaderFields &other) const
+		{
+			return (m_storage == other.m_storage);
+		}
+
 		HTTPHeaderFields&
 		acceptCharsets(const std::string &value);
 

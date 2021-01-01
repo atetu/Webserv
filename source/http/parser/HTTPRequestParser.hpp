@@ -13,11 +13,9 @@
 #ifndef HTTPREQUESTPARSER_HPP_
 # define HTTPREQUESTPARSER_HPP_
 
-#include <http/header/HTTPHeaderFields.hpp>
-#include <http/header/HTTPHeaderParser.hpp>
-#include <map>
+#include <http/parser/HTTPHeaderFieldsParser.hpp>
+#include <http/parser/HTTPRequestPathParser.hpp>
 #include <string>
-#include <vector>
 
 class URL;
 
@@ -50,42 +48,20 @@ class HTTPRequestParser
 			S_HTTP_END,
 			S_HTTP_END2,
 			S_HTTP_END3,
-			S_QUERY_STRING_KEY,
-			S_QUERY_STRING_VALUE,
-			S_FRAGMENT,
-			S_HEX_START,
-			S_HEX_END,
-			S_FIELD,
-			S_COLON,
-			S_SPACES_BEFORE_VALUE,
-			S_VALUE,
-			S_SPACES_AFTER_VALUE,
-			S_VALUE_END,
-			S_VALUE_END2,
-			S_VALUE_END3,
+			S_HEADER_FIELDS,
 			S_END,
 		};
 
 	private:
 		State m_state;
 		std::string m_method;
-		std::string m_path;
+		HTTPRequestPathParser m_pathParser;
 		int m_major;
 		int m_minor;
-		std::string m_field;
-		std::string m_value;
-		HTTPHeaderFields m_headerFields;
-		std::map<std::string, std::string> m_query;
-		std::string m_queryKey;
-		std::string m_queryValue;
-		std::string m_fragment;
+		HTTPHeaderFieldsParser m_headerFieldsParser;
 		std::string m_body;
-		State m_hexBeforeState;
-		std::string *m_hexStoreTarget;
-		std::string m_hex;
-
-		char m_last_char;
-		char m_last_char2;
+		char m_last;
+		char m_last2;
 
 	public:
 		HTTPRequestParser();
@@ -99,32 +75,35 @@ class HTTPRequestParser
 		std::string
 		method() const;
 
-		std::string
-		path() const;
+		inline const HTTPRequestPathParser&
+		pathParser() const
+		{
+			return (m_pathParser);
+		}
 
-		int
-		major() const;
+		inline int
+		major() const
+		{
+			return (m_major);
+		}
 
-		int
-		minor() const;
+		inline int
+		minor() const
+		{
+			return (m_major);
+		}
 
-		const HTTPHeaderFields&
-		headerFields();
+		inline const HTTPHeaderFieldsParser&
+		headerFieldsParser() const
+		{
+			return (m_headerFieldsParser);
+		}
 
-		void
-		header(HTTPHeaderParser headerParser);
-
-		std::vector<HTTPHeaderParser>
-		getHeader();
-
-		char
-		lastChar() const;
-
-		std::map<std::string, std::string>&
-		query();
-
-		std::string&
-		fragment();
+		inline const HTTPHeaderFields&
+		headerFields() const
+		{
+			return (m_headerFieldsParser.headerFields());
+		}
 
 		void
 		body(const std::string &storage);
@@ -137,15 +116,6 @@ class HTTPRequestParser
 
 		URL
 		url();
-
-	private:
-		inline void
-		hexStart(std::string *storeInto)
-		{
-			m_hexBeforeState = m_state;
-			m_state = S_HEX_START;
-			m_hexStoreTarget = storeInto;
-		}
 };
 
 #endif /* HTTPREQUESTPARSER_HPP_ */

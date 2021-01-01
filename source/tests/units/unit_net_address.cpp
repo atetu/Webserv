@@ -14,10 +14,7 @@
 #include <net/address/Inet6Address.hpp>
 #include <net/address/InetSocketAddress.hpp>
 #include <tests/test_unit.hpp>
-#include <util/log/LoggerFactory.hpp>
 #include <string>
-
-static Logger &LOG = LoggerFactory::get("net/address/*");
 
 CASE("net-address", "4")
 {
