@@ -104,7 +104,7 @@ HTTPRequestProcessor::process(HTTPClient &client)
 	}
 
 	if (method.hasBody())
-		client.parser().body(client.in().storage());
+		client.parser().body(client.in().storage(), serverBlock.maxBodySize());
 
 	const RootBlock &rootBlock = m_configuration.rootBlock();
 

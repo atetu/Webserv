@@ -6,7 +6,7 @@
 /*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/27 17:29:02 by ecaceres          #+#    #+#             */
-/*   Updated: 2020/12/24 14:33:28 by alicetetu        ###   ########.fr       */
+/*   Updated: 2021/01/02 11:53:12 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -266,13 +266,23 @@ HTTPRequestParser::body() const
 }
 
 void
-HTTPRequestParser::body(std::string &storage)
+HTTPRequestParser::body(std::string &storage, const Optional<DataSize> &maxBodySize)
 {
+	long long max;
+	if (maxBodySize.present())
+		max = maxBodySize.get().toBytes();
+	else
+		max = -1; // can we not have maxBodySize? 
 	const Optional<std::string> contentLengthOptional = headerFieldsParser().headerFields().get(HTTPHeaderFields::CONTENT_LENGTH);
 	if (contentLengthOptional.present())
 	{
 		int bodySize = ::atoi(contentLengthOptional.get().c_str());
-		m_body = storage.substr(0, bodySize);
+		if (max != -1 && bodySize < max)
+			m_body = storage.substr(0, bodySize);
+		else if (max != -1)
+			m_body = storage.substr(0, max);
+		else
+			m_body = storage;
 	}
 	else
 	{
@@ -281,7 +291,9 @@ HTTPRequestParser::body(std::string &storage)
 		{
 			const std::string &encoding = transfertEncodingOptional.get();
 
-			if (encoding == "chunked")
+			if (encoding == "chunked" && max != -1)
+				m_body = ChunkDecoder(storage.substr(0, max)).decode();
+			else if (encoding == "chunked")
 				m_body = ChunkDecoder(storage).decode();
 			else
 				throw Exception("transfer_encoding not supported");
