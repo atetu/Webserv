@@ -170,15 +170,15 @@ JsonTokenizer::nextToken(void)
 			return (JsonToken::COMMA);
 
 		case 't':
-			expectRead("true" + 1); /* 't' has already been read */
+			expectRead((const char*)"true" + 1); /* 't' has already been read */
 			return (JsonToken::TRUE);
 
 		case 'f':
-			expectRead("false" + 1); /* 'f' has already been read */
+			expectRead((const char*)"false" + 1); /* 'f' has already been read */
 			return (JsonToken::FALSE);
 
 		case 'n':
-			expectRead("null" + 1); /* 'n' has already been read */
+			expectRead((const char*)"null" + 1); /* 'n' has already been read */
 			return (JsonToken::NULL_);
 
 		case '}':

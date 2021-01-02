@@ -27,7 +27,7 @@ class JsonValue
 			TYPE_NUMBER,
 			TYPE_DECIMAL,
 			TYPE_BOOLEAN,
-			TYPE_NULL,
+			TYPE_NULL, /* DO NOT CHANGE ORDER, typeStringStorage() depends on it. */
 			TYPE__SIZE
 		};
 

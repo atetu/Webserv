@@ -22,13 +22,13 @@ const std::string*
 JsonValue::typeStringStorage()
 {
 	static std::string strings[TYPE__SIZE] = {
-		[TYPE_ARRAY] = "ARRAY",
-		[TYPE_OBJECT] = "OBJECT",
-		[TYPE_STRING] = "STRING",
-		[TYPE_NUMBER] = "NUMBER",
-		[TYPE_DECIMAL] = "DECIMAL",
-		[TYPE_BOOLEAN] = "BOOLEAN",
-		[TYPE_NULL] = "NULL" };
+		"ARRAY",
+		"OBJECT",
+		"STRING",
+		"NUMBER",
+		"DECIMAL",
+		"BOOLEAN",
+		"NULL" }; /* DO NOT CHANGE ORDER, depend on the Type type. */
 
 	return ((std::string*)strings);
 }
