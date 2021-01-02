@@ -14,8 +14,6 @@
 # define JSONARRAY_HPP_
 
 #include <util/json/JsonStructure.hpp>
-#include <util/json/JsonValue.hpp>
-#include <iterator>
 #include <string>
 #include <vector>
 
@@ -24,168 +22,68 @@ class JsonArray :
 {
 	public:
 		typedef std::vector<JsonValue*> Container;
-		typedef typename Container::size_type size_type;
-		typedef typename Container::iterator iterator;
-		typedef typename Container::const_iterator const_iterator;
+		typedef Container::size_type size_type;
+		typedef Container::iterator iterator;
+		typedef Container::const_iterator const_iterator;
 
 	private:
 		Container m_value;
 
 	public:
-		JsonArray(void) :
-				m_value()
-		{
-		}
-
-		JsonArray(std::vector<JsonValue*> value) :
-				m_value(value)
-		{
-		}
-
-		JsonArray(const JsonArray &other) :
-				m_value()
-		{
-			operator =(other);
-		}
+		JsonArray(void);
+		JsonArray(std::vector<JsonValue*> value);
+		JsonArray(const JsonArray &other);
 
 		virtual
-		~JsonArray(void)
-		{
-			clear();
-		}
+		~JsonArray(void);
 
 		JsonArray&
-		operator =(const JsonArray &other)
-		{
-			if (this != &other)
-			{
-				const_iterator it = other.m_value.begin();
-				const_iterator ite = other.m_value.end();
-
-				clear();
-
-				for (; it != ite; it++)
-					m_value.insert(m_value.end(), (*it)->clone());
-			}
-
-			return (*this);
-		}
+		operator =(const JsonArray &other);
 
 		JsonValue&
-		operator [](int index)
-		{
-			return (*(m_value[index]));
-		}
+		operator [](int index);
 
 		const JsonValue&
-		operator [](int index) const
-		{
-			return (*(m_value[index]));
-		}
+		operator [](int index) const;
 
-		operator Container(void)
-		{
-			return (m_value);
-		}
-
-		operator Container(void) const
-		{
-			return (m_value);
-		}
+		operator Container(void);
+		operator Container(void) const;
 
 		void
-		add(JsonValue *value)
-		{
-			m_value.push_back(value);
-		}
+		add(JsonValue *value);
 
-		inline iterator
-		begin()
-		{
-			return (m_value.begin());
-		}
+		iterator
+		begin();
 
-		inline iterator
-		end()
-		{
-			return (m_value.end());
-		}
+		iterator
+		end();
 
-		inline const_iterator
-		begin() const
-		{
-			return (m_value.begin());
-		}
+		const_iterator
+		begin() const;
 
-		inline const_iterator
-		end() const
-		{
-			return (m_value.end());
-		}
+		const_iterator
+		end() const;
 
 		virtual void
-		clear(void)
-		{
-			if (m_value.empty())
-				return;
+		clear(void);
 
-			iterator it = m_value.begin();
-			iterator ite = m_value.end();
+		bool
+		empty() const;
 
-			for (; it != ite; it++) // TODO Use simple for-loop...
-				delete *it;
-
-			return (m_value.clear());
-		}
-
-		inline bool
-		empty() const
-		{
-			return (m_value.empty());
-		}
-
-		inline Container::size_type
-		size() const
-		{
-			return (m_value.size());
-		}
+		Container::size_type
+		size() const;
 
 		JsonValue*
-		clone(void) const
-		{
-			return (new JsonArray(*this));
-		}
+		clone(void) const;
 
 		const Type
-		type(void) const
-		{
-			return (TYPE_ARRAY);
-		}
+		type(void) const;
 
 		const std::string
 		toJsonString(void) const;
 
 		bool
-		equals(const JsonValue &other) const
-		{
-			const JsonArray *casted = dynamic_cast<JsonArray const*>(&other);
-			if (casted)
-			{
-				size_type size = this->size();
-				if (size != casted->size())
-					return (false);
-
-				for (size_type index = 0; index < size; index++)
-				{
-					if (this->operator [](index) != casted->operator [](index))
-						return (false);
-				}
-
-				return (true);
-			}
-
-			return (false);
-		}
+		equals(const JsonValue &other) const;
 };
 
 #endif /* JSONARRAY_HPP_ */

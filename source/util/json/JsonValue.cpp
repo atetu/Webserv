@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "JsonValue.hpp"
+#include <util/json/JsonValue.hpp>
 
 const std::string&
 JsonValue::typeString() const

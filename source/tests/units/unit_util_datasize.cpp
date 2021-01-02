@@ -24,7 +24,7 @@ CASE("datasize", "parse-invalid")
 
 CASE("datasize", "parse-default-unit")
 {
-	ASSERT_NO_EXCEPT(DataSize::parse("1").toBytes() == 1);
+	ASSERT_NO_EXCEPT(ASSERT(DataSize::parse("1").toBytes() == 1));
 
 	return (0);
 }

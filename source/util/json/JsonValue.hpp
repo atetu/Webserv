@@ -93,22 +93,6 @@ class JsonValue
 		typeStringStorage();
 };
 
-template<typename T>
-	struct JsonTypeTraits
-	{
-			static const char *name;
-			static const JsonValue::Type type;
-			static const char *typeString;
-	};
-
-#define REGISTER_JSON_TYPE_TRAITS(cls, jsonType) \
-    template<> \
-		const char* JsonTypeTraits<cls>::name = #cls; \
-	template<> \
-		const JsonValue::Type JsonTypeTraits<cls>::type = jsonType; \
-	template<> \
-		const char* JsonTypeTraits<cls>::typeString = JsonValue::typeStringStorage()[jsonType].c_str();
-
 std::ostream&
 operator <<(std::ostream &stream, const JsonValue &jsonValue);
 

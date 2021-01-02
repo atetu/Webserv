@@ -31,7 +31,6 @@ class HTTPLocationInterpretor
 			S_TILDE,
 			S_SPACE_AFTER_TILDE,
 			S_NO_CASE_MODIFIER,
-			S_SPACE_AFTER_NO_CASE_MODIFIER,
 			S_END,
 			S_OVER,
 		};

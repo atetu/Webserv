@@ -49,7 +49,7 @@ CASE("json", "parsing number")
 	ASSERT(json("42").cast<JsonNumber>()->operator int() == 42);
 	ASSERT(json("-42").cast<JsonNumber>()->operator int() == -42);
 
-	&autoDelete(NULL);
+	(void)&autoDelete(NULL);
 
 	return (0);
 }
@@ -64,7 +64,7 @@ CASE("json", "parsing decimal")
 	ASSERT(json("4.2").cast<JsonDecimal>()->operator double() == 4.2);
 	ASSERT(json("-4.2").cast<JsonDecimal>()->operator double() == -4.2);
 
-	&autoDelete(NULL);
+	(void)&autoDelete(NULL);
 
 	return (0);
 }
@@ -74,7 +74,7 @@ CASE("json", "parsing true")
 	ASSERT(json("true").instanceOf<JsonBoolean>());
 	ASSERT(json("true").cast<JsonBoolean>()->operator bool() == true);
 
-	&autoDelete(NULL);
+	(void)&autoDelete(NULL);
 
 	return (0);
 }
@@ -84,7 +84,7 @@ CASE("json", "parsing false")
 	ASSERT(json("false").instanceOf<JsonBoolean>());
 	ASSERT(json("false").cast<JsonBoolean>()->operator bool() == false);
 
-	&autoDelete(NULL);
+	(void)&autoDelete(NULL);
 
 	return (0);
 }
@@ -93,7 +93,7 @@ CASE("json", "parsing null")
 {
 	ASSERT(json("null").instanceOf<JsonNull>());
 
-	&autoDelete(NULL);
+	(void)&autoDelete(NULL);
 
 	return (0);
 }
@@ -104,7 +104,7 @@ CASE("json", "parsing string")
 
 	ASSERT(json("\"Hello\"").cast<JsonString>()->operator std::string() == "Hello");
 
-	&autoDelete(NULL);
+	(void)&autoDelete(NULL);
 
 	return (0);
 }
@@ -114,7 +114,7 @@ CASE("json", "parsing empty object")
 	ASSERT(json("{}").instanceOf<JsonObject>());
 	ASSERT(json("{}").cast<JsonObject>()->empty());
 
-	&autoDelete(NULL);
+	(void)&autoDelete(NULL);
 
 	return (0);
 }
@@ -124,7 +124,7 @@ CASE("json", "parsing empty array")
 	ASSERT(json("[]").instanceOf<JsonArray>());
 	ASSERT(json("[]").cast<JsonArray>()->empty());
 
-	&autoDelete(NULL);
+	(void)&autoDelete(NULL);
 
 	return (0);
 }
@@ -145,7 +145,7 @@ CASE("json", "simple object")
 	aTemplate.put("another", new JsonNull());
 	ASSERT(json("{\"hello\": true, \"another\": null}") == aTemplate);
 
-	&autoDelete(NULL);
+	(void)&autoDelete(NULL);
 
 	return (0);
 }
@@ -166,7 +166,7 @@ CASE("json", "simple array")
 	aTemplate.add(new JsonNull());
 	ASSERT(json("[\"hello\", 42, true, null]") == aTemplate);
 
-	&autoDelete(NULL);
+	(void)&autoDelete(NULL);
 
 	return (0);
 }

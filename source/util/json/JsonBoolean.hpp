@@ -27,72 +27,30 @@ class JsonBoolean :
 		bool m_value;
 
 	public:
-		JsonBoolean() :
-				m_value(false)
-		{
-		}
-
-		JsonBoolean(bool value) :
-				m_value(value)
-		{
-		}
-
-		JsonBoolean(const JsonBoolean &other) :
-				m_value(other.m_value)
-		{
-		}
+		JsonBoolean();
+		JsonBoolean(bool value);
+		JsonBoolean(const JsonBoolean &other);
 
 		virtual
-		~JsonBoolean()
-		{
-		}
+		~JsonBoolean();
 
 		JsonBoolean&
-		operator =(const JsonBoolean &other)
-		{
-			if (this != &other)
-				m_value = other.m_value;
+		operator =(const JsonBoolean &other);
 
-			return (*this);
-		}
-
-		operator bool()
-		{
-			return (m_value);
-		}
-
-		operator bool() const
-		{
-			return (m_value);
-		}
+		operator bool();
+		operator bool() const;
 
 		JsonValue*
-		clone() const
-		{
-			return (new JsonBoolean(*this));
-		}
+		clone() const;
 
 		const Type
-		type() const
-		{
-			return (TYPE_BOOLEAN);
-		}
+		type() const;
 
 		const std::string
-		toJsonString() const
-		{
-			return (m_value ? TRUE : FALSE);
-		}
+		toJsonString() const;
 
 		bool
-		equals(const JsonValue &other) const
-		{
-			const JsonBoolean *casted = dynamic_cast<JsonBoolean const*>(&other);
-			if (casted)
-				return (m_value == casted->m_value);
-
-			return (false);
-		}
+		equals(const JsonValue &other) const;
 };
 
 #endif /* JSONBOOLEAN_HPP_ */

@@ -14,8 +14,6 @@
 # define JSONDECIMAL_HPP_
 
 #include <util/json/JsonValue.hpp>
-#include <iomanip>
-#include <sstream>
 #include <string>
 
 class JsonDecimal :
@@ -26,96 +24,33 @@ class JsonDecimal :
 		int m_precision;
 
 	public:
-		JsonDecimal() :
-				m_value(0.0),
-				m_precision(1)
-		{
-		}
-
-		JsonDecimal(double value) :
-				m_value(value),
-				m_precision(1)
-		{
-		}
-		JsonDecimal(double value, int precision) :
-				m_value(value),
-				m_precision(precision)
-		{
-		}
-
-		JsonDecimal(const JsonDecimal &other) :
-				m_value(other.m_value),
-				m_precision(other.m_precision)
-		{
-		}
+		JsonDecimal();
+		JsonDecimal(double value);
+		JsonDecimal(double value, int precision);
+		JsonDecimal(const JsonDecimal &other);
 
 		virtual
-		~JsonDecimal()
-		{
-		}
+		~JsonDecimal();
 
 		JsonDecimal&
-		operator =(const JsonDecimal &other)
-		{
-			if (this != &other)
-			{
-				m_value = other.m_value;
-				m_precision = other.m_precision;
-			}
+		operator =(const JsonDecimal &other);
 
-			return (*this);
-		}
-
-		operator float()
-		{
-			return (m_value);
-		}
-
-		operator float() const
-		{
-			return (m_value);
-		}
-
-		operator double()
-		{
-			return (m_value);
-		}
-
-		operator double() const
-		{
-			return (m_value);
-		}
+		operator float();
+		operator float() const;
+		operator double();
+		operator double() const;
 
 		JsonValue*
-		clone() const
-		{
-			return (new JsonDecimal(*this));
-		}
+		clone() const;
 
 		const Type
-		type() const
-		{
-			return (TYPE_DECIMAL);
-		}
+		type() const;
 
 		const std::string
-		toJsonString() const
-		{
-			std::stringstream sstream;
-			sstream << std::fixed << std::setprecision(m_precision) << m_value;
-
-			return (sstream.str());
-		}
+		toJsonString() const;
 
 		bool
-		equals(const JsonValue &other) const
-		{
-			const JsonDecimal *casted = dynamic_cast<JsonDecimal const*>(&other);
-			if (casted)
-				return (m_value == casted->m_value);
-
-			return (false);
-		}
+		equals(const JsonValue &other) const;
 };
 
 #endif /* JSONDECIMAL_HPP_ */

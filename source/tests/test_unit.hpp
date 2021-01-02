@@ -69,7 +69,7 @@ static Logger &TEST_CASE_LOG = LoggerFactory::get("test-case");
 # define ASSERT_NO_EXCEPT(code) \
 	try \
 	{ \
-		code;\
+		code; \
 	} \
 	catch (std::exception &exception) \
 	{ \

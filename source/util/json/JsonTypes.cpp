@@ -10,6 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+#include <util/json/JsonType.hpp>
 #include <util/json/JsonValue.hpp>
 #include <util/json/JsonArray.hpp>
 #include <util/json/JsonBoolean.hpp>
@@ -19,6 +20,11 @@
 #include <util/json/JsonObject.hpp>
 #include <util/json/JsonReader.hpp>
 #include <util/json/JsonString.hpp>
+
+#define REGISTER_JSON_TYPE_TRAITS(cls, jsonType) \
+   const char* JsonTypeTraits<cls>::name = #cls; \
+	const JsonValue::Type JsonTypeTraits<cls>::type = jsonType; \
+	const char* JsonTypeTraits<cls>::typeString = JsonValue::typeStringStorage()[jsonType].c_str();
 
 REGISTER_JSON_TYPE_TRAITS(JsonArray, JsonValue::TYPE_ARRAY);
 REGISTER_JSON_TYPE_TRAITS(JsonObject, JsonValue::TYPE_OBJECT);
