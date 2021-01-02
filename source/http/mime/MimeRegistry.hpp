@@ -17,8 +17,8 @@
 #include <map>
 #include <string>
 #include <exception/IOException.hpp>
-#include <util/log/Logger.hpp>
-#include <util/json/JsonObject.hpp>
+#include <log/Logger.hpp>
+#include <json/JsonObject.hpp>
 
 /**
  * MIME Registry to allow an easy mapping and reverse mapping between MIME string type notation (e.g. text/csv) and a corresponding file extension.

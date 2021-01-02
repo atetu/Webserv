@@ -16,12 +16,12 @@
 #include <http/header/HTTPHeaderFields.hpp>
 #include <http/HTTP.hpp>
 #include <http/response/impl/cgi/CGIHTTPResponse.hpp>
-#include <util/buffer/impl/FileDescriptorBuffer.hpp>
-#include <util/buffer/impl/SocketBuffer.hpp>
+#include <buffer/impl/FileDescriptorBuffer.hpp>
+#include <buffer/impl/SocketBuffer.hpp>
 #include <util/Enum.hpp>
 #include <util/helper/DeleteHelper.hpp>
-#include <util/log/Logger.hpp>
-#include <util/log/LoggerFactory.hpp>
+#include <log/Logger.hpp>
+#include <log/LoggerFactory.hpp>
 #include <util/Number.hpp>
 #include <util/Optional.hpp>
 #include <iostream>

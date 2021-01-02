@@ -14,8 +14,8 @@
 #include <http/request/HTTPRequest.hpp>
 #include <http/response/HTTPResponse.hpp>
 #include <stddef.h>
-#include <util/buffer/impl/FileDescriptorBuffer.hpp>
-#include <util/buffer/impl/SocketBuffer.hpp>
+#include <buffer/impl/FileDescriptorBuffer.hpp>
+#include <buffer/impl/SocketBuffer.hpp>
 #include <util/helper/DeleteHelper.hpp>
 #include <util/System.hpp>
 

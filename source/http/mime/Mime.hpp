@@ -13,8 +13,8 @@
 #ifndef MIME_HPP_
 # define MIME_HPP_
 
-#include <util/json/JsonArray.hpp>
-#include <util/json/JsonObject.hpp>
+#include <json/JsonArray.hpp>
+#include <json/JsonObject.hpp>
 #include <list>
 #include <string>
 

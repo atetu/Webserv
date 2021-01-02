@@ -13,7 +13,7 @@
 #include <encoding/default/chunk/ChunkDecoder.hpp>
 #include <encoding/default/chunk/ChunkEncoder.hpp>
 #include <tests/test_unit.hpp>
-#include <util/log/LoggerFactory.hpp>
+#include <log/LoggerFactory.hpp>
 #include <string>
 
 static std::string

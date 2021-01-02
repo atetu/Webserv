@@ -31,11 +31,11 @@
 #include <net/address/InetSocketAddress.hpp>
 #include <sys/errno.h>
 #include <sys/types.h>
-#include <util/buffer/impl/SocketBuffer.hpp>
+#include <buffer/impl/SocketBuffer.hpp>
 #include <util/Enum.hpp>
 #include <util/Environment.hpp>
-#include <util/log/Logger.hpp>
-#include <util/log/LoggerFactory.hpp>
+#include <log/Logger.hpp>
+#include <log/LoggerFactory.hpp>
 #include <util/Optional.hpp>
 #include <util/System.hpp>
 #include <util/URL.hpp>

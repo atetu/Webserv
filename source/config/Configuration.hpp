@@ -15,7 +15,7 @@
 
 #include <config/block/RootBlock.hpp>
 #include <http/mime/MimeRegistry.hpp>
-#include <util/json/JsonObject.hpp>
+#include <json/JsonObject.hpp>
 #include <string>
 
 // TODO: All blocks need deep-copy, same goes for mime registry

@@ -30,7 +30,7 @@
 #include <util/Convert.hpp>
 #include <util/Enum.hpp>
 #include <util/helper/DeleteHelper.hpp>
-#include <util/log/LoggerFactory.hpp>
+#include <log/LoggerFactory.hpp>
 #include <util/Optional.hpp>
 #include <util/StringUtils.hpp>
 #include <util/URL.hpp>

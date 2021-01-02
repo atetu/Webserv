@@ -13,7 +13,7 @@
 #include <signal.h>
 #include <main/normal_main.hpp>
 #include <tests/test_unit.hpp>
-#include <util/log/LoggerFactory.hpp>
+#include <log/LoggerFactory.hpp>
 #include <csignal>
 #include <iostream>
 #include <typeinfo>
