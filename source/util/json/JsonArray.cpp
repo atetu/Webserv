@@ -134,7 +134,7 @@ JsonArray::clone(void) const
 	return (new JsonArray(*this));
 }
 
-const JsonArray::Type
+JsonArray::Type
 JsonArray::type(void) const
 {
 	return (TYPE_ARRAY);

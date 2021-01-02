@@ -86,6 +86,7 @@ GenericHTTPResponse::FileAndStringBody::FileAndStringBody(FileDescriptorBuffer &
 		m_string(string),
 		m_strSent(false)
 {
+	(void)m_fdSent; // TODO Field not used
 }
 
 GenericHTTPResponse::FileAndStringBody::~FileAndStringBody()
@@ -225,7 +226,7 @@ GenericHTTPResponse::status(HTTPStatus &status, const HTTPHeaderFields &headers)
 GenericHTTPResponse*
 GenericHTTPResponse::file(HTTPStatus &status, const HTTPHeaderFields &headers, FileDescriptorBuffer &fileBuffer)
 {
-	return (new GenericHTTPResponse(HTTPStatusLine(*HTTPStatus::OK), headers, new GenericHTTPResponse::FileBody(fileBuffer)));
+	return (new GenericHTTPResponse(HTTPStatusLine(status), headers, new GenericHTTPResponse::FileBody(fileBuffer)));
 }
 
 GenericHTTPResponse*
@@ -237,5 +238,5 @@ GenericHTTPResponse::string(HTTPStatus &status, const HTTPHeaderFields &headers,
 GenericHTTPResponse*
 GenericHTTPResponse::fileAndString(HTTPStatus &status, const HTTPHeaderFields &headers, FileDescriptorBuffer &fileBuffer, const std::string &string)
 {
-	return (new GenericHTTPResponse(HTTPStatusLine(*HTTPStatus::OK), headers, new GenericHTTPResponse::FileAndStringBody(fileBuffer, string)));
+	return (new GenericHTTPResponse(HTTPStatusLine(status), headers, new GenericHTTPResponse::FileAndStringBody(fileBuffer, string)));
 }

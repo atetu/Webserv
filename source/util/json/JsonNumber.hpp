@@ -42,7 +42,7 @@ class JsonNumber :
 		JsonValue*
 		clone() const;
 
-		const Type
+		Type
 		type() const;
 
 		const std::string

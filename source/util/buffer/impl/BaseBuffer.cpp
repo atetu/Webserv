@@ -112,7 +112,7 @@ BaseBuffer::next(std::string &str, bool crlf)
 
 	for (std::string::iterator it = m_storage.begin(); it != m_storage.end(); it++)
 	{
-		if (*it == '\n')
+		if ((crlf && *it == '\r' && *(++(std::string::iterator(it))) == '\n') || *it == '\n')
 		{
 			str = std::string(m_storage.begin(), it);
 

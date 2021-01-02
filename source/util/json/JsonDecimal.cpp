@@ -79,7 +79,7 @@ JsonDecimal::clone() const
 	return (new JsonDecimal(*this));
 }
 
-const JsonDecimal::Type
+JsonDecimal::Type
 JsonDecimal::type() const
 {
 	return (TYPE_DECIMAL);

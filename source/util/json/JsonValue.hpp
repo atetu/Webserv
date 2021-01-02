@@ -40,7 +40,7 @@ class JsonValue
 		virtual JsonValue*
 		clone() const = 0;
 
-		virtual const Type
+		virtual Type
 		type() const = 0;
 
 		const std::string&

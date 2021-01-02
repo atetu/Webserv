@@ -206,7 +206,7 @@ HTTPOrchestrator::start()
 
 							HTTPClient &httpClient = *(new HTTPClient(*socket, socketAddress, httpServer));
 
-							if (clientFds.size() >= m_configuration.rootBlock().maxActiveClient().orElse(RootBlock::DEFAULT_MAX_ACTIVE_CLIENT))
+							if (clientFds.size() >= (unsigned long)m_configuration.rootBlock().maxActiveClient().orElse(RootBlock::DEFAULT_MAX_ACTIVE_CLIENT))
 								httpClient.response() = HTTPMethodHandler::status(*HTTPStatus::SERVICE_UNAVAILABLE, HTTPHeaderFields().retryAfter(10));
 
 							addClient(httpClient);

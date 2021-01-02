@@ -35,7 +35,7 @@ class JsonNull :
 		JsonValue*
 		clone() const;
 
-		const Type
+		Type
 		type() const;
 
 		const std::string

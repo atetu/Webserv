@@ -86,7 +86,7 @@ class JsonObject :
 		JsonValue*
 		clone(void) const;
 
-		const Type
+		Type
 		type(void) const;
 
 		const std::string

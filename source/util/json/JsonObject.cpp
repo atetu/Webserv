@@ -169,7 +169,7 @@ JsonObject::clone(void) const
 	return (new JsonObject(*this));
 }
 
-const JsonObject::Type
+JsonObject::Type
 JsonObject::type(void) const
 {
 	return (TYPE_OBJECT);
@@ -178,20 +178,15 @@ JsonObject::type(void) const
 const std::string
 JsonObject::toJsonString() const
 {
-	std::string out;
+	std::string out("{");
 
-	const_iterator it = m_value.begin();
-	const_iterator ite = m_value.end();
-
-	out += '{';
-
-	while (it != ite)
+	for (const_iterator it = m_value.begin(); it != m_value.end(); it++)
 	{
 		out += JsonUtils::escapeString(it->first);
 		out += ':';
 		out += it->second->toJsonString();
 
-		if (++it != ite)
+		if (++it != m_value.end())
 			out += ',';
 	}
 

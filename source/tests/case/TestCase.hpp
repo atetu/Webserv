@@ -56,7 +56,7 @@ class TestCase
 			return (m_location);
 		}
 
-		inline const main_function
+		inline main_function
 		function(void) const
 		{
 			return (m_function);

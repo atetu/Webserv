@@ -61,9 +61,9 @@ class Number
 				{
 					char c = *it;
 
-					std::string::size_type pos = alphabet.find(*it);
+					std::string::size_type pos = alphabet.find(c);
 					if (pos == std::string::npos)
-						throw IllegalArgumentException(std::string("char ") + *it + " is not in the alphabet: " + alphabet);
+						throw IllegalArgumentException(std::string("char ") + c + " is not in the alphabet: " + alphabet);
 
 					out *= alphabet.size();
 					out += pos;

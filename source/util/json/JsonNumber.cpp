@@ -66,7 +66,7 @@ JsonNumber::clone() const
 	return (new JsonNumber(*this));
 }
 
-const JsonNumber::Type
+JsonNumber::Type
 JsonNumber::type() const
 {
 	return (TYPE_NUMBER);

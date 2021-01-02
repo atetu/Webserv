@@ -59,7 +59,7 @@ JsonBoolean::clone() const
 	return (new JsonBoolean(*this));
 }
 
-const JsonBoolean::Type
+JsonBoolean::Type
 JsonBoolean::type() const
 {
 	return (TYPE_BOOLEAN);

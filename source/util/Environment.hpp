@@ -72,6 +72,9 @@ template<typename T>
 	inline T
 	Environment::getProperty(const std::string &key, const T &defaultValue)
 	{
+		(void)key;
+		(void)defaultValue;
+
 		throw Exception("Unsupported type");
 	}
 

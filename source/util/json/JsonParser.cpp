@@ -37,6 +37,8 @@ JsonParser::NoneContext::nextEvent(JsonParser &parser, JsonTokenizer &tokenizer,
 		return (token->getEvent());
 
 	throw parser.parsingException(token, "{, [, String, Number, true, false, null");
+
+	(void)currentEvent;
 }
 
 JsonParser::ObjectContext::ObjectContext() :

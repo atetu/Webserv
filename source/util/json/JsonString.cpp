@@ -61,7 +61,7 @@ JsonString::clone() const
 	return (new JsonString(*this));
 }
 
-const JsonString::Type
+JsonString::Type
 JsonString::type() const
 {
 	return (TYPE_STRING);

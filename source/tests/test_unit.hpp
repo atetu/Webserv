@@ -40,10 +40,10 @@
 #  define CASE(unit, name) \
 	static int CASE_METHOD_NAME(int argc, char **argv, char **envp); \
 	static TestCase CASE_OBJECT_NAME(unit, name, FILE_LOCATION, &CASE_METHOD_NAME); \
-	static int CASE_METHOD_NAME(int argc, char **argv, char **envp)
+	static int CASE_METHOD_NAME(__attribute__((unused)) int argc, __attribute__((unused)) char **argv, __attribute__((unused)) char **envp)
 # else
 #  define CASE(unit, name) \
-	static int CASE_METHOD_NAME(int argc, char **argv, char **envp)
+	static int __attribute__((unused)) CASE_METHOD_NAME(__attribute__((unused)) int argc, __attribute__((unused)) char **argv, __attribute__((unused)) char **envp)
 # endif
 
 static Logger &TEST_CASE_LOG = LoggerFactory::get("test-case");

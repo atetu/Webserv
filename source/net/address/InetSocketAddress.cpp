@@ -91,7 +91,6 @@ InetSocketAddress::hostAddress() const
 	return (out + ":" + Convert::toString(m_port));
 }
 
-
 InetSocketAddress::port_t
 InetSocketAddress::port(void) const
 {
@@ -104,6 +103,8 @@ InetSocketAddress::port(void) const
 InetSocketAddress
 InetSocketAddress::from(const struct sockaddr *addr, socklen_t addrlen)
 {
+	(void)addrlen; /* Used for UNIX, but not supported here. */
+
 	switch (addr->sa_family)
 	{
 		case AF_INET:

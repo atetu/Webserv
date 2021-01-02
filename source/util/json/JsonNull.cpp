@@ -41,7 +41,7 @@ JsonNull::clone() const
 	return (new JsonNull(*this));
 }
 
-const JsonNull::Type
+JsonNull::Type
 JsonNull::type() const
 {
 	return (TYPE_NULL);

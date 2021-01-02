@@ -118,7 +118,7 @@ test_main(int argc, char **argv, char **envp)
 
 			std::cout << std::endl;
 
-			if ((*(it2->function()))(argc, argv, envp))
+			if ((*(testCase.function()))(argc, argv, envp))
 			{
 				if (!doContinue)
 					return (1);
