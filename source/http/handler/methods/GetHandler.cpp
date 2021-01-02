@@ -49,7 +49,10 @@ GetHandler::handle(HTTPRequest &request)
 		if (request.url().extension(extension))
 			headers.contentType(request.configuration().mimeRegistry(), extension);
 
-		return (file(*HTTPStatus::OK, *targetFile.open(O_RDONLY), headers));
+		if (request.method().name() == "GET")
+			return (file(*HTTPStatus::OK, *targetFile.open(O_RDONLY), headers));
+		else if (request.method().name() == "HEAD")
+			return (status(*HTTPStatus::OK, headers));
 	}
 
 	if (targetFile.isDirectory())
@@ -87,7 +90,10 @@ GetHandler::handle(HTTPRequest &request)
 					if (request.url().extension(extension))
 						headers.contentType(request.configuration().mimeRegistry(), extension);
 
-					return (file(*HTTPStatus::OK, *indexTargetFile.open(O_RDONLY), headers));
+					if (request.method().name() == "GET")
+						return (file(*HTTPStatus::OK, *indexTargetFile.open(O_RDONLY), headers));
+					else if (request.method().name() == "HEAD")
+						return (status(*HTTPStatus::OK, headers));
 				}
 			}
 
@@ -100,7 +106,10 @@ GetHandler::handle(HTTPRequest &request)
 		headers.html();
 		headers.contentLength(content.size());
 
-		return (string(*HTTPStatus::OK, content, headers));
+		if (request.method().name() == "GET")
+			return (string(*HTTPStatus::OK, content, headers));
+		else if (request.method().name() == "HEAD")
+			return (status(*HTTPStatus::OK, headers));
 	}
 
 	return (error(request, *HTTPStatus::NOT_FOUND));
