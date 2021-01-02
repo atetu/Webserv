@@ -179,7 +179,7 @@ class HTTPHeaderFields
 		format(const std::string &seperator = HTTP::CRLF) const;
 
 		bool
-		empty(void);
+		empty(void) const;
 
 		map&
 		storage(void);

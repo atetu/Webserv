@@ -104,8 +104,6 @@ CommonGatewayInterface::running()
 	return (false);
 }
 
-#define HERE __FUNCTION__ << ':' << __LINE__
-
 CommonGatewayInterface*
 CommonGatewayInterface::execute(HTTPClient &client, const CGIBlock &cgiBlock, const Environment &environment)
 {
@@ -214,7 +212,7 @@ CommonGatewayInterface::execute(HTTPClient &client, const CGIBlock &cgiBlock, co
 //			::dup2(1, 2);
 
 		std::string path = cgiBlock.path().get();
-		std::string file = "." + request.url().path();
+		std::string file = File(request.root(), request.url().path()).path();
 
 		char *const argv[] = {
 			const_cast<char*>(path.c_str()), /* Dangerous, but kernel allocate it anyway... */

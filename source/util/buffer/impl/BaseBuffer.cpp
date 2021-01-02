@@ -11,8 +11,11 @@
 /* ************************************************************************** */
 
 #include <util/buffer/impl/BaseBuffer.hpp>
+#include <util/buffer/impl/SocketBuffer.hpp>
 #include <algorithm>
+#include <iostream>
 #include <iterator>
+#include <typeinfo>
 
 BaseBuffer::BaseBuffer() :
 		m_storage(),
@@ -53,19 +56,18 @@ BaseBuffer::store(const std::string &str)
 }
 
 BaseBuffer&
-BaseBuffer::store(BaseBuffer &buffer, bool andClear)
+BaseBuffer::store(BaseBuffer &buffer, bool andErase)
 {
 	size_type capacity = std::min(this->capacity(), buffer.capacity());
 
 	if (capacity)
 	{
+
 		m_storage += buffer.storage().substr(0, capacity);
 
-		buffer.storage().erase(0, capacity);
+		if (andErase)
+			buffer.storage().erase(0, capacity);
 	}
-
-	if (andClear)
-		buffer.clear();
 
 	return (*this);
 }
@@ -92,12 +94,12 @@ BaseBuffer::next(char &c)
 }
 
 bool
-BaseBuffer::peek(char &c) const
+BaseBuffer::peek(char &c, size_t index) const
 {
-	if (m_storage.empty())
+	if (m_storage.empty() || index >= m_storage.size())
 		return (false);
 
-	c = m_storage[0];
+	c = m_storage[index];
 
 	return (true);
 }

@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 
 import os
+import sys
+
+#print(os.environ.items(), file=sys.stderr)
 
 print('Content-Type: text/html')
 print('')
@@ -20,14 +23,21 @@ th {
 </style>""")
 print("""<table>
   <tr>
+    <th>#</th>
     <th>KEY</th>
     <th>VALUE</th>
   </tr>""")
+
+inc = 0
+
 for key, value in os.environ.items():
+    inc += 1
     print(f"""<tr>
+    <td style="white-space: nowrap"><p>{inc} / {len(os.environ)}</p></td>
     <td>{key}</td>
     <td>{value}</td>
   </tr>""")
+    #print(key, file=sys.stderr)
 print("</table>")
 print('</html>')
 

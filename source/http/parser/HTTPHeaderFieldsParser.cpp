@@ -10,15 +10,15 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+#include <exception/Exception.hpp>
 #include <http/parser/HTTPHeaderFieldsParser.hpp>
+#include <iostream>
 
 HTTPHeaderFieldsParser::HTTPHeaderFieldsParser() :
 		m_state(S_FIELD),
 		m_headerFields(),
 		m_key(),
-		m_value(),
-		m_last(),
-		m_last2()
+		m_value()
 {
 }
 
@@ -68,7 +68,9 @@ HTTPHeaderFieldsParser::consume(char c)
 			if (c == ' ')
 				m_state = S_SPACES_AFTER_VALUE;
 			else if (c == '\r')
-				commit(S_VALUE_END);
+				commit(S_END_R);
+			else if (c == '\n')
+				commit(S_END_N);
 			else
 				m_value += c;
 
@@ -80,9 +82,9 @@ HTTPHeaderFieldsParser::consume(char c)
 			if (c == ' ')
 				m_state = S_SPACES_AFTER_VALUE;
 			else if (c == '\r')
-				commit(S_VALUE_END);
+				commit(S_END_R);
 			else if (c == '\n')
-				m_state = S_VALUE_END2;
+				commit(S_END_N);
 			else
 			{
 				m_value += ' ';
@@ -93,20 +95,22 @@ HTTPHeaderFieldsParser::consume(char c)
 			break;
 		}
 
-		case S_VALUE_END:
+		case S_END_R:
 		{
 			if (c == '\n')
-				m_state = S_VALUE_END2;
+				m_state = S_END_N;
 			else
 				throw Exception("Expected a \\n");
 
 			break;
 		}
 
-		case S_VALUE_END2:
+		case S_END_N:
 		{
-			if (m_last2 == '\r' && m_last == '\n' && c == '\r')
-				m_state = S_VALUE_END3;
+			if (c == '\r')
+				m_state = S_END_R2;
+			else if (c == '\n')
+				m_state = S_END;
 			else
 			{
 				m_key += c;
@@ -116,26 +120,19 @@ HTTPHeaderFieldsParser::consume(char c)
 			break;
 		}
 
-		case S_VALUE_END3:
+		case S_END_R2:
 		{
-			if (m_last2 == '\n' && m_last == '\r' && c == '\n')
+			if (c == '\n')
 				m_state = S_END;
 			else
-			{
-				m_key += c;
-				m_state = S_FIELD; // should be an error, souldn't it?
-			}
+				throw Exception("Expected a \\n");
 
 			break;
 		}
 
 		case S_END:
 			break;
-
 	}
-
-	m_last2 = m_last;
-	m_last = c;
 }
 
 void

@@ -10,20 +10,32 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+#include <exception/Exception.hpp>
+#include <http/cgi/CommonGatewayInterface.hpp>
+#include <http/enums/HTTPStatus.hpp>
+#include <http/header/HTTPHeaderFields.hpp>
 #include <http/HTTP.hpp>
-#include <http/response/HTTPStatusLine.hpp>
 #include <http/response/impl/cgi/CGIHTTPResponse.hpp>
 #include <util/buffer/impl/FileDescriptorBuffer.hpp>
 #include <util/buffer/impl/SocketBuffer.hpp>
+#include <util/Enum.hpp>
 #include <util/helper/DeleteHelper.hpp>
+#include <util/log/Logger.hpp>
+#include <util/log/LoggerFactory.hpp>
+#include <util/Number.hpp>
+#include <util/Optional.hpp>
+#include <iostream>
+#include <string>
 #include <vector>
 
 CGIHTTPResponse::CGIHTTPResponse(const HTTPStatusLine &statusLine, CommonGatewayInterface &cgi) :
 		m_statusLine(statusLine),
 		m_cgi(cgi),
-		m_inBuffer(FileDescriptorBuffer::from(cgi.in(), FileDescriptorBuffer::NOTHING, 4096)),
-		m_outBuffer(FileDescriptorBuffer::from(cgi.out(), FileDescriptorBuffer::NOTHING, 4096)),
-		m_state(NONE)
+		m_inBuffer(FileDescriptorBuffer::from(cgi.in(), FileDescriptorBuffer::NOTHING)),
+		m_outBuffer(FileDescriptorBuffer::from(cgi.out(), FileDescriptorBuffer::NOTHING)),
+		m_state(NONE),
+		m_headerFieldsParser(),
+		m_peekIndex()
 {
 }
 
@@ -40,8 +52,8 @@ CGIHTTPResponse::~CGIHTTPResponse()
 bool
 CGIHTTPResponse::write(SocketBuffer &socketBuffer)
 {
-	if (m_state == NONE)
-		m_state = STATUS_LINE;
+//	if (m_state == NONE)
+//		m_state = STATUS_LINE;
 
 //	static int running = -1;
 //	if (m_cgi.running() != running)
@@ -52,6 +64,54 @@ CGIHTTPResponse::write(SocketBuffer &socketBuffer)
 
 	switch (m_state)
 	{
+		case NONE:
+		{
+			try
+			{
+				char c;
+				while (m_outBuffer->peek(c, m_peekIndex))
+				{
+					m_peekIndex++;
+
+					m_headerFieldsParser.consume(c);
+					if (m_headerFieldsParser.state() == HTTPHeaderFieldsParser::S_END)
+					{
+
+						const HTTPHeaderFields &headerFields = m_headerFieldsParser.headerFields();
+
+						Optional<std::string> statusOptional = headerFields.get("Status");
+						if (statusOptional.present())
+						{
+							try
+							{
+								std::string codePart = statusOptional.get().substr(0, statusOptional.get().find(' '));
+
+								int code = Number::parse<int>(codePart);
+								const HTTPStatus *newStatus = HTTPStatus::findByCode(code);
+
+								if (newStatus)
+									m_statusLine = HTTPStatusLine(m_statusLine.version(), *newStatus);
+							}
+							catch (Exception &exception)
+							{
+								LoggerFactory::get("CGI Response").error() << exception.message() << std::endl;
+							}
+						}
+
+						m_state = STATUS_LINE;
+						break;
+					}
+				}
+			}
+			catch (Exception &exception)
+			{
+				std::cout << exception.message() << std::endl;
+				m_state = STATUS_LINE;
+			}
+
+			break;
+		}
+
 		case STATUS_LINE:
 			socketBuffer.store(m_statusLine.format());
 			socketBuffer.store(HTTP::CRLF);
@@ -62,7 +122,6 @@ CGIHTTPResponse::write(SocketBuffer &socketBuffer)
 
 		case BODY:
 			socketBuffer.store(*m_outBuffer);
-			socketBuffer.send();
 
 			if (!m_cgi.running() || m_outBuffer->hasReadEverything())
 				m_state = FLUSHING;
@@ -70,7 +129,7 @@ CGIHTTPResponse::write(SocketBuffer &socketBuffer)
 			break;
 
 		case FLUSHING:
-			if (socketBuffer.send() < 0 || socketBuffer.size() == 0)
+			if (socketBuffer.size() == 0)
 				m_state = FINISHED;
 
 			break;

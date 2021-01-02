@@ -52,6 +52,19 @@ class HTTPStatus :
 		}
 
 	public:
+		inline static const HTTPStatus*
+		findByCode(int code)
+		{
+			const Container &storage = values();
+
+			for (iterator it = storage.begin(); it != storage.end(); it++)
+				if ((*it)->m_code == code)
+					return (*it);
+
+			return (NULL);
+		}
+
+	public:
 		static HTTPStatus *CONTINUE;
 		static HTTPStatus *SWITCHING_PROTOCOLS;
 		static HTTPStatus *PROCESSING;

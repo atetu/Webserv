@@ -235,6 +235,7 @@ HTTPRequestParser::consume(char c)
 	}
 
 //	std::cout << m_state << " -- " << c << std::endl;
+//	std::cout << c << std::flush;
 
 	m_last2 = m_last;
 	m_last = c;

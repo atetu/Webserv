@@ -53,13 +53,13 @@ class BaseBuffer :
 		store(const void *buffer, size_t len);
 
 		BaseBuffer&
-		store(BaseBuffer &buffer, bool andClear = true);
+		store(BaseBuffer &buffer, bool andErase = true);
 
 		bool
 		next(char &c);
 
 		bool
-		peek(char &c) const;
+		peek(char &c, size_t index = 0) const;
 
 		bool
 		next(std::string &str, bool crlf = false);

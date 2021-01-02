@@ -29,7 +29,7 @@ class IReadableBuffer :
 		next(char &c) = 0;
 
 		virtual bool
-		peek(char &c) const = 0;
+		peek(char &c, size_t index = 0) const = 0;
 
 		virtual bool
 		next(std::string &str, bool crlf = false) = 0;

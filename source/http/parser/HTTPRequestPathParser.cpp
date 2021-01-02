@@ -40,7 +40,10 @@ HTTPRequestPathParser::consume(char c)
 			else if (c == '%')
 				hexStart(&m_path);
 			else if (c == '?')
+			{
+				m_query.set();
 				m_state = S_QUERY_STRING_KEY;
+			}
 			else if (c == '#')
 			{
 				m_fragment.set();

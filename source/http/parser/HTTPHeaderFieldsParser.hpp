@@ -26,9 +26,9 @@ class HTTPHeaderFieldsParser
 			S_SPACES_BEFORE_VALUE,
 			S_VALUE,
 			S_SPACES_AFTER_VALUE,
-			S_VALUE_END,
-			S_VALUE_END2,
-			S_VALUE_END3,
+			S_END_R,
+			S_END_N,
+			S_END_R2,
 			S_END,
 		};
 
@@ -37,8 +37,6 @@ class HTTPHeaderFieldsParser
 		HTTPHeaderFields m_headerFields;
 		std::string m_key;
 		std::string m_value;
-		char m_last;
-		char m_last2;
 
 	public:
 		HTTPHeaderFieldsParser();

@@ -13,18 +13,23 @@
 #ifndef CGIHTTPRESPONSE_HPP_
 # define CGIHTTPRESPONSE_HPP_
 
-#include <http/cgi/CommonGatewayInterface.hpp>
+#include <http/parser/HTTPHeaderFieldsParser.hpp>
 #include <http/response/HTTPResponse.hpp>
+#include <http/response/HTTPStatusLine.hpp>
+
+class CommonGatewayInterface;
 
 class CGIHTTPResponse :
 		public HTTPResponse
 {
 	private:
-		const HTTPStatusLine m_statusLine;
+		HTTPStatusLine m_statusLine;
 		CommonGatewayInterface &m_cgi;
 		FileDescriptorBuffer *m_inBuffer;
 		FileDescriptorBuffer *m_outBuffer;
 		State m_state;
+		HTTPHeaderFieldsParser m_headerFieldsParser;
+		size_t m_peekIndex;
 
 	private:
 		CGIHTTPResponse();

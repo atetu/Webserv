@@ -336,7 +336,7 @@ HTTPHeaderFields::format(const std::string &separator) const
 }
 
 bool
-HTTPHeaderFields::empty(void)
+HTTPHeaderFields::empty(void) const
 {
 	return (m_storage.empty());
 }

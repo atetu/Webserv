@@ -50,17 +50,24 @@
 					"cgi": "php-cgi"
 				},
 				"/x.py": {
-					"root": "/mnt/c/Users/cacer/OneDrive/Developments/Workspace/webserv",
+					"root": "../dummy-files/",
 					"methods": [
 						"GET"
 					],
 					"cgi": "python3"
 				},
-				"/x.php": {
+				"/x2.py": {
+					"root": "../dummy-files/",
+					"methods": [
+						"GET"
+					],
+					"cgi": "python3"
+				},
+				"/_tests/x.php": {
 					"root": ".",
 					"cgi": "php-cgi"
 				},
-				"/x.sh": {
+				"/_tests/x.sh": {
 					"root": ".",
 					"methods": [
 						"GET"

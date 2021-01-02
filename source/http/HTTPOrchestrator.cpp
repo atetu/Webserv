@@ -414,7 +414,7 @@ HTTPOrchestrator::start()
 					int fd = it->first;
 					HTTPClient &client = *it->second;
 
-					if (client.lastAction() + 5 < now)
+					if (client.lastAction() + 30 /* TODO */ < now)
 					{
 						std::cout << "timeout: " << fd << std::endl;
 
