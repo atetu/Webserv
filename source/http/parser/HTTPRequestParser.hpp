@@ -6,7 +6,7 @@
 /*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/27 17:29:02 by ecaceres          #+#    #+#             */
-/*   Updated: 2020/12/23 16:05:04 by alicetetu        ###   ########.fr       */
+/*   Updated: 2021/01/02 11:53:08 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 
 #include <http/parser/HTTPHeaderFieldsParser.hpp>
 #include <http/parser/HTTPRequestPathParser.hpp>
+#include <util/unit/DataSize.hpp>
 #include <string>
 
 class URL;
@@ -112,7 +113,7 @@ class HTTPRequestParser
 		body() const;
 
 		void
-		body(std::string &storage);
+		body(std::string &storage, const Optional<DataSize> &maxBodySize);
 
 		URL
 		url();

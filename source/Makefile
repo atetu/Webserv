@@ -6,7 +6,7 @@
 #    By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2019/08/13 15:11:33 by ecaceres          #+#    #+#              #
-#    Updated: 2020/11/30 16:18:47 by alicetetu        ###   ########.fr        #
+#    Updated: 2021/01/02 11:50:52 by alicetetu        ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -33,13 +33,13 @@ LIBRARIES_BIN			=
 
 OBJECTS					= $(SOURCES:.cpp=.o)
 
-COMPILER				= g++
+COMPILER				= clang++
 
 FRAMEWORKS				= 
 FLAGS					= -std=c++98 -g3
 TARGET_REQUIRED_FLAGS	= -I.
 
-TOOL_BASE64_DECODE		= base64 -d
+TOOL_BASE64_DECODE		= base64 -D
 
 MAKE_PREFIX				= "$(COLOR_LIGHT_MAGENTA)[$(COLOR_LIGHT_GREEN) make: $(TARGET) $(COLOR_LIGHT_MAGENTA)]"
 

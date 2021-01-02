@@ -6,7 +6,7 @@
 /*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/21 23:36:43 by ecaceres          #+#    #+#             */
-/*   Updated: 2020/12/26 15:16:53 by alicetetu        ###   ########.fr       */
+/*   Updated: 2021/01/02 11:55:03 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@
 #include <dirent.h>
 #include <sys/stat.h>
 #include <sys/unistd.h>
+#include <unistd.h>
 #include <cstdio>
 #include <iostream>
 #include <util/StringUtils.hpp>
