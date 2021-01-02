@@ -16,7 +16,7 @@ RUN_TESTS				= 0
 SOURCE_DIR				= source
 PROJECT_MAKE			= make -s -C $(SOURCE_DIR) USE_FSANITIZE=$(USE_FSANITIZE) RUN_TESTS=$(RUN_TESTS)
 
-ifeq ($(shell if grep -q Microsoft /proc/version; then echo "wsl"; else echo "linux"; fi),wsl)
+ifeq ($(shell if grep -q Microsoft /proc/version 2>/dev/null; then echo "wsl"; else echo "linux"; fi),wsl)
     DOCKER := /mnt/c/Windows/System32/cmd.exe /c docker
 else
     DOCKER := docker
