@@ -22,6 +22,8 @@ RUN service mysql start; \
 	mysql -u root -e "UPDATE mysql.user SET authentication_string=PASSWORD(\"password\") WHERE user='root';"; \
 	mysql -u root -e "SELECT host, user, plugin, authentication_string FROM mysql.user WHERE user='root';"; \
 	mysql -u root -e "FLUSH PRIVILEGES;";
+	
+RUN apt-get install -y dos2unix
 
 RUN mkdir /app
 

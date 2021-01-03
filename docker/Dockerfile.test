@@ -6,4 +6,5 @@ WORKDIR /app/source
 
 CMD echo Starting 'run' && \
 	service mysql start && \
+	dos2unix run-tests.sh && \
 	/usr/bin/zsh run-tests.sh
