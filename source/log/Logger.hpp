@@ -21,9 +21,7 @@ class Logger
 {
 	public:
 		virtual
-		~Logger()
-		{
-		}
+		~Logger();
 
 		virtual std::ostream&
 		trace() const = 0;
@@ -52,41 +50,23 @@ class Logger
 		virtual const std::string&
 		tag() const = 0;
 
-		virtual inline bool
-		isTraceEnabled() const
-		{
-			return (isEnabled(*LogLevel::TRACE));
-		}
+		virtual bool
+		isTraceEnabled() const;
 
-		virtual inline bool
-		isDebugEnabled() const
-		{
-			return (isEnabled(*LogLevel::DEBUG));
-		}
+		virtual bool
+		isDebugEnabled() const;
 
-		virtual inline bool
-		isInfoEnabled() const
-		{
-			return (isEnabled(*LogLevel::INFO));
-		}
+		virtual bool
+		isInfoEnabled() const;
 
-		virtual inline bool
-		isWarnEnabled() const
-		{
-			return (isEnabled(*LogLevel::WARN));
-		}
+		virtual bool
+		isWarnEnabled() const;
 
-		virtual inline bool
-		isErrorEnabled() const
-		{
-			return (isEnabled(*LogLevel::ERROR));
-		}
+		virtual bool
+		isErrorEnabled() const;
 
-		virtual inline bool
-		isFatalEnabled() const
-		{
-			return (isEnabled(*LogLevel::FATAL));
-		}
+		virtual bool
+		isFatalEnabled() const;
 };
 
 #endif /* LOGGER_HPP_ */
