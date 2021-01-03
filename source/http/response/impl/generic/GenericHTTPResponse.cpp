@@ -6,7 +6,7 @@
 /*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/27 16:38:46 by ecaceres          #+#    #+#             */
-/*   Updated: 2020/12/27 11:09:27 by alicetetu        ###   ########.fr       */
+/*   Updated: 2021/01/03 19:20:27 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -229,10 +229,19 @@ GenericHTTPResponse::file(HTTPStatus &status, const HTTPHeaderFields &headers, F
 	return (new GenericHTTPResponse(HTTPStatusLine(status), headers, new GenericHTTPResponse::FileBody(fileBuffer)));
 }
 
+// GenericHTTPResponse*
+// GenericHTTPResponse::string(HTTPStatus &status, const HTTPHeaderFields &headers, const std::string &string)
+// {
+// 	std::cout <<string << std::endl;
+// 	return (new GenericHTTPResponse(HTTPStatusLine(status), HTTPHeaderFields(headers).contentLength(string.length()), new GenericHTTPResponse::StringBody(string)));
+// }
+
+
 GenericHTTPResponse*
 GenericHTTPResponse::string(HTTPStatus &status, const HTTPHeaderFields &headers, const std::string &string)
 {
-	return (new GenericHTTPResponse(HTTPStatusLine(status), HTTPHeaderFields(headers).contentLength(string.length()), new GenericHTTPResponse::StringBody(string)));
+	std::cout <<string << std::endl;
+	return (new GenericHTTPResponse(HTTPStatusLine(status), headers, new GenericHTTPResponse::StringBody(string)));
 }
 
 GenericHTTPResponse*

@@ -22,10 +22,17 @@ HTTPMethodHandler::~HTTPMethodHandler()
 {
 }
 
+// HTTPResponse*
+// HTTPMethodHandler::status(HTTPStatus &status, const HTTPHeaderFields &headers)
+// {
+// 	return (GenericHTTPResponse::string(status, HTTPHeaderFields(headers).html(), DefaultPages::instance().resolve(status)));
+// }
+
 HTTPResponse*
 HTTPMethodHandler::status(HTTPStatus &status, const HTTPHeaderFields &headers)
 {
-	return (GenericHTTPResponse::string(status, HTTPHeaderFields(headers).html(), DefaultPages::instance().resolve(status)));
+	//return (GenericHTTPResponse::string(status, headers, DefaultPages::instance().resolve(status)));
+	return (GenericHTTPResponse::string(status, headers, ""));
 }
 
 HTTPResponse*

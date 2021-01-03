@@ -100,7 +100,8 @@ PutHandler::handle(HTTPRequest &request)
 	//File file(path + "/" + request.getLocation());
 	File file(path);
 	if (!checkExtension(request, file))
-		return (GenericHTTPResponse::status(*HTTPStatus::UNSUPPORTED_MEDIA_TYPE));
+		return (error(request, *HTTPStatus::UNSUPPORTED_MEDIA_TYPE));
+		//return (GenericHTTPResponse::status(*HTTPStatus::UNSUPPORTED_MEDIA_TYPE));
 
 	if (!file.exists())
 	{
@@ -111,7 +112,8 @@ PutHandler::handle(HTTPRequest &request)
 		catch (Exception &exception)
 		{
 			LOG.warn() << exception.what() << std::endl;
-			return (GenericHTTPResponse::status(*HTTPStatus::NOT_FOUND));
+		//	return (GenericHTTPResponse::status(*HTTPStatus::NOT_FOUND));
+			return (error(request, *HTTPStatus::NOT_FOUND));
 		}
 	}
 	if (file.isFile())
@@ -129,10 +131,12 @@ PutHandler::handle(HTTPRequest &request)
 	if (file.isDirectory())
 	{
 		LOG.warn() << "Put method not handled for directories" << std::endl;
-		return (GenericHTTPResponse::status(*HTTPStatus::UNSUPPORTED_MEDIA_TYPE));
+		return (error(request, *HTTPStatus::UNSUPPORTED_MEDIA_TYPE));
+	//	return (GenericHTTPResponse::status(*HTTPStatus::UNSUPPORTED_MEDIA_TYPE));
 	}
 
-	return (GenericHTTPResponse::status(*HTTPStatus::NOT_FOUND));
+	return (error(request, *HTTPStatus::NOT_FOUND));
+//	return (GenericHTTPResponse::status(*HTTPStatus::NOT_FOUND));
 }
 
 PutHandler&
