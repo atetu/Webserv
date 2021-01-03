@@ -36,7 +36,7 @@ GetHandler::handle(HTTPRequest &request)
 {
 	HTTPHeaderFields headers;
 
-	File targetFile(request.root() + request.url().path());
+	File targetFile(request.root(), request.resource());
 
 	if (!targetFile.exists())
 		return (error(request, *HTTPStatus::NOT_FOUND));
@@ -57,45 +57,9 @@ GetHandler::handle(HTTPRequest &request)
 
 	if (targetFile.isDirectory())
 	{
-		if (StringUtils::last(request.url().path()) != '/')
-			return (redirect(*HTTPStatus::MOVED_PERMANENTLY, request.url().builder().appendToPath("/").build()));
-
 		if (request.location().present())
 		{
 			const LocationBlock &locationBlock = *request.location().get();
-
-			if (locationBlock.index().present())
-			{
-				const std::list<std::string> &indexFiles = locationBlock.index().get();
-
-				Optional<File> validIndexFile;
-				for (std::list<std::string>::const_iterator it = indexFiles.begin(); it != indexFiles.end(); it++)
-				{
-					File anIndex(targetFile, *it);
-
-					if (anIndex.exists() && anIndex.isFile())
-					{
-						validIndexFile.set(anIndex);
-						break;
-					}
-				}
-
-				if (validIndexFile.present())
-				{
-					File &indexTargetFile = validIndexFile.get();
-
-					headers.contentLength(indexTargetFile.length());
-
-					std::string extension;
-					if (request.url().extension(extension))
-						headers.contentType(request.configuration().mimeRegistry(), extension);
-
-					if (request.method().name() == "GET")
-						return (file(*HTTPStatus::OK, *indexTargetFile.open(O_RDONLY), headers));
-					else if (request.method().name() == "HEAD")
-						return (status(*HTTPStatus::OK, headers));
-				}
-			}
 
 			if (!locationBlock.listing().orElse(false))
 				return (error(request, *HTTPStatus::FORBIDDEN));

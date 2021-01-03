@@ -240,7 +240,6 @@ GenericHTTPResponse::file(HTTPStatus &status, const HTTPHeaderFields &headers, F
 GenericHTTPResponse*
 GenericHTTPResponse::string(HTTPStatus &status, const HTTPHeaderFields &headers, const std::string &string)
 {
-	std::cout <<string << std::endl;
 	return (new GenericHTTPResponse(HTTPStatusLine(status), headers, new GenericHTTPResponse::StringBody(string)));
 }
 

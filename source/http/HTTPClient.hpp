@@ -17,12 +17,10 @@
 #include <io/Socket.hpp>
 #include <net/address/InetSocketAddress.hpp>
 
+class HTTPRequest;
 class HTTPResponse;
 class HTTPServer;
 class SocketBuffer;
-class Socket;
-class HTTPRequest;
-class GenericHTTPResponse;
 
 class HTTPClient
 {

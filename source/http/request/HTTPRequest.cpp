@@ -12,24 +12,11 @@
 
 #include <config/block/RootBlock.hpp>
 #include <config/block/ServerBlock.hpp>
+#include <config/Configuration.hpp>
 #include <http/request/HTTPRequest.hpp>
 #include <io/File.hpp>
-#include <map>
 
 class HTTPVersion;
-
-HTTPRequest::HTTPRequest(const HTTPMethod &method, const URL &url, const HTTPVersion &version, const HTTPHeaderFields &headerFields, const std::string body, const Configuration &configuration, const RootBlock &rootBlock, const ServerBlock &serverBlock, const Optional<LocationBlock const*> &locationBlock) :
-		m_method(method),
-		m_url(url),
-		m_version(version),
-		m_headerFields(headerFields),
-		m_body(body),
-		m_configuration(configuration),
-		m_rootBlock(rootBlock),
-		m_serverBlock(serverBlock),
-		m_locationBlock(locationBlock)
-{
-}
 
 HTTPRequest::~HTTPRequest(void)
 {
@@ -38,19 +25,19 @@ HTTPRequest::~HTTPRequest(void)
 std::string
 HTTPRequest::root(void) const
 {
-	if (m_locationBlock.present())
+	if (location().present())
 	{
-		const LocationBlock &locationBlock = *m_locationBlock.get();
+		const LocationBlock &locationBlock = *location().get();
 
 		if (locationBlock.root().present())
 			return (locationBlock.root().get());
 	}
 
-	if (m_serverBlock.root().present())
-		return (m_serverBlock.root().get());
+	if (server().root().present())
+		return (server().root().get());
 
-	if (m_rootBlock.root().present())
-		return (m_rootBlock.root().get());
+	if (configuration().rootBlock().root().present())
+		return (configuration().rootBlock().root().get());
 
 	return (File::currentDirectory().path());
 }
@@ -58,14 +45,14 @@ HTTPRequest::root(void) const
 bool
 HTTPRequest::needAuth() const
 {
-	return (m_serverBlock.auth().present() || (m_locationBlock.present() && m_locationBlock.get()->auth().present()));
+	return (server().auth().present() || (location().present() && location().get()->auth().present()));
 }
 
 const AuthBlock*
 HTTPRequest::auth() const
 {
-	if (m_locationBlock.present() && m_locationBlock.get()->auth().present())
-		return (m_locationBlock.get()->auth().get());
+	if (location().present() && location().get()->auth().present())
+		return (location().get()->auth().get());
 
-	return (m_serverBlock.auth().get());
+	return (server().auth().get());
 }

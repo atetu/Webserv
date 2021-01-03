@@ -13,41 +13,20 @@
 #ifndef HTTPREQUEST_HPP_
 # define HTTPREQUEST_HPP_
 
-#include <config/block/AuthBlock.hpp>
 #include <config/block/LocationBlock.hpp>
-#include <http/enums/HTTPVersion.hpp>
-#include <http/header/HTTPHeaderFields.hpp>
 #include <util/Optional.hpp>
-#include <util/URL.hpp>
 #include <string>
 
 class Configuration;
-class RootBlock;
+class HTTPHeaderFields;
+class HTTPMethod;
+class HTTPVersion;
 class ServerBlock;
+class URL;
 
 class HTTPRequest
 {
-	private:
-		const HTTPMethod &m_method;
-		URL m_url;
-		HTTPVersion m_version;
-		HTTPHeaderFields m_headerFields;
-		const std::string m_body;
-		const Configuration &m_configuration;
-		const RootBlock &m_rootBlock;
-		const ServerBlock &m_serverBlock;
-		const Optional<LocationBlock const*> &m_locationBlock;
-
-	private:
-		HTTPRequest(void);
-		HTTPRequest(const HTTPRequest &other);
-
-		HTTPRequest&
-		operator =(const HTTPRequest &other);
-
 	public:
-		HTTPRequest(const HTTPMethod &method, const URL &url, const HTTPVersion &version, const HTTPHeaderFields &headerFields, const std::string body, const Configuration &configuration, const RootBlock &rootBlock, const ServerBlock &serverBlock, const Optional<LocationBlock const*> &locationBlock);
-
 		virtual
 		~HTTPRequest(void);
 
@@ -60,53 +39,32 @@ class HTTPRequest
 		const AuthBlock*
 		auth() const;
 
-		inline const HTTPMethod&
-		method()
-		{
-			return (m_method);
-		}
+		virtual const HTTPMethod&
+		method() const = 0;
 
-		inline const URL&
-		url()
-		{
-			return (m_url);
-		}
+		virtual const URL&
+		url() const = 0;
 
-		inline const HTTPVersion&
-		version()
-		{
-			return (m_version);
-		}
+		virtual const std::string&
+		resource() const = 0;
 
-		inline const HTTPHeaderFields&
-		headers()
-		{
-			return (m_headerFields);
-		}
+		virtual const HTTPVersion&
+		version() const = 0;
 
-		inline const std::string&
-		body()
-		{
-			return (m_body);
-		}
+		virtual const HTTPHeaderFields&
+		headers() const = 0;
 
-		inline const Configuration&
-		configuration()
-		{
-			return (m_configuration);
-		}
+		virtual const std::string&
+		body() const = 0;
 
-		inline const ServerBlock&
-		server()
-		{
-			return (m_serverBlock);
-		}
+		virtual const Configuration&
+		configuration() const = 0;
 
-		inline const Optional<LocationBlock const*>&
-		location()
-		{
-			return (m_locationBlock);
-		}
+		virtual const ServerBlock&
+		server() const = 0;
+
+		virtual const Optional<LocationBlock const*>&
+		location() const = 0;
 };
 
 #endif /* HTTPREQUEST_HPP_ */

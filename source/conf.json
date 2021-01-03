@@ -47,7 +47,17 @@
 			"locations": {
 				"/wordpress": {
 					"root": "/root/",
-					"cgi": "php-cgi"
+					"cgi": "php-cgi",
+					"index": [
+						"index.php"
+					]
+				},
+				"/superform": {
+					"root": "/root/",
+					"cgi": "php-cgi",
+					"index": [
+						"index.php"
+					]
 				},
 				"/x.py": {
 					"root": "../dummy-files/",

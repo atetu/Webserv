@@ -234,6 +234,39 @@ File::concatPaths(const std::string &a, const std::string &b)
 	return (a + '/' + b);
 }
 
+bool
+File::findFilename(const std::string &path, std::string &out)
+{
+	if (path.empty())
+		return (false);
+
+	std::string::size_type lastSlashPos = path.rfind("/");
+
+	if (lastSlashPos != std::string::npos)
+		out = path.substr(lastSlashPos + 1);
+	else
+		out = path;
+
+	return (true);
+}
+
+bool
+File::findExtension(const std::string &path, std::string &out)
+{
+	std::string filename;
+	if (!File::findFilename(path, filename))
+		return (false);
+
+	std::string::size_type lastDotPos = filename.rfind(".");
+
+	if (lastDotPos == std::string::npos)
+		return (false);
+
+	out = filename.substr(lastDotPos + 1);
+
+	return (true);
+}
+
 File
 File::currentDirectory()
 {

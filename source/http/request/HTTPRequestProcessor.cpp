@@ -10,7 +10,10 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+#include <buffer/impl/BaseBuffer.hpp>
+#include <buffer/impl/SocketBuffer.hpp>
 #include <config/block/AuthBlock.hpp>
+#include <config/block/CGIBlock.hpp>
 #include <config/block/LocationBlock.hpp>
 #include <config/block/RootBlock.hpp>
 #include <config/block/ServerBlock.hpp>
@@ -24,20 +27,20 @@
 #include <http/header/HTTPHeaderFields.hpp>
 #include <http/HTTPClient.hpp>
 #include <http/HTTPServer.hpp>
-#include <http/request/HTTPRequest.hpp>
-#include <http/request/HTTPRequestProcessor.hpp>
 #include <http/parser/HTTPRequestParser.hpp>
+#include <http/parser/HTTPRequestPathParser.hpp>
+#include <http/request/HTTPRequestProcessor.hpp>
+#include <http/request/impl/GenericHTTPRequest.hpp>
+#include <http/request/impl/SubHTTPRequest.hpp>
 #include <http/response/HTTPStatusLine.hpp>
 #include <http/response/impl/cgi/CGIHTTPResponse.hpp>
-#include <http/response/impl/generic/GenericHTTPResponse.hpp>
 #include <http/route/HTTPFindLocation.hpp>
-#include <stddef.h>
-#include <buffer/impl/BaseBuffer.hpp>
-#include <buffer/impl/SocketBuffer.hpp>
-#include <util/Enum.hpp>
-#include <util/Environment.hpp>
+#include <io/File.hpp>
 #include <log/Logger.hpp>
 #include <log/LoggerFactory.hpp>
+#include <stddef.h>
+#include <util/Enum.hpp>
+#include <util/Environment.hpp>
 #include <util/Optional.hpp>
 #include <util/StringUtils.hpp>
 #include <util/URL.hpp>
@@ -106,8 +109,6 @@ HTTPRequestProcessor::process(HTTPClient &client)
 	if (method.hasBody())
 		client.parser().body(client.in().storage(), serverBlock.maxBodySize());
 
-	const RootBlock &rootBlock = m_configuration.rootBlock();
-
 	const HTTPVersion &version = HTTPVersion::HTTP_1_1;
 	const HTTPHeaderFields &headerFields = client.parser().headerFields();
 	const Optional<LocationBlock const*> locationBlockOptional = Optional<LocationBlock const*>::ofNullable(locationBlockPtr);
@@ -116,7 +117,7 @@ HTTPRequestProcessor::process(HTTPClient &client)
 
 	URL url = client.parser().url(); // TODO Need fix
 
-	client.request() = new HTTPRequest(method, url, version, headerFields, body, m_configuration, rootBlock, *serverBlockPtr, locationBlockOptional);
+	client.request() = new GenericHTTPRequest(method, url, version, headerFields, body, m_configuration, *serverBlockPtr, locationBlockOptional);
 
 	if (client.request()->needAuth()) // TODO Need to be moved
 	{
@@ -160,13 +161,54 @@ HTTPRequestProcessor::process(HTTPClient &client)
 				return;
 			}
 		}
+	}
 
+	if (method == *HTTPMethod::GET || method == *HTTPMethod::HEAD)
+	{
+		File targetFile(client.request()->root(),client.request()->url().path());
+
+		if (targetFile.exists() && targetFile.isDirectory())
+		{
+			if (StringUtils::last(client.request()->url().path()) != '/')
+			{
+				client.response() = HTTPMethodHandler::redirect(*HTTPStatus::MOVED_PERMANENTLY, client.request()->url().builder().appendToPath("/").build());
+				return;
+			}
+
+			if (locationBlockPtr)
+			{
+				const LocationBlock &locationBlock = *locationBlockPtr;
+
+				if (locationBlock.index().present())
+				{
+					const std::list<std::string> &indexFiles = locationBlock.index().get();
+
+					for (std::list<std::string>::const_iterator it = indexFiles.begin(); it != indexFiles.end(); it++)
+					{
+						File anIndex(targetFile, *it);
+
+						if (anIndex.exists() && anIndex.isFile())
+						{
+							File newPath(client.request()->url().path(), *it);
+
+							client.request() = new SubHTTPRequest(*static_cast<GenericHTTPRequest*>(client.request()), method, newPath.path());
+							break;
+						}
+					}
+				}
+			}
+		}
+	}
+
+	if (locationBlockPtr)
+	{
+		const LocationBlock &locationBlock = *locationBlockPtr;
 		if (!client.response() && locationBlock.cgi().present())
 		{
-			const CGIBlock &cgiBlock = rootBlock.getCGI(locationBlockPtr->cgi().get());
+			const CGIBlock &cgiBlock = m_configuration.rootBlock().getCGI(locationBlock.cgi().get());
 
 			std::string extension;
-			if (client.request()->url().extension(extension))
+			if (File::findExtension(client.request()->resource(), extension))
 			{
 				if (cgiBlock.hasExtension(extension))
 				{
@@ -186,7 +228,7 @@ HTTPRequestProcessor::process(HTTPClient &client)
 			}
 		}
 	}
-	
+
 	if (!client.response())
 		client.response() = method.handler().handle(*client.request());
 }

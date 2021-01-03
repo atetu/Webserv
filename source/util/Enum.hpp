@@ -152,6 +152,13 @@ template<typename E>
 	};
 
 template<typename E>
+	inline bool
+	operator ==(const Enum<E> left, const Enum<E> right)
+	{
+		return (left.ordinal() == right.ordinal());
+	}
+
+template<typename E>
 	std::ostream&
 	operator <<(std::ostream &stream, const Enum<E> value)
 	{

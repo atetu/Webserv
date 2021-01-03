@@ -21,7 +21,7 @@ th {
   width: 1hv;
 }
 </style>""")
-print("""<table>
+print("""<body><table style="width: 100%">
   <tr>
     <th>#</th>
     <th>KEY</th>
@@ -38,7 +38,7 @@ for key, value in os.environ.items():
     <td>{value}</td>
   </tr>""")
     #print(key, file=sys.stderr)
-print("</table>")
+print("</body></table>")
 print('</html>')
 
 #import time

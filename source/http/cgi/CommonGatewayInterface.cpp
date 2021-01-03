@@ -137,7 +137,7 @@ CommonGatewayInterface::execute(HTTPClient &client, const CGIBlock &cgiBlock, co
 
 	HTTPRequest &request = *client.request();
 
-	File scriptFile(request.url().path());
+	File scriptFile(request.resource());
 	File scriptAbsoluteFile(request.root(), scriptFile);
 
 	env.setProperty(ENV_GATEWAY_INTERFACE, "CGI/1.1");

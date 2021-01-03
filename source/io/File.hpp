@@ -100,6 +100,12 @@ class File
 		static std::string
 		concatPaths(const std::string &a, const std::string &b);
 
+		static bool
+		findFilename(const std::string &path, std::string &out);
+
+		static bool
+		findExtension(const std::string &path, std::string &out);
+
 	public:
 		static File
 		currentDirectory();

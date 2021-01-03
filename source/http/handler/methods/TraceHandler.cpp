@@ -10,10 +10,13 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+#include <http/enums/HTTPMethod.hpp>
 #include <http/enums/HTTPStatus.hpp>
 #include <http/handler/methods/TraceHandler.hpp>
 #include <http/header/HTTPHeaderFields.hpp>
 #include <http/request/HTTPRequest.hpp>
+#include <util/Enum.hpp>
+#include <util/URL.hpp>
 #include <string>
 
 TraceHandler::TraceHandler()
