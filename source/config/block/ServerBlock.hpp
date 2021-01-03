@@ -16,7 +16,7 @@
 #include <config/block/container/CustomErrorMap.hpp>
 #include <config/block/LocationBlock.hpp>
 #include <util/Optional.hpp>
-#include <util/unit/DataSize.hpp>
+#include <unit/DataSize.hpp>
 #include <list>
 #include <string>
 

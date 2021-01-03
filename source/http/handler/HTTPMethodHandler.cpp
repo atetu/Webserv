@@ -14,7 +14,7 @@
 #include <http/page/DefaultPages.hpp>
 #include <http/request/HTTPRequest.hpp>
 #include <http/response/impl/generic/GenericHTTPResponse.hpp>
-#include <util/buffer/impl/FileDescriptorBuffer.hpp>
+#include <buffer/impl/FileDescriptorBuffer.hpp>
 #include <util/Singleton.hpp>
 #include <util/URL.hpp>
 

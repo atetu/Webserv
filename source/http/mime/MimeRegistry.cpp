@@ -12,8 +12,8 @@
 
 #include <http/mime/MimeRegistry.hpp>
 #include <util/helper/DeleteHelper.hpp>
-#include <util/json/JsonReader.hpp>
-#include <util/log/LoggerFactory.hpp>
+#include <json/JsonReader.hpp>
+#include <log/LoggerFactory.hpp>
 #include <iostream>
 #include <list>
 #include <utility>

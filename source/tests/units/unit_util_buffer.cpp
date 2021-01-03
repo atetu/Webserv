@@ -11,7 +11,7 @@
 /* ************************************************************************** */
 
 #include <tests/test_unit.hpp>
-#include <util/buffer/impl/BaseBuffer.hpp>
+#include <buffer/impl/BaseBuffer.hpp>
 #include <string>
 
 CASE("buffer", "base-store")

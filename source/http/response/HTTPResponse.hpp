@@ -13,7 +13,7 @@
 #ifndef HTTPRESPONSE_HPP_
 # define HTTPRESPONSE_HPP_
 
-#include <util/buffer/impl/FileDescriptorBuffer.hpp>
+#include <buffer/impl/FileDescriptorBuffer.hpp>
 #include <vector>
 
 class SocketBuffer;

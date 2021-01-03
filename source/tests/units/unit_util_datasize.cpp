@@ -11,7 +11,7 @@
 /* ************************************************************************** */
 
 #include <tests/test_unit.hpp>
-#include <util/unit/DataSize.hpp>
+#include <unit/DataSize.hpp>
 
 CASE("datasize", "parse-invalid")
 {

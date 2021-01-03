@@ -13,7 +13,7 @@
 #include <encoding/default/base64/Base64.hpp>
 #include <encoding/default/base64/Base64Encoder.hpp>
 #include <tests/test_unit.hpp>
-#include <util/log/LoggerFactory.hpp>
+#include <log/LoggerFactory.hpp>
 
 static std::string
 encode(const char *str)

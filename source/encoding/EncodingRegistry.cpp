@@ -11,7 +11,7 @@
 /* ************************************************************************** */
 
 #include <encoding/EncodingRegistry.hpp>
-#include <util/log/LoggerFactory.hpp>
+#include <log/LoggerFactory.hpp>
 
 class LoggerFactory;
 

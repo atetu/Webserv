@@ -19,8 +19,8 @@
 #include <http/mime/MimeRegistry.hpp>
 #include <http/request/HTTPRequest.hpp>
 #include <http/response/impl/generic/GenericHTTPResponse.hpp>
-#include <util/log/Logger.hpp>
-#include <util/log/LoggerFactory.hpp>
+#include <log/Logger.hpp>
+#include <log/LoggerFactory.hpp>
 #include <util/URL.hpp>
 #include <io/FileDescriptor.hpp>
 #include <algorithm>

@@ -16,7 +16,7 @@
 #include <http/HTTPClient.hpp>
 #include <http/HTTPServer.hpp>
 #include <sys/select.h>
-#include <util/buffer/impl/FileDescriptorBuffer.hpp>
+#include <buffer/impl/FileDescriptorBuffer.hpp>
 #include <list>
 #include <map>
 

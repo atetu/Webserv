@@ -12,7 +12,7 @@
 
 #include <http/mime/Mime.hpp>
 #include <util/helper/JsonBinderHelper.hpp>
-#include <util/json/JsonString.hpp>
+#include <json/JsonString.hpp>
 
 Mime::Mime(void) :
 		m_type(),

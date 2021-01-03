@@ -14,8 +14,8 @@
 # define CONFIGURATIONBINDEXCEPTION_HPP_
 
 #include <config/exceptions/ConfigurationException.hpp>
-#include <util/json/JsonType.hpp>
-#include <util/json/JsonValue.hpp>
+#include <json/JsonType.hpp>
+#include <json/JsonValue.hpp>
 #include <string>
 
 class ConfigurationBindException :

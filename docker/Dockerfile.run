@@ -1,6 +1,6 @@
 FROM webserv-base
 
-ENTRYPOINT echo Starting 'run' && \
+CMD echo Starting 'run' && \
 	service mysql start && \
 	cd /app/source && \
 	/app/source/webserv

@@ -17,8 +17,8 @@
 #include <config/exceptions/ConfigurationBindException.hpp>
 #include <util/Convert.hpp>
 #include <util/helper/DeleteHelper.hpp>
-#include <util/json/JsonArray.hpp>
-#include <util/json/JsonObject.hpp>
+#include <json/JsonArray.hpp>
+#include <json/JsonObject.hpp>
 #include <util/Objects.hpp>
 #include <iterator>
 #include <list>

@@ -11,15 +11,15 @@
 /* ************************************************************************** */
 
 #include <tests/test_unit.hpp>
-#include <util/json/JsonArray.hpp>
-#include <util/json/JsonBoolean.hpp>
-#include <util/json/JsonDecimal.hpp>
-#include <util/json/JsonNull.hpp>
-#include <util/json/JsonNumber.hpp>
-#include <util/json/JsonObject.hpp>
-#include <util/json/JsonReader.hpp>
-#include <util/json/JsonString.hpp>
-#include <util/json/JsonValue.hpp>
+#include <json/JsonArray.hpp>
+#include <json/JsonBoolean.hpp>
+#include <json/JsonDecimal.hpp>
+#include <json/JsonNull.hpp>
+#include <json/JsonNumber.hpp>
+#include <json/JsonObject.hpp>
+#include <json/JsonReader.hpp>
+#include <json/JsonString.hpp>
+#include <json/JsonValue.hpp>
 #include <string>
 
 static JsonValue *g_temporary_storage = NULL;

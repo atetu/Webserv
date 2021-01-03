@@ -13,8 +13,8 @@
 #include <http/enums/HTTPStatus.hpp>
 #include <http/HTTP.hpp>
 #include <http/response/impl/generic/GenericHTTPResponse.hpp>
-#include <util/buffer/impl/FileDescriptorBuffer.hpp>
-#include <util/buffer/impl/SocketBuffer.hpp>
+#include <buffer/impl/FileDescriptorBuffer.hpp>
+#include <buffer/impl/SocketBuffer.hpp>
 #include <iostream>
 #include <vector>
 

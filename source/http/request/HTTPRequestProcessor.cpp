@@ -32,12 +32,12 @@
 #include <http/response/impl/generic/GenericHTTPResponse.hpp>
 #include <http/route/HTTPFindLocation.hpp>
 #include <stddef.h>
-#include <util/buffer/impl/BaseBuffer.hpp>
-#include <util/buffer/impl/SocketBuffer.hpp>
+#include <buffer/impl/BaseBuffer.hpp>
+#include <buffer/impl/SocketBuffer.hpp>
 #include <util/Enum.hpp>
 #include <util/Environment.hpp>
-#include <util/log/Logger.hpp>
-#include <util/log/LoggerFactory.hpp>
+#include <log/Logger.hpp>
+#include <log/LoggerFactory.hpp>
 #include <util/Optional.hpp>
 #include <util/StringUtils.hpp>
 #include <util/URL.hpp>

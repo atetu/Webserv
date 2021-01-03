@@ -29,8 +29,8 @@
 #include <http/response/impl/generic/GenericHTTPResponse.hpp>
 #include <http/route/HTTPFindLocation.hpp>
 #include <io/Socket.hpp>
-#include <util/buffer/impl/BaseBuffer.hpp>
-#include <util/buffer/impl/SocketBuffer.hpp>
+#include <buffer/impl/BaseBuffer.hpp>
+#include <buffer/impl/SocketBuffer.hpp>
 #include <util/Enum.hpp>
 #include <util/Environment.hpp>
 #include <util/Optional.hpp>
