@@ -22,7 +22,7 @@ else
     DOCKER := docker
 endif
 
-all: touch_test_files
+all: --touch-test-files
 	@$(PROJECT_MAKE) all
     
 fclean:
@@ -63,7 +63,7 @@ docker-run: docker-build-run
 docker-test: docker-build-test
 	@$(DOCKER) run --rm -it -p 80:80 webserv-test $(ARGS)
 
-touch_test_files:
+--touch-test-files:
 	@#echo ${RUN_TESTS} $$(bash -c "test -f '.test'; echo $$?") # DEBUG
 	@bash -c "if [[ ('${RUN_TESTS}' = 0 && -f '.test') || ('${RUN_TESTS}' != 0 && ! -f '.test') ]]; then touch source/main.cpp source/tests/units/*.cpp; fi"
 	@bash -c "if [[ '${RUN_TESTS}' = 0 && -f '.test' ]]; then rm .test; fi"
