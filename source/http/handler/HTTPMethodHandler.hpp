@@ -36,6 +36,12 @@ class HTTPMethodHandler
 		status(HTTPStatus &status, const HTTPHeaderFields &headers = HTTPHeaderFields());
 
 		static HTTPResponse*
+		statusHead(HTTPStatus &status, const HTTPHeaderFields &headers= HTTPHeaderFields());
+
+		static HTTPResponse*
+		statusEmpty(HTTPStatus &status, const HTTPHeaderFields &headers = HTTPHeaderFields());
+
+		static HTTPResponse*
 		file(HTTPStatus &httpStatus, int fd, const HTTPHeaderFields &headers = HTTPHeaderFields());
 
 		static HTTPResponse*
@@ -49,6 +55,9 @@ class HTTPMethodHandler
 
 		static HTTPResponse*
 		error(const HTTPRequest &request, HTTPStatus &httpStatus, const HTTPHeaderFields &headers = HTTPHeaderFields());
+
+		static HTTPResponse*
+		errorHead(const HTTPRequest &request, HTTPStatus &httpStatus, const HTTPHeaderFields &headers);
 
 		static HTTPResponse*
 		redirect(HTTPStatus &httpStatus, const URL &to, const HTTPHeaderFields &headers = HTTPHeaderFields());

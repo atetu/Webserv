@@ -63,6 +63,13 @@ HTTPRequestProcessor::~HTTPRequestProcessor()
 void
 HTTPRequestProcessor::process(HTTPClient &client)
 {
+	// if (client.parser().headerFields().get(HTTPHeaderFields::TRANSFER_ENCODING).present() && client.in().size()==0)
+	// 	return;
+//	std::cout << "Storage\n" << client.in().storage() << std::endl;
+	// std::cout << "Storage\n" << client.in().size() << std::endl;
+	// std::cout << "Storage[0]\n" << (int)client.in().storage()[0] << std::endl;
+	// std::cout << "Storage[1]\n" << (int)client.in().storage()[1] << std::endl;
+
 	const ServerBlock *serverBlockPtr = findServerBlock(client);
 	if (!serverBlockPtr)
 	{
@@ -73,6 +80,7 @@ HTTPRequestProcessor::process(HTTPClient &client)
 	const HTTPMethod *methodPtr = HTTPMethod::find(client.parser().method());
 	if (!methodPtr)
 	{
+		std::cout << "pouet\n";
 		client.response() = HTTPMethodHandler::error(*client.request(), *HTTPStatus::METHOD_NOT_ALLOWED);
 		return;
 	}
@@ -80,8 +88,11 @@ HTTPRequestProcessor::process(HTTPClient &client)
 	const ServerBlock &serverBlock = *serverBlockPtr;
 	const HTTPMethod &method = *methodPtr;
 
+//	std::cout << "method: " << method.name() << ": " << serverBlock.methods().present() << " : " << serverBlock.hasMethod(method.name())<< std::endl;
 	if (serverBlock.methods().present() && !serverBlock.hasMethod(method.name()))
 	{
+		std::cout << "method: " << method.name() << std::endl;
+
 		client.response() = HTTPMethodHandler::error(*client.request(), *HTTPStatus::METHOD_NOT_ALLOWED);
 		return;
 	}
@@ -94,14 +105,20 @@ HTTPRequestProcessor::process(HTTPClient &client)
 		if (findLocation.parse().location().present())
 			locationBlockPtr = findLocation.parse().location().get();
 	}
-
+	
 	if (locationBlockPtr)
 	{
 		const LocationBlock &locationBlock = *locationBlockPtr;
 
 		if (locationBlock.methods().present() && !locationBlock.hasMethod(method.name()))
 		{
-			client.response() = HTTPMethodHandler::error(*client.request(), *HTTPStatus::METHOD_NOT_ALLOWED);
+			std::cout<<"lo\n";
+			HTTPHeaderFields headers;
+			headers.allow("GET"); // TODO list allowed methods + Add everywhere method is not allowed
+			if (method.name()== "HEAD")
+				client.response() = HTTPMethodHandler::errorHead(*client.request(), *HTTPStatus::METHOD_NOT_ALLOWED, headers);
+			else
+				client.response() = HTTPMethodHandler::error(*client.request(), *HTTPStatus::METHOD_NOT_ALLOWED, headers);
 			return;
 		}
 	}
@@ -148,15 +165,18 @@ HTTPRequestProcessor::process(HTTPClient &client)
 			return;
 		}
 	}
-
+//std::cout << "before location\n";
 	if (locationBlockPtr)
 	{
 		const LocationBlock &locationBlock = *locationBlockPtr;
 
+//		std::cout << "before before Error\n";
 		if (locationBlock.methods().present())
 		{
+//			std::cout << "Before Error\n";
 			if (!locationBlock.hasMethod(method.name()))
 			{
+				std::cout << "Error\n";
 				client.response() = HTTPMethodHandler::error(*client.request(), *HTTPStatus::METHOD_NOT_ALLOWED);
 				return;
 			}

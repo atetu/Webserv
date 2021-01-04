@@ -57,7 +57,7 @@ PutHandler::checkExtension(HTTPRequest &request, File &file)
 		const Mime *mime = request.configuration().mimeRegistry().findByMimeType(type);
 		if (mime == NULL)
 		{
-			LOG.warn() << "Extension conversion not handled (1)" << std::endl;
+			//LOG.warn() << "Extension conversion not handled (1)" << std::endl;
 			return (0);
 		}
 
@@ -99,9 +99,10 @@ PutHandler::handle(HTTPRequest &request)
 	const std::string &path = request.root() + request.url().path();
 	//File file(path + "/" + request.getLocation());
 	File file(path);
-	if (!checkExtension(request, file))
-		return (error(request, *HTTPStatus::UNSUPPORTED_MEDIA_TYPE));
-		//return (GenericHTTPResponse::status(*HTTPStatus::UNSUPPORTED_MEDIA_TYPE));
+//	if (!checkExtension(request, file))
+	//	return (status(*HTTPStatus::CONFLICT, headers));
+	//	return (error(request, *HTTPStatus::BAD_REQUEST));
+	//	return (statusEmpty(*HTTPStatus::UNSUPPORTED_MEDIA_TYPE, headers));
 
 	if (!file.exists())
 	{
@@ -130,8 +131,12 @@ PutHandler::handle(HTTPRequest &request)
 
 	if (file.isDirectory())
 	{
+		return (error(request, *HTTPStatus::METHOD_NOT_ALLOWED));
+		return (statusEmpty(*HTTPStatus::OK, headers));
+		//return (HTTPMethodHandler::filePut(*HTTPStatus::OK, *file.open(O_WRONLY|O_APPEND), request.body(), created, headers));
 		LOG.warn() << "Put method not handled for directories" << std::endl;
-		return (error(request, *HTTPStatus::UNSUPPORTED_MEDIA_TYPE));
+		return (error(request, *HTTPStatus::METHOD_NOT_ALLOWED));
+	//	return (statusEmpty(*HTTPStatus::UNSUPPORTED_MEDIA_TYPE, headers));
 	//	return (GenericHTTPResponse::status(*HTTPStatus::UNSUPPORTED_MEDIA_TYPE));
 	}
 

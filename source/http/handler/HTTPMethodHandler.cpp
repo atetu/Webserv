@@ -22,14 +22,24 @@ HTTPMethodHandler::~HTTPMethodHandler()
 {
 }
 
-// HTTPResponse*
-// HTTPMethodHandler::status(HTTPStatus &status, const HTTPHeaderFields &headers)
-// {
-// 	return (GenericHTTPResponse::string(status, HTTPHeaderFields(headers).html(), DefaultPages::instance().resolve(status)));
-// }
-
 HTTPResponse*
 HTTPMethodHandler::status(HTTPStatus &status, const HTTPHeaderFields &headers)
+{
+	return (GenericHTTPResponse::string(status, HTTPHeaderFields(headers).html(), DefaultPages::instance().resolve(status)));
+}
+
+HTTPResponse*
+HTTPMethodHandler::statusHead(HTTPStatus &status, const HTTPHeaderFields &headers)
+{
+	const std::string &defaultPage = DefaultPages::instance().resolve(status);
+	HTTPHeaderFields(headers).contentLength(defaultPage.size());
+	//(defaultPage.size());
+	const std::string empty = "";
+	return (GenericHTTPResponse::string(status, HTTPHeaderFields(headers).html(), empty));
+}
+
+HTTPResponse*
+HTTPMethodHandler::statusEmpty(HTTPStatus &status, const HTTPHeaderFields &headers)
 {
 	//return (GenericHTTPResponse::string(status, headers, DefaultPages::instance().resolve(status)));
 	return (GenericHTTPResponse::string(status, headers, ""));
@@ -66,6 +76,13 @@ HTTPMethodHandler::error(const HTTPRequest &request, HTTPStatus &httpStatus, con
 {
 	(void)request; // TODO Need to handle custom error pages if necessary
 	return (status(httpStatus, headers));
+}
+
+HTTPResponse*
+HTTPMethodHandler::errorHead(const HTTPRequest &request, HTTPStatus &httpStatus, const HTTPHeaderFields &headers)
+{
+	(void)request; // TODO Need to handle custom error pages if necessary
+	return (statusHead(httpStatus, headers));
 }
 
 HTTPResponse*
