@@ -105,17 +105,16 @@ HTTPRequestProcessor::process(HTTPClient &client)
 		if (findLocation.parse().location().present())
 			locationBlockPtr = findLocation.parse().location().get();
 	}
-	
+
 	if (locationBlockPtr)
 	{
 		const LocationBlock &locationBlock = *locationBlockPtr;
 
 		if (locationBlock.methods().present() && !locationBlock.hasMethod(method.name()))
 		{
-			std::cout<<"lo\n";
 			HTTPHeaderFields headers;
 			headers.allow("GET"); // TODO list allowed methods + Add everywhere method is not allowed
-			if (method.name()== "HEAD")
+			if (method.name() == "HEAD")
 				client.response() = HTTPMethodHandler::errorHead(*client.request(), *HTTPStatus::METHOD_NOT_ALLOWED, headers);
 			else
 				client.response() = HTTPMethodHandler::error(*client.request(), *HTTPStatus::METHOD_NOT_ALLOWED, headers);
@@ -185,7 +184,7 @@ HTTPRequestProcessor::process(HTTPClient &client)
 
 	if (method == *HTTPMethod::GET || method == *HTTPMethod::HEAD)
 	{
-		File targetFile(client.request()->root(),client.request()->url().path());
+		File targetFile(client.request()->root(), client.request()->url().path());
 
 		if (targetFile.exists() && targetFile.isDirectory())
 		{
@@ -232,6 +231,12 @@ HTTPRequestProcessor::process(HTTPClient &client)
 			{
 				if (cgiBlock.hasExtension(extension))
 				{
+					if (!File(client.request()->root(), client.request()->resource()).exists())
+					{
+						client.response() = HTTPMethodHandler::error(*client.request(), *HTTPStatus::NOT_FOUND);
+						return;
+					}
+
 					try
 					{
 						CommonGatewayInterface *cgi = CommonGatewayInterface::execute(client, cgiBlock, m_environment);
