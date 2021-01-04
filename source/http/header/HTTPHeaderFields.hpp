@@ -134,6 +134,9 @@ class HTTPHeaderFields
 		retryAfter(const std::string &value);
 
 		HTTPHeaderFields&
+		server(void);
+
+		HTTPHeaderFields&
 		server(const std::string &value);
 
 		HTTPHeaderFields&

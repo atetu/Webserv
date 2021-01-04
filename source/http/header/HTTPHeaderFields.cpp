@@ -16,6 +16,7 @@
 #include <util/Convert.hpp>
 #include <util/Enum.hpp>
 #include <util/URL.hpp>
+#include <webserv.hpp>
 
 const std::string HTTPHeaderFields::ACCEPT_CHARSETS/*	*/= "Accept-Charsets";
 const std::string HTTPHeaderFields::ACCEPT_LANGUAGE/*	*/= "Accept-Language";
@@ -226,6 +227,12 @@ HTTPHeaderFields&
 HTTPHeaderFields::retryAfter(const std::string &value)
 {
 	return (set(RETRY_AFTER, value));
+}
+
+HTTPHeaderFields&
+HTTPHeaderFields::server(void)
+{
+	return (server(APPLICATION_NAME));
 }
 
 HTTPHeaderFields&

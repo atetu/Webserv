@@ -165,7 +165,7 @@ GenericHTTPResponse::write(SocketBuffer &socketBuffer)
 		case HEADERS:
 			if (!m_headers.empty())
 			{
-				socketBuffer.store(m_headers.format());
+				socketBuffer.store(m_headers.date().server().format());
 				socketBuffer.store(HTTP::CRLF);
 			}
 
