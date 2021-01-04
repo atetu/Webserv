@@ -15,7 +15,7 @@
 
 #include <string>
 
-class ChunkEncoder 
+class ChunkEncoder
 {
 	public:
 
@@ -56,6 +56,10 @@ class ChunkEncoder
 	private:
 		std::string m_input;
 		std::string m_parsedData;
+
+	public:
+		static std::string
+		staticEncode(const std::string &input);
 };
 
 #endif /* CHUNKENCODER_HPP_ */

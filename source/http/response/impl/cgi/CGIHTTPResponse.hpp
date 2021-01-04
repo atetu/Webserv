@@ -29,7 +29,6 @@ class CGIHTTPResponse :
 		FileDescriptorBuffer *m_outBuffer;
 		State m_state;
 		HTTPHeaderFieldsParser m_headerFieldsParser;
-		size_t m_peekIndex;
 
 	private:
 		CGIHTTPResponse();

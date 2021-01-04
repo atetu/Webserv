@@ -23,6 +23,9 @@ class BaseBuffer :
 		public IReadableBuffer
 {
 	public:
+		typedef std::string
+		(*transformer)(const std::string&);
+
 		typedef std::string::size_type size_type;
 
 	protected:
@@ -53,7 +56,7 @@ class BaseBuffer :
 		store(const void *buffer, size_t len);
 
 		BaseBuffer&
-		store(BaseBuffer &buffer, bool andErase = true);
+		store(BaseBuffer &buffer, bool andErase = true, transformer = NULL);
 
 		bool
 		next(char &c);

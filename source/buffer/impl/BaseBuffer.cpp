@@ -56,17 +56,22 @@ BaseBuffer::store(const std::string &str)
 }
 
 BaseBuffer&
-BaseBuffer::store(BaseBuffer &buffer, bool andErase)
+BaseBuffer::store(BaseBuffer &buffer, bool andErase, transformer transform)
 {
-	size_type capacity = std::min(this->capacity(), buffer.capacity());
-
-	if (capacity)
+	if (!buffer.empty())
 	{
+		size_type capacity = std::min(this->capacity(), buffer.capacity());
 
-		m_storage += buffer.storage().substr(0, capacity);
+		if (capacity)
+		{
+			if (transform)
+				m_storage += (*(transform))(buffer.storage().substr(0, capacity));
+			else
+				m_storage += buffer.storage().substr(0, capacity);
 
-		if (andErase)
-			buffer.storage().erase(0, capacity);
+			if (andErase)
+				buffer.storage().erase(0, capacity);
+		}
 	}
 
 	return (*this);

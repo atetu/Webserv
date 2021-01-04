@@ -10,18 +10,18 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+#include <buffer/impl/FileDescriptorBuffer.hpp>
+#include <buffer/impl/SocketBuffer.hpp>
+#include <encoding/default/chunk/ChunkEncoder.hpp>
 #include <exception/Exception.hpp>
 #include <http/cgi/CommonGatewayInterface.hpp>
 #include <http/enums/HTTPStatus.hpp>
 #include <http/header/HTTPHeaderFields.hpp>
 #include <http/HTTP.hpp>
 #include <http/response/impl/cgi/CGIHTTPResponse.hpp>
-#include <buffer/impl/FileDescriptorBuffer.hpp>
-#include <buffer/impl/SocketBuffer.hpp>
-#include <util/Enum.hpp>
-#include <util/helper/DeleteHelper.hpp>
 #include <log/Logger.hpp>
 #include <log/LoggerFactory.hpp>
+#include <util/helper/DeleteHelper.hpp>
 #include <util/Number.hpp>
 #include <util/Optional.hpp>
 #include <iostream>
@@ -34,8 +34,7 @@ CGIHTTPResponse::CGIHTTPResponse(const HTTPStatusLine &statusLine, CommonGateway
 		m_inBuffer(FileDescriptorBuffer::from(cgi.in(), FileDescriptorBuffer::NOTHING)),
 		m_outBuffer(FileDescriptorBuffer::from(cgi.out(), FileDescriptorBuffer::NOTHING)),
 		m_state(NONE),
-		m_headerFieldsParser(),
-		m_peekIndex()
+		m_headerFieldsParser()
 {
 }
 
@@ -69,14 +68,11 @@ CGIHTTPResponse::write(SocketBuffer &socketBuffer)
 			try
 			{
 				char c;
-				while (m_outBuffer->peek(c, m_peekIndex))
+				while (m_outBuffer->peek(c))
 				{
-					m_peekIndex++;
-
 					m_headerFieldsParser.consume(c);
 					if (m_headerFieldsParser.state() == HTTPHeaderFieldsParser::S_END)
 					{
-
 						const HTTPHeaderFields &headerFields = m_headerFieldsParser.headerFields();
 
 						Optional<std::string> statusOptional = headerFields.get("Status");
@@ -101,6 +97,8 @@ CGIHTTPResponse::write(SocketBuffer &socketBuffer)
 						m_state = STATUS_LINE;
 						break;
 					}
+					else
+						m_outBuffer->next(c);
 				}
 			}
 			catch (Exception &exception)
@@ -116,15 +114,25 @@ CGIHTTPResponse::write(SocketBuffer &socketBuffer)
 			socketBuffer.store(m_statusLine.format());
 			socketBuffer.store(HTTP::CRLF);
 
+			if (!m_headerFieldsParser.headerFields().empty())
+			{
+				socketBuffer.store(HTTPHeaderFields(m_headerFieldsParser.headerFields()).date().server().transferEncoding("chunked").format());
+				socketBuffer.store(HTTP::CRLF);
+			}
+
 			m_state = BODY;
 
 			break;
 
 		case BODY:
-			socketBuffer.store(*m_outBuffer);
+			socketBuffer.store(*m_outBuffer, true, ChunkEncoder::staticEncode);
 
 			if (!m_cgi.running() || m_outBuffer->hasReadEverything())
+			{
+				socketBuffer.store(ChunkEncoder::staticEncode(""));
+
 				m_state = FLUSHING;
+			}
 
 			break;
 

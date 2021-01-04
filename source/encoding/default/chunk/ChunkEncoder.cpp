@@ -11,8 +11,9 @@
 /* ************************************************************************** */
 
 #include <encoding/default/chunk/ChunkEncoder.hpp>
-#include <exception/Exception.hpp>
-#include <iomanip>
+#include <http/HTTP.hpp>
+#include <util/Convert.hpp>
+#include <iostream>
 #include <sstream>
 
 ChunkEncoder::ChunkEncoder() :
@@ -64,4 +65,10 @@ ChunkEncoder::encode()
 	m_parsedData += "0\r\n\r\n";
 	
 	return (m_parsedData);
+}
+
+std::string
+ChunkEncoder::staticEncode(const std::string &input)
+{
+	return (Convert::toString(input.size(), 16) + HTTP::CRLF + input + HTTP::CRLF);
 }
