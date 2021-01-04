@@ -279,7 +279,7 @@ HTTPOrchestrator::start()
 
 								while (client.in().next(c))
 								{
-									std::cout << c;
+//									std::cout << c;
 									try
 									{
 										client.parser().consume(c);
@@ -312,7 +312,7 @@ HTTPOrchestrator::start()
 										client.response()->readFileDescriptors(buffers);
 										for (HTTPResponse::fdb_iterator it = buffers.begin(); it != buffers.end(); it++)
 										{
-											std::cout << "read\n";
+//											std::cout << "read\n";
 											addFileDescriptorBufferRead(*(*it));
 										}
 
