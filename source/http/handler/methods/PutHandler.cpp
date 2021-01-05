@@ -44,13 +44,7 @@ PutHandler::~PutHandler()
 int
 PutHandler::checkExtension(HTTPRequest &request, File &file)
 {
-	std::string type;
-
-	std::map<std::string, std::string>::const_iterator it = request.headers().storage().find("Content-Type");
-	if (it == request.headers().storage().end())
-		type = "";
-	else
-		type = it->second;
+	std::string type = request.headers().get(HTTPHeaderFields::CONTENT_TYPE).orElse("");
 
 	if (!type.empty())
 	{

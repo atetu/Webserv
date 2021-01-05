@@ -36,6 +36,7 @@ const std::string HTTPHeaderFields::SERVER/*			*/= "Server";
 const std::string HTTPHeaderFields::TRANSFER_ENCODING/*	*/= "Transfer-Encoding";
 const std::string HTTPHeaderFields::USER_AGENT/*		*/= "User-Agent";
 const std::string HTTPHeaderFields::WWW_AUTHENTICATE/*	*/= "WWW-Authenticate";
+const std::string HTTPHeaderFields::SET_COOKIE/*	    */= "Set-Cookie";
 
 const std::string HTTPHeaderFields::MIME_HTML/*	        */= "text/html";
 const std::string HTTPHeaderFields::MIME_HTTP/*	        */= "message/http";
@@ -299,9 +300,21 @@ HTTPHeaderFields::httpMessage(void)
 }
 
 HTTPHeaderFields&
-HTTPHeaderFields::set(const std::string &key, const std::string &value)
+HTTPHeaderFields::set(const std::string &key, const std::string &value, bool folding)
 {
-	m_storage[key] = value;
+	static std::string comaAndASpace = ", ";
+
+	list &lst = m_storage[key];
+
+	if (lst.empty() || key == SET_COOKIE)
+		lst.push_back(value);
+	else
+	{
+		if (folding)
+			lst.front() += comaAndASpace + value; /* RFC 7230 - 3.2.2 */
+		else
+			lst.front() = value;
+	}
 
 	return (*this);
 }
@@ -309,21 +322,21 @@ HTTPHeaderFields::set(const std::string &key, const std::string &value)
 const Optional<std::string>
 HTTPHeaderFields::get(const std::string &key) const
 {
-	const_iterator it = m_storage.find(key);
+	mconst_iterator it = m_storage.find(key);
 
 	if (it == m_storage.end())
 		return (Optional<std::string>());
 
-	return (Optional<std::string>(it->second));
+	return (Optional<std::string>::onlyIf(!it->second.empty(), it->second.front()));
 }
 
-HTTPHeaderFields::const_iterator
+HTTPHeaderFields::mconst_iterator
 HTTPHeaderFields::begin(void) const
 {
 	return (m_storage.begin());
 }
 
-HTTPHeaderFields::const_iterator
+HTTPHeaderFields::mconst_iterator
 HTTPHeaderFields::end(void) const
 {
 	return (m_storage.end());
@@ -332,12 +345,17 @@ HTTPHeaderFields::end(void) const
 std::string
 HTTPHeaderFields::format(const std::string &separator) const
 {
-	static std::string dotAndASpace = ": ";
+	static std::string colonAndASpace = ": ";
 
 	std::string str;
 
-	for (const_iterator it = begin(); it != end(); it++)
-		str += it->first + dotAndASpace + it->second + separator;
+	for (mconst_iterator it = begin(); it != end(); it++)
+	{
+		const list &lst = it->second;
+
+		for (lconst_iterator lit = lst.begin(); lit != lst.end(); lit++)
+			str += it->first + colonAndASpace + *lit + separator;
+	}
 
 	return (str);
 }
@@ -348,13 +366,13 @@ HTTPHeaderFields::empty(void) const
 	return (m_storage.empty());
 }
 
-std::map<std::string, std::string>&
+HTTPHeaderFields::map&
 HTTPHeaderFields::storage(void)
 {
 	return (m_storage);
 }
 
-const std::map<std::string, std::string>&
+const HTTPHeaderFields::map&
 HTTPHeaderFields::storage(void) const
 {
 	return (m_storage);

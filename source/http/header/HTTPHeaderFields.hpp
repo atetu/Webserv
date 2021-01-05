@@ -18,22 +18,24 @@
 #include <http/HTTP.hpp>
 #include <stddef.h>
 #include <util/Optional.hpp>
+#include <util/StringUtils.hpp>
 #include <list>
 #include <map>
 #include <string>
 #include <vector>
 
-class URL;
-
-class HTTPValueParser;
 class Mime;
 class MimeRegistry;
+class URL;
 
 class HTTPHeaderFields
 {
 	public:
-		typedef std::map<std::string, std::string> map;
-		typedef map::const_iterator const_iterator;
+		typedef std::list<std::string> list;
+		typedef list::const_iterator lconst_iterator;
+
+		typedef std::map<std::string, list, StringUtils::InsensitiveCompare> map;
+		typedef map::const_iterator mconst_iterator;
 
 	private:
 		map m_storage;
@@ -167,15 +169,15 @@ class HTTPHeaderFields
 		httpMessage(void);
 
 		HTTPHeaderFields&
-		set(const std::string &key, const std::string &value);
+		set(const std::string &key, const std::string &value, bool folding = false);
 
 		const Optional<std::string>
 		get(const std::string &key) const;
 
-		const_iterator
+		mconst_iterator
 		begin(void) const;
 
-		const_iterator
+		mconst_iterator
 		end(void) const;
 
 		std::string
@@ -209,6 +211,7 @@ class HTTPHeaderFields
 		static const std::string TRANSFER_ENCODING;
 		static const std::string USER_AGENT;
 		static const std::string WWW_AUTHENTICATE;
+		static const std::string SET_COOKIE;
 
 		static const std::string MIME_HTML;
 		static const std::string MIME_HTTP;

@@ -1,51 +1,26 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft.hpp                                             :+:      :+:    :+:   */
+/*   is.cpp                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ecaceres <ecaceres@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2020/12/20 17:24:32 by ecaceres          #+#    #+#             */
-/*   Updated: 2020/12/20 17:24:32 by ecaceres         ###   ########.fr       */
+/*   Created: 2021/01/05 01:22:51 by ecaceres          #+#    #+#             */
+/*   Updated: 2021/01/05 01:22:51 by ecaceres         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-
-#ifndef FT_HPP_
-# define FT_HPP_
-
-#include <stddef.h>
 
 namespace ft
 {
 	bool
-	islower(char c);
+	islower(char c)
+	{
+		return (c >= 'a' && c <= 'z');
+	}
 
 	bool
-	isupper(char c);
-
-	void*
-	memcpy(void *dest, const void *src, size_t len);
-
-	void*
-	memset(void *dest, char val, size_t len);
-
-	void*
-	bzero(void *dest, size_t len);
-
-	size_t
-	strlen(const char *str);
-
-	char*
-	strdup(const char *str);
-
-	char*
-	strchr(char *str, char c);
-
-	char
-	tolower(char c);
-
-	char
-	toupper(char c);
+	isupper(char c)
+	{
+		return (c >= 'A' && c <= 'Z');
+	}
 }
-
-#endif /* FT_HPP_ */

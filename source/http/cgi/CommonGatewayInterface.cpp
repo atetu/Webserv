@@ -182,8 +182,8 @@ CommonGatewayInterface::execute(HTTPClient &client, const CGIBlock &cgiBlock, co
 	}
 
 	const HTTPHeaderFields &headers = request.headers();
-	for (HTTPHeaderFields::const_iterator it = headers.begin(); it != headers.end(); it++)
-		env.setProperty("HTTP_" + StringUtils::toUpperCase(StringUtils::replace(StringUtils::replace(it->first, '=', '_'), '-', '_')), it->second);
+	for (HTTPHeaderFields::mconst_iterator it = headers.begin(); it != headers.end(); it++)
+		env.setProperty("HTTP_" + StringUtils::toUpperCase(StringUtils::replace(StringUtils::replace(it->first, '=', '_'), '-', '_')), it->second.front());
 
 	char **envp = env.allocate();
 

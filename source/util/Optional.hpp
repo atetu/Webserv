@@ -192,6 +192,15 @@ template<typename T>
 			}
 
 			static Optional<T>
+			onlyIf(bool present, const T &value)
+			{
+				if (present)
+					return (Optional(value));
+
+				return (Optional());
+			}
+
+			static Optional<T>
 			ofNullable(T &value)
 			{
 				if (value != NULL)

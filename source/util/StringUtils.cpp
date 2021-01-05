@@ -10,10 +10,10 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+#include <util/CharacterUtils.hpp>
 #include <util/StringUtils.hpp>
 #include <algorithm>
 #include <cctype>
-#include <iostream>
 
 StringUtils::StringUtils()
 {
@@ -87,4 +87,10 @@ StringUtils::last(const std::string &string)
 	std::string::size_type len = string.length();
 
 	return (string.c_str()[len ? len - 1 : 0]);
+}
+
+bool
+StringUtils::InsensitiveCompare::operator ()(const std::string &s1, const std::string &s2) const
+{
+	return (std::lexicographical_compare(s1.begin(), s1.end(), s2.begin(), s2.end(), CharacterUtils::InsensitiveCompare()));
 }

@@ -44,6 +44,14 @@ class StringUtils
 
 		static char
 		last(const std::string &string);
+
+	public:
+		struct InsensitiveCompare
+		{
+			public:
+				bool
+				operator()(const std::string &s1, const std::string &s2) const;
+		};
 };
 
 #endif /* STRINGUTILS_HPP_ */

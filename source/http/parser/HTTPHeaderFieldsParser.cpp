@@ -138,7 +138,7 @@ HTTPHeaderFieldsParser::consume(char c)
 void
 HTTPHeaderFieldsParser::commit(State nextState)
 {
-	m_headerFields.set(m_key, m_value);
+	m_headerFields.set(m_key, m_value, true);
 
 	m_key.clear();
 	m_value.clear();
