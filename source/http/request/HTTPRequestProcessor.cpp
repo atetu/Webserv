@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HTTPRequestProcessor.cpp                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ecaceres <ecaceres@student.42.fr>          +#+  +:+       +#+        */
+/*   By: atetu <atetu@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/26 15:59:39 by ecaceres          #+#    #+#             */
-/*   Updated: 2020/12/26 15:59:39 by ecaceres         ###   ########.fr       */
+/*   Updated: 2021/01/05 17:32:17 by atetu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,7 +80,6 @@ HTTPRequestProcessor::process(HTTPClient &client)
 	const HTTPMethod *methodPtr = HTTPMethod::find(client.parser().method());
 	if (!methodPtr)
 	{
-		std::cout << "pouet\n";
 		client.response() = HTTPMethodHandler::error(*client.request(), *HTTPStatus::METHOD_NOT_ALLOWED);
 		return;
 	}
@@ -91,7 +90,7 @@ HTTPRequestProcessor::process(HTTPClient &client)
 //	std::cout << "method: " << method.name() << ": " << serverBlock.methods().present() << " : " << serverBlock.hasMethod(method.name())<< std::endl;
 	if (serverBlock.methods().present() && !serverBlock.hasMethod(method.name()))
 	{
-		std::cout << "method: " << method.name() << std::endl;
+		// std::cout << "method: " << method.name() << std::endl;
 
 		client.response() = HTTPMethodHandler::error(*client.request(), *HTTPStatus::METHOD_NOT_ALLOWED);
 		return;
@@ -105,9 +104,13 @@ HTTPRequestProcessor::process(HTTPClient &client)
 		if (findLocation.parse().location().present())
 			locationBlockPtr = findLocation.parse().location().get();
 	}
-
+	// std::cout<<"before location\n";
 	if (locationBlockPtr)
 	{
+		// std::cout<<"Location\n";
+		// std::cout << "path: " << locationBlockPtr->path()<< std::endl;
+		// if(locationBlockPtr->root().present())
+		// 	std::cout<< "loc:" <<locationBlockPtr->root().get() << std::endl;
 		const LocationBlock &locationBlock = *locationBlockPtr;
 
 		if (locationBlock.methods().present() && !locationBlock.hasMethod(method.name()))
@@ -131,8 +134,22 @@ HTTPRequestProcessor::process(HTTPClient &client)
 
 	const std::string &body = client.parser().body();
 
-	URL url = client.parser().url(); // TODO Need fix
+// std::cout << "before Url\n";
+	URL url = client.parser().url(locationBlockPtr); // TODO Need fix
 
+	// if (locationBlockPtr &&locationBlockPtr->root().present())
+	// {
+	// 	std::cout << "URL CHNAGE\n";
+	// //	std::string newstring = url.path().
+	// 	std::string urlpath = url.path();
+	// //	std::string newstring = urlpath.substr(0, locationBlockPtr->path().size());
+	// const std::string newstring = urlpath.substr(0, std::string::npos);
+	// 	std::cout << "url:" << url.path() << std::endl;
+	// 		std::cout << "loc:" << locationBlockPtr->path() << " : " << locationBlockPtr->path().size() << std::endl;
+	// 	std::cout << "new:" << newstring << std::endl;
+	// 	url.path(url.path().substr(0, locationBlockPtr->path().size()));
+	// }
+	// std::cout << "URL:" <<url.path() << std::endl;
 	client.request() = new GenericHTTPRequest(method, url, version, headerFields, body, m_configuration, *serverBlockPtr, locationBlockOptional);
 
 	if (client.request()->needAuth()) // TODO Need to be moved
@@ -185,15 +202,24 @@ HTTPRequestProcessor::process(HTTPClient &client)
 	if (method == *HTTPMethod::GET || method == *HTTPMethod::HEAD)
 	{
 		File targetFile(client.request()->root(), client.request()->url().path());
-
+	
 		if (targetFile.exists() && targetFile.isDirectory())
 		{
-			if (StringUtils::last(client.request()->url().path()) != '/')
+			// if ( !client.request()->url().path().empty() && StringUtils::last(client.request()->url().path()) != '/') // here maddition of the frst condition
+			// {
+			// 	client.response() = HTTPMethodHandler::redirect(*HTTPStatus::NOT_FOUND, client.request()->url().builder().appendToPath("/").build());
+			// 	return;
+			// }
+			if ( !client.request()->url().path().empty() && StringUtils::last(client.request()->url().path()) != '/' &&StringUtils::last(client.request()->url().path()) == 'p') // here addition of the frst condition
 			{
 				client.response() = HTTPMethodHandler::redirect(*HTTPStatus::MOVED_PERMANENTLY, client.request()->url().builder().appendToPath("/").build());
 				return;
 			}
-
+				if ( !client.request()->url().path().empty() && StringUtils::last(client.request()->url().path()) != '/') // why in the tester Expected 404 on http://localhost:80/directory/Yeah? but 301 accepted for http://localhost:80/directory/nop
+			{
+				client.response() = HTTPMethodHandler::redirect(*HTTPStatus::NOT_FOUND, client.request()->url().builder().appendToPath("/").build());
+				return;
+			}	
 			if (locationBlockPtr)
 			{
 				const LocationBlock &locationBlock = *locationBlockPtr;

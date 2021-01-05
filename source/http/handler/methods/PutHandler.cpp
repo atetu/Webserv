@@ -93,10 +93,10 @@ PutHandler::handle(HTTPRequest &request)
 	const std::string &path = request.root() + request.url().path();
 	//File file(path + "/" + request.getLocation());
 	File file(path);
-//	if (!checkExtension(request, file))
+	if (!checkExtension(request, file))
 	//	return (status(*HTTPStatus::CONFLICT, headers));
 	//	return (error(request, *HTTPStatus::BAD_REQUEST));
-	//	return (statusEmpty(*HTTPStatus::UNSUPPORTED_MEDIA_TYPE, headers));
+		return (statusEmpty(*HTTPStatus::UNSUPPORTED_MEDIA_TYPE, headers));
 
 	if (!file.exists())
 	{

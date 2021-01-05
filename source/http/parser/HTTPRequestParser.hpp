@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HTTPRequestParser.hpp                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
+/*   By: atetu <atetu@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/27 17:29:02 by ecaceres          #+#    #+#             */
-/*   Updated: 2021/01/02 11:53:08 by alicetetu        ###   ########.fr       */
+/*   Updated: 2021/01/05 15:48:04 by atetu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@
 #include <http/parser/HTTPRequestPathParser.hpp>
 #include <unit/DataSize.hpp>
 #include <string>
+#include <config/block/LocationBlock.hpp>
 
 class URL;
 
@@ -116,7 +117,7 @@ class HTTPRequestParser
 		body(std::string &storage, const Optional<DataSize> &maxBodySize);
 
 		URL
-		url();
+		url(const LocationBlock *locationBlockPtr);
 };
 
 #endif /* HTTPREQUESTPARSER_HPP_ */

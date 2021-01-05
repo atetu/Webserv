@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HTTPLocationInterpretor.cpp                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
+/*   By: atetu <atetu@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/15 17:11:28 by alicetetu         #+#    #+#             */
-/*   Updated: 2020/12/17 18:08:00 by alicetetu        ###   ########.fr       */
+/*   Updated: 2021/01/05 14:38:15 by atetu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,17 +20,19 @@ HTTPLocationInterpretor::HTTPLocationInterpretor() :
 		m_start(""),
 		m_middleList(),
 		m_middle(""),
-		m_end("")
+		m_end(""),
+		m_locationBlock()
 {
 }
 
-HTTPLocationInterpretor::HTTPLocationInterpretor(std::string path) :
+HTTPLocationInterpretor::HTTPLocationInterpretor(std::string path, const LocationBlock *locationBlock) :
 		m_state(S_NOT_STARTED),
 		m_path(path),
 		m_start(""),
 		m_middleList(),
 		m_middle(""),
-		m_end("")
+		m_end(""),
+		m_locationBlock(locationBlock)
 {
 }
 
@@ -40,7 +42,8 @@ HTTPLocationInterpretor::HTTPLocationInterpretor(const HTTPLocationInterpretor &
 		m_start(other.m_start),
 		m_middleList(other.m_middleList),
 		m_middle(other.m_middle),
-		m_end(other.m_end)
+		m_end(other.m_end),
+		m_locationBlock(other.m_locationBlock)
 {
 }
 
@@ -310,4 +313,10 @@ void
 HTTPLocationInterpretor::setEnd(std::string end)
 {
 	m_end = end;
+}
+
+const LocationBlock *
+HTTPLocationInterpretor::locationBlock()
+{
+	return (m_locationBlock);	
 }

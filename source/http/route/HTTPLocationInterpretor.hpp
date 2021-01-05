@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HTTPLocationInterpretor.hpp                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
+/*   By: atetu <atetu@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/15 17:11:25 by alicetetu         #+#    #+#             */
-/*   Updated: 2020/12/17 16:55:41 by alicetetu        ###   ########.fr       */
+/*   Updated: 2021/01/05 14:38:06 by atetu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 
 #include <list>
 #include <string>
+#include <config/block/LocationBlock.hpp>
 
 class HTTPLocationInterpretor
 {
@@ -43,12 +44,13 @@ class HTTPLocationInterpretor
 		std::string m_middle;
 		std::string m_end;;
 		std::string m_exact;
+		const LocationBlock *m_locationBlock;
 
 		char m_lastChar;
 		
 	public:
 		HTTPLocationInterpretor();
-		HTTPLocationInterpretor(std::string path);
+		HTTPLocationInterpretor(std::string path, const LocationBlock *locationBlock);
 		HTTPLocationInterpretor(const HTTPLocationInterpretor &other);
 		
 		virtual
@@ -86,6 +88,9 @@ class HTTPLocationInterpretor
 
 		void
 		end(std::string &end);
+
+		const LocationBlock *
+		locationBlock();
 };
 
 #endif /* HTTPLocationInterpretor_HPP_ */

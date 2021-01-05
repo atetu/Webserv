@@ -6,7 +6,7 @@
 /*   By: atetu <atetu@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/28 14:34:10 by ecaceres          #+#    #+#             */
-/*   Updated: 2021/01/04 17:14:59 by atetu            ###   ########.fr       */
+/*   Updated: 2021/01/05 16:53:35 by atetu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -168,7 +168,7 @@ HTTPOrchestrator::start()
 	struct timeval timeout = {
 		.tv_sec = 0,
 		.tv_usec = 5000 };
-
+	
 	try
 	{
 		m_running = true;
@@ -279,7 +279,7 @@ HTTPOrchestrator::start()
 
 								while (client.in().next(c))
 								{
-//									std::cout << c;
+									std::cout << c;
 									try
 									{
 										client.parser().consume(c);
@@ -297,7 +297,6 @@ HTTPOrchestrator::start()
 										{
 											if (client.parser().state() == HTTPRequestParser::S_END)
 												HTTPRequestProcessor(m_configuration, m_environment).process(client);
-										
 										}
 										catch (Exception &exception)
 										{

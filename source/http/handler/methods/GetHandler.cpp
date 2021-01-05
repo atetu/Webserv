@@ -37,7 +37,7 @@ GetHandler::handle(HTTPRequest &request)
 	HTTPHeaderFields headers;
 
 	File targetFile(request.root(), request.resource());
-
+	std::cout << targetFile.path() << std::endl;
 	if (!targetFile.exists())
 		return (error(request, *HTTPStatus::NOT_FOUND));
 

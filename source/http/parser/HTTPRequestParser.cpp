@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HTTPRequestParser.cpp                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
+/*   By: atetu <atetu@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/27 17:29:02 by ecaceres          #+#    #+#             */
-/*   Updated: 2021/01/02 11:53:12 by alicetetu        ###   ########.fr       */
+/*   Updated: 2021/01/05 16:35:32 by atetu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@
 #include <util/Optional.hpp>
 #include <cctype>
 #include <cstdlib>
+#include <config/block/LocationBlock.hpp>
 
 #if 1
 #include <util/URL.hpp> /* Eclipse does not import it. */
@@ -306,7 +307,19 @@ HTTPRequestParser::body(std::string &storage, const Optional<DataSize> &maxBodyS
 }
 
 URL
-HTTPRequestParser::url()
+HTTPRequestParser::url(const LocationBlock *locationBlockPtr)
 {
+	if (locationBlockPtr &&locationBlockPtr->root().present())
+	{
+		std::string path;
+		
+		if (locationBlockPtr->path().size() <= m_pathParser.path().size())
+			path = m_pathParser.path().substr(locationBlockPtr->path().size(), std::string::npos);
+		else
+			path = "";
+			
+		return (URL(path, m_pathParser.query(), m_pathParser.fragment()));
+	}
+	
 	return (URL(m_pathParser.path(), m_pathParser.query(), m_pathParser.fragment()));
 }

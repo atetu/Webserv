@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HTTPFindLocation.cpp                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
+/*   By: atetu <atetu@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/15 15:24:50 by alicetetu         #+#    #+#             */
-/*   Updated: 2020/12/17 17:56:07 by alicetetu        ###   ########.fr       */
+/*   Updated: 2021/01/05 16:22:28 by atetu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,10 +89,12 @@ HTTPFindLocation::parse(void)
 	std::size_t pos;
 	std::size_t new_pos;
 	int not_found_middle;
+
+	std::list<HTTPLocationInterpretor *> possibleLocationList;
 	
 	while (it != ite)
 	{
-		HTTPLocationInterpretor interpretor((*it)->path());
+		HTTPLocationInterpretor *interpretor = new HTTPLocationInterpretor((*it)->path(), *it);
 				
 		char c ;
 				
@@ -103,43 +105,48 @@ HTTPFindLocation::parse(void)
 		new_pos = 0;
 		not_found_middle = 0;
 		
-		while (interpretor.next(c))
-			interpretor.consume(c);
+		while (interpretor->next(c))
+			interpretor->consume(c);
 
-		if (interpretor.lastChar() != '*' && !interpretor.middleList().empty())
+		if (interpretor->lastChar() != '*' && !interpretor->middleList().empty())
 		{
-			std::list<std::string>::iterator it_middleListEnd = interpretor.middleList().end()--;
-			interpretor.setEnd(*it_middleListEnd);
-			interpretor.erase(it_middleListEnd);
+			std::list<std::string>::iterator it_middleListEnd = interpretor->middleList().end()--;
+			interpretor->setEnd(*it_middleListEnd);
+			interpretor->erase(it_middleListEnd);
 		}
 			
-		if(!(interpretor.exact().empty()))
+		if(!(interpretor->exact().empty()))
 		{
 			std::cout << "exact\n";
-			if (interpretor.exact().compare(m_clientPath) == 0)
+			if (interpretor->exact().compare(m_clientPath) == 0 || interpretor->exact().compare(m_clientPath + "/") == 0 )
 			{
-				m_locationBlock = *it;
-				return (*this);
+			//	m_locationBlock = *it;
+				possibleLocationList.push_back(interpretor);
+				//return (*this);
 			}
 			else
-				NEXT_LOOP(it);
+				delete(interpretor);
+			NEXT_LOOP(it);
 		}
 		
-		if(!(interpretor.start().empty()))
+		if(!(interpretor->start().empty()))
 		{
-			if (m_clientPath.compare(0, interpretor.start().size(), interpretor.start()) == 0)
+			if (m_clientPath.compare(0, interpretor->start().size(), interpretor->start()) == 0 || (m_clientPath + "/").compare(0, interpretor->start().size(), interpretor->start()) == 0)
 			{	
 				start = 1;
-				pos = interpretor.start().size();
+				pos = interpretor->start().size();
 			}
 			else
+			{
+				delete(interpretor);
 				NEXT_LOOP(it);
+			}
 		}
 		
-		if(!(interpretor.middleList().empty()))
+		if(!(interpretor->middleList().empty()))
 		{
-			std::list<std::string>::iterator it_list = interpretor.middleList().begin();
-			std::list<std::string>::iterator ite_list = interpretor.middleList().end();
+			std::list<std::string>::iterator it_list = interpretor->middleList().begin();
+			std::list<std::string>::iterator ite_list = interpretor->middleList().end();
 			while (it_list != ite_list)
 			{
 				if ((new_pos = m_clientPath.find(*it_list)))
@@ -160,30 +167,56 @@ HTTPFindLocation::parse(void)
 				it_list++;
 			}
 			if (not_found_middle)
+			{
+				delete(interpretor);
 				NEXT_LOOP(it);
+			}
 			middle = 1;
 		}
 		
-		if(!(interpretor.end().empty()))
+		if(!(interpretor->end().empty()))
 		{
-			std::string end = interpretor.end();
+			std::string end = interpretor->end();
 			
 			int size = end.size();
 			int index = m_clientPath.size() - size;
-			if (m_clientPath.compare(index, size, end) == 0)
+			if (m_clientPath.compare(index, size, end) == 0 || (m_clientPath + "/").compare(index, size, end) == 0)
 				end = 1;
 			else
+			{
+				delete(interpretor);
 				NEXT_LOOP(it);			
+			}
 		}
 		
 		if (start || middle || end)
 		{
-			this->location(*it);
-			return (*this);
-		}	
+			possibleLocationList.push_back(interpretor);
+			// this->location(*it);
+			// return (*this);
+		}
+		else
+		{
+			delete(interpretor);
+		}
+		
 		
 		it++;
 	}
+
+	std::list<HTTPLocationInterpretor*>::iterator it_PossibleLoc = possibleLocationList.begin();
+	std::list<HTTPLocationInterpretor*>::iterator ite_PossibleLoc = possibleLocationList.end();
+
+	HTTPLocationInterpretor *bestLocation = NULL;
+	while (it_PossibleLoc != ite_PossibleLoc)
+	{
+		if (!bestLocation)
+			bestLocation = *it_PossibleLoc;
+		else if ((*it_PossibleLoc)->start().size() > bestLocation->start().size())
+			bestLocation = *it_PossibleLoc;
+		it_PossibleLoc++;
+	}
+	location(bestLocation->locationBlock());  // TODO bestlocation for midle /end, what is the actual rule?
 	return (*this);
 }
 
