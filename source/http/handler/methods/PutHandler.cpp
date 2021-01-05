@@ -82,6 +82,7 @@ PutHandler::checkExtension(HTTPRequest &request, File &file)
 		else if (!file.exists())
 			file = File(path + "." + *(mime->extensions().begin()));
 	}
+	
 	return (1);
 }
 
@@ -102,6 +103,7 @@ PutHandler::handle(HTTPRequest &request)
 	{
 		try
 		{
+			std::cout << "create\n";
 			file.createNewFile(0666);
 		}
 		catch (Exception &exception)

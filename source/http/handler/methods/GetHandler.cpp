@@ -37,7 +37,7 @@ GetHandler::handle(HTTPRequest &request)
 	HTTPHeaderFields headers;
 
 	File targetFile(request.root(), request.resource());
-	std::cout << targetFile.path() << std::endl;
+	//std::cout << targetFile.path() << std::endl;
 	if (!targetFile.exists())
 		return (error(request, *HTTPStatus::NOT_FOUND));
 
@@ -62,7 +62,7 @@ GetHandler::handle(HTTPRequest &request)
 			const LocationBlock &locationBlock = *request.location().get();
 
 			if (!locationBlock.listing().orElse(false))
-				return (error(request, *HTTPStatus::FORBIDDEN));
+				return (error(request, *HTTPStatus::NOT_FOUND)); // changed the forbidden in not found for directory/nop
 		}
 
 		std::string content = listing(request.url(), targetFile);

@@ -6,7 +6,7 @@
 /*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/21 23:36:43 by ecaceres          #+#    #+#             */
-/*   Updated: 2021/01/02 11:55:03 by alicetetu        ###   ########.fr       */
+/*   Updated: 2021/01/05 20:11:51 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -107,10 +107,13 @@ bool
 File::createNewFile(mode_t mode) const
 {
 	int fd;
-	if ((fd = ::open(m_path.c_str(), O_CREAT, mode)) == -1)
+	//std::cout << "path: " <<  m_path << std::endl; // TODO split the path ind directories and sub directories
+	//mkdir ("put_test",0777);
+	if ((fd = ::open(m_path.c_str(), O_CREAT, mode)) == -1) //TOTO create directory if needed
 	{
 		errno = 0;
-		return (false);
+	//	std::cout << "error\n";
+		return (false);//TODO handle errors
 	}
 
 	close(fd);
