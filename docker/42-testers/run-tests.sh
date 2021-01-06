@@ -1,4 +1,4 @@
-valgrind --track-fds=yes ./webserv -f conf2.json &> valgrind_out.log &
+valgrind --track-fds=yes --leak-check=full ./webserv -f conf2.json &> valgrind_out.log &
 jobpid=$!
 
 while ! grep 'Command:' valgrind_out.log
