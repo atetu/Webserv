@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ChunkDecoder.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: atetu <atetu@student.42.fr>                +#+  +:+       +#+        */
+/*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/19 14:51:33 by alicetetu         #+#    #+#             */
-/*   Updated: 2021/01/06 17:55:11 by atetu            ###   ########.fr       */
+/*   Updated: 2021/01/06 21:32:04 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,21 +72,23 @@ ChunkDecoder::operator =(const ChunkDecoder &other)
 		m_sizeNb = strtol(hex_intro.c_str(), &endPtr, 16);			\
 		if (endPtr == hex_intro.c_str())							\
 			throw Exception ("Hexadecimal conversion impossible"); 	\
-		m_sizeStr = "";\
-//		std::cout << "nb : " << m_sizeNb << std::endl;
+		m_sizeStr = "";					
+		
+		//std::cout << "hex: " << hex_intro << std::endl; 
+		//	std::cout << "nb : " << m_sizeNb << std::endl;
 	
 std::string
 ChunkDecoder::decode(std::string storage)
 {
 	// if (m_input == "\r\n")
 	// 	return (m_parsedData);
-	m_input += storage;
+	m_input = storage;
 //	std::cout << "decode\n";
 	int in_len = m_input.size();
-//	std::cout << "len: " << in_len << std::endl;
+	//std::cout << "len: " << in_len << std::endl;
 	int in = 0;
 	//std::cout << m_state << "\n";
-	while (in_len--)
+	while (in_len-- && m_state != S_OVER)
 	{
 		char c = m_input[in];
 		in++;
@@ -97,6 +99,7 @@ ChunkDecoder::decode(std::string storage)
 			case S_NOT_STARTED :
 			case S_SIZE:
 			{
+			//	std::cout << "c: " << c << "\n";
 				if (ChunkDecoder::isValidCharacter(c))
 				{
 					m_sizeStr += c;
@@ -114,6 +117,7 @@ ChunkDecoder::decode(std::string storage)
 				}
 				else
 				{
+					std::cout << "characetr not recognized\n";
 					throw Exception ("Character not recognized"); // check error
 				}
 						
@@ -122,6 +126,7 @@ ChunkDecoder::decode(std::string storage)
 			
 			case S_EXTENSION:
 			{
+			//	std::cout << m_state << "\n";
 				if (c == '\r')
 				{
 					m_state = S_SIZE_END;
@@ -139,6 +144,7 @@ ChunkDecoder::decode(std::string storage)
 			
 			case S_SIZE_END:
 			{
+			//	std::cout << m_state << "\n";
 				if (c == '\n' && m_sizeNb == 0)
 					m_state = S_NULL;
 				else if (c == '\n')
@@ -151,14 +157,17 @@ ChunkDecoder::decode(std::string storage)
 			
 			case S_CHUNK:
 			{
+			//	std::cout << m_state << "\n";
 				//std::cout << "chunk: \n" << m_parsedChunk << std::endl;
 			//	std::cout << "size: " << m_sizeNb << std::endl;
 				m_parsedChunk += c;
 				m_sizeNb--;
-				if (m_sizeNb == 0 || in_len == 0)
+				if (m_sizeNb == 0)
 				{
 					m_parsedData += m_parsedChunk;
-				//	std::cout << "parsed: \n" << m_parsedData << std::endl;
+					// std::cout << "parsed: " << m_parsedData << std::endl;
+					// std::cout << "chunk: " << m_parsedChunk << std::endl;
+					// std::cout << "chunksize: " << m_parsedChunk.size() << std::endl;
 					m_parsedChunk = "";
 					m_sizeNb = 0;
 					m_state = S_CHUNK_END;
@@ -172,19 +181,27 @@ ChunkDecoder::decode(std::string storage)
 			
 			case S_CHUNK_END:
 			{
+		//		std::cout << m_state << "\n";
 				if (c == '\r')
 					m_state = S_CHUNK_END2;
-			
+				// else if (c == '\n')
+				// 	m_state = S_SIZE;
 				else
 				{
-					throw Exception ("Character not recognized"); // check error
+					m_state = S_CHUNK_END;
+					// std::cout << "c : " << c << std::endl;
+					// std::cout << "error chunk end\n";
+					// // throw Exception ("Character not recognized"); // check error
+					// m_state = S_SIZE;
+					// m_sizeStr += c;
 				}
-				std::cout << "5%%%%\n";
+		
 				break;
 			}
 
 			case S_CHUNK_END2:
 			{
+			//	std::cout << m_state << "\n";
 				if (c == '\n')
 					m_state = S_SIZE;
 				else if (c == '\r')
@@ -197,26 +214,33 @@ ChunkDecoder::decode(std::string storage)
 			
 			case S_NULL:
 			{
+		//		std::cout << m_state << "\n";
 				if (c == '\r')
 					m_state = S_END;
+				else if (c == '\n')
+				 	m_state = S_OVER;
 				else
-					throw Exception ("\r excepted");
+					m_state = S_NULL;
 				
 				break;
 			}
 	
 			case S_END:
 			{
+			//	std::cout << m_state << "\n";
 				if (c == '\n')
 					m_state = S_OVER;
 				else
-					throw Exception ("\n excepted");
+					m_state = S_END;
+				//	throw Exception ("\n excepted");
 				
 				break;
 			}
 		
 			case S_OVER:
 			{
+		//		std::cout << m_state << "\n";
+			//	return (m_parsedData);
 				break;
 			}
 		}

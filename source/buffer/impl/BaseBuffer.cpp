@@ -98,6 +98,12 @@ BaseBuffer::next(char &c)
 	return (true);
 }
 
+void
+BaseBuffer::first(char &c)
+{
+	m_storage = c + m_storage;
+}
+
 bool
 BaseBuffer::peek(char &c, size_t index) const
 {

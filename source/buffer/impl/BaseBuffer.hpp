@@ -92,6 +92,9 @@ class BaseBuffer :
 		{
 			return (m_storage);
 		}
+		
+		void
+		first(char &c);
 };
 
 #endif /* BASEBUFFER_HPP_ */

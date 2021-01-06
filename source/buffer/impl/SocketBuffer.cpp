@@ -40,7 +40,7 @@ SocketBuffer::recv(int flags, size_t len)
 
 		if (r >= 0)
 			BaseBuffer::store(rbuffer, r);
-
+	//	std::cout << "r:" << r << std::endl;
 		m_readEverything = r == 0;
 
 	//std::cout << (int)rbuffer[0] << std::endl;

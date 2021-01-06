@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HTTPRequestParser.cpp                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: atetu <atetu@student.42.fr>                +#+  +:+       +#+        */
+/*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/27 17:29:02 by ecaceres          #+#    #+#             */
-/*   Updated: 2021/01/06 17:48:31 by atetu            ###   ########.fr       */
+/*   Updated: 2021/01/06 21:13:07 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -222,16 +222,22 @@ HTTPRequestParser::consume(char c)
 
 		case S_HEADER_FIELDS:
 		{
+		//	std:: cout << "c header: " << (int)c << std::endl;
 			m_headerFieldsParser.consume(c);
 
 			if (m_headerFieldsParser.state() == HTTPHeaderFieldsParser::S_END)
+			{
+	//			std::cout << "normally end\n";
 				m_state = S_END;
-
+			}
 			break;
 		}
 
 		case S_END:
+		{
+	//		std:: cout << "c end: " << (int)c << std::endl;
 			break;
+		}
 
 	}
 
@@ -292,31 +298,32 @@ HTTPRequestParser::body(std::string &storage, const Optional<DataSize> &maxBodyS
 		const Optional<std::string> transfertEncodingOptional = headerFieldsParser().headerFields().get(HTTPHeaderFields::TRANSFER_ENCODING);
 		if (transfertEncodingOptional.present())
 		{
-			std::cout << "chunk\n";
+		//	std::cout << "chunk\n";
 			const std::string &encoding = transfertEncodingOptional.get();
 		//	ChunkDecoder chunkDecoder;
 			if (encoding == "chunked" && max != -1)
 			{
-				std::cout << "first\n";
+		//		std::cout << "first\n";
 				
 		
 				m_body += m_chunkDecoder.decode(storage.substr(0, max));
+				storage.erase(0, max);
 				if (m_chunkDecoder.state() != ChunkDecoder::S_OVER)
 				{
-					std::cout << "third\n";
+			//		std::cout << "third\n";
 				return (0);
 				}
 			
 			}
 			else if (encoding == "chunked")
 			{
-				std::cout << "second\n";
+			//	std::cout << "second\n";
 		
 				m_body += m_chunkDecoder.decode(storage);
-				std::cout << "after second\n";
+			//	std::cout << "after second\n";
 				if (m_chunkDecoder.state() != ChunkDecoder::S_OVER)
 				{
-					std::cout << "third\n";
+					//std::cout << "third\n";
 				return (0);
 				}
 			}
