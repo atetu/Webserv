@@ -39,7 +39,7 @@ class HTTPRequestProcessor
 		virtual
 		~HTTPRequestProcessor();
 
-		void
+		int
 		process(HTTPClient &client);
 
 		ServerBlock const*

@@ -103,8 +103,8 @@ PutHandler::handle(HTTPRequest &request)
 	{
 		try
 		{
-			std::cout << "create\n";
-			file.createNewFile(0666);
+		//	std::cout << "create\n";
+			file.createNewFile(0777);
 		}
 		catch (Exception &exception)
 		{

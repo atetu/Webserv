@@ -6,7 +6,7 @@
 /*   By: atetu <atetu@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/28 14:34:10 by ecaceres          #+#    #+#             */
-/*   Updated: 2021/01/05 16:53:35 by atetu            ###   ########.fr       */
+/*   Updated: 2021/01/06 17:55:24 by atetu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -185,7 +185,7 @@ HTTPOrchestrator::start()
 
 				throw IOException("select", errno);
 			}
-
+			
 			printSelectOutput(readFdSet, writeFdSet);
 
 			if (fdCount)
@@ -208,7 +208,7 @@ HTTPOrchestrator::start()
 
 							if (clientFds.size() >= (unsigned long)m_configuration.rootBlock().maxActiveClient().orElse(RootBlock::DEFAULT_MAX_ACTIVE_CLIENT))
 								httpClient.response() = HTTPMethodHandler::status(*HTTPStatus::SERVICE_UNAVAILABLE, HTTPHeaderFields().retryAfter(10));
-
+						//	std::cout << "NewClient \n";
 							addClient(httpClient);
 						}
 					}
@@ -273,15 +273,22 @@ HTTPOrchestrator::start()
 
 						if (canRead && !client.response())
 						{
+						//	std::cout << "ici\n";
+							
+							// std::cout << "size: " << client.in().size() << std::endl;
+							// std::cout << "size: " << client.in().recv() << std::endl;
 							if (client.in().size() != 0 || client.in().recv() > 0)
 							{
 								char c;
-
+								bool toContinue = false;
 								while (client.in().next(c))
 								{
+									if (toContinue)
+										continue;
 									std::cout << c;
 									try
 									{
+								//	std::cout << "consume\n";
 										client.parser().consume(c);
 									}
 									catch (Exception &exception)
@@ -296,7 +303,20 @@ HTTPOrchestrator::start()
 										try
 										{
 											if (client.parser().state() == HTTPRequestParser::S_END)
-												HTTPRequestProcessor(m_configuration, m_environment).process(client);
+											{	
+												//std::cout <<"processor\n";
+												if (!HTTPRequestProcessor(m_configuration, m_environment).process(client))
+												{
+													toContinue = true;
+													//std::cout << "continue\n";
+													continue;
+												}
+												else
+												{
+													toContinue = false;
+												}
+												
+											}
 										}
 										catch (Exception &exception)
 										{

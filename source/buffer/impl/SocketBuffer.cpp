@@ -43,7 +43,7 @@ SocketBuffer::recv(int flags, size_t len)
 
 		m_readEverything = r == 0;
 
-	//	std::cout << "BUFFER: " <<  rbuffer << std::endl;
+	//std::cout << (int)rbuffer[0] << std::endl;
 
 		return (r);
 	}

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ChunkDecoder.hpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
+/*   By: atetu <atetu@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/19 14:47:44 by alicetetu         #+#    #+#             */
-/*   Updated: 2020/12/23 16:57:33 by alicetetu        ###   ########.fr       */
+/*   Updated: 2021/01/06 16:23:34 by atetu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,7 +46,9 @@ class ChunkDecoder
 		operator=(const ChunkDecoder &other);
 
 		std::string
-		decode();
+		decode(std::string storage);
+		
+		ChunkDecoder::State state();
 
 		static inline bool // why inline?
 		isValidCharacter(char c)

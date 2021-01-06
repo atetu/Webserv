@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ChunkDecoder.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
+/*   By: atetu <atetu@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/19 14:51:33 by alicetetu         #+#    #+#             */
-/*   Updated: 2020/12/23 20:11:24 by alicetetu        ###   ########.fr       */
+/*   Updated: 2021/01/06 17:55:11 by atetu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,19 +76,24 @@ ChunkDecoder::operator =(const ChunkDecoder &other)
 //		std::cout << "nb : " << m_sizeNb << std::endl;
 	
 std::string
-ChunkDecoder::decode()
+ChunkDecoder::decode(std::string storage)
 {
+	// if (m_input == "\r\n")
+	// 	return (m_parsedData);
+	m_input += storage;
+//	std::cout << "decode\n";
 	int in_len = m_input.size();
+//	std::cout << "len: " << in_len << std::endl;
 	int in = 0;
-	
+	//std::cout << m_state << "\n";
 	while (in_len--)
 	{
 		char c = m_input[in];
 		in++;
-	
+	//	std::cout << m_state << "\n";
 		switch (m_state)
 		{
-
+//std::cout << m_state << "\n";
 			case S_NOT_STARTED :
 			case S_SIZE:
 			{
@@ -174,7 +179,7 @@ ChunkDecoder::decode()
 				{
 					throw Exception ("Character not recognized"); // check error
 				}
-			
+				std::cout << "5%%%%\n";
 				break;
 			}
 
@@ -217,6 +222,12 @@ ChunkDecoder::decode()
 		}
 		m_lastChar = c ;
 	}
-	// std::cout << "parsed: \n" << m_parsedData << std::endl;
+//	std::cout << "parsed: \n" << m_parsedData << std::endl;
 	return (m_parsedData);
+}
+
+ChunkDecoder::State 
+ChunkDecoder::state()
+{
+	return (m_state);
 }

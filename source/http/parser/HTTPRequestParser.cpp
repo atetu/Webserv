@@ -6,7 +6,7 @@
 /*   By: atetu <atetu@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/27 17:29:02 by ecaceres          #+#    #+#             */
-/*   Updated: 2021/01/05 16:35:32 by atetu            ###   ########.fr       */
+/*   Updated: 2021/01/06 17:48:31 by atetu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -266,10 +266,12 @@ HTTPRequestParser::body() const
 	return (m_body);
 }
 
-void
+int
 HTTPRequestParser::body(std::string &storage, const Optional<DataSize> &maxBodySize)
 {
 	long long max;
+	//std::cout << "storage: " << storage  << "  storage size : "<< storage.size()<< std::endl;
+	
 	if (maxBodySize.present())
 		max = maxBodySize.get().toBytes();
 	else
@@ -290,20 +292,45 @@ HTTPRequestParser::body(std::string &storage, const Optional<DataSize> &maxBodyS
 		const Optional<std::string> transfertEncodingOptional = headerFieldsParser().headerFields().get(HTTPHeaderFields::TRANSFER_ENCODING);
 		if (transfertEncodingOptional.present())
 		{
+			std::cout << "chunk\n";
 			const std::string &encoding = transfertEncodingOptional.get();
-
+		//	ChunkDecoder chunkDecoder;
 			if (encoding == "chunked" && max != -1)
-				m_body = ChunkDecoder(storage.substr(0, max)).decode();
+			{
+				std::cout << "first\n";
+				
+		
+				m_body += m_chunkDecoder.decode(storage.substr(0, max));
+				if (m_chunkDecoder.state() != ChunkDecoder::S_OVER)
+				{
+					std::cout << "third\n";
+				return (0);
+				}
+			
+			}
 			else if (encoding == "chunked")
-				m_body = ChunkDecoder(storage).decode();
+			{
+				std::cout << "second\n";
+		
+				m_body += m_chunkDecoder.decode(storage);
+				std::cout << "after second\n";
+				if (m_chunkDecoder.state() != ChunkDecoder::S_OVER)
+				{
+					std::cout << "third\n";
+				return (0);
+				}
+			}
 			else
 				throw Exception("transfer_encoding not supported");
+		
+		
 		}
 		else
 		{
 			// check with Nginx if error. RFC = content-length header SHOULD be sent...
 		}
 	}
+	return (1);
 }
 
 URL

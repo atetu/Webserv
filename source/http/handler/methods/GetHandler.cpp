@@ -48,7 +48,9 @@ GetHandler::handle(HTTPRequest &request)
 		std::string extension;
 		if (request.url().extension(extension))
 			headers.contentType(request.configuration().mimeRegistry(), extension);
-
+		// headers.lastModified("Mon, 04 Jan 2021 14:39:41 GMT");
+		// else
+		// 	headers.contentType("txt/html");
 		if (request.method().name() == "GET")
 			return (file(*HTTPStatus::OK, *targetFile.open(O_RDONLY), headers));
 		else if (request.method().name() == "HEAD")

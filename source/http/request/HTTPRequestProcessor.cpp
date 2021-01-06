@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HTTPRequestProcessor.cpp                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
+/*   By: atetu <atetu@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/26 15:59:39 by ecaceres          #+#    #+#             */
-/*   Updated: 2021/01/05 19:41:19 by alicetetu        ###   ########.fr       */
+/*   Updated: 2021/01/06 17:47:54 by atetu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,7 +60,7 @@ HTTPRequestProcessor::~HTTPRequestProcessor()
 {
 }
 
-void
+int
 HTTPRequestProcessor::process(HTTPClient &client)
 {
 	// if (client.parser().headerFields().get(HTTPHeaderFields::TRANSFER_ENCODING).present() && client.in().size()==0)
@@ -70,18 +70,19 @@ HTTPRequestProcessor::process(HTTPClient &client)
 	// std::cout << "Storage[0]\n" << (int)client.in().storage()[0] << std::endl;
 	// std::cout << "Storage[1]\n" << (int)client.in().storage()[1] << std::endl;
 
+//std::cout << "process\n";
 	const ServerBlock *serverBlockPtr = findServerBlock(client);
 	if (!serverBlockPtr)
 	{
 		client.response() = HTTPMethodHandler::error(*client.request(), *HTTPStatus::NOT_FOUND);
-		return;
+		return(1);
 	}
 
 	const HTTPMethod *methodPtr = HTTPMethod::find(client.parser().method());
 	if (!methodPtr)
 	{
 		client.response() = HTTPMethodHandler::error(*client.request(), *HTTPStatus::METHOD_NOT_ALLOWED);
-		return;
+		return(1);
 	}
 
 	const ServerBlock &serverBlock = *serverBlockPtr;
@@ -93,7 +94,7 @@ HTTPRequestProcessor::process(HTTPClient &client)
 		// std::cout << "method: " << method.name() << std::endl;
 
 		client.response() = HTTPMethodHandler::error(*client.request(), *HTTPStatus::METHOD_NOT_ALLOWED);
-		return;
+		return(1);
 	}
 
 	const LocationBlock *locationBlockPtr = NULL;
@@ -121,19 +122,26 @@ HTTPRequestProcessor::process(HTTPClient &client)
 				client.response() = HTTPMethodHandler::errorHead(*client.request(), *HTTPStatus::METHOD_NOT_ALLOWED, headers);
 			else
 				client.response() = HTTPMethodHandler::error(*client.request(), *HTTPStatus::METHOD_NOT_ALLOWED, headers);
-			return;
+			return(1);
 		}
 	}
 
-	if (method.hasBody())
-		client.parser().body(client.in().storage(), serverBlock.maxBodySize());
-
+	
 	const HTTPVersion &version = HTTPVersion::HTTP_1_1;
 	const HTTPHeaderFields &headerFields = client.parser().headerFields();
 	const Optional<LocationBlock const*> locationBlockOptional = Optional<LocationBlock const*>::ofNullable(locationBlockPtr);
 
+if (method.hasBody())
+	{
+	//	 std::cout << "body method\n";
+		if (!client.parser().body(client.in().storage(), serverBlock.maxBodySize()))
+		{
+		//	std::cout << "no body\n";
+			return (0);
+		}
+	}
 	const std::string &body = client.parser().body();
-
+//	std::cout << "body : " << body << std::endl;
 // std::cout << "before Url\n";
 	URL url = client.parser().url(locationBlockPtr); // TODO Need fix
 
@@ -178,7 +186,7 @@ HTTPRequestProcessor::process(HTTPClient &client)
 		if (!authorized)
 		{
 			client.response() = HTTPMethodHandler::error(*client.request(), *HTTPStatus::UNAUTHORIZED, HTTPHeaderFields().wwwAuthenticate(authBlock->prettyType(), authBlock->realm()));
-			return;
+			return (1);
 		}
 	}
 //std::cout << "before location\n";
@@ -194,7 +202,7 @@ HTTPRequestProcessor::process(HTTPClient &client)
 			{
 				std::cout << "Error\n";
 				client.response() = HTTPMethodHandler::error(*client.request(), *HTTPStatus::METHOD_NOT_ALLOWED);
-				return;
+				return(1);
 			}
 		}
 	}
@@ -260,7 +268,7 @@ HTTPRequestProcessor::process(HTTPClient &client)
 					if (!File(client.request()->root(), client.request()->resource()).exists())
 					{
 						client.response() = HTTPMethodHandler::error(*client.request(), *HTTPStatus::NOT_FOUND);
-						return;
+						return(1);
 					}
 
 					try
@@ -282,6 +290,7 @@ HTTPRequestProcessor::process(HTTPClient &client)
 
 	if (!client.response())
 		client.response() = method.handler().handle(*client.request());
+	return (1);
 }
 
 const ServerBlock*

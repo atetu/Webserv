@@ -6,7 +6,7 @@
 /*   By: atetu <atetu@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/27 17:29:02 by ecaceres          #+#    #+#             */
-/*   Updated: 2021/01/05 15:48:04 by atetu            ###   ########.fr       */
+/*   Updated: 2021/01/06 17:28:59 by atetu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@
 #include <unit/DataSize.hpp>
 #include <string>
 #include <config/block/LocationBlock.hpp>
+#include <encoding/default/chunk/ChunkDecoder.hpp>
 
 class URL;
 
@@ -61,6 +62,7 @@ class HTTPRequestParser
 		int m_major;
 		int m_minor;
 		HTTPHeaderFieldsParser m_headerFieldsParser;
+		ChunkDecoder m_chunkDecoder;
 		std::string m_body;
 		char m_last;
 		char m_last2;
@@ -113,7 +115,7 @@ class HTTPRequestParser
 		const std::string&
 		body() const;
 
-		void
+		int
 		body(std::string &storage, const Optional<DataSize> &maxBodySize);
 
 		URL

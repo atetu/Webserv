@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HTTPHeaderFields.cpp                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
+/*   By: atetu <atetu@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/27 18:39:24 by ecaceres          #+#    #+#             */
-/*   Updated: 2020/12/24 12:44:58 by alicetetu        ###   ########.fr       */
+/*   Updated: 2021/01/06 17:16:41 by atetu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -142,7 +142,11 @@ HTTPHeaderFields::contentType(const MimeRegistry &registry, const std::string &e
 
 	if (mime)
 		return (contentType(*mime));
-
+	// else
+	// {
+	// 	return (contentType("text/plain"));
+	// }
+	
 	return (*this);
 }
 

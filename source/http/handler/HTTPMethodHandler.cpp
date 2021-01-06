@@ -68,6 +68,7 @@ HTTPMethodHandler::filePut(HTTPStatus &httpStatus, FileDescriptor &fileDescripto
 {
 	FileDescriptorBuffer *buffer = FileDescriptorBuffer::from(fileDescriptor, FileDescriptorBuffer::CLOSE | FileDescriptorBuffer::DELETE);
 	buffer->store(body);
+	//std::cout << "body: " << body<< std::endl;
 	return (GenericHTTPResponse::fileAndString(httpStatus, headers, *buffer, string));
 }
 
