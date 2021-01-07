@@ -14,10 +14,10 @@
 #include <json/JsonParser.hpp>
 #include <json/JsonToken.hpp>
 
-JsonParserEvent* /* Handle {, [, value */
-JsonParser::NoneContext::nextEvent(JsonParser &parser, JsonTokenizer &tokenizer, JsonParserEvent *&currentEvent, Context *&currentContext, std::stack<Context*> &stack)
+const JsonParserEvent* /* Handle {, [, value */
+JsonParser::NoneContext::nextEvent(JsonParser &parser, JsonTokenizer &tokenizer, const JsonParserEvent *&currentEvent, Context *&currentContext, std::stack<Context*> &stack)
 {
-	JsonToken *token = tokenizer.nextToken();
+	const JsonToken *token = tokenizer.nextToken();
 
 	if (token == JsonToken::CURLYOPEN)
 	{
@@ -46,11 +46,11 @@ JsonParser::ObjectContext::ObjectContext() :
 {
 }
 
-JsonParserEvent*
-JsonParser::ObjectContext::nextEvent(JsonParser &parser, JsonTokenizer &tokenizer, JsonParserEvent *&currentEvent, Context *&currentContext, std::stack<Context*> &stack)
+const JsonParserEvent*
+JsonParser::ObjectContext::nextEvent(JsonParser &parser, JsonTokenizer &tokenizer, const JsonParserEvent *&currentEvent, Context *&currentContext, std::stack<Context*> &stack)
 {
 	// Handle 1. }   2. name:value   3. ,name:value
-	JsonToken *token = tokenizer.nextToken();
+	const JsonToken *token = tokenizer.nextToken();
 	if (token == JsonToken::END_OF_FILE)
 	{
 		if (JsonParserEvent::START_OBJECT == currentEvent)
@@ -123,10 +123,10 @@ JsonParser::ArrayContext::ArrayContext() :
 }
 
 // Handle 1. ]   2. value   3. ,value
-JsonParserEvent*
-JsonParser::ArrayContext::nextEvent(JsonParser &parser, JsonTokenizer &tokenizer, JsonParserEvent *&currentEvent, Context *&currentContext, std::stack<Context*> &stack)
+const JsonParserEvent*
+JsonParser::ArrayContext::nextEvent(JsonParser &parser, JsonTokenizer &tokenizer, const JsonParserEvent *&currentEvent, Context *&currentContext, std::stack<Context*> &stack)
 {
-	JsonToken *token = tokenizer.nextToken();
+	const JsonToken *token = tokenizer.nextToken();
 	if (token == JsonToken::END_OF_FILE)
 	{
 		if (JsonParserEvent::START_ARRAY == currentEvent)
@@ -295,7 +295,7 @@ JsonParser::getArray(void)
 	{
 		while (hasNext())
 		{
-			JsonParserEvent *event = next();
+			const JsonParserEvent *event = next();
 			if (event == JsonParserEvent::END_ARRAY)
 			{
 				return array;
@@ -323,8 +323,7 @@ JsonParser::getObject(void)
 	{
 		while (hasNext())
 		{
-			JsonParserEvent *event = next();
-
+			const JsonParserEvent *event = next();
 			if (event == JsonParserEvent::END_OBJECT)
 				return (object);
 
@@ -350,7 +349,7 @@ JsonParser::hasNext()
 {
 	if (m_stack.empty() && (m_currentEvent != NULL && m_currentEvent->compareTo(JsonParserEvent::KEY_NAME) > 0))
 	{
-		JsonToken *token = m_tokenizer.nextToken();
+		const JsonToken *token = m_tokenizer.nextToken();
 
 		if (token != JsonToken::END_OF_FILE)
 			throw JsonParseException::expectedEndOfFile(token, m_tokenizer.location());
@@ -367,7 +366,7 @@ JsonParser::hasNext()
 	return (true);
 }
 
-JsonParserEvent*
+const JsonParserEvent*
 JsonParser::next()
 {
 	if (!hasNext())

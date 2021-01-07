@@ -19,16 +19,16 @@ class JsonParserEvent :
 		public Enum<JsonParserEvent>
 {
 	public:
-		static JsonParserEvent *START_ARRAY;
-		static JsonParserEvent *START_OBJECT;
-		static JsonParserEvent *KEY_NAME;
-		static JsonParserEvent *VALUE_STRING;
-		static JsonParserEvent *VALUE_NUMBER;
-		static JsonParserEvent *VALUE_TRUE;
-		static JsonParserEvent *VALUE_FALSE;
-		static JsonParserEvent *VALUE_NULL;
-		static JsonParserEvent *END_OBJECT;
-		static JsonParserEvent *END_ARRAY;
+		static const JsonParserEvent *START_ARRAY;
+		static const JsonParserEvent *START_OBJECT;
+		static const JsonParserEvent *KEY_NAME;
+		static const JsonParserEvent *VALUE_STRING;
+		static const JsonParserEvent *VALUE_NUMBER;
+		static const JsonParserEvent *VALUE_TRUE;
+		static const JsonParserEvent *VALUE_FALSE;
+		static const JsonParserEvent *VALUE_NULL;
+		static const JsonParserEvent *END_OBJECT;
+		static const JsonParserEvent *END_ARRAY;
 };
 
 #endif /* JSONPARSEREVENT_HPP_ */

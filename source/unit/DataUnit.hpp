@@ -21,7 +21,7 @@ class DataUnit :
 		public Enum<DataUnit>
 {
 	public:
-		typedef Enum<DataUnit>::iterator iterator;
+		typedef Enum<DataUnit>::const_iterator const_iterator;
 
 	private:
 		std::string m_suffix;
@@ -45,14 +45,14 @@ class DataUnit :
 		size() const;
 
 	public:
-		static DataUnit *BYTES;
-		static DataUnit *KILOBYTES;
-		static DataUnit *MEGABYTES;
-		static DataUnit *GIGABYTES;
-		static DataUnit *TERABYTES;
+		static const DataUnit *BYTES;
+		static const DataUnit *KILOBYTES;
+		static const DataUnit *MEGABYTES;
+		static const DataUnit *GIGABYTES;
+		static const DataUnit *TERABYTES;
 
 	public:
-		static DataUnit*
+		static const DataUnit*
 		fromSuffix(const std::string &suffix);
 };
 

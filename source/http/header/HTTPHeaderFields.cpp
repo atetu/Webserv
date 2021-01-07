@@ -88,14 +88,20 @@ HTTPHeaderFields::allow(const HTTPMethod &method)
 }
 
 HTTPHeaderFields&
-HTTPHeaderFields::allow(const std::vector<HTTPMethod> &methods)
+HTTPHeaderFields::allow(const std::vector<const HTTPMethod*> &methods)
 {
+	if (methods.empty())
+		return (*this);
+
 	return (allow(Convert::join(methods)));
 }
 
 HTTPHeaderFields&
-HTTPHeaderFields::allow(const std::list<HTTPMethod> &methods)
+HTTPHeaderFields::allow(const std::list<const HTTPMethod*> &methods)
 {
+	if (methods.empty())
+		return (*this);
+
 	return (allow(Convert::join(methods)));
 }
 

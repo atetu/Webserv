@@ -13,7 +13,9 @@
 #ifndef HTTPMETHOD_HPP_
 # define HTTPMETHOD_HPP_
 
+#include <util/Convert.hpp>
 #include <util/Enum.hpp>
+#include <string>
 
 class HTTPMethodHandler;
 
@@ -42,14 +44,14 @@ class HTTPMethod :
 		handler(void) const;
 
 	public:
-		static HTTPMethod *GET;
-		static HTTPMethod *HEAD;
-		static HTTPMethod *POST;
-		static HTTPMethod *PUT;
-		static HTTPMethod *DELETE;
-		static HTTPMethod *CONNECT;
-		static HTTPMethod *OPTIONS;
-		static HTTPMethod *TRACE;
+		static const HTTPMethod *GET;
+		static const HTTPMethod *HEAD;
+		static const HTTPMethod *POST;
+		static const HTTPMethod *PUT;
+		static const HTTPMethod *DELETE;
+		static const HTTPMethod *CONNECT;
+		static const HTTPMethod *OPTIONS;
+		static const HTTPMethod *TRACE;
 };
 
 #endif /* HTTPMETHOD_HPP_ */

@@ -72,13 +72,13 @@ class LoggerImpl :
 		fatal() const;
 
 		std::ostream&
-		log(LogLevel &level) const;
+		log(const LogLevel &level) const;
 
 		const std::string&
 		tag() const;
 
 		bool
-		isEnabled(LogLevel &logLevel) const;
+		isEnabled(const LogLevel &logLevel) const;
 };
 
 #endif /* LOGGERIMPL_HPP_ */

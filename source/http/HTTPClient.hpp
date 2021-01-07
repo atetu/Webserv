@@ -63,7 +63,7 @@ class HTTPClient
 		}
 
 		const HTTPServer&
-		server() const
+		httpServer() const
 		{
 			return (m_server);
 		}

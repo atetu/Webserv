@@ -95,7 +95,7 @@ JsonReader::readStructure(void)
 
 		try
 		{
-			JsonParserEvent *event = m_parser.next();
+			const JsonParserEvent *event = m_parser.next();
 
 			if (JsonParserEvent::START_ARRAY == event)
 				structure = m_parser.getArray();

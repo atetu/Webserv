@@ -19,12 +19,12 @@ class LogLevel :
 		public Enum<LogLevel>
 {
 	public:
-		static LogLevel *TRACE;
-		static LogLevel *DEBUG;
-		static LogLevel *INFO;
-		static LogLevel *WARN;
-		static LogLevel *ERROR;
-		static LogLevel *FATAL;
+		static const LogLevel *TRACE;
+		static const LogLevel *DEBUG;
+		static const LogLevel *INFO;
+		static const LogLevel *WARN;
+		static const LogLevel *ERROR;
+		static const LogLevel *FATAL;
 
 		static const LogLevel *ACTIVE;
 };

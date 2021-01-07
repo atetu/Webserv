@@ -67,10 +67,10 @@ class HTTPHeaderFields
 		allow(const HTTPMethod &method);
 
 		HTTPHeaderFields&
-		allow(const std::vector<HTTPMethod> &methods);
+		allow(const std::vector<const HTTPMethod*> &methods);
 
 		HTTPHeaderFields&
-		allow(const std::list<HTTPMethod> &methods);
+		allow(const std::list<const HTTPMethod*> &methods);
 
 		HTTPHeaderFields&
 		allow(const std::string &value);

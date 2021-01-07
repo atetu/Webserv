@@ -126,6 +126,9 @@ HTTPOrchestrator::clearFd(int fd)
 void
 HTTPOrchestrator::printSelectOutput(fd_set &readFds, fd_set &writeFds)
 {
+	if (!LOG.isDebugEnabled())
+		return;
+
 	static std::string last;
 	static unsigned long lastTime = System::currentTimeSeconds();
 
@@ -168,7 +171,7 @@ HTTPOrchestrator::start()
 	struct timeval timeout = {
 		.tv_sec = 0,
 		.tv_usec = 5000 };
-	
+
 	try
 	{
 		m_running = true;
@@ -279,7 +282,7 @@ HTTPOrchestrator::start()
 
 								while (client.in().next(c))
 								{
-									std::cout << c;
+//									std::cout << c;
 									try
 									{
 										client.parser().consume(c);
@@ -418,7 +421,7 @@ HTTPOrchestrator::start()
 					int fd = it->first;
 					HTTPClient &client = *it->second;
 
-					if (client.lastAction() + 30 /* TODO */ < now)
+					if (client.lastAction() + 30 /* TODO */< now)
 					{
 						std::cout << "timeout: " << fd << std::endl;
 

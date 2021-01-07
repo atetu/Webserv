@@ -112,8 +112,8 @@ File::createNewFile(mode_t mode) const
 	if ((fd = ::open(m_path.c_str(), O_CREAT, mode)) == -1) //TOTO create directory if needed
 	{
 		errno = 0;
-	//	std::cout << "error\n";
-		return (false);//TODO handle errors
+		//	std::cout << "error\n";
+		return (false); //TODO handle errors
 	}
 
 	close(fd);
@@ -147,7 +147,16 @@ File::open(int flags, mode_t mode) const
 	if ((fd = ::open(m_path.c_str(), flags, mode)) == -1)
 		throw ioException();
 
-	return (FileDescriptor::wrap(fd));
+	try
+	{
+		return (FileDescriptor::wrap(fd));
+	}
+	catch (...)
+	{
+		::close(fd);
+
+		throw;
+	}
 }
 
 void

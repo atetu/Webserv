@@ -109,7 +109,7 @@ class JsonTokenizer
 		}
 
 	public:
-		JsonToken*
+		const JsonToken*
 		nextToken(void);
 
 		inline bool

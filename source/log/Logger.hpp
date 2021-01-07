@@ -42,10 +42,10 @@ class Logger
 		fatal() const = 0;
 
 		virtual std::ostream&
-		log(LogLevel &level) const = 0;
+		log(const LogLevel &level) const = 0;
 
 		virtual bool
-		isEnabled(LogLevel &logLevel) const = 0;
+		isEnabled(const LogLevel &logLevel) const = 0;
 
 		virtual const std::string&
 		tag() const = 0;

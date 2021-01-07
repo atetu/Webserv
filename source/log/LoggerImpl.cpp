@@ -78,7 +78,7 @@ LoggerImpl::fatal() const
 }
 
 std::ostream&
-LoggerImpl::log(LogLevel &level) const
+LoggerImpl::log(const LogLevel &level) const
 {
 	if (!isEnabled(level))
 		return (VOID);
@@ -93,7 +93,7 @@ LoggerImpl::tag() const
 }
 
 bool
-LoggerImpl::isEnabled(LogLevel &level) const
+LoggerImpl::isEnabled(const LogLevel &level) const
 {
 	return (!(LogLevel::ACTIVE == NULL || LogLevel::ACTIVE->ordinal() > level.ordinal()));
 }

@@ -41,7 +41,7 @@ class JsonReader
 		markDone()
 		{
 			if (m_done)
-				throw IllegalStateException("read*() already called");
+				throw IllegalStateException("read() already called");
 
 			m_done = true;
 		}

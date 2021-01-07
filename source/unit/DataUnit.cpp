@@ -69,10 +69,10 @@ DataUnit::size() const
 	return (m_size);
 }
 
-DataUnit*
+const DataUnit*
 DataUnit::fromSuffix(const std::string &suffix)
 {
-	for (iterator it = values().begin(); it != values().end(); it++)
+	for (const_iterator it = values().begin(); it != values().end(); it++)
 	{
 		if ((*it)->suffix() == suffix)
 			return (*it);

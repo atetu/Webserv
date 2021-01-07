@@ -218,19 +218,19 @@ GenericHTTPResponse::state() const
 }
 
 GenericHTTPResponse*
-GenericHTTPResponse::status(HTTPStatus &status, const HTTPHeaderFields &headers)
+GenericHTTPResponse::status(const HTTPStatus &status, const HTTPHeaderFields &headers)
 {
 	return (new GenericHTTPResponse(HTTPStatusLine(status), headers, NULL));
 }
 
 GenericHTTPResponse*
-GenericHTTPResponse::file(HTTPStatus &status, const HTTPHeaderFields &headers, FileDescriptorBuffer &fileBuffer)
+GenericHTTPResponse::file(const HTTPStatus &status, const HTTPHeaderFields &headers, FileDescriptorBuffer &fileBuffer)
 {
 	return (new GenericHTTPResponse(HTTPStatusLine(status), headers, new GenericHTTPResponse::FileBody(fileBuffer)));
 }
 
 GenericHTTPResponse*
-GenericHTTPResponse::string(HTTPStatus &status, const HTTPHeaderFields &headers, const std::string &string)
+GenericHTTPResponse::string(const HTTPStatus &status, const HTTPHeaderFields &headers, const std::string &string)
 {
 	return (new GenericHTTPResponse(HTTPStatusLine(status), HTTPHeaderFields(headers).contentLength(string.length()), new GenericHTTPResponse::StringBody(string)));
 }
@@ -243,7 +243,7 @@ GenericHTTPResponse::string(HTTPStatus &status, const HTTPHeaderFields &headers,
 // }
 
 GenericHTTPResponse*
-GenericHTTPResponse::fileAndString(HTTPStatus &status, const HTTPHeaderFields &headers, FileDescriptorBuffer &fileBuffer, const std::string &string)
+GenericHTTPResponse::fileAndString(const HTTPStatus &status, const HTTPHeaderFields &headers, FileDescriptorBuffer &fileBuffer, const std::string &string)
 {
 	return (new GenericHTTPResponse(HTTPStatusLine(status), headers, new GenericHTTPResponse::FileAndStringBody(fileBuffer, string)));
 }

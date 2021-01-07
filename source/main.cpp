@@ -11,9 +11,9 @@
 /* ************************************************************************** */
 
 #include <signal.h>
+#include <log/LoggerFactory.hpp>
 #include <main/normal_main.hpp>
 #include <tests/test_unit.hpp>
-#include <log/LoggerFactory.hpp>
 #include <csignal>
 #include <iostream>
 #include <typeinfo>

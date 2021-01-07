@@ -23,13 +23,13 @@ HTTPMethodHandler::~HTTPMethodHandler()
 }
 
 HTTPResponse*
-HTTPMethodHandler::status(HTTPStatus &status, const HTTPHeaderFields &headers)
+HTTPMethodHandler::status(const HTTPStatus &status, const HTTPHeaderFields &headers)
 {
 	return (GenericHTTPResponse::string(status, HTTPHeaderFields(headers).html(), DefaultPages::instance().resolve(status)));
 }
 
 HTTPResponse*
-HTTPMethodHandler::statusHead(HTTPStatus &status, const HTTPHeaderFields &headers)
+HTTPMethodHandler::statusHead(const HTTPStatus &status, const HTTPHeaderFields &headers)
 {
 	const std::string &defaultPage = DefaultPages::instance().resolve(status);
 	HTTPHeaderFields(headers).contentLength(defaultPage.size());
@@ -39,32 +39,32 @@ HTTPMethodHandler::statusHead(HTTPStatus &status, const HTTPHeaderFields &header
 }
 
 HTTPResponse*
-HTTPMethodHandler::statusEmpty(HTTPStatus &status, const HTTPHeaderFields &headers)
+HTTPMethodHandler::statusEmpty(const HTTPStatus &status, const HTTPHeaderFields &headers)
 {
 	//return (GenericHTTPResponse::string(status, headers, DefaultPages::instance().resolve(status)));
 	return (GenericHTTPResponse::string(status, headers, ""));
 }
 
 HTTPResponse*
-HTTPMethodHandler::file(HTTPStatus &httpStatus, int fd, const HTTPHeaderFields &headers)
+HTTPMethodHandler::file(const HTTPStatus &httpStatus, int fd, const HTTPHeaderFields &headers)
 {
 	return (file(httpStatus, *FileDescriptor::wrap(fd), headers));
 }
 
 HTTPResponse*
-HTTPMethodHandler::file(HTTPStatus &httpStatus, FileDescriptor &fileDescriptor, const HTTPHeaderFields &headers)
+HTTPMethodHandler::file(const HTTPStatus &httpStatus, FileDescriptor &fileDescriptor, const HTTPHeaderFields &headers)
 {
 	return (GenericHTTPResponse::file(httpStatus, headers, *FileDescriptorBuffer::from(fileDescriptor, FileDescriptorBuffer::CLOSE | FileDescriptorBuffer::DELETE)));
 }
 
 HTTPResponse*
-HTTPMethodHandler::string(HTTPStatus &httpStatus, const std::string &string, const HTTPHeaderFields &headers)
+HTTPMethodHandler::string(const HTTPStatus &httpStatus, const std::string &string, const HTTPHeaderFields &headers)
 {
 	return (GenericHTTPResponse::string(httpStatus, headers, string));
 }
 
 HTTPResponse*
-HTTPMethodHandler::filePut(HTTPStatus &httpStatus, FileDescriptor &fileDescriptor, const std::string &body, const std::string &string, const HTTPHeaderFields &headers)
+HTTPMethodHandler::filePut(const HTTPStatus &httpStatus, FileDescriptor &fileDescriptor, const std::string &body, const std::string &string, const HTTPHeaderFields &headers)
 {
 	FileDescriptorBuffer *buffer = FileDescriptorBuffer::from(fileDescriptor, FileDescriptorBuffer::CLOSE | FileDescriptorBuffer::DELETE);
 	buffer->store(body);
@@ -72,21 +72,21 @@ HTTPMethodHandler::filePut(HTTPStatus &httpStatus, FileDescriptor &fileDescripto
 }
 
 HTTPResponse*
-HTTPMethodHandler::error(const HTTPRequest &request, HTTPStatus &httpStatus, const HTTPHeaderFields &headers)
+HTTPMethodHandler::error(const HTTPRequest &request, const HTTPStatus &httpStatus, const HTTPHeaderFields &headers)
 {
 	(void)request; // TODO Need to handle custom error pages if necessary
 	return (status(httpStatus, headers));
 }
 
 HTTPResponse*
-HTTPMethodHandler::errorHead(const HTTPRequest &request, HTTPStatus &httpStatus, const HTTPHeaderFields &headers)
+HTTPMethodHandler::errorHead(const HTTPRequest &request, const HTTPStatus &httpStatus, const HTTPHeaderFields &headers)
 {
 	(void)request; // TODO Need to handle custom error pages if necessary
 	return (statusHead(httpStatus, headers));
 }
 
 HTTPResponse*
-HTTPMethodHandler::redirect(HTTPStatus &httpStatus, const URL &to, const HTTPHeaderFields &headers)
+HTTPMethodHandler::redirect(const HTTPStatus &httpStatus, const URL &to, const HTTPHeaderFields &headers)
 {
 	return (status(httpStatus, HTTPHeaderFields(headers).location(to)));
 }

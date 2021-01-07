@@ -41,13 +41,13 @@ class CustomErrorMap
 		has(int status) const;
 
 		bool
-		has(HTTPStatus &status) const;
+		has(const HTTPStatus &status) const;
 
 		const std::string&
 		get(int status) const;
 
 		const std::string&
-		get(HTTPStatus &status) const;
+		get(const HTTPStatus &status) const;
 };
 
 #endif /* CUSTOMERRORMAP_HPP_ */

@@ -42,7 +42,7 @@ class HTTPRequestProcessor
 		void
 		process(HTTPClient &client);
 
-		ServerBlock const*
+		static ServerBlock const*
 		findServerBlock(HTTPClient &client);
 };
 

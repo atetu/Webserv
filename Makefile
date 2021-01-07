@@ -44,6 +44,10 @@ run: RUN_TESTS=0
 run: all
 	@$(PROJECT_MAKE) ARGS="$(ARGS)" run
 
+run-with-valgrind: RUN_TESTS=0
+run-with-valgrind: all
+	@$(PROJECT_MAKE) ARGS="$(ARGS)" run-with-valgrind
+
 test: RUN_TESTS=1
 test: all
 	@$(PROJECT_MAKE) ARGS="$(ARGS)" run

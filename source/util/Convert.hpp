@@ -13,6 +13,8 @@
 #ifndef CONVERT_HPP_
 # define CONVERT_HPP_
 
+#include <util/Object.hpp>
+#include <util/TypeTraits.hpp>
 #include <iomanip>
 #include <sstream>
 #include <string>
@@ -22,11 +24,22 @@ class Convert
 	public:
 		template<typename T>
 			inline static std::string
-			toString(const T &t)
+			toString(const T &t, typename enable_if<!is_pointer<T>::value>::type* = 0)
 			{
 				std::stringstream stream;
 
 				stream << t;
+
+				return (stream.str());
+			}
+
+		template<typename T>
+			inline static std::string
+			toString(const T &t, typename enable_if<is_pointer<T>::value>::type* = 0)
+			{
+				std::stringstream stream;
+
+				stream << *t; /* Reimpl to avoid deep pointer. */
 
 				return (stream.str());
 			}
@@ -65,7 +78,7 @@ class Convert
 				iterator it = container.begin();
 				iterator ite = container.end();
 
-				std::string out = prefix;
+				std::string out(prefix);
 				while (it != ite)
 				{
 					out += toString(*it);
@@ -80,9 +93,30 @@ class Convert
 
 template<>
 	inline std::string
-	Convert::toString<std::string>(const std::string &t)
+	Convert::toString<std::string>(const std::string &t, int)
 	{
 		return (t);
+	}
+
+template<>
+	inline std::string
+	Convert::toString<std::string>(const std::string &t, void*)
+	{
+		return (t);
+	}
+
+template<>
+	inline std::string
+	Convert::toString<Object>(const Object &t, int)
+	{
+		return (t.toString());
+	}
+
+template<>
+	inline std::string
+	Convert::toString<Object>(const Object &t, void*)
+	{
+		return (t.toString());
 	}
 
 #endif /* CONVERT_HPP_ */

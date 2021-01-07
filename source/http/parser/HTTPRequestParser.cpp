@@ -307,19 +307,19 @@ HTTPRequestParser::body(std::string &storage, const Optional<DataSize> &maxBodyS
 }
 
 URL
-HTTPRequestParser::url(const LocationBlock *locationBlockPtr)
+HTTPRequestParser::url(/*const LocationBlock *locationBlockPtr*/)
 {
-	if (locationBlockPtr &&locationBlockPtr->root().present())
-	{
-		std::string path;
-		
-		if (locationBlockPtr->path().size() <= m_pathParser.path().size())
-			path = m_pathParser.path().substr(locationBlockPtr->path().size(), std::string::npos);
-		else
-			path = "";
-			
-		return (URL(path, m_pathParser.query(), m_pathParser.fragment()));
-	}
+//	if (locationBlockPtr &&locationBlockPtr->root().present())
+//	{
+//		std::string path;
+//
+//		if (locationBlockPtr->path().size() <= m_pathParser.path().size())
+//			path = m_pathParser.path().substr(locationBlockPtr->path().size(), std::string::npos);
+//		else
+//			path = "";
+//
+//		return (URL(path, m_pathParser.query(), m_pathParser.fragment()));
+//	}
 	
 	return (URL(m_pathParser.path(), m_pathParser.query(), m_pathParser.fragment()));
 }

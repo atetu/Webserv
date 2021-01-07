@@ -117,7 +117,7 @@ class HTTPRequestParser
 		body(std::string &storage, const Optional<DataSize> &maxBodySize);
 
 		URL
-		url(const LocationBlock *locationBlockPtr);
+		url(/*const LocationBlock *locationBlockPtr*/);
 };
 
 #endif /* HTTPREQUESTPARSER_HPP_ */

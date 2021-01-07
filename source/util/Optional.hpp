@@ -210,6 +210,15 @@ template<typename T>
 			}
 
 			static Optional<T>
+			ofNullable(const T &value)
+			{
+				if (value != NULL)
+					return (Optional(value));
+
+				return (Optional());
+			}
+
+			static Optional<T>
 			ofEmpty(T &value)
 			{
 				if (!value.empty())

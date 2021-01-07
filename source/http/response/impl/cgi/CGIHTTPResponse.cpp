@@ -83,7 +83,7 @@ CGIHTTPResponse::write(SocketBuffer &socketBuffer)
 								std::string codePart = statusOptional.get().substr(0, statusOptional.get().find(' '));
 
 								int code = Number::parse<int>(codePart);
-								const HTTPStatus *newStatus = HTTPStatus::findByCode(code);
+								const HTTPStatus *newStatus = HTTPStatus::find(code);
 
 								if (newStatus)
 									m_statusLine = HTTPStatusLine(m_statusLine.version(), *newStatus);

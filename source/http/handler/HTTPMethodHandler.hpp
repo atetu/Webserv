@@ -33,34 +33,34 @@ class HTTPMethodHandler
 
 	public:
 		static HTTPResponse*
-		status(HTTPStatus &status, const HTTPHeaderFields &headers = HTTPHeaderFields());
+		status(const HTTPStatus &status, const HTTPHeaderFields &headers = HTTPHeaderFields());
 
 		static HTTPResponse*
-		statusHead(HTTPStatus &status, const HTTPHeaderFields &headers= HTTPHeaderFields());
+		statusHead(const HTTPStatus &status, const HTTPHeaderFields &headers= HTTPHeaderFields());
 
 		static HTTPResponse*
-		statusEmpty(HTTPStatus &status, const HTTPHeaderFields &headers = HTTPHeaderFields());
+		statusEmpty(const HTTPStatus &status, const HTTPHeaderFields &headers = HTTPHeaderFields());
 
 		static HTTPResponse*
-		file(HTTPStatus &httpStatus, int fd, const HTTPHeaderFields &headers = HTTPHeaderFields());
+		file(const HTTPStatus &httpStatus, int fd, const HTTPHeaderFields &headers = HTTPHeaderFields());
 
 		static HTTPResponse*
-		file(HTTPStatus &httpStatus, FileDescriptor &fileDescriptor, const HTTPHeaderFields &headers = HTTPHeaderFields());
+		file(const HTTPStatus &httpStatus, FileDescriptor &fileDescriptor, const HTTPHeaderFields &headers = HTTPHeaderFields());
 
 		static HTTPResponse*
-		string(HTTPStatus &httpStatus, const std::string &string, const HTTPHeaderFields &headers = HTTPHeaderFields());
+		string(const HTTPStatus &httpStatus, const std::string &string, const HTTPHeaderFields &headers = HTTPHeaderFields());
 
 		static HTTPResponse*
-		filePut(HTTPStatus &httpStatus, FileDescriptor &fileDescriptor, const std::string &body, const std::string &string, const HTTPHeaderFields &headers);
+		filePut(const HTTPStatus &httpStatus, FileDescriptor &fileDescriptor, const std::string &body, const std::string &string, const HTTPHeaderFields &headers);
 
 		static HTTPResponse*
-		error(const HTTPRequest &request, HTTPStatus &httpStatus, const HTTPHeaderFields &headers = HTTPHeaderFields());
+		error(const HTTPRequest &request, const HTTPStatus &httpStatus, const HTTPHeaderFields &headers = HTTPHeaderFields());
 
 		static HTTPResponse*
-		errorHead(const HTTPRequest &request, HTTPStatus &httpStatus, const HTTPHeaderFields &headers);
+		errorHead(const HTTPRequest &request, const HTTPStatus &httpStatus, const HTTPHeaderFields &headers);
 
 		static HTTPResponse*
-		redirect(HTTPStatus &httpStatus, const URL &to, const HTTPHeaderFields &headers = HTTPHeaderFields());
+		redirect(const HTTPStatus &httpStatus, const URL &to, const HTTPHeaderFields &headers = HTTPHeaderFields());
 };
 
 #endif /* HTTPMETHODHANDLER_HPP_ */

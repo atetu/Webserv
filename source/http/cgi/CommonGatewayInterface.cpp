@@ -147,8 +147,8 @@ CommonGatewayInterface::execute(HTTPClient &client, const CGIBlock &cgiBlock, co
 	env.setProperty(ENV_REQUEST_URI, request.url().path());
 	env.setProperty(ENV_SCRIPT_FILENAME, scriptAbsoluteFile.path());
 	env.setProperty(ENV_SCRIPT_NAME, request.url().path());
-	env.setProperty(ENV_SERVER_NAME, client.server().host());
-	env.setProperty(ENV_SERVER_PORT, Convert::toString(client.server().port()));
+	env.setProperty(ENV_SERVER_NAME, client.httpServer().host());
+	env.setProperty(ENV_SERVER_PORT, Convert::toString(client.httpServer().port()));
 	env.setProperty(ENV_SERVER_PROTOCOL, request.version().format());
 	env.setProperty(ENV_SERVER_SOFTWARE, APPLICATION_NAME_AND_VERSION);
 	env.setProperty(ENV_PATH_INFO, scriptFile.parent().path());

@@ -127,7 +127,7 @@ JsonTokenizer::readString(void)
 		throwExpected('"', c);
 }
 
-JsonToken*
+const JsonToken*
 JsonTokenizer::nextToken(void)
 {
 	m_start = m_index;

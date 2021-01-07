@@ -63,9 +63,6 @@ class URL
 		Builder
 		builder(void) const;
 
-		void 
-		path(const std::string path);
-
 	public:
 		static std::string
 		encode(const std::string &input);
