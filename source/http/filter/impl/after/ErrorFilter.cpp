@@ -61,39 +61,24 @@ ErrorFilter::operator=(const ErrorFilter &other)
 void
 ErrorFilter::doFilter(UNUSED HTTPClient &client, UNUSED HTTPRequest &request, HTTPResponse &response, FilterChain &next)
 {
-	std::cout << 'a' << std::endl;
-
 	if (!response.status().present())
 		return (next());
-
-	std::cout << 'b' << std::endl;
 
 	const HTTPStatus &status = *response.status().get();
 	if (!status.isError())
 		return (next());
 
-	std::cout << 'c' << std::endl;
-	std::cout << response.body() << std::endl;
-
 	if (response.body() && response.body()->isSelfManaged())
 		return (next());
-
-	std::cout << 'd' << std::endl;
 
 	if (!request.serverBlock().present())
 		return (next());
 
-	std::cout << 'e' << std::endl;
-
 	const ServerBlock &serverBlock = *request.serverBlock().get();
-
-	std::cout << 'g' << std::endl;
 
 	bool success = false;
 	if (serverBlock.errors().present())
 	{
-
-		std::cout << 'h' << std::endl;
 		const CustomErrorMap &errorMap = serverBlock.errors().get();
 		if (errorMap.has(status))
 		{
@@ -106,7 +91,6 @@ ErrorFilter::doFilter(UNUSED HTTPClient &client, UNUSED HTTPRequest &request, HT
 				fd = errorFile.open(O_RDONLY);
 				fdBuffer = FileDescriptorBuffer::from(*fd, FileDescriptorBuffer::CLOSE | FileDescriptorBuffer::DELETE);
 
-				std::cout << 'i' << std::endl;
 				response.body(new FileResponseBody(*fdBuffer));
 
 				success = true;
@@ -124,7 +108,6 @@ ErrorFilter::doFilter(UNUSED HTTPClient &client, UNUSED HTTPRequest &request, HT
 		}
 	}
 
-	std::cout << success << std::endl;
 	if (!success)
 		response.body(new StringResponseBody(DefaultPages::instance().resolve(status)));
 

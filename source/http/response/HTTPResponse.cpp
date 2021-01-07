@@ -10,8 +10,11 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+#include <http/HTTP.hpp>
 #include <http/response/body/impl/StringResponseBody.hpp>
 #include <http/response/HTTPResponse.hpp>
+#include <http/response/HTTPStatusLine.hpp>
+#include <util/helper/DeleteHelper.hpp>
 #include <string>
 
 HTTPResponse::HTTPResponse() :
@@ -34,6 +37,7 @@ HTTPResponse::HTTPResponse(const HTTPResponse &other) :
 
 HTTPResponse::~HTTPResponse()
 {
+	DeleteHelper::pointer<IResponseBody>(m_body);
 }
 
 HTTPResponse&
@@ -107,6 +111,10 @@ HTTPResponse::store(BaseBuffer &buffer)
 		case S_NONE:
 		case S_HEADERS:
 		{
+			buffer.store(HTTPStatusLine(*status().get()).format());
+			buffer.store(HTTP::CRLF);
+			buffer.store(headers().format());
+			buffer.store(HTTP::CRLF);
 
 			m_state = S_BODY;
 			return (false);
