@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HTTPRequestParser.cpp                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
+/*   By: atetu <atetu@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/27 17:29:02 by ecaceres          #+#    #+#             */
-/*   Updated: 2021/01/07 11:34:13 by alicetetu        ###   ########.fr       */
+/*   Updated: 2021/01/07 14:23:00 by atetu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,8 @@ HTTPRequestParser::HTTPRequestParser() :
 		m_method(),
 		m_major(),
 		m_minor(),
+		m_body(""),
+		m_chunkDecoder(m_body),
 		m_last(),
 		m_last2()
 {
@@ -280,8 +282,8 @@ HTTPRequestParser::body(std::string &storage, const Optional<DataSize> &maxBodyS
 	
 	if (maxBodySize.present())
 		max = maxBodySize.get().toBytes();
-	else
-		max = -1; // can we not have maxBodySize? 
+	// else
+	// 	max = -1; // can we not have maxBodySize? 
 	const Optional<std::string> contentLengthOptional = headerFieldsParser().headerFields().get(HTTPHeaderFields::CONTENT_LENGTH);
 	if (contentLengthOptional.present())
 	{
@@ -306,7 +308,7 @@ HTTPRequestParser::body(std::string &storage, const Optional<DataSize> &maxBodyS
 		//		std::cout << "first\n";
 				
 		
-				m_body += m_chunkDecoder.decode(storage.substr(0, max));
+				m_body = m_chunkDecoder.decode(storage.substr(0, max));
 				storage.erase(0, max);
 				if (m_chunkDecoder.state() != ChunkDecoder::S_OVER)
 				{
@@ -324,7 +326,7 @@ HTTPRequestParser::body(std::string &storage, const Optional<DataSize> &maxBodyS
 				storage.erase(0, max);
 				if (m_chunkDecoder.state() != ChunkDecoder::S_OVER)
 				{
-		//			std::cout << "third\n";
+					std::cout << "third\n";
 				return (0);
 				}
 			}

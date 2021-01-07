@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HTTPOrchestrator.cpp                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
+/*   By: atetu <atetu@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/28 14:34:10 by ecaceres          #+#    #+#             */
-/*   Updated: 2021/01/07 11:41:17 by alicetetu        ###   ########.fr       */
+/*   Updated: 2021/01/07 14:26:39 by atetu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -296,8 +296,10 @@ HTTPOrchestrator::start()
 										client.parser().consume(c);
 										if (client.parser().state() == HTTPRequestParser::S_END && c != '\n')
 										{
+									//		std::cout << "iici\n";
 											client.in().first(c); // I know you will have a panick attack when reading that but that's a temporary solution. I dont know it is not directly taken into account below
 										}
+								//		std::cout << "la\n";
 									}
 									catch (Exception &exception)
 									{
@@ -432,7 +434,7 @@ HTTPOrchestrator::start()
 				if (clientFds.empty() && fileReadFds.empty() && fileWriteFds.empty())
 				{
 					m_running = false;
-					std::cout << "false\n";
+				//	std::cout << "false\n";
 					break;
 				}
 			}

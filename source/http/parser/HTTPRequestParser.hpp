@@ -6,7 +6,7 @@
 /*   By: atetu <atetu@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/27 17:29:02 by ecaceres          #+#    #+#             */
-/*   Updated: 2021/01/06 17:28:59 by atetu            ###   ########.fr       */
+/*   Updated: 2021/01/07 14:23:08 by atetu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,8 +62,8 @@ class HTTPRequestParser
 		int m_major;
 		int m_minor;
 		HTTPHeaderFieldsParser m_headerFieldsParser;
-		ChunkDecoder m_chunkDecoder;
 		std::string m_body;
+		ChunkDecoder m_chunkDecoder;
 		char m_last;
 		char m_last2;
 

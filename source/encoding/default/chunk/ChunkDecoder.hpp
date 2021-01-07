@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ChunkDecoder.hpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
+/*   By: atetu <atetu@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/19 14:47:44 by alicetetu         #+#    #+#             */
-/*   Updated: 2021/01/07 12:12:13 by alicetetu        ###   ########.fr       */
+/*   Updated: 2021/01/07 14:32:35 by atetu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,6 +37,7 @@ class ChunkDecoder
 
 		ChunkDecoder();
 		ChunkDecoder(const std::string &input);
+		// ChunkDecoder(std::string &body);
 		ChunkDecoder(const ChunkDecoder &other);
 
 		virtual
