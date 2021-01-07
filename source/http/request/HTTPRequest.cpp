@@ -20,33 +20,36 @@
 
 HTTPRequest::HTTPRequest() :
 		m_configuration(NULL),
+		m_version(),
 		m_url(),
+		m_headers(),
 		m_method(),
 		m_serverBlock(),
 		m_locationBlock(),
-		m_headers(),
 		m_resource()
 {
 }
 
-HTTPRequest::HTTPRequest(const Configuration &configuration, URL url) :
+HTTPRequest::HTTPRequest(const Configuration &configuration, const HTTPVersion &version, const URL &url, const HTTPHeaderFields &headers) :
 		m_configuration(&configuration),
+		m_version(version),
 		m_url(url),
+		m_headers(headers),
 		m_method(),
 		m_serverBlock(),
 		m_locationBlock(),
-		m_headers(),
 		m_resource(url.path())
 {
 }
 
 HTTPRequest::HTTPRequest(const HTTPRequest &other) :
 		m_configuration(other.m_configuration),
+		m_version(other.m_version),
 		m_url(other.m_url),
+		m_headers(other.m_headers),
 		m_method(other.m_method),
 		m_serverBlock(other.m_serverBlock),
 		m_locationBlock(other.m_locationBlock),
-		m_headers(other.m_headers),
 		m_resource(other.m_resource)
 {
 }
@@ -61,15 +64,22 @@ HTTPRequest::operator=(const HTTPRequest &other)
 	if (this != &other)
 	{
 		m_configuration = other.m_configuration;
+		m_version = other.m_version;
 		m_url = other.m_url;
+		m_headers = other.m_headers;
 		m_method = other.m_method;
 		m_serverBlock = other.m_serverBlock;
 		m_locationBlock = other.m_locationBlock;
-		m_headers = other.m_headers;
 		m_resource = other.m_resource;
 	}
 
 	return (*this);
+}
+
+const HTTPVersion&
+HTTPRequest::version(void) const
+{
+	return (m_version);
 }
 
 const URL&

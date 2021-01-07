@@ -42,14 +42,15 @@ HTTPRequestProcessor::~HTTPRequestProcessor()
 void
 HTTPRequestProcessor::process(HTTPClient &client)
 {
-	HTTPRequest request(m_configuration, client.parser().url());
-	HTTPResponse response;
-
-	FilterChain chain(client, request, response);
-
-	chain.doChaining();
-
-	std::cout << request.resource() << std::endl;
+	(void)client;
+//	HTTPRequest request(m_configuration, client.parser().url());
+//	HTTPResponse response;
+//
+//	FilterChain chain(client, request, response);
+//
+//	chain.doChaining();
+//
+//	std::cout << request.resource() << std::endl;
 //
 //	// if (client.parser().headerFields().get(HTTPHeaderFields::TRANSFER_ENCODING).present() && client.in().size()==0)
 //	// 	return;

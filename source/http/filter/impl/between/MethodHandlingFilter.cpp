@@ -45,8 +45,6 @@ void
 MethodHandlingFilter::doFilter(UNUSED HTTPClient &client, UNUSED HTTPRequest &request, UNUSED HTTPResponse &response, FilterChain &next)
 {
 	request.method().get()->handler().handle(request, response);
-	std::cout << response.status().get()->name() << std::endl;
-	std::cout << response.body() << std::endl;
 
 	return (next());
 }

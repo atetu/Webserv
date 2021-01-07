@@ -300,7 +300,7 @@ HTTPOrchestrator::start()
 										{
 											if (client.parser().state() == HTTPRequestParser::S_END)
 											{
-												client.request() = HTTPRequest(m_configuration, client.parser().url());
+												client.request() = HTTPRequest(m_configuration, client.parser().version(), client.parser().url(), client.parser().headerFields());
 												client.filterChain().doChaining();
 
 												if (client.response().status().absent() && client.request().method().present() && client.request().method().get()->hasBody())

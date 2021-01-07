@@ -17,6 +17,7 @@
 #include <config/block/LocationBlock.hpp>
 #include <config/block/ServerBlock.hpp>
 #include <http/enums/HTTPMethod.hpp>
+#include <http/enums/HTTPVersion.hpp>
 #include <http/header/HTTPHeaderFields.hpp>
 #include <util/Optional.hpp>
 #include <util/URL.hpp>
@@ -30,16 +31,17 @@ class HTTPRequest
 {
 	private:
 		const Configuration *m_configuration;
+		HTTPVersion m_version;
 		URL m_url;
+		HTTPHeaderFields m_headers;
 		const HTTPMethod *m_method;
 		const ServerBlock *m_serverBlock;
 		const LocationBlock *m_locationBlock;
-		HTTPHeaderFields m_headers;
 		std::string m_resource;
 
 	public:
 		HTTPRequest();
-		HTTPRequest(const Configuration &configuration, URL url);
+		HTTPRequest(const Configuration &configuration, const HTTPVersion &version, const URL &url, const HTTPHeaderFields &headers);
 		HTTPRequest(const HTTPRequest &other);
 
 		virtual
@@ -47,6 +49,9 @@ class HTTPRequest
 
 		HTTPRequest&
 		operator=(const HTTPRequest &other);
+
+		const HTTPVersion&
+		version(void) const;
 
 		const URL&
 		url(void) const;

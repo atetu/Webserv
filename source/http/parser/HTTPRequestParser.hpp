@@ -13,11 +13,12 @@
 #ifndef HTTPREQUESTPARSER_HPP_
 # define HTTPREQUESTPARSER_HPP_
 
+#include <http/enums/HTTPVersion.hpp>
 #include <http/parser/HTTPHeaderFieldsParser.hpp>
 #include <http/parser/HTTPRequestPathParser.hpp>
 #include <unit/DataSize.hpp>
+#include <util/Optional.hpp>
 #include <string>
-#include <config/block/LocationBlock.hpp>
 
 class URL;
 
@@ -97,6 +98,12 @@ class HTTPRequestParser
 		minor() const
 		{
 			return (m_major);
+		}
+
+		inline HTTPVersion
+		version()
+		{
+			return (HTTPVersion(m_major, m_minor));
 		}
 
 		inline const HTTPHeaderFieldsParser&
