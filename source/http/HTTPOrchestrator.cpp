@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HTTPOrchestrator.cpp                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: atetu <atetu@student.42.fr>                +#+  +:+       +#+        */
+/*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/28 14:34:10 by ecaceres          #+#    #+#             */
-/*   Updated: 2021/01/07 09:00:29 by atetu            ###   ########.fr       */
+/*   Updated: 2021/01/07 11:41:17 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -286,7 +286,7 @@ HTTPOrchestrator::start()
 								bool toContinue = false;
 								while (client.in().next(c))
 								{
-									if (!toContinue)
+									if (toContinue == false)
 									{
 										
 									std::cout << c;

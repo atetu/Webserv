@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ChunkDecoder.hpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: atetu <atetu@student.42.fr>                +#+  +:+       +#+        */
+/*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/19 14:47:44 by alicetetu         #+#    #+#             */
-/*   Updated: 2021/01/06 16:23:34 by atetu            ###   ########.fr       */
+/*   Updated: 2021/01/07 12:12:13 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,15 +23,15 @@ class ChunkDecoder
 		{
 			S_NOT_STARTED,
 			S_SIZE,
-			S_EXTENSION,
-			S_SIZE_END,
+		//	S_EXTENSION,
+		//	S_SIZE_END,
 		//	S_SIZE_END2,
 			S_CHUNK,
 		//	S_CHUNK_END_EXPECTED,
 			S_CHUNK_END,
-			S_CHUNK_END2,
+		//	S_CHUNK_END2,
 			S_NULL,
-			S_END,
+		//	S_END,
 			S_OVER
 		};
 
@@ -65,6 +65,7 @@ class ChunkDecoder
 		std::string m_parsedChunk;
 		std::string m_extension;
 		char m_lastChar;
+		size_t m_totalSize;
 };
 
 #endif /* CHUNKDECODER_HPP_ */

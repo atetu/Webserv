@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ChunkDecoder.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: atetu <atetu@student.42.fr>                +#+  +:+       +#+        */
+/*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/19 14:51:33 by alicetetu         #+#    #+#             */
-/*   Updated: 2021/01/07 10:10:15 by atetu            ###   ########.fr       */
+/*   Updated: 2021/01/07 12:18:21 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,8 @@ ChunkDecoder::ChunkDecoder() :
 	m_parsedData(""),
 	m_parsedChunk(""),
 	m_extension(""),
-	m_lastChar()
+	m_lastChar(),
+	m_totalSize(0)
 {
 }
 
@@ -72,14 +73,19 @@ ChunkDecoder::operator =(const ChunkDecoder &other)
 		m_sizeNb = strtol(hex_intro.c_str(), &endPtr, 16);			\
 		if (endPtr == hex_intro.c_str())							\
 			throw Exception ("Hexadecimal conversion impossible"); 	\
-		m_sizeStr = "";					\
 		std::cout << "hex: " << hex_intro << std::endl; \
 		std::cout << "nb : " << m_sizeNb << std::endl;
 	
 std::string
 ChunkDecoder::decode(std::string storage)
 {
-	m_input += storage;
+	m_input = storage;
+	if (m_input.empty())
+		return(m_parsedData);
+	bool loop = true;
+	std::cout << "input:" << m_input.size() << std::endl;
+	m_totalSize += m_input.size();
+	std::cout << "total:" << m_totalSize << std::endl;
 //	size_t found = m_input.find("\r\n");
 	
 // 	// if (m_input == "\r\n")
@@ -95,6 +101,8 @@ ChunkDecoder::decode(std::string storage)
 // 		char c = m_input[in];
 // 		in++;
 // 	//	std::cout << m_state << "\n";
+	while(loop == true)
+	{
  		switch (m_state)
 		{
  			std::cout << m_state << "\n";
@@ -104,12 +112,51 @@ ChunkDecoder::decode(std::string storage)
 				size_t found = m_input.find("\r\n");
 				if (found != std::string::npos)
 				{
+					std::cout << "found / " << m_input[found]  << m_input[found + 1]<< std::endl;
 					m_sizeStr = m_input.substr(0, found);
-					SIZE_CONVERSION;
+					if (m_sizeStr.empty())
+					{
+						m_state = S_OVER;
+						return (m_parsedData);
+					}
+					std::cout << "size: " << m_sizeStr << std::endl;
+					SIZE_CONVERSION();
+				
+ 					
+					std::cout << "input size bef: " << m_input.size() << std::endl;
+					size_t toErase = m_sizeStr.size() + (size_t)2;
+					std::cout << "to erase: " << toErase << std::endl;
+					m_input.erase(0, toErase);
+					std::cout << "input size after: " << m_input.size() << std::endl;
+					m_sizeStr = "";
 				}
-			//	std::cout << "c: " << c << "\n";
-				if (ChunkDecoder::isValidCharacter(c))
+				else
 				{
+					m_input.erase(0, std::string::npos);
+					return(m_parsedData);
+					loop = false;
+				}
+				
+				if (m_sizeNb == 0)
+ 				{
+ 	//				m_parsedData += m_parsedChunk;
+ //					std::cout << "parsed: " << m_parsedData << std::endl;
+// 					std::cout << "chunk: " << m_parsedChunk << std::endl;
+// 					std::cout << "chunksize: " << m_parsedData.size() << std::endl;
+// 					m_parsedChunk = "";
+// 					m_sizeNb = 0;
+ 					m_state = S_OVER;
+					 break;
+ 				}
+				 else
+ 						m_state = S_CHUNK;
+				//std::cout << "input sec:"<< m_input.size() << std::endl;
+				//std::cout << "pasred:" << m_parsedData.size() << std::endl;
+				break;
+			}
+			//	std::cout << "c: " << c << "\n";
+			//	if (ChunkDecoder::isValidCharacter(c))
+			//	{
 // 					m_sizeStr += c;
 // 					m_state = S_SIZE;
 // 				}
@@ -179,50 +226,98 @@ ChunkDecoder::decode(std::string storage)
 // 				break;
 // 			}
 			
-// 			case S_CHUNK:
-// 			{
-// 			//	std::cout << m_state ;
-// 				//std::cout << "chunk: \n" << m_parsedChunk << std::endl;
-// 			//	std::cout << "size: " << m_sizeNb << std::endl;
-// 				if (in_len <= m_sizeNb)
-// 				{
-// 					m_parsedChunk = m_input.substr(in, std::string::npos);
-// 					m_sizeNb -= m_parsedChunk.size();
-// 					m_parsedData += m_parsedChunk;
-// 					//	std::cout << "parsed: " << m_parsedData << std::endl;
-// 					std::cout << "chunk: " << m_parsedChunk << std::endl;
-// 					std::cout << "chunksize: " << m_parsedChunk.size() << std::endl;
-// 					std::cout << "parsedsize: " << m_parsedData.size() << std::endl;
-// 					std::cout << "size NB: " << m_sizeNb << std::endl;
-// 					m_parsedChunk = "";
-// 					in_len = 0;
+ 			case S_CHUNK:
+ 			{
+ 			//	std::cout << m_state ;
+ 				//std::cout << "chunk: \n" << m_parsedChunk << std::endl;
+ 			//	std::cout << "size: " << m_sizeNb << std::endl;
+ 				if (m_input.size() <= (size_t)m_sizeNb)
+ 				{
+ 				//	m_parsedChunk = m_input.substr(in, std::string::npos);
+ 				//	m_sizeNb -= m_parsedChunk.size();
+ 					m_parsedData += m_input;
+					m_sizeNb -= m_input.size();
+					m_input.erase(0, std::string::npos);
+					std::cout << "input erase totally: " << m_input << std::endl;
+					std::cout << "sed\n";
+ 					//	std::cout << "parsed: " << m_parsedData << std::endl;
+ 				//	std::cout << "chunk: " << m_parsedChunk << std::endl;
+ 				//	std::cout << "chunksize: " << m_parsedChunk.size() << std::endl;
+ 				//	std::cout << "parsedsize: " << m_parsedData.size() << std::endl;
+ 				//	std::cout << "size NB: " << m_sizeNb << std::endl;
+ 				//	m_parsedChunk = "";
+ 				//	in_len = 0;
 					
-// 				}
+ 				}
+				else
+				{
+					std::cout << "sizeNb: " << m_sizeNb << std::endl;
+					std::cout << "input size: " << m_input.size() << std::endl;
+					m_parsedChunk = m_input.substr(0, m_sizeNb);
+					m_parsedData += m_parsedChunk;
+					m_input.erase(0, m_sizeNb);
+					m_parsedData = "";
+					m_sizeNb = 0;
+					std::cout << "input erase partially: " << m_input << std::endl;
+				}
 // 				else
 // 				{		
 // 					m_parsedChunk += c;
 // 					m_sizeNb--;
 // 				}
-// 				if (m_sizeNb == 0)
-// 				{
-// 					m_parsedData += m_parsedChunk;
-// 					std::cout << "parsed: " << m_parsedData << std::endl;
+ 				if (m_sizeNb == 0)
+ 				{
+ 	//				m_parsedData += m_parsedChunk;
+ //					std::cout << "parsed: " << m_parsedData << std::endl;
 // 					std::cout << "chunk: " << m_parsedChunk << std::endl;
 // 					std::cout << "chunksize: " << m_parsedData.size() << std::endl;
 // 					m_parsedChunk = "";
 // 					m_sizeNb = 0;
-// 					m_state = S_CHUNK_END;
-// 				}
-// 				else
-// 					m_state = S_CHUNK;	
+ 					m_state = S_CHUNK_END;
+					 break;
+ 				}
+ 				if (!m_input.empty())
+				 {
+					// std::cout << "inut: " << m_input << std::endl;
+ 					m_state = S_CHUNK;	
+				 }
+				else
+				{
+					//std::cout << "false\n";
+					m_state = S_CHUNK;
+					loop = false;
+					return(m_parsedData);
+				}
+				
+		//	std::cout << "parsed: " << m_parsedData << " - state : " << m_state << std::endl;
+ 				break;
+ 			}
+			
+ 			case S_CHUNK_END:
+ 			{
+				size_t f = m_input.find("\r\n");
+				if (f != std::string::npos)
+				{
+					std::cout << "input end" << m_input << std::endl;
+					std::cout << "chunkend\n";
+					m_input.erase(0, f + 2);
+					m_state = S_SIZE;
+				}
+				else
+				{
+					m_input.erase(0, std::string::npos);
+				}
+				if (m_input.size() == 0)
+				{
+					return(m_parsedData);
+					loop = false;
+				}
 
-			
-// 				break;
-// 			}
-			
-// 			case S_CHUNK_END:
-// 			{
-// 			//	std::cout << m_state;
+				break;
+			 }
+				
+				 
+ 			//	std::cout << m_state;
 // 				if (c == '\r')
 // 					m_state = S_CHUNK_END2;
 // 				// else if (c == '\n')
@@ -253,9 +348,28 @@ ChunkDecoder::decode(std::string storage)
 // 				break;
 // 			}
 			
-// 			case S_NULL:
-// 			{
-// 				std::cout << m_state ;
+ 			case S_NULL:
+ 			{
+				size_t f = m_input.find("\r\n");
+				if (f != std::string::npos)
+				{
+					std::cout << "over\n";
+					m_state = S_OVER;
+				}
+				else
+				{
+					std::cout << " earse \n";
+					m_input.erase(0, std::string::npos);
+				}
+
+				if (m_input.size() == 0)
+				{
+					loop = false;
+					return(m_parsedData);
+			 	}
+				break;
+			 }
+ //				std::cout << m_state ;
 // 				if (c == '\r')
 // 					m_state = S_END;
 // 				else if (c == '\n')
@@ -278,17 +392,20 @@ ChunkDecoder::decode(std::string storage)
 // 				break;
 // 			}
 		
-// 			case S_OVER:
-// 			{
-// 				std::cout << m_state ;
-// 			//	return (m_parsedData);
-// 				break;
-// 			}
-// 		}
+ 			case S_OVER:
+ 			{
+ 				loop = false;
+				 std::cout << "loop" << loop << std::endl;
+ 				return (m_parsedData);
+ 				break;
+ 			}
+ 		}
 // 		m_lastChar = c ;
 	}
 //	std::cout << "parsed: \n" << m_parsedData << std::endl;
-	return (m_parsedData);
+	
+
+return (m_parsedData);
 }
 
 ChunkDecoder::State 

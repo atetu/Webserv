@@ -6,7 +6,7 @@
 /*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/27 17:29:02 by ecaceres          #+#    #+#             */
-/*   Updated: 2021/01/06 21:13:07 by alicetetu        ###   ########.fr       */
+/*   Updated: 2021/01/07 11:34:13 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -320,10 +320,11 @@ HTTPRequestParser::body(std::string &storage, const Optional<DataSize> &maxBodyS
 			//	std::cout << "second\n";
 		
 				m_body += m_chunkDecoder.decode(storage);
-			//	std::cout << "after second\n";
+		//		std::cout << "after second\n";
+				storage.erase(0, max);
 				if (m_chunkDecoder.state() != ChunkDecoder::S_OVER)
 				{
-					//std::cout << "third\n";
+		//			std::cout << "third\n";
 				return (0);
 				}
 			}
