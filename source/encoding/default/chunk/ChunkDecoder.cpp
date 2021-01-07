@@ -6,7 +6,7 @@
 /*   By: atetu <atetu@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/19 14:51:33 by alicetetu         #+#    #+#             */
-/*   Updated: 2021/01/07 10:05:24 by atetu            ###   ########.fr       */
+/*   Updated: 2021/01/07 10:10:15 by atetu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,7 +80,7 @@ std::string
 ChunkDecoder::decode(std::string storage)
 {
 	m_input += storage;
-	size_t found = m_input.find("\r\n");
+//	size_t found = m_input.find("\r\n");
 	
 // 	// if (m_input == "\r\n")
 // 	// 	return (m_parsedData);
@@ -95,15 +95,21 @@ ChunkDecoder::decode(std::string storage)
 // 		char c = m_input[in];
 // 		in++;
 // 	//	std::cout << m_state << "\n";
-// 		switch (m_state)
-// 		{
-// //std::cout << m_state << "\n";
-// 			case S_NOT_STARTED :
-// 			case S_SIZE:
-// 			{
-// 			//	std::cout << "c: " << c << "\n";
-// 				if (ChunkDecoder::isValidCharacter(c))
-// 				{
+ 		switch (m_state)
+		{
+ 			std::cout << m_state << "\n";
+			case S_NOT_STARTED :
+			case S_SIZE:
+			{
+				size_t found = m_input.find("\r\n");
+				if (found != std::string::npos)
+				{
+					m_sizeStr = m_input.substr(0, found);
+					SIZE_CONVERSION;
+				}
+			//	std::cout << "c: " << c << "\n";
+				if (ChunkDecoder::isValidCharacter(c))
+				{
 // 					m_sizeStr += c;
 // 					m_state = S_SIZE;
 // 				}
