@@ -14,22 +14,24 @@
 # define OPTIONSHANDLER_HPP_
 
 #include <http/handler/HTTPMethodHandler.hpp>
+#include <util/Singleton.hpp>
 
 class OptionsHandler :
-		public HTTPMethodHandler
+		public HTTPMethodHandler,
+		public Singleton<OptionsHandler>
 {
 	public:
 		OptionsHandler();
+		OptionsHandler(const OptionsHandler &other);
 
 		virtual
 		~OptionsHandler();
 
-		HTTPResponse*
-		handle(HTTPRequest &request);
+		OptionsHandler&
+		operator =(const OptionsHandler &other);
 
-	public:
-		static OptionsHandler&
-		get(void);
+		void
+		handle(HTTPRequest &request, HTTPResponse &response);
 };
 
 #endif /* OptionsHANDLER_HPP_ */

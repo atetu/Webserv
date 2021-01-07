@@ -15,7 +15,6 @@
 
 #include <http/filter/Filter.hpp>
 #include <deque>
-#include <list>
 
 class FilterChain
 {
@@ -30,10 +29,11 @@ class FilterChain
 
 	private:
 		HTTPClient &m_client;
-		Request &m_request;
-		Response &m_response;
+		HTTPRequest &m_request;
+		HTTPResponse &m_response;
 
 		std::deque<Filter*> m_current;
+		bool m_beforePassed;
 
 	private:
 		FilterChain();
@@ -43,7 +43,7 @@ class FilterChain
 		operator=(const FilterChain &other);
 
 	public:
-		FilterChain(HTTPClient &client, Request &request, Response &response);
+		FilterChain(HTTPClient &client, HTTPRequest &request, HTTPResponse &response);
 
 		virtual
 		~FilterChain();

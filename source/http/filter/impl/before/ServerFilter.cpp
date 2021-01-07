@@ -14,11 +14,12 @@
 #include <http/enums/HTTPStatus.hpp>
 #include <http/filter/FilterChain.hpp>
 #include <http/filter/impl/before/ServerFilter.hpp>
-#include <http/filter/x/Request.hpp>
-#include <http/filter/x/Response.hpp>
 #include <http/header/HTTPHeaderFields.hpp>
 #include <http/HTTPClient.hpp>
 #include <http/HTTPServer.hpp>
+#include <http/parser/HTTPRequestParser.hpp>
+#include <http/request/HTTPRequest.hpp>
+#include <http/response/HTTPResponse.hpp>
 #include <util/Optional.hpp>
 #include <list>
 #include <string>
@@ -45,7 +46,7 @@ ServerFilter::operator=(const ServerFilter &other)
 }
 
 void
-ServerFilter::doFilter(HTTPClient &client, Request &request, Response &response, FilterChain &next)
+ServerFilter::doFilter(HTTPClient &client, HTTPRequest &request, HTTPResponse &response, FilterChain &next)
 {
 	const ServerBlock *serverBlockPtr = findBlock(client);
 	if (serverBlockPtr)

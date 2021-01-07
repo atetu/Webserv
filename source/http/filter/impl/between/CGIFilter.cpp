@@ -36,7 +36,7 @@ CGIFilter::operator=(const CGIFilter &other)
 }
 
 void
-CGIFilter::doFilter(UNUSED HTTPClient &client, UNUSED Request &request, UNUSED Response &response, FilterChain &next)
+CGIFilter::doFilter(UNUSED HTTPClient &client, UNUSED HTTPRequest &request, UNUSED HTTPResponse &response, FilterChain &next)
 {
 	return (next());
 }

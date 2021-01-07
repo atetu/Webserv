@@ -33,7 +33,7 @@ class ServerFilter :
 		operator=(const ServerFilter &other);
 
 		void
-		doFilter(HTTPClient &client, Request &request, Response &response, FilterChain &next);
+		doFilter(HTTPClient &client, HTTPRequest &request, HTTPResponse &response, FilterChain &next);
 
 		static ServerBlock const*
 		findBlock(HTTPClient &client);

@@ -31,7 +31,7 @@ class FinalFilter :
 		operator=(const FinalFilter &other);
 
 		void
-		doFilter(HTTPClient &client, Request &request, Response &response, FilterChain &next);
+		doFilter(HTTPClient &client, HTTPRequest &request, HTTPResponse &response, FilterChain &next);
 };
 
 #endif /* FINALFILTER_HPP_ */

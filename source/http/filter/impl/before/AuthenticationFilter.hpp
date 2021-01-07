@@ -30,7 +30,7 @@ class AuthenticationFilter :
 		operator=(const AuthenticationFilter &other);
 
 		void
-		doFilter(HTTPClient &client, Request &request, Response &response, FilterChain &next);
+		doFilter(HTTPClient &client, HTTPRequest &request, HTTPResponse &response, FilterChain &next);
 };
 
 #endif /* AUTHENTICATIONFILTER_HPP_ */

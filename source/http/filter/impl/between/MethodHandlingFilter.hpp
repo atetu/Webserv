@@ -31,7 +31,7 @@ class MethodHandlingFilter :
 		operator=(const MethodHandlingFilter &other);
 
 		void
-		doFilter(HTTPClient &client, Request &request, Response &response, FilterChain &next);
+		doFilter(HTTPClient &client, HTTPRequest &request, HTTPResponse &response, FilterChain &next);
 };
 
 #endif /* METHODHANDLINGFILTER_HPP_ */

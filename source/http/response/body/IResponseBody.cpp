@@ -1,31 +1,32 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Filter.hpp                                         :+:      :+:    :+:   */
+/*   IResponseBody.cpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ecaceres <ecaceres@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/01/06 18:45:19 by ecaceres          #+#    #+#             */
-/*   Updated: 2021/01/06 18:45:19 by ecaceres         ###   ########.fr       */
+/*   Created: 2021/01/07 17:09:17 by ecaceres          #+#    #+#             */
+/*   Updated: 2021/01/07 17:09:17 by ecaceres         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef FILTER_HPP_
-# define FILTER_HPP_
+#include <buffer/impl/FileDescriptorBuffer.hpp>
+#include <http/response/body/IResponseBody.hpp>
+#include <stddef.h>
 
-class HTTPClient;
-class HTTPRequest;
-class HTTPResponse;
-class FilterChain;
-
-class Filter
+IResponseBody::~IResponseBody()
 {
-	public:
-		virtual
-		~Filter();
+}
 
-		virtual void
-		doFilter(HTTPClient &client, HTTPRequest &request, HTTPResponse &response, FilterChain &next) = 0;
-};
+void
+IResponseBody::io(FileDescriptorBuffer **in, FileDescriptorBuffer **out)
+{
+	*in = NULL;
+	*out = NULL;
+}
 
-#endif /* FILTER_HPP_ */
+bool
+IResponseBody::isSelfManaged() const
+{
+	return (false);
+}

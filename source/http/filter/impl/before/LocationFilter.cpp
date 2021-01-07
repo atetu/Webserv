@@ -14,10 +14,10 @@
 #include <config/block/ServerBlock.hpp>
 #include <http/filter/FilterChain.hpp>
 #include <http/filter/impl/before/LocationFilter.hpp>
-#include <http/filter/x/Request.hpp>
 #include <http/HTTPClient.hpp>
 #include <http/parser/HTTPRequestParser.hpp>
 #include <http/parser/HTTPRequestPathParser.hpp>
+#include <http/request/HTTPRequest.hpp>
 #include <http/route/HTTPFindLocation.hpp>
 #include <io/File.hpp>
 #include <util/Macros.hpp>
@@ -47,7 +47,7 @@ LocationFilter::operator=(const LocationFilter &other)
 }
 
 void
-LocationFilter::doFilter(UNUSED HTTPClient &client, Request &request, UNUSED Response &response, FilterChain &next)
+LocationFilter::doFilter(UNUSED HTTPClient &client, HTTPRequest &request, UNUSED HTTPResponse &response, FilterChain &next)
 {
 	const ServerBlock &serverBlock = *request.serverBlock().get(); /* Should always have one. */
 	const Optional<std::list<const LocationBlock*> > &locations = serverBlock.locations();

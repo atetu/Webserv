@@ -31,7 +31,7 @@ class CGIFilter :
 		operator=(const CGIFilter &other);
 
 		void
-		doFilter(HTTPClient &client, Request &request, Response &response, FilterChain &next);
+		doFilter(HTTPClient &client, HTTPRequest &request, HTTPResponse &response, FilterChain &next);
 };
 
 #endif /* CGIFILTER_HPP_ */

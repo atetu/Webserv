@@ -230,6 +230,13 @@ HTTPRequestParser::consume(char c)
 			break;
 		}
 
+		case S_BODY:
+		{
+			m_state = S_END;
+
+			break;
+		}
+
 		case S_END:
 			break;
 
@@ -240,6 +247,12 @@ HTTPRequestParser::consume(char c)
 
 	m_last2 = m_last;
 	m_last = c;
+}
+
+HTTPRequestParser::State&
+HTTPRequestParser::state()
+{
+	return (m_state);
 }
 
 HTTPRequestParser::State
@@ -320,6 +333,6 @@ HTTPRequestParser::url(/*const LocationBlock *locationBlockPtr*/)
 //
 //		return (URL(path, m_pathParser.query(), m_pathParser.fragment()));
 //	}
-	
+
 	return (URL(m_pathParser.path(), m_pathParser.query(), m_pathParser.fragment()));
 }

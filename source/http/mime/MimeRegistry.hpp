@@ -99,7 +99,7 @@ class MimeRegistry
 		 * @return Found MIME instance. (or null if none)
 		 */
 		const Mime*
-		findByFileExtension(const std::string &type) const;
+		findByFileExtension(const std::string &extension) const;
 
 		/**
 		 * Load MIMEs from a compatible file.

@@ -14,7 +14,7 @@
 #include <http/enums/HTTPMethod.hpp>
 #include <http/filter/FilterChain.hpp>
 #include <http/filter/impl/before/IndexFilter.hpp>
-#include <http/filter/x/Request.hpp>
+#include <http/request/HTTPRequest.hpp>
 #include <io/File.hpp>
 #include <util/Enum.hpp>
 #include <util/Macros.hpp>
@@ -45,7 +45,7 @@ IndexFilter::operator =(const IndexFilter &other)
 }
 
 void
-IndexFilter::doFilter(UNUSED HTTPClient &client, Request &request, UNUSED Response &response, FilterChain &next)
+IndexFilter::doFilter(UNUSED HTTPClient &client, HTTPRequest &request, UNUSED HTTPResponse &response, FilterChain &next)
 {
 	Optional<const HTTPMethod*> methodOpt = request.method();
 	if (methodOpt.present())

@@ -11,11 +11,13 @@
 /* ************************************************************************** */
 
 #include <http/enums/HTTPMethod.hpp>
-#include <http/enums/HTTPStatus.hpp>
 #include <http/handler/methods/TraceHandler.hpp>
 #include <http/header/HTTPHeaderFields.hpp>
 #include <http/request/HTTPRequest.hpp>
+#include <http/response/HTTPResponse.hpp>
 #include <util/Enum.hpp>
+#include <util/Macros.hpp>
+#include <util/Optional.hpp>
 #include <util/URL.hpp>
 #include <string>
 
@@ -23,34 +25,34 @@ TraceHandler::TraceHandler()
 {
 }
 
+TraceHandler::TraceHandler(const TraceHandler &other)
+{
+	(void)other;
+}
+
 TraceHandler::~TraceHandler()
 {
 }
 
-HTTPResponse*
-TraceHandler::handle(HTTPRequest &request)
+TraceHandler&
+TraceHandler::operator =(const TraceHandler &other)
 {
-	HTTPHeaderFields headers;
+	(void)other;
 
-//#if 0 // TODO The 'status line' variable is never used
-	std::string method = request.method().name();
-	std::string path = request.url().path(); // TODO check queries and fragments with Nginx
-	std::string version = "HTTTP/1.1";
-	std::string statusLine = method + ' ' + path + ' ' + version + '\n';
-//#endif
-
-	std::string body = statusLine + request.headers().format("\n");
-
-	headers.httpMessage();
-	headers.contentLength(body.size());
-
-	return (string(*HTTPStatus::OK, body, headers));
+	return (*this);
 }
 
-TraceHandler&
-TraceHandler::get(void)
+void
+TraceHandler::handle(UNUSED HTTPRequest &request, HTTPResponse &response)
 {
-	static TraceHandler handler;
+	std::string method = request.method().get()->name();
+	std::string path = request.url().format();
+	std::string version = "HTTP/1.1";
+	std::string statusLine = method + ' ' + path + ' ' + version + '\n';
 
-	return (handler);
+	std::string head = statusLine + request.headers().format("\n");
+
+	response.headers().httpMessage();
+	response.headers().contentLength(head.size());
+	response.string(head);
 }

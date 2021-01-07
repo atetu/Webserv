@@ -14,9 +14,9 @@
 #include <http/enums/HTTPStatus.hpp>
 #include <http/filter/FilterChain.hpp>
 #include <http/filter/impl/before/AuthenticationFilter.hpp>
-#include <http/filter/x/Request.hpp>
-#include <http/filter/x/Response.hpp>
 #include <http/header/HTTPHeaderFields.hpp>
+#include <http/request/HTTPRequest.hpp>
+#include <http/response/HTTPResponse.hpp>
 #include <stddef.h>
 #include <util/Macros.hpp>
 #include <util/Optional.hpp>
@@ -45,7 +45,7 @@ AuthenticationFilter::operator=(const AuthenticationFilter &other)
 }
 
 void
-AuthenticationFilter::doFilter(UNUSED HTTPClient &client, Request &request, Response &response, FilterChain &next)
+AuthenticationFilter::doFilter(UNUSED HTTPClient &client, HTTPRequest &request, HTTPResponse &response, FilterChain &next)
 {
 	Optional<const AuthBlock*> authBlockOpt = request.authBlock();
 	if (authBlockOpt.absent())

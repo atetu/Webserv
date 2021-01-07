@@ -51,6 +51,7 @@ class HTTPRequestParser
 			S_HTTP_END2,
 			S_HTTP_END3,
 			S_HEADER_FIELDS,
+			S_BODY,
 			S_END,
 		};
 
@@ -70,6 +71,9 @@ class HTTPRequestParser
 
 		void
 		consume(char c);
+
+		State&
+		state();
 
 		State
 		state() const;

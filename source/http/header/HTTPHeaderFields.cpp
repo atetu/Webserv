@@ -165,6 +165,15 @@ HTTPHeaderFields::contentType(const Mime &mime)
 }
 
 HTTPHeaderFields&
+HTTPHeaderFields::contentType(const Optional<const Mime*> &optional)
+{
+	if (optional.absent())
+		return (*this);
+
+	return (set(CONTENT_TYPE, optional.get()->type()));
+}
+
+HTTPHeaderFields&
 HTTPHeaderFields::date(void)
 {
 	return (date(HTTPDate::now()));

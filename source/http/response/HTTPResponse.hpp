@@ -1,60 +1,84 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   HTTPResponse.hpp                                   :+:      :+:    :+:   */
+/*   Response.hpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ecaceres <ecaceres@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2020/12/20 19:46:03 by ecaceres          #+#    #+#             */
-/*   Updated: 2020/12/20 19:46:03 by ecaceres         ###   ########.fr       */
+/*   Created: 2021/01/06 18:51:19 by ecaceres          #+#    #+#             */
+/*   Updated: 2021/01/06 18:51:19 by ecaceres         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef HTTPRESPONSE_HPP_
 # define HTTPRESPONSE_HPP_
 
-#include <buffer/impl/FileDescriptorBuffer.hpp>
-#include <vector>
+#include <buffer/impl/BaseBuffer.hpp>
+#include <http/enums/HTTPStatus.hpp>
+#include <http/header/HTTPHeaderFields.hpp>
+#include <util/Optional.hpp>
 
-class SocketBuffer;
-class HTTPStatusLine;
+class IResponseBody;
+
+class HTTPStatus;
 
 class HTTPResponse
 {
 	public:
-		typedef std::vector<FileDescriptorBuffer*> fdb_vector;
-		typedef fdb_vector::iterator fdb_iterator;
-		typedef fdb_vector::const_iterator fdb_const_iterator;
+		class IBody;
 
 		enum State
 		{
-			NONE = 0,
-			CONNECTING,
-			STATUS_LINE,
-			HEADERS,
-			BODY,
-			FLUSHING,
-			FINISHED,
+			S_NONE,
+			S_HEADERS,
+			S_BODY,
+			S_FLUSH
 		};
 
+	private:
+		Optional<const HTTPStatus*> m_status;
+		HTTPHeaderFields m_headers;
+		IResponseBody *m_body;
+		bool m_ended;
+		State m_state;
+
 	public:
+		HTTPResponse();
+		HTTPResponse(const HTTPResponse &other);
+
 		virtual
 		~HTTPResponse();
 
-		virtual bool
-		write(SocketBuffer &socketBuffer) = 0;
+		HTTPResponse&
+		operator=(const HTTPResponse &other);
 
-		virtual void
-		readFileDescriptors(fdb_vector &out) = 0;
+		void
+		status(const HTTPStatus &status);
 
-		virtual void
-		writeFileDescriptors(fdb_vector &out) = 0;
+		Optional<const HTTPStatus*>&
+		status();
 
-		virtual HTTPStatusLine
-		statusLine() const = 0;
+		HTTPHeaderFields&
+		headers();
 
-		virtual State
-		state() const = 0;
+		void
+		body(IResponseBody *body, bool deletePrevious = true);
+
+		IResponseBody*
+		body();
+
+		void
+		end();
+
+		bool
+		ended();
+
+		void
+		string(const std::string &content);
+
+		bool
+		store(BaseBuffer &buffer);
+
 };
 
 #endif /* HTTPRESPONSE_HPP_ */

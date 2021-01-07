@@ -31,7 +31,7 @@ class HeadFilter :
 		operator=(const HeadFilter &other);
 
 		void
-		doFilter(HTTPClient &client, Request &request, Response &response, FilterChain &next);
+		doFilter(HTTPClient &client, HTTPRequest &request, HTTPResponse &response, FilterChain &next);
 };
 
 #endif /* HEADFILTER_HPP_ */

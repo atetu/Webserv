@@ -21,17 +21,18 @@
 #include <http/filter/impl/before/ServerFilter.hpp>
 #include <http/filter/impl/between/CGIFilter.hpp>
 #include <http/filter/impl/between/MethodHandlingFilter.hpp>
-#include <http/filter/x/Response.hpp>
+#include <http/response/HTTPResponse.hpp>
 #include <util/Optional.hpp>
 #include <util/Singleton.hpp>
 #include <iostream>
 #include <typeinfo>
 
-FilterChain::FilterChain(HTTPClient &client, Request &request, Response &response) :
+FilterChain::FilterChain(HTTPClient &client, HTTPRequest &request, HTTPResponse &response) :
 		m_client(client),
 		m_request(request),
 		m_response(response),
-		m_current()
+		m_current(),
+		m_beforePassed(false)
 {
 }
 
@@ -56,17 +57,24 @@ FilterChain::next()
 void
 FilterChain::doChaining()
 {
-	nextState(S_BEFORE);
-	next();
-
-	if (m_response.status().absent())
+	if (!m_beforePassed)
 	{
-		nextState(S_BETWEEN);
+		m_beforePassed = true;
+
+		nextState(S_BEFORE);
 		next();
 	}
+	else
+	{
+		if (m_response.status().absent())
+		{
+			nextState(S_BETWEEN);
+			next();
+		}
 
-	nextState(S_AFTER);
-	next();
+		nextState(S_AFTER);
+		next();
+	}
 }
 
 bool

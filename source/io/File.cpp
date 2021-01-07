@@ -166,6 +166,21 @@ File::remove(void) const
 		throw ioException();
 }
 
+bool
+File::tryRemove(void) const
+{
+	try
+	{
+		remove();
+
+		return (true);
+	}
+	catch (Exception &exception)
+	{
+		return (false);
+	}
+}
+
 File
 File::absolute() const
 {

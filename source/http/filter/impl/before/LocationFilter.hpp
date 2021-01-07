@@ -30,7 +30,7 @@ class LocationFilter :
 		operator=(const LocationFilter &other);
 
 		void
-		doFilter(HTTPClient &client, Request &request, Response &response, FilterChain &next);
+		doFilter(HTTPClient &client, HTTPRequest &request, HTTPResponse &response, FilterChain &next);
 };
 
 #endif /* LOCATIONFILTER_HPP_ */

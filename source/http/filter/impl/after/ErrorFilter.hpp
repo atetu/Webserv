@@ -36,7 +36,7 @@ class ErrorFilter :
 		operator=(const ErrorFilter &other);
 
 		void
-		doFilter(HTTPClient &client, Request &request, Response &response, FilterChain &next);
+		doFilter(HTTPClient &client, HTTPRequest &request, HTTPResponse &response, FilterChain &next);
 };
 
 #endif /* ERRORFILTER_HPP_ */

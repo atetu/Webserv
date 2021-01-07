@@ -31,7 +31,7 @@ class IndexFilter :
 		operator=(const IndexFilter &other);
 
 		void
-		doFilter(HTTPClient &client, Request &request, Response &response, FilterChain &next);
+		doFilter(HTTPClient &client, HTTPRequest &request, HTTPResponse &response, FilterChain &next);
 };
 
 #endif /* INDEXFILTER_HPP_ */

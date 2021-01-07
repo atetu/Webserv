@@ -21,23 +21,21 @@
 #include <http/HTTPServer.hpp>
 #include <http/request/HTTPRequest.hpp>
 #include <io/File.hpp>
+#include <log/LoggerFactory.hpp>
 #include <net/address/InetAddress.hpp>
 #include <net/address/InetSocketAddress.hpp>
 #include <os/detect_platform.h>
 #include <sys/errno.h>
 #include <sys/unistd.h>
-#include <unistd.h>
 #include <util/Convert.hpp>
-#include <util/Enum.hpp>
 #include <util/helper/DeleteHelper.hpp>
-#include <log/LoggerFactory.hpp>
 #include <util/Optional.hpp>
 #include <util/StringUtils.hpp>
 #include <util/URL.hpp>
 #include <webserv.hpp>
 #include <cstdlib>
-#include <cstring>
 #include <iostream>
+#include <list>
 #include <map>
 
 const std::string CommonGatewayInterface::ENV_AUTH_TYPE = "AUTH_TYPE";
@@ -135,7 +133,7 @@ CommonGatewayInterface::execute(HTTPClient &client, const CGIBlock &cgiBlock, co
 			env.setProperty(it->first, it->second);
 	}
 
-	HTTPRequest &request = *client.request();
+	HTTPRequest &request = client.request();
 
 	File scriptFile(request.resource());
 	File scriptAbsoluteFile(request.root(), scriptFile);
@@ -143,41 +141,39 @@ CommonGatewayInterface::execute(HTTPClient &client, const CGIBlock &cgiBlock, co
 	env.setProperty(ENV_GATEWAY_INTERFACE, "CGI/1.1");
 	env.setProperty(ENV_REMOTE_ADDR, client.socketAddress().address()->hostAddress());
 	env.setProperty(ENV_REMOTE_PORT, Convert::toString(client.socketAddress().port()));
-	env.setProperty(ENV_REQUEST_METHOD, request.method().name());
+	env.setProperty(ENV_REQUEST_METHOD, request.method().get()->name());
 	env.setProperty(ENV_REQUEST_URI, request.url().path());
 	env.setProperty(ENV_SCRIPT_FILENAME, scriptAbsoluteFile.path());
 	env.setProperty(ENV_SCRIPT_NAME, request.url().path());
 	env.setProperty(ENV_SERVER_NAME, client.httpServer().host());
 	env.setProperty(ENV_SERVER_PORT, Convert::toString(client.httpServer().port()));
-	env.setProperty(ENV_SERVER_PROTOCOL, request.version().format());
+	env.setProperty(ENV_SERVER_PROTOCOL, HTTPVersion::HTTP_1_1.format()); // TODO Put in HTTPRequest
 	env.setProperty(ENV_SERVER_SOFTWARE, APPLICATION_NAME_AND_VERSION);
 	env.setProperty(ENV_PATH_INFO, scriptFile.parent().path());
 	env.setProperty(ENV_PATH_TRANSLATED, scriptAbsoluteFile.parent().path());
 	env.setProperty(ENV_QUERY_STRING, request.url().queryString());
 
-	if (request.method().hasBody())
+	if (request.method().get()->hasBody())
 	{
-		env.setProperty(ENV_CONTENT_LENGTH, Convert::toString(request.body().length()));
+//		env.setProperty(ENV_CONTENT_LENGTH, Convert::toString(request.body().length()));
 
 		Optional<std::string> optional = request.headers().get(HTTPHeaderFields::CONTENT_TYPE);
 		if (optional.present())
 			env.setProperty(ENV_CONTENT_TYPE, optional.get());
 	}
 
-	if (request.needAuth()) // TODO Need to be changed to authorization objects
+	Optional<const AuthBlock*> authBlockOpt = request.authBlock();
+	if (authBlockOpt.present()) // TODO Need to be changed to authorization objects
 	{
-		const AuthBlock *authBlock = request.auth();
+		const AuthBlock &authBlock = *authBlockOpt.get();
 
-		if (authBlock)
+		env.setProperty(ENV_AUTH_TYPE, authBlock.prettyType());
+
+		const BasicAuthBlock *basicAuthBlock = dynamic_cast<BasicAuthBlock const*>(&authBlock);
+		if (basicAuthBlock)
 		{
-			env.setProperty(ENV_AUTH_TYPE, authBlock->prettyType());
-
-			const BasicAuthBlock *basicAuthBlock = dynamic_cast<BasicAuthBlock const*>(authBlock);
-			if (basicAuthBlock)
-			{
-				env.setProperty(ENV_REMOTE_USER, basicAuthBlock->user());
-				env.setProperty(ENV_REMOTE_IDENT, basicAuthBlock->user());
-			}
+			env.setProperty(ENV_REMOTE_USER, basicAuthBlock->user());
+			env.setProperty(ENV_REMOTE_IDENT, basicAuthBlock->user());
 		}
 	}
 
@@ -258,11 +254,11 @@ CommonGatewayInterface::execute(HTTPClient &client, const CGIBlock &cgiBlock, co
 
 		CommonGatewayInterface *cgi = new CommonGatewayInterface(pid, *stdin, *stdout);
 
-		if (request.method().hasBody()) // TODO Operation is blocking
-		{
-			cgi->in().write(request.body().c_str(), request.body().length());
-			//::write(1, request.body().c_str(), request.body().length());
-		}
+//		if (request.method().get().hasBody()) // TODO Operation is blocking
+//		{
+//			cgi->in().write(request.body().c_str(), request.body().length());
+//			//::write(1, request.body().c_str(), request.body().length());
+//		}
 
 		return (cgi);
 	}

@@ -13,12 +13,13 @@
 #ifndef HTTPCLIENT_HPP_
 # define HTTPCLIENT_HPP_
 
+#include <http/filter/FilterChain.hpp>
 #include <http/parser/HTTPRequestParser.hpp>
+#include <http/request/HTTPRequest.hpp>
+#include <http/response/HTTPResponse.hpp>
 #include <io/Socket.hpp>
 #include <net/address/InetSocketAddress.hpp>
 
-class HTTPRequest;
-class HTTPResponse;
 class HTTPServer;
 class SocketBuffer;
 
@@ -32,8 +33,9 @@ class HTTPClient
 		const HTTPServer &m_server;
 		HTTPRequestParser m_parser;
 		unsigned long m_lastAction;
-		HTTPRequest *m_request;
-		HTTPResponse *m_response;
+		HTTPRequest m_request;
+		HTTPResponse m_response;
+		FilterChain m_filterChain;
 
 		HTTPClient(void);
 		HTTPClient(const HTTPClient &other);
@@ -92,28 +94,40 @@ class HTTPClient
 			return (m_lastAction);
 		}
 
-		inline HTTPRequest*&
+		inline HTTPRequest&
 		request(void)
 		{
 			return (m_request);
 		}
 
-		inline const HTTPRequest*
+		inline const HTTPRequest&
 		request(void) const
 		{
 			return (m_request);
 		}
 
-		inline HTTPResponse*&
+		inline HTTPResponse&
 		response(void)
 		{
 			return (m_response);
 		}
 
-		inline const HTTPResponse*
+		inline const HTTPResponse&
 		response(void) const
 		{
 			return (m_response);
+		}
+
+		inline FilterChain&
+		filterChain(void)
+		{
+			return (m_filterChain);
+		}
+
+		inline const FilterChain&
+		filterChain(void) const
+		{
+			return (m_filterChain);
 		}
 };
 

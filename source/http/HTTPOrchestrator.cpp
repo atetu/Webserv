@@ -10,42 +10,39 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+#include <buffer/impl/SocketBuffer.hpp>
 #include <config/block/RootBlock.hpp>
 #include <config/block/ServerBlock.hpp>
 #include <config/Configuration.hpp>
 #include <exception/IOException.hpp>
 #include <http/enums/HTTPMethod.hpp>
 #include <http/enums/HTTPStatus.hpp>
+#include <http/filter/FilterChain.hpp>
 #include <http/handler/HTTPMethodHandler.hpp>
 #include <http/header/HTTPDate.hpp>
 #include <http/header/HTTPHeaderFields.hpp>
 #include <http/HTTPOrchestrator.hpp>
-#include <http/request/HTTPRequest.hpp>
-#include <http/request/HTTPRequestProcessor.hpp>
 #include <http/parser/HTTPRequestParser.hpp>
+#include <http/request/HTTPRequest.hpp>
+#include <http/response/body/IResponseBody.hpp>
 #include <http/response/HTTPResponse.hpp>
-#include <http/response/HTTPStatusLine.hpp>
-#include <http/response/impl/generic/GenericHTTPResponse.hpp>
 #include <io/Socket.hpp>
+#include <log/Logger.hpp>
+#include <log/LoggerFactory.hpp>
 #include <net/address/InetAddress.hpp>
 #include <net/address/InetSocketAddress.hpp>
 #include <sys/errno.h>
 #include <sys/types.h>
-#include <buffer/impl/SocketBuffer.hpp>
-#include <util/Enum.hpp>
 #include <util/Environment.hpp>
-#include <log/Logger.hpp>
-#include <log/LoggerFactory.hpp>
 #include <util/Optional.hpp>
 #include <util/System.hpp>
 #include <util/URL.hpp>
 #include <cstring>
 #include <iostream>
-#include <iterator>
+#include <new>
 #include <set>
 #include <string>
 #include <utility>
-#include <vector>
 
 Logger &HTTPOrchestrator::LOG = LoggerFactory::get("Orchestrator");
 
@@ -210,7 +207,10 @@ HTTPOrchestrator::start()
 							HTTPClient &httpClient = *(new HTTPClient(*socket, socketAddress, httpServer));
 
 							if (clientFds.size() >= (unsigned long)m_configuration.rootBlock().maxActiveClient().orElse(RootBlock::DEFAULT_MAX_ACTIVE_CLIENT))
-								httpClient.response() = HTTPMethodHandler::status(*HTTPStatus::SERVICE_UNAVAILABLE, HTTPHeaderFields().retryAfter(10));
+							{
+								httpClient.response().status(*HTTPStatus::SERVICE_UNAVAILABLE);
+								httpClient.response().headers().retryAfter(10);
+							}
 
 							addClient(httpClient);
 						}
@@ -274,7 +274,7 @@ HTTPOrchestrator::start()
 
 						HTTPClient &client = *it->second;
 
-						if (canRead && !client.response())
+						if (canRead && client.response().status().absent())
 						{
 							if (client.in().size() != 0 || client.in().recv() > 0)
 							{
@@ -291,38 +291,43 @@ HTTPOrchestrator::start()
 									{
 										LOG.debug() << exception.message() << std::endl;
 
-										client.response() = GenericHTTPResponse::status(*HTTPStatus::BAD_REQUEST);
+										client.response().status(*HTTPStatus::BAD_REQUEST);
 									}
 
-									if (!client.response())
+									if (client.response().status().absent())
 									{
 										try
 										{
 											if (client.parser().state() == HTTPRequestParser::S_END)
-												HTTPRequestProcessor(m_configuration, m_environment).process(client);
+											{
+												client.request() = HTTPRequest(m_configuration, client.parser().url());
+												client.filterChain().doChaining();
+
+												if (client.response().status().absent() && client.request().method().present() && client.request().method().get()->hasBody())
+													client.parser().state() = HTTPRequestParser::S_BODY;
+
+												if (!client.response().body())
+													client.filterChain().doChaining();
+											}
 										}
 										catch (Exception &exception)
 										{
-											client.response() = GenericHTTPResponse::status(*HTTPStatus::INTERNAL_SERVER_ERROR);
+											client.response().status(*HTTPStatus::INTERNAL_SERVER_ERROR);
 										}
 									}
 
-									if (client.response())
+									if (client.response().body())
 									{
-										HTTPResponse::fdb_vector buffers;
+										FileDescriptorBuffer *read = NULL;
+										FileDescriptorBuffer *write = NULL;
 
-										client.response()->readFileDescriptors(buffers);
-										for (HTTPResponse::fdb_iterator it = buffers.begin(); it != buffers.end(); it++)
-										{
-//											std::cout << "read\n";
-											addFileDescriptorBufferRead(*(*it));
-										}
+										client.response().body()->io(&read, &write);
 
-										buffers.clear();
+										if (read)
+											addFileDescriptorBufferRead(*read);
 
-										client.response()->writeFileDescriptors(buffers);
-										for (HTTPResponse::fdb_iterator it = buffers.begin(); it != buffers.end(); it++)
-											addFileDescriptorBufferWrite(*(*it));
+										if (write)
+											addFileDescriptorBufferRead(*write);
 
 										break;
 									}
@@ -332,10 +337,10 @@ HTTPOrchestrator::start()
 
 						if (canWrite && !deleted)
 						{
-							if (client.response())
+							if (client.response().ended())
 							{
 								ssize_t sent = client.out().send();
-								if (sent != -1 && (sent > 0 || !client.response()->write(client.out())))
+								if (sent != -1 && (sent > 0 || !client.response().store(client.out())))
 									client.updateLastAction();
 								else
 								{
@@ -350,16 +355,16 @@ HTTPOrchestrator::start()
 							}
 						}
 
-						if (!deleted && client.response() && client.response()->state() == HTTPResponse::FINISHED)
-						{
-							std::cout << "done: " << fd << std::endl;
-
-							fdToRemove.insert(fdToRemove.end(), fd);
-
-							deleted = true;
-
-							continue;
-						}
+//						if (!deleted && client.response().ended() && client.response()->state() == HTTPResponse::S_FLUSH)
+//						{
+//							std::cout << "done: " << fd << std::endl;
+//
+//							fdToRemove.insert(fdToRemove.end(), fd);
+//
+//							deleted = true;
+//
+//							continue;
+//						}
 					}
 
 					for (std::set<int>::iterator it = fdToRemove.begin(); it != fdToRemove.end(); it++)
@@ -555,32 +560,31 @@ HTTPOrchestrator::removeClient(int fd)
 	{
 		HTTPClient &client = *found->second;
 
-		if (client.response())
+		if (client.response().body())
 		{
-			HTTPResponse::fdb_vector buffers;
+			FileDescriptorBuffer *read = NULL;
+			FileDescriptorBuffer *write = NULL;
 
-			client.response()->readFileDescriptors(buffers);
-			for (HTTPResponse::fdb_iterator it = buffers.begin(); it != buffers.end(); it++)
-				removeFileRead((*it)->descriptor().raw());
+			client.response().body()->io(&read, &write);
 
-			buffers.clear();
+			if (read)
+				removeFileRead(read->descriptor().raw());
 
-			client.response()->writeFileDescriptors(buffers);
-			for (HTTPResponse::fdb_iterator it = buffers.begin(); it != buffers.end(); it++)
-				removeFileWrite((*it)->descriptor().raw());
+			if (write)
+				removeFileWrite(write->descriptor().raw());
+		}
 
-			if (client.request() && LOG.isInfoEnabled())
-			{
-				LOG.info() << '[' << HTTPDate::now().format() << "] "
-				/**/<< client.socketAddress().hostAddress()
-				/**/<< " - "
-				/**/<< client.request()->method().name()
-				/**/<< " "
-				/**/<< client.request()->url().path()
-				/**/<< " :: "
-				/**/<< client.response()->statusLine().status().code()
-				/**/<< std::endl;
-			}
+		if (client.response().ended() && LOG.isInfoEnabled())
+		{
+			LOG.info() << '[' << HTTPDate::now().format() << "] "
+			/**/<< client.socketAddress().hostAddress()
+			/**/<< " - "
+			/**/<< client.request().method().get()->name() // TODO Unsafe
+			/**/<< " "
+			/**/<< client.request().url().path()
+			/**/<< " :: "
+			/**/<< client.response().status().get()->code()
+			/**/<< std::endl;
 		}
 
 		clearFd(fd);

@@ -15,27 +15,31 @@
 
 #include <http/handler/HTTPMethodHandler.hpp>
 #include <io/File.hpp>
+#include <util/Singleton.hpp>
 #include <string>
 
+class URL;
+
 class GetHandler :
-		public HTTPMethodHandler
+		public HTTPMethodHandler,
+		public Singleton<GetHandler>
 {
 	public:
 		GetHandler();
+		GetHandler(const GetHandler &other);
 
 		virtual
 		~GetHandler();
 
-		HTTPResponse*
-		handle(HTTPRequest &request);
+		GetHandler&
+		operator =(const GetHandler &other);
+
+		void
+		handle(HTTPRequest &request, HTTPResponse &response);
 
 	private:
 		std::string
 		listing(const URL &url, const File &file);
-
-	public:
-		static GetHandler&
-		get(void);
 };
 
 #endif /* GETHANDLER_HPP_ */

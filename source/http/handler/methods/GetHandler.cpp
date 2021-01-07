@@ -10,73 +10,101 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+#include <buffer/impl/FileDescriptorBuffer.hpp>
 #include <config/Configuration.hpp>
 #include <http/enums/HTTPStatus.hpp>
 #include <http/handler/methods/GetHandler.hpp>
 #include <http/header/HTTPHeaderFields.hpp>
+#include <http/mime/Mime.hpp>
+#include <http/mime/MimeRegistry.hpp>
 #include <http/request/HTTPRequest.hpp>
-#include <io/File.hpp>
+#include <http/response/body/impl/FileResponseBody.hpp>
+#include <http/response/HTTPResponse.hpp>
 #include <io/FileDescriptor.hpp>
+#include <stddef.h>
 #include <sys/fcntl.h>
-#include <util/StringUtils.hpp>
+#include <util/helper/DeleteHelper.hpp>
+#include <util/Optional.hpp>
 #include <util/URL.hpp>
 #include <list>
-#include <string>
+
+class FileDescriptorBuffer;
 
 GetHandler::GetHandler()
 {
+}
+
+GetHandler::GetHandler(const GetHandler &other)
+{
+	(void)other;
 }
 
 GetHandler::~GetHandler()
 {
 }
 
-HTTPResponse*
-GetHandler::handle(HTTPRequest &request)
+GetHandler&
+GetHandler::operator =(const GetHandler &other)
 {
-	HTTPHeaderFields headers;
+	(void)other;
 
+	return (*this);
+}
+
+void
+GetHandler::handle(HTTPRequest &request, HTTPResponse &response)
+{
 	File targetFile(request.root(), request.resource());
-	//std::cout << targetFile.path() << std::endl;
+
 	if (!targetFile.exists())
-		return (error(request, *HTTPStatus::NOT_FOUND));
+		return (response.status(*HTTPStatus::NOT_FOUND));
 
 	if (targetFile.isFile())
 	{
-		headers.contentLength(targetFile.length());
+		size_t contentLength = targetFile.length();
+		Optional<const Mime*> contentType;
 
 		std::string extension;
 		if (request.url().extension(extension))
-			headers.contentType(request.configuration().mimeRegistry(), extension);
+			contentType = Optional<const Mime*>::ofNullable(request.configuration().mimeRegistry().findByFileExtension(extension));
 
-		if (request.method().name() == "GET")
-			return (file(*HTTPStatus::OK, *targetFile.open(O_RDONLY), headers));
-		else if (request.method().name() == "HEAD")
-			return (statusEmpty(*HTTPStatus::OK, headers));
+		FileDescriptor *fd = NULL;
+		FileDescriptorBuffer *fdBuffer = NULL;
+
+		try
+		{
+			fd = targetFile.open(O_RDONLY);
+			fdBuffer = FileDescriptorBuffer::from(*fd, FileDescriptorBuffer::CLOSE | FileDescriptorBuffer::DELETE);
+
+			response.body(new FileResponseBody(*fdBuffer));
+			response.headers().contentLength(contentLength);
+			response.headers().contentType(contentType);
+			response.status(*HTTPStatus::OK);
+		}
+		catch (...)
+		{
+			if (fdBuffer)
+				DeleteHelper::pointer<FileDescriptorBuffer>(fdBuffer);
+			else
+				DeleteHelper::pointer<FileDescriptor>(fd); /* In case of memory allocation failing for the body. */
+
+			throw;
+		}
+
+		return;
 	}
 
 	if (targetFile.isDirectory())
 	{
-		if (request.location().present())
-		{
-			const LocationBlock &locationBlock = *request.location().get();
+		if (!request.listing())
+			return (response.status(*HTTPStatus::FORBIDDEN));
 
-			if (!locationBlock.listing().orElse(false))
-				return (error(request, *HTTPStatus::NOT_FOUND)); // changed the forbidden in not found for directory/nop
-		}
-
-		std::string content = listing(request.url(), targetFile);
-
-		headers.html();
-		headers.contentLength(content.size());
-
-		if (request.method().name() == "GET")
-			return (string(*HTTPStatus::OK, content, headers));
-		else if (request.method().name() == "HEAD")
-			return (statusEmpty(*HTTPStatus::OK, headers));
+		response.string(listing(request.url(), targetFile));
+		response.headers().html();
+		return (response.status(*HTTPStatus::OK));
 	}
 
-	return (error(request, *HTTPStatus::NOT_FOUND));
+	return (response.status(*HTTPStatus::NOT_FOUND));
 }
 
 std::string
@@ -113,12 +141,4 @@ GetHandler::listing(const URL &url, const File &file)
 			"</html>\n";
 
 	return (out);
-}
-
-GetHandler&
-GetHandler::get(void)
-{
-	static GetHandler handler;
-
-	return (handler);
 }

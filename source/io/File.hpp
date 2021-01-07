@@ -20,6 +20,10 @@
 #include <list>
 #include <string>
 
+#if 1
+#include <sys/fcntl.h>
+#endif
+
 class FileDescriptor;
 
 class File
@@ -74,6 +78,9 @@ class File
 
 		void
 		remove(void) const;
+
+		bool
+		tryRemove(void) const;
 
 		size_t
 		length() const;

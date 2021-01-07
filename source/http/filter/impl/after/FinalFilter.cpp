@@ -12,8 +12,8 @@
 
 #include <http/filter/FilterChain.hpp>
 #include <http/filter/impl/after/FinalFilter.hpp>
-#include <http/filter/x/Response.hpp>
 #include <http/header/HTTPHeaderFields.hpp>
+#include <http/response/HTTPResponse.hpp>
 #include <util/Macros.hpp>
 
 FinalFilter::FinalFilter()
@@ -38,10 +38,11 @@ FinalFilter::operator=(const FinalFilter &other)
 }
 
 void
-FinalFilter::doFilter(UNUSED HTTPClient &client, UNUSED Request &request, Response &response, FilterChain &next)
+FinalFilter::doFilter(UNUSED HTTPClient &client, UNUSED HTTPRequest &request, HTTPResponse &response, FilterChain &next)
 {
 	response.headers().date();
 	response.headers().server();
+	response.end();
 
 	return (next());
 }

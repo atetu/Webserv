@@ -14,22 +14,24 @@
 # define TRACEHANDLER_HPP_
 
 #include <http/handler/HTTPMethodHandler.hpp>
+#include <util/Singleton.hpp>
 
 class TraceHandler :
-		public HTTPMethodHandler
+		public HTTPMethodHandler,
+		public Singleton<TraceHandler>
 {
 	public:
 		TraceHandler();
+		TraceHandler(const TraceHandler &other);
 
 		virtual
 		~TraceHandler();
 
-		HTTPResponse*
-		handle(HTTPRequest &request);
+		TraceHandler&
+		operator =(const TraceHandler &other);
 
-	public:
-		static TraceHandler&
-		get(void);
+		void
+		handle(HTTPRequest &request, HTTPResponse &response);
 };
 
 #endif /* TraceHANDLER_HPP_ */

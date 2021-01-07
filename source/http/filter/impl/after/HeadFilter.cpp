@@ -13,11 +13,11 @@
 #include <http/enums/HTTPMethod.hpp>
 #include <http/filter/FilterChain.hpp>
 #include <http/filter/impl/after/HeadFilter.hpp>
-#include <http/filter/x/Request.hpp>
-#include <http/filter/x/Response.hpp>
+#include <http/request/HTTPRequest.hpp>
+#include <http/response/HTTPResponse.hpp>
 #include <stddef.h>
-#include <util/Optional.hpp>
 #include <util/Macros.hpp>
+#include <util/Optional.hpp>
 
 HeadFilter::HeadFilter()
 {
@@ -41,7 +41,7 @@ HeadFilter::operator=(const HeadFilter &other)
 }
 
 void
-HeadFilter::doFilter(UNUSED HTTPClient &client, UNUSED Request &request, Response &response, FilterChain &next)
+HeadFilter::doFilter(UNUSED HTTPClient &client, UNUSED HTTPRequest &request, HTTPResponse &response, FilterChain &next)
 {
 	if (request.method().get() == HTTPMethod::HEAD)
 		response.body(NULL);

@@ -10,9 +10,15 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+#include <http/enums/HTTPMethod.hpp>
 #include <http/filter/FilterChain.hpp>
 #include <http/filter/impl/between/MethodHandlingFilter.hpp>
+#include <http/handler/HTTPMethodHandler.hpp>
+#include <http/request/HTTPRequest.hpp>
+#include <http/response/HTTPResponse.hpp>
 #include <util/Macros.hpp>
+#include <util/Optional.hpp>
+#include <iostream>
 
 MethodHandlingFilter::MethodHandlingFilter()
 {
@@ -36,7 +42,11 @@ MethodHandlingFilter::operator=(const MethodHandlingFilter &other)
 }
 
 void
-MethodHandlingFilter::doFilter(UNUSED HTTPClient &client, UNUSED Request &request, UNUSED Response &response, FilterChain &next)
+MethodHandlingFilter::doFilter(UNUSED HTTPClient &client, UNUSED HTTPRequest &request, UNUSED HTTPResponse &response, FilterChain &next)
 {
+	request.method().get()->handler().handle(request, response);
+	std::cout << response.status().get()->name() << std::endl;
+	std::cout << response.body() << std::endl;
+
 	return (next());
 }

@@ -1,31 +1,36 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Filter.hpp                                         :+:      :+:    :+:   */
+/*   IResponseBody.hpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ecaceres <ecaceres@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/01/06 18:45:19 by ecaceres          #+#    #+#             */
-/*   Updated: 2021/01/06 18:45:19 by ecaceres         ###   ########.fr       */
+/*   Created: 2021/01/07 17:08:17 by ecaceres          #+#    #+#             */
+/*   Updated: 2021/01/07 17:08:17 by ecaceres         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef FILTER_HPP_
-# define FILTER_HPP_
+#ifndef IRESPONSEBODY_HPP_
+# define IRESPONSEBODY_HPP_
 
-class HTTPClient;
-class HTTPRequest;
-class HTTPResponse;
-class FilterChain;
+#include <buffer/impl/BaseBuffer.hpp>
 
-class Filter
+class FileDescriptorBuffer;
+
+class IResponseBody
 {
 	public:
 		virtual
-		~Filter();
+		~IResponseBody();
+
+		virtual bool
+		store(BaseBuffer &buffer) = 0;
 
 		virtual void
-		doFilter(HTTPClient &client, HTTPRequest &request, HTTPResponse &response, FilterChain &next) = 0;
+		io(FileDescriptorBuffer **in, FileDescriptorBuffer **out);
+
+		virtual bool
+		isSelfManaged() const;
 };
 
-#endif /* FILTER_HPP_ */
+#endif /* IRESPONSEBODY_HPP_ */

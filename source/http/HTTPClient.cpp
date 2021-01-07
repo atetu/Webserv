@@ -10,13 +10,9 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <http/HTTPClient.hpp>
-#include <http/request/HTTPRequest.hpp>
-#include <http/response/HTTPResponse.hpp>
-#include <stddef.h>
 #include <buffer/impl/FileDescriptorBuffer.hpp>
 #include <buffer/impl/SocketBuffer.hpp>
-#include <util/helper/DeleteHelper.hpp>
+#include <http/HTTPClient.hpp>
 #include <util/System.hpp>
 
 HTTPClient::HTTPClient(Socket &socket, InetSocketAddress socketAddress, const HTTPServer &server) :
@@ -27,8 +23,9 @@ HTTPClient::HTTPClient(Socket &socket, InetSocketAddress socketAddress, const HT
 		m_server(server),
 		m_parser(),
 		m_lastAction(),
-		m_request(NULL),
-		m_response(NULL)
+		m_request(),
+		m_response(),
+		m_filterChain(*this, m_request, m_response)
 {
 	updateLastAction();
 }
@@ -38,9 +35,6 @@ HTTPClient::~HTTPClient(void)
 	delete &m_in;
 	delete &m_out;
 	delete &m_socket;
-
-	DeleteHelper::pointer<HTTPRequest>(m_request);
-	DeleteHelper::pointer<HTTPResponse>(m_response);
 }
 
 void

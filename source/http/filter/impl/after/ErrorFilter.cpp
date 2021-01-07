@@ -10,15 +10,18 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+#include <buffer/impl/FileDescriptorBuffer.hpp>
 #include <config/block/container/CustomErrorMap.hpp>
 #include <config/block/ServerBlock.hpp>
 #include <exception/Exception.hpp>
 #include <http/enums/HTTPStatus.hpp>
 #include <http/filter/FilterChain.hpp>
 #include <http/filter/impl/after/ErrorFilter.hpp>
-#include <http/filter/x/Request.hpp>
-#include <http/filter/x/Response.hpp>
 #include <http/page/DefaultPages.hpp>
+#include <http/request/HTTPRequest.hpp>
+#include <http/response/body/impl/FileResponseBody.hpp>
+#include <http/response/body/impl/StringResponseBody.hpp>
+#include <http/response/HTTPResponse.hpp>
 #include <io/File.hpp>
 #include <io/FileDescriptor.hpp>
 #include <log/Logger.hpp>
@@ -56,55 +59,74 @@ ErrorFilter::operator=(const ErrorFilter &other)
 }
 
 void
-ErrorFilter::doFilter(UNUSED HTTPClient &client, UNUSED Request &request, Response &response, FilterChain &next)
+ErrorFilter::doFilter(UNUSED HTTPClient &client, UNUSED HTTPRequest &request, HTTPResponse &response, FilterChain &next)
 {
+	std::cout << 'a' << std::endl;
+
 	if (!response.status().present())
 		return (next());
+
+	std::cout << 'b' << std::endl;
 
 	const HTTPStatus &status = *response.status().get();
 	if (!status.isError())
 		return (next());
 
-	if (dynamic_cast<Response::CGIBody*>(response.body()))
+	std::cout << 'c' << std::endl;
+	std::cout << response.body() << std::endl;
+
+	if (response.body() && response.body()->isSelfManaged())
 		return (next());
+
+	std::cout << 'd' << std::endl;
 
 	if (!request.serverBlock().present())
 		return (next());
 
+	std::cout << 'e' << std::endl;
+
 	const ServerBlock &serverBlock = *request.serverBlock().get();
 
-	if (!serverBlock.errors().present())
-		return (next());
+	std::cout << 'g' << std::endl;
 
 	bool success = false;
-
-	const CustomErrorMap &errorMap = serverBlock.errors().get();
-	if (errorMap.has(status))
+	if (serverBlock.errors().present())
 	{
-		File errorFile(request.root(), errorMap.get(status));
 
-		FileDescriptor *fd = NULL;
-		try
+		std::cout << 'h' << std::endl;
+		const CustomErrorMap &errorMap = serverBlock.errors().get();
+		if (errorMap.has(status))
 		{
-			fd = errorFile.open(O_RDONLY);
+			File errorFile(request.root(), errorMap.get(status));
 
-			response.body(new Response::FileBody(*fd));
-
-			success = true;
-		}
-		catch (Exception &exception)
-		{
-			DeleteHelper::pointer<FileDescriptor>(fd); /* In case of memory allocation failing for the body. */
-
-			if (LOG.isDebugEnabled())
+			FileDescriptor *fd = NULL;
+			FileDescriptorBuffer *fdBuffer = NULL;
+			try
 			{
-				LOG.debug() << "Failed to open custom error file: " << exception.message() << std::endl;
+				fd = errorFile.open(O_RDONLY);
+				fdBuffer = FileDescriptorBuffer::from(*fd, FileDescriptorBuffer::CLOSE | FileDescriptorBuffer::DELETE);
+
+				std::cout << 'i' << std::endl;
+				response.body(new FileResponseBody(*fdBuffer));
+
+				success = true;
+			}
+			catch (Exception &exception)
+			{
+				if (fdBuffer)
+					DeleteHelper::pointer<FileDescriptorBuffer>(fdBuffer);
+				else
+					DeleteHelper::pointer<FileDescriptor>(fd); /* In case of memory allocation failing for the body. */
+
+				if (LOG.isDebugEnabled())
+					LOG.debug() << "Failed to open custom error file: " << exception.message() << std::endl;
 			}
 		}
 	}
 
+	std::cout << success << std::endl;
 	if (!success)
-		response.body(new Response::StringBody(DefaultPages::instance().resolve(status)));
+		response.body(new StringResponseBody(DefaultPages::instance().resolve(status)));
 
 	return (next());
 }

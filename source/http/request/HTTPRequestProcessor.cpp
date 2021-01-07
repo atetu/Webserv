@@ -10,42 +10,18 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <buffer/impl/BaseBuffer.hpp>
-#include <buffer/impl/SocketBuffer.hpp>
-#include <config/block/AuthBlock.hpp>
-#include <config/block/CGIBlock.hpp>
-#include <config/block/LocationBlock.hpp>
-#include <config/block/RootBlock.hpp>
 #include <config/block/ServerBlock.hpp>
-#include <config/Configuration.hpp>
-#include <exception/Exception.hpp>
-#include <http/cgi/CommonGatewayInterface.hpp>
-#include <http/enums/HTTPMethod.hpp>
-#include <http/enums/HTTPStatus.hpp>
-#include <http/enums/HTTPVersion.hpp>
 #include <http/filter/FilterChain.hpp>
-#include <http/filter/x/Request.hpp>
-#include <http/filter/x/Response.hpp>
-#include <http/handler/HTTPMethodHandler.hpp>
 #include <http/header/HTTPHeaderFields.hpp>
 #include <http/HTTPClient.hpp>
 #include <http/HTTPServer.hpp>
 #include <http/parser/HTTPRequestParser.hpp>
-#include <http/parser/HTTPRequestPathParser.hpp>
+#include <http/request/HTTPRequest.hpp>
 #include <http/request/HTTPRequestProcessor.hpp>
-#include <http/request/impl/GenericHTTPRequest.hpp>
-#include <http/request/impl/SubHTTPRequest.hpp>
-#include <http/response/HTTPStatusLine.hpp>
-#include <http/response/impl/cgi/CGIHTTPResponse.hpp>
-#include <http/route/HTTPFindLocation.hpp>
-#include <io/File.hpp>
-#include <log/Logger.hpp>
+#include <http/response/HTTPResponse.hpp>
 #include <log/LoggerFactory.hpp>
-#include <stddef.h>
-#include <util/Enum.hpp>
 #include <util/Environment.hpp>
 #include <util/Optional.hpp>
-#include <util/StringUtils.hpp>
 #include <util/URL.hpp>
 #include <iostream>
 #include <list>
@@ -66,8 +42,8 @@ HTTPRequestProcessor::~HTTPRequestProcessor()
 void
 HTTPRequestProcessor::process(HTTPClient &client)
 {
-	Request request(m_configuration, client.parser().url());
-	Response response;
+	HTTPRequest request(m_configuration, client.parser().url());
+	HTTPResponse response;
 
 	FilterChain chain(client, request, response);
 

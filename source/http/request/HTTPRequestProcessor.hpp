@@ -13,6 +13,10 @@
 #ifndef HTTPREQUESTPROCESSOR_HPP_
 # define HTTPREQUESTPROCESSOR_HPP_
 
+#include <util/Environment.hpp>
+
+class ServerBlock;
+
 class Logger;
 class Configuration;
 class HTTPClient;

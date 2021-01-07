@@ -18,7 +18,6 @@
 #include <string>
 
 class HTTPClient;
-
 class Socket;
 
 class HTTPServer

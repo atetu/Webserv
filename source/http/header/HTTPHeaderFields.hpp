@@ -100,6 +100,9 @@ class HTTPHeaderFields
 		contentType(const Mime &mime);
 
 		HTTPHeaderFields&
+		contentType(const Optional<const Mime*> &optional);
+
+		HTTPHeaderFields&
 		date(void);
 
 		HTTPHeaderFields&

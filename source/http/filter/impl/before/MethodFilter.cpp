@@ -15,11 +15,11 @@
 #include <http/enums/HTTPStatus.hpp>
 #include <http/filter/FilterChain.hpp>
 #include <http/filter/impl/before/MethodFilter.hpp>
-#include <http/filter/x/Request.hpp>
-#include <http/filter/x/Response.hpp>
 #include <http/header/HTTPHeaderFields.hpp>
 #include <http/HTTPClient.hpp>
 #include <http/parser/HTTPRequestParser.hpp>
+#include <http/request/HTTPRequest.hpp>
+#include <http/response/HTTPResponse.hpp>
 #include <util/Enum.hpp>
 #include <util/Macros.hpp>
 
@@ -45,7 +45,7 @@ MethodFilter::operator=(const MethodFilter &other)
 }
 
 void
-MethodFilter::doFilter(UNUSED HTTPClient &client, Request &request, Response &response, FilterChain &next)
+MethodFilter::doFilter(UNUSED HTTPClient &client, HTTPRequest &request, HTTPResponse &response, FilterChain &next)
 {
 	const HTTPMethod *methodPtr = HTTPMethod::find(client.parser().method());
 	if (methodPtr)
@@ -61,7 +61,6 @@ MethodFilter::doFilter(UNUSED HTTPClient &client, Request &request, Response &re
 	}
 
 	response.headers().allow(request.allowedMethods());
-	response.headers().allow(HTTPMethod::values());
 	response.status(*HTTPStatus::METHOD_NOT_ALLOWED);
 }
 
