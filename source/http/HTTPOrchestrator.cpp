@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HTTPOrchestrator.cpp                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
+/*   By: atetu <atetu@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/28 14:34:10 by ecaceres          #+#    #+#             */
-/*   Updated: 2021/01/06 21:28:16 by alicetetu        ###   ########.fr       */
+/*   Updated: 2021/01/07 09:00:29 by atetu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -174,6 +174,7 @@ HTTPOrchestrator::start()
 		m_running = true;
 		while (m_running)
 		{
+		//	std::cout << "running\n";
 			readFdSet = m_fds;
 			writeFdSet = m_fds;
 
@@ -190,6 +191,7 @@ HTTPOrchestrator::start()
 
 			if (fdCount)
 			{
+		//		std::cout << "running\n";
 				try
 				{
 					typedef std::map<int, HTTPServer const*>::iterator iterator;
@@ -217,7 +219,7 @@ HTTPOrchestrator::start()
 				{
 					LOG.warn() << "Could not accept connection: " << exception.message() << std::endl;
 				}
-
+		//		std::cout << "ici\n";
 				try
 				{
 					typedef std::map<int, FileDescriptorBuffer*>::iterator iterator;
@@ -287,7 +289,7 @@ HTTPOrchestrator::start()
 									if (!toContinue)
 									{
 										
-									
+									std::cout << c;
 									try
 									{
 								//	std::cout << "consume\n";
@@ -386,7 +388,7 @@ HTTPOrchestrator::start()
 							continue;
 						}
 					}
-
+			//		std::cout << "end\n";
 					for (std::set<int>::iterator it = fdToRemove.begin(); it != fdToRemove.end(); it++)
 						removeClient(*it);
 				}
@@ -430,6 +432,7 @@ HTTPOrchestrator::start()
 				if (clientFds.empty() && fileReadFds.empty() && fileWriteFds.empty())
 				{
 					m_running = false;
+					std::cout << "false\n";
 					break;
 				}
 			}
