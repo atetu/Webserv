@@ -10,18 +10,15 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <exception/Exception.hpp>
 #include <http/header/HTTPDate.hpp>
-#include <sys/time.h>
-#include <ctime>
-#include <string>
+#include <libs/ft.hpp>
 
 HTTPDate::HTTPDate() :
 		m_time()
 {
 }
 
-HTTPDate::HTTPDate(time_t time) :
+HTTPDate::HTTPDate(Time time) :
 		m_time(time)
 {
 }
@@ -52,13 +49,15 @@ HTTPDate::format(void) const
 	//			=          1   1     1    1    1      1      1
 	//			== 29, but 35 (just in case)
 
-	char str[35] = { 0 };
-	::strftime(str, sizeof(str), HTTPDATE_FORMAT, &m_time);
+	char str[35];
+	ft::bzero(str, sizeof(str));
+
+	m_time.cformat(str, sizeof(str), HTTPDATE_FORMAT);
 
 	return (std::string(str));
 }
 
-HTTPDate::time_t
+Time
 HTTPDate::time(void) const
 {
 	return (m_time);
@@ -67,14 +66,5 @@ HTTPDate::time(void) const
 HTTPDate
 HTTPDate::now()
 {
-	HTTPDate date;
-
-	struct timeval tv;
-	struct tm *tm;
-
-	::gettimeofday(&tv, NULL);
-	if ((tm = ::localtime(&tv.tv_sec)))
-		return (HTTPDate(*tm));
-
-	throw Exception("localtime");
+	return (HTTPDate(Time::now()));
 }

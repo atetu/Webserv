@@ -62,6 +62,7 @@ GetHandler::handle(HTTPRequest &request, HTTPResponse &response)
 	if (targetFile.isFile())
 	{
 		size_t contentLength = targetFile.length();
+		Time lastModified = targetFile.lastModified();
 		Optional<const Mime*> contentType;
 
 		std::string extension;
@@ -79,6 +80,7 @@ GetHandler::handle(HTTPRequest &request, HTTPResponse &response)
 			response.body(new FileResponseBody(*fdBuffer));
 			response.headers().contentLength(contentLength);
 			response.headers().contentType(contentType);
+			response.headers().lastModified(lastModified);
 			response.status(*HTTPStatus::OK);
 		}
 		catch (...)

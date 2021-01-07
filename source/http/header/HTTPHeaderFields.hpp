@@ -115,6 +115,12 @@ class HTTPHeaderFields
 		host(const std::string &value);
 
 		HTTPHeaderFields&
+		lastModified(long seconds);
+
+		HTTPHeaderFields&
+		lastModified(const Time &time);
+
+		HTTPHeaderFields&
 		lastModified(const HTTPDate &date);
 
 		HTTPHeaderFields&
@@ -166,6 +172,9 @@ class HTTPHeaderFields
 		wwwAuthenticate(const std::string &type, const Optional<std::string> realm);
 
 		HTTPHeaderFields&
+		connection(const std::string &value);
+
+		HTTPHeaderFields&
 		html(void);
 
 		HTTPHeaderFields&
@@ -215,6 +224,7 @@ class HTTPHeaderFields
 		static const std::string USER_AGENT;
 		static const std::string WWW_AUTHENTICATE;
 		static const std::string SET_COOKIE;
+		static const std::string CONNECTION;
 
 		static const std::string MIME_HTML;
 		static const std::string MIME_HTTP;

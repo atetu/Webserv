@@ -20,8 +20,11 @@
 #include <list>
 #include <string>
 
+class Time;
+
 #if 1
 #include <sys/fcntl.h>
+#include <util/Time.hpp>
 #endif
 
 class FileDescriptor;
@@ -84,6 +87,9 @@ class File
 
 		size_t
 		length() const;
+
+		Time
+		lastModified() const;
 
 		std::string
 		name() const;

@@ -13,21 +13,19 @@
 #ifndef HTTPDATE_HPP_
 # define HTTPDATE_HPP_
 
-# include <iostream>
+#include <util/Time.hpp>
+#include <string>
 
 # define HTTPDATE_FORMAT "%a, %d %b %Y %H:%M:%S GMT"
 
 class HTTPDate
 {
-	public:
-		typedef struct tm time_t;
-
 	private:
-		time_t m_time;
+		Time m_time;
 
 	public:
 		HTTPDate(void);
-		HTTPDate(time_t time);
+		HTTPDate(Time time);
 		HTTPDate(const HTTPDate &other);
 
 		virtual
@@ -39,7 +37,7 @@ class HTTPDate
 		std::string
 		format(void) const;
 
-		time_t
+		Time
 		time(void) const;
 
 	public:

@@ -10,17 +10,15 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+#include <dirent.h>
 #include <io/File.hpp>
 #include <io/FileDescriptor.hpp>
 #include <stdlib.h>
 #include <sys/fcntl.h>
-#include <dirent.h>
 #include <sys/stat.h>
 #include <sys/unistd.h>
-#include <unistd.h>
-#include <cstdio>
-#include <iostream>
 #include <util/StringUtils.hpp>
+#include <cstdio>
 
 File::File() :
 		m_path()
@@ -129,6 +127,16 @@ File::length() const
 		throw ioException();
 
 	return (st.st_size);
+}
+
+Time
+File::lastModified() const
+{
+	struct stat st;
+	if (::stat(m_path.c_str(), &st) == -1)
+		throw ioException();
+
+	return (Time(st.st_mtim));
 }
 
 std::string

@@ -15,8 +15,10 @@
 #include <http/mime/MimeRegistry.hpp>
 #include <util/Convert.hpp>
 #include <util/Enum.hpp>
+#include <util/Time.hpp>
 #include <util/URL.hpp>
 #include <webserv.hpp>
+#include <set>
 
 const std::string HTTPHeaderFields::ACCEPT_CHARSETS/*	*/= "Accept-Charsets";
 const std::string HTTPHeaderFields::ACCEPT_LANGUAGE/*	*/= "Accept-Language";
@@ -37,6 +39,7 @@ const std::string HTTPHeaderFields::TRANSFER_ENCODING/*	*/= "Transfer-Encoding";
 const std::string HTTPHeaderFields::USER_AGENT/*		*/= "User-Agent";
 const std::string HTTPHeaderFields::WWW_AUTHENTICATE/*	*/= "WWW-Authenticate";
 const std::string HTTPHeaderFields::SET_COOKIE/*	    */= "Set-Cookie";
+const std::string HTTPHeaderFields::CONNECTION/*	    */= "Connection";
 
 const std::string HTTPHeaderFields::MIME_HTML/*	        */= "text/html";
 const std::string HTTPHeaderFields::MIME_HTTP/*	        */= "message/http";
@@ -198,6 +201,18 @@ HTTPHeaderFields::host(const std::string &value)
 }
 
 HTTPHeaderFields&
+HTTPHeaderFields::lastModified(long seconds)
+{
+	return (lastModified(Time(seconds)));
+}
+
+HTTPHeaderFields&
+HTTPHeaderFields::lastModified(const Time &time)
+{
+	return (lastModified(HTTPDate(time)));
+}
+
+HTTPHeaderFields&
 HTTPHeaderFields::lastModified(const HTTPDate &date)
 {
 	return (lastModified(date.format()));
@@ -300,6 +315,12 @@ HTTPHeaderFields::wwwAuthenticate(const std::string &type, const Optional<std::s
 		return (wwwAuthenticate(type, realm.get()));
 
 	return (wwwAuthenticate(type));
+}
+
+HTTPHeaderFields&
+HTTPHeaderFields::connection(const std::string &value)
+{
+	return (set(CONNECTION, value));
 }
 
 HTTPHeaderFields&
