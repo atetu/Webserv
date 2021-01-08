@@ -6,7 +6,7 @@
 /*   By: atetu <atetu@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/28 14:34:10 by ecaceres          #+#    #+#             */
-/*   Updated: 2021/01/07 14:26:39 by atetu            ###   ########.fr       */
+/*   Updated: 2021/01/08 14:13:05 by atetu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -174,7 +174,6 @@ HTTPOrchestrator::start()
 		m_running = true;
 		while (m_running)
 		{
-		//	std::cout << "running\n";
 			readFdSet = m_fds;
 			writeFdSet = m_fds;
 
@@ -191,7 +190,6 @@ HTTPOrchestrator::start()
 
 			if (fdCount)
 			{
-		//		std::cout << "running\n";
 				try
 				{
 					typedef std::map<int, HTTPServer const*>::iterator iterator;
@@ -275,11 +273,7 @@ HTTPOrchestrator::start()
 
 						if (canRead && !client.response())
 						{
-						//	std::cout << "ici\n";
-							
-							// std::cout << "size: " << client.in().size() << std::endl;
-							// std::cout << "size: " << client.in().recv() << std::endl;
-							
+												
 							if (client.in().size() != 0 || client.in().recv() > 0)
 							{
 								char c;
@@ -289,17 +283,15 @@ HTTPOrchestrator::start()
 									if (toContinue == false)
 									{
 										
-									std::cout << c;
+								//	std::cout << c;
 									try
 									{
-								//	std::cout << "consume\n";
 										client.parser().consume(c);
 										if (client.parser().state() == HTTPRequestParser::S_END && c != '\n')
 										{
-									//		std::cout << "iici\n";
 											client.in().first(c); // I know you will have a panick attack when reading that but that's a temporary solution. I dont know it is not directly taken into account below
 										}
-								//		std::cout << "la\n";
+								
 									}
 									catch (Exception &exception)
 									{
@@ -312,15 +304,13 @@ HTTPOrchestrator::start()
 									{
 										try
 										{
-											// std::cout << "end\n";
-											// std::cout << "c: " << c << std::endl;
 											if (client.parser().state() == HTTPRequestParser::S_END)
 											{	
-											//	std::cout <<"processor\n";
+											
 												if (!HTTPRequestProcessor(m_configuration, m_environment).process(client))
 												{
 													toContinue = true;
-												//	std::cout << "continue\n";
+											
 													continue;
 												}
 												else

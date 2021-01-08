@@ -6,7 +6,7 @@
 /*   By: atetu <atetu@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/26 15:59:39 by ecaceres          #+#    #+#             */
-/*   Updated: 2021/01/06 17:47:54 by atetu            ###   ########.fr       */
+/*   Updated: 2021/01/08 14:10:49 by atetu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -101,9 +101,9 @@ HTTPRequestProcessor::process(HTTPClient &client)
 	if (serverBlockPtr && serverBlockPtr->locations().present())
 	{
 		HTTPFindLocation findLocation(client.parser().pathParser().path(), serverBlockPtr->locations().get());
-
-		if (findLocation.parse().location().present())
-			locationBlockPtr = findLocation.parse().location().get();
+		findLocation.parse();
+		if (findLocation.location().present())
+			locationBlockPtr = findLocation.location().get();
 	}
 	// std::cout<<"before location\n";
 	if (locationBlockPtr)

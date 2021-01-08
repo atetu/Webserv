@@ -6,7 +6,7 @@
 /*   By: atetu <atetu@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/27 17:29:02 by ecaceres          #+#    #+#             */
-/*   Updated: 2021/01/07 14:23:00 by atetu            ###   ########.fr       */
+/*   Updated: 2021/01/08 13:20:38 by atetu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -354,7 +354,8 @@ HTTPRequestParser::url(const LocationBlock *locationBlockPtr)
 			path = m_pathParser.path().substr(locationBlockPtr->path().size(), std::string::npos);
 		else
 			path = "";
-			
+		
+	//	std::cout << "path2: " << path << std::endl;
 		return (URL(path, m_pathParser.query(), m_pathParser.fragment()));
 	}
 	
