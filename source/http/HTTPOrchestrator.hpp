@@ -65,39 +65,6 @@ class HTTPOrchestrator
 		void
 		unprepare(void);
 
-		void
-		setFd(int fd);
-
-		void
-		clearFd(int fd);
-
-		void
-		printSelectOutput(fd_set &readFds, fd_set &writeFds, bool forced = false);
-
-		void
-		addServer(HTTPServer &server);
-
-		void
-		addFileDescriptorBufferRead(FileDescriptorBuffer &fileDescriptorBuffer);
-
-		void
-		addClient(HTTPClient &client);
-
-		void
-		addFileDescriptorBufferWrite(FileDescriptorBuffer &fileDescriptorBuffer);
-
-		void
-		removeServer(int fd);
-
-		void
-		removeFileRead(int fd);
-
-		void
-		removeClient(int fd);
-
-		void
-		removeFileWrite(int fd);
-
 	public:
 		void
 		start();

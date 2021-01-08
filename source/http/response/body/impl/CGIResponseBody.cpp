@@ -11,11 +11,20 @@
 /* ************************************************************************** */
 
 #include <buffer/impl/FileDescriptorBuffer.hpp>
+#include <encoding/default/chunk/ChunkEncoder.hpp>
 #include <http/cgi/CommonGatewayInterface.hpp>
+#include <http/enums/HTTPStatus.hpp>
+#include <http/filter/FilterChain.hpp>
+#include <http/header/HTTPHeaderFields.hpp>
 #include <http/HTTPClient.hpp>
 #include <http/response/body/impl/CGIResponseBody.hpp>
+#include <http/response/HTTPResponse.hpp>
 #include <io/Socket.hpp>
+#include <stddef.h>
+#include <util/Number.hpp>
+#include <util/Optional.hpp>
 #include <util/Singleton.hpp>
+#include <string>
 
 CGIResponseBody::CGIResponseBody(HTTPClient &client, CommonGatewayInterface &cgi) :
 		m_client(client),
@@ -29,8 +38,14 @@ CGIResponseBody::CGIResponseBody(HTTPClient &client, CommonGatewayInterface &cgi
 
 CGIResponseBody::~CGIResponseBody()
 {
+	m_cgi.exit();
+
 	NIOSelector::instance().remove(m_cgi.in());
 	NIOSelector::instance().remove(m_cgi.out());
+
+	delete &m_bufferedIn;
+	delete &m_bufferedOut;
+	delete &m_cgi;
 }
 
 bool
@@ -43,11 +58,17 @@ bool
 CGIResponseBody::store(BaseBuffer &buffer)
 {
 	if (m_headerFieldsParser.state() != HTTPHeaderFieldsParser::S_END)
+		return (false);
+
+	buffer.store(m_bufferedOut, true, ChunkEncoder::staticEncode);
+
+	if (isDone())
+	{
+		buffer.store(ChunkEncoder::ZERO);
 		return (true);
+	}
 
-	buffer.store(m_bufferedOut);
-
-	return (isDone());
+	return (false);
 }
 
 bool
@@ -71,7 +92,7 @@ CGIResponseBody::readable(FileDescriptor &fd)
 {
 	(void)fd;
 
-	m_bufferedOut.read();
+	m_bufferedOut.read(); // TODO Handle -1
 
 	if (m_headerFieldsParser.state() != HTTPHeaderFieldsParser::S_END)
 	{
@@ -80,12 +101,10 @@ CGIResponseBody::readable(FileDescriptor &fd)
 		bool parsed = false;
 		while (m_bufferedOut.peek(c))
 		{
-			std::cout << c << std::flush;
 			m_headerFieldsParser.consume(c);
 
 			if (m_headerFieldsParser.state() == HTTPHeaderFieldsParser::S_END)
 			{
-				std::cout << "PARSED" << std::endl;
 				parsed = true;
 				break;
 			}
@@ -95,21 +114,37 @@ CGIResponseBody::readable(FileDescriptor &fd)
 
 		if (parsed)
 		{
-			NIOSelector::instance().update(m_client.socket(), NIOSelector::WRITE);
+			m_client.response().headers().merge(m_headerFieldsParser.headerFields(), true);
+
+			Optional<std::string> statusOpt = m_headerFieldsParser.headerFields().get(HTTPHeaderFields::STATUS);
+			if (statusOpt.present())
+			{
+				std::string codePart = statusOpt.get().substr(0, statusOpt.get().find(' '));
+
+				int code = Number::parse<int>(codePart);
+				const HTTPStatus *newStatus = HTTPStatus::find(code);
+
+				if (newStatus)
+					m_client.response().status(*newStatus);
+			}
+
+			m_client.response().headers().chunkedTransferEncoding();
 			m_client.filterChain().next();
+
+			NIOSelector::instance().update(m_client.socket(), NIOSelector::WRITE);
 		}
 
 		return (false);
 	}
 
-	return (isDone());
+	if (m_bufferedOut.hasReadEverything())
+		NIOSelector::instance().remove(m_cgi.out());
+
+	return (m_bufferedOut.hasReadEverything());
 }
 
 bool
 CGIResponseBody::isDone()
 {
-	if (m_cgi.running())
-		return (!m_bufferedIn.empty() && m_bufferedOut.empty());
-
-	return (m_bufferedOut.empty());
+	return (m_bufferedOut.hasReadEverything() && m_bufferedOut.empty());
 }

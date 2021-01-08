@@ -80,43 +80,6 @@ HTTPOrchestrator::unprepare(void)
 }
 
 void
-HTTPOrchestrator::printSelectOutput(fd_set &readFds, fd_set &writeFds, bool forced)
-{
-	if (!LOG.isDebugEnabled())
-		return;
-
-	static std::string last;
-	static unsigned long lastTime = System::currentTimeSeconds();
-
-	std::string line;
-	line.reserve(m_highestFd + 1);
-
-	for (int i = 0; i < m_highestFd; i++)
-	{
-		char c = FD_ISSET(i, &m_fds) ? '-' : '.';
-
-		if (FD_ISSET(i, &writeFds) && FD_ISSET(i, &readFds))
-			c = 'X';
-		else if (FD_ISSET(i, &readFds))
-			c = 'R';
-		else if (FD_ISSET(i, &writeFds))
-			c = 'W';
-
-		line += c;
-	}
-
-	unsigned long now = System::currentTimeSeconds();
-
-	if (forced || line != last || lastTime + 3 < now)
-	{
-		last = line;
-		lastTime = now;
-
-		LOG.debug() << line << std::endl;
-	}
-}
-
-void
 HTTPOrchestrator::start()
 {
 	prepare();

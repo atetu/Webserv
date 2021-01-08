@@ -54,7 +54,7 @@ IndexFilter::doFilter(UNUSED HTTPClient &client, HTTPRequest &request, UNUSED HT
 
 		if (method == *HTTPMethod::GET || method == *HTTPMethod::HEAD)
 		{
-			File targetFile(request.root());
+			File targetFile(request.targetFile());
 
 			if (targetFile.exists() && targetFile.isDirectory())
 			{

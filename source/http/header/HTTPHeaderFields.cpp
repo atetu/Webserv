@@ -40,9 +40,14 @@ const std::string HTTPHeaderFields::USER_AGENT/*		*/= "User-Agent";
 const std::string HTTPHeaderFields::WWW_AUTHENTICATE/*	*/= "WWW-Authenticate";
 const std::string HTTPHeaderFields::SET_COOKIE/*	    */= "Set-Cookie";
 const std::string HTTPHeaderFields::CONNECTION/*	    */= "Connection";
+const std::string HTTPHeaderFields::STATUS/*	        */= "Status";
 
 const std::string HTTPHeaderFields::MIME_HTML/*	        */= "text/html";
 const std::string HTTPHeaderFields::MIME_HTTP/*	        */= "message/http";
+
+const std::string HTTPHeaderFields::CHUNKED/*	        */= "chunked";
+const std::string HTTPHeaderFields::CLOSE/*	            */= "close";
+const std::string HTTPHeaderFields::KEEP_ALIVE/*	    */= "keep-alive";
 
 HTTPHeaderFields::HTTPHeaderFields(void) :
 		m_storage()
@@ -155,7 +160,7 @@ HTTPHeaderFields::contentType(const MimeRegistry &registry, const std::string &e
 	// {
 	// 	return (contentType("text/plain"));
 	// }
-	
+
 	return (*this);
 }
 
@@ -295,6 +300,12 @@ HTTPHeaderFields::transferEncoding(const std::string &value)
 }
 
 HTTPHeaderFields&
+HTTPHeaderFields::chunkedTransferEncoding(void)
+{
+	return (transferEncoding(CHUNKED));
+}
+
+HTTPHeaderFields&
 HTTPHeaderFields::userAgent(const std::string &value)
 {
 	return (set(USER_AGENT, value));
@@ -355,6 +366,15 @@ HTTPHeaderFields::set(const std::string &key, const std::string &value, bool fol
 		else
 			lst.front() = value;
 	}
+
+	return (*this);
+}
+
+HTTPHeaderFields&
+HTTPHeaderFields::merge(const HTTPHeaderFields &headerFields, bool folding)
+{
+	for (mconst_iterator it = headerFields.begin(); it != headerFields.end(); it++)
+		set(it->first, it->second.front(), folding);
 
 	return (*this);
 }

@@ -55,7 +55,7 @@ GetHandler::operator =(const GetHandler &other)
 void
 GetHandler::handle(HTTPRequest &request, HTTPResponse &response)
 {
-	File targetFile(request.root(), request.resource());
+	File targetFile(request.targetFile());
 
 	if (!targetFile.exists())
 		return (response.status(*HTTPStatus::NOT_FOUND));

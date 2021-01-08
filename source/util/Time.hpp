@@ -14,6 +14,7 @@
 # define TIME_HPP_
 
 #include <stddef.h>
+#include <string>
 
 struct timespec;
 struct timeval;
@@ -49,6 +50,9 @@ class Time
 
 		size_t
 		cformat(char *str, size_t maxSize, const char *format) const;
+
+		std::string
+		cformat(const char *format) const;
 
 	private:
 		static time_t

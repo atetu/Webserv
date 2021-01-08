@@ -43,7 +43,7 @@ HeadFilter::operator=(const HeadFilter &other)
 void
 HeadFilter::doFilter(UNUSED HTTPClient &client, UNUSED HTTPRequest &request, HTTPResponse &response, FilterChain &next)
 {
-	if (request.method().get() == HTTPMethod::HEAD)
+	if (request.method().present() && request.method().get() == HTTPMethod::HEAD)
 		response.body(NULL);
 
 	return (next());

@@ -160,6 +160,9 @@ class HTTPHeaderFields
 		transferEncoding(const std::string &value);
 
 		HTTPHeaderFields&
+		chunkedTransferEncoding(void);
+
+		HTTPHeaderFields&
 		userAgent(const std::string &value);
 
 		HTTPHeaderFields&
@@ -182,6 +185,9 @@ class HTTPHeaderFields
 
 		HTTPHeaderFields&
 		set(const std::string &key, const std::string &value, bool folding = false);
+
+		HTTPHeaderFields&
+		merge(const HTTPHeaderFields &headerFields, bool folding = false);
 
 		const Optional<std::string>
 		get(const std::string &key) const;
@@ -225,9 +231,14 @@ class HTTPHeaderFields
 		static const std::string WWW_AUTHENTICATE;
 		static const std::string SET_COOKIE;
 		static const std::string CONNECTION;
+		static const std::string STATUS;
 
 		static const std::string MIME_HTML;
 		static const std::string MIME_HTTP;
+
+		static const std::string CHUNKED;
+		static const std::string CLOSE;
+		static const std::string KEEP_ALIVE;
 };
 
 #endif /* HTTPHEADERFIELDS_HPP_ */

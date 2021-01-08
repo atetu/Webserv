@@ -15,6 +15,7 @@
 #include <nio/NIOSelector.hpp>
 #include <sys/select.h>
 #include <util/Collections.hpp>
+#include <util/Convert.hpp>
 #include <util/System.hpp>
 #include <iostream>
 #include <string>
@@ -294,10 +295,22 @@ NIOSelector::debug(const Logger &logger, const NIOSelector &selector, FileDescri
 
 		logger.debug() << line << std::endl;
 
-		logger.debug();
-		for (int i = 0; i < highest; i++)
-			std::cout << i;
+		if (logger.isTraceEnabled())
+		{
+			{
+				std::ostream &out = logger.trace();
+				for (int i = 0; i < highest; i++)
+					out << Convert::toString(i)[0];
+				out << std::endl;
+			}
 
-		std::cout << std::endl;
+			if (highest >= 10)
+			{
+				std::ostream &out = logger.trace();
+				for (int i = 0; i < highest; i++)
+					out << (i < 10 ? ' ' : Convert::toString(i)[1]);
+				out << std::endl;
+			}
+		}
 	}
 }

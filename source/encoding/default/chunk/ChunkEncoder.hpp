@@ -18,7 +18,6 @@
 class ChunkEncoder
 {
 	public:
-
 		enum State
 		{
 			S_NOT_STARTED,
@@ -34,6 +33,10 @@ class ChunkEncoder
 			S_OVER
 		};
 
+	public:
+		static const std::string ZERO;
+
+	public:
 		ChunkEncoder();
 		ChunkEncoder(const std::string &input);
 		ChunkEncoder(const ChunkEncoder &other);

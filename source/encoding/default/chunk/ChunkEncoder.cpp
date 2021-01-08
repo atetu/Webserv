@@ -13,24 +13,25 @@
 #include <encoding/default/chunk/ChunkEncoder.hpp>
 #include <http/HTTP.hpp>
 #include <util/Convert.hpp>
-#include <iostream>
 #include <sstream>
 
+const std::string ChunkEncoder::ZERO = "0\r\n\r\n";
+
 ChunkEncoder::ChunkEncoder() :
-	m_input(""),
-	m_parsedData("")
+		m_input(""),
+		m_parsedData("")
 {
 }
 
 ChunkEncoder::ChunkEncoder(const std::string &input) :
-	m_input(input),
-	m_parsedData("")
+		m_input(input),
+		m_parsedData("")
 {
 }
 
 ChunkEncoder::ChunkEncoder(const ChunkEncoder &other) :
-	m_input(other.m_input),
-	m_parsedData(other.m_parsedData)
+		m_input(other.m_input),
+		m_parsedData(other.m_parsedData)
 {
 }
 
@@ -59,11 +60,11 @@ ChunkEncoder::encode()
 		std::string chunkToAdd = chunkSikeStr + "\r\n" + chunkStr + "\r\n";
 
 		m_parsedData += chunkToAdd;
-		
+
 		m_input.erase(0, 48);
 	}
 	m_parsedData += "0\r\n\r\n";
-	
+
 	return (m_parsedData);
 }
 

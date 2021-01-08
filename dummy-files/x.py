@@ -38,7 +38,12 @@ for key, value in os.environ.items():
     <td>{value}</td>
   </tr>""")
     #print(key, file=sys.stderr)
-print("</body></table>")
+print("</table>")
+
+for i in range(50):
+    print("<p style='display:none'>" + ("x" * 1024) + "</p> BLOCK #" + str(i) + "<br>")
+
+print('</body>')
 print('</html>')
 
 #import time

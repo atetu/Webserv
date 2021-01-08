@@ -11,10 +11,11 @@
 /* ************************************************************************** */
 
 #include <exception/IOException.hpp>
+#include <libs/ft.hpp>
 #include <sys/errno.h>
 #include <sys/time.h>
 #include <util/Time.hpp>
-#include <ctime>
+#include <string>
 
 Time::Time() :
 		m_time()
@@ -58,6 +59,24 @@ Time::operator=(const Time &other)
 	return (*this);
 }
 
+size_t
+Time::cformat(char *str, size_t maxSize, const char *format) const
+{
+	return (::strftime(str, maxSize, format, &m_time));
+}
+
+std::string
+Time::cformat(const char *format) const
+{
+	size_t len = ft::strlen(format) * 3;
+	char str[len];
+	ft::bzero(str, len);
+
+	size_t r = cformat(str, len, format);
+
+	return (std::string(str, r));
+}
+
 Time::time_t
 Time::fromLong(long seconds)
 {
@@ -77,10 +96,4 @@ Time::now()
 		throw IOException("gettimeofday", errno);
 
 	return (Time(timeval));
-}
-
-size_t
-Time::cformat(char *str, size_t maxSize, const char *format) const
-{
-	return (::strftime(str, maxSize, format, &m_time));
 }

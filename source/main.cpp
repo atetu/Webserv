@@ -26,8 +26,8 @@ main(int argc, char **argv, char **envp)
 {
 	int exitCode = 0;
 
-	try
-	{
+//	try
+//	{
 		signal(SIGPIPE, SIG_IGN);
 
 #if RUN_TESTS
@@ -35,13 +35,13 @@ main(int argc, char **argv, char **envp)
 #else
 		exitCode = normal_main(argc, argv, envp);
 #endif
-	}
-	catch (std::exception &exception)
-	{
-		exitCode = 1;
-
-		std::cerr << "unhandled " << typeid(exception).name() << ": " << exception.what() << std::endl;
-	}
+//	}
+//	catch (std::exception &exception)
+//	{
+//		exitCode = 1;
+//
+//		std::cerr << "unhandled " << typeid(exception).name() << ": " << exception.what() << std::endl;
+//	}
 
 	Configuration::setInstance(NULL);
 	LoggerFactory::destroy();

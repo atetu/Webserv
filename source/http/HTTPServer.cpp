@@ -65,7 +65,7 @@ HTTPServer::watchForTimeouts()
 		HTTPClient &client = *(*it);
 		it++;
 
-		if (client.lastAction() + 5 /* TODO */< now)
+		if (client.lastAction() + 30 /* TODO */< now)
 		{
 			if (LOG.isTraceEnabled())
 				LOG.trace() << "Timeout-ed: " << client.socketAddress().hostAddress() << " (fd=" << client.socket().raw() << ")" << std::endl;
@@ -134,8 +134,8 @@ HTTPServer::readable(FileDescriptor &fd)
 //		httpClient.response().status(*HTTPStatus::SERVICE_UNAVAILABLE);
 //		httpClient.response().headers().retryAfter(10);
 //	}
-
-	LOG.info() << "accepted " << socketAddress.hostAddress() << std::endl;
+//
+//	LOG.info() << "accepted " << socketAddress.hostAddress() << std::endl;
 
 	m_clients.push_back(&httpClient);
 

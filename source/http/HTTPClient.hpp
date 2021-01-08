@@ -21,6 +21,8 @@
 #include <net/address/InetSocketAddress.hpp>
 #include <nio/NIOSelector.hpp>
 
+# define HTTPCLIENT_LOG_TIME_FORMAT "%Y-%m-%d %H:%M:%S"
+
 class HTTPServer;
 class Logger;
 class SocketBuffer;

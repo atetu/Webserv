@@ -62,7 +62,5 @@ LocationFilter::doFilter(UNUSED HTTPClient &client, HTTPRequest &request, UNUSED
 			request.locationBlock(*findLocation.parse().location().get());
 	}
 
-	request.resource(request.targetFile().path());
-
 	return (next());
 }

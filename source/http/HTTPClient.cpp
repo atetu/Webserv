@@ -58,7 +58,7 @@ HTTPClient::~HTTPClient(void)
 	if (LOG.isInfoEnabled())
 	{
 		std::ostream &out = LOG.info()
-		/**/<< '[' << HTTPDate::now().format() << "] "
+		/**/<< '[' << Time::now().cformat(HTTPCLIENT_LOG_TIME_FORMAT) << "] "
 		/**/<< m_socketAddress.hostAddress()
 		/**/<< " - ";
 

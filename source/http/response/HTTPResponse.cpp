@@ -116,14 +116,20 @@ HTTPResponse::store(BaseBuffer &buffer)
 			buffer.store(headers().format());
 			buffer.store(HTTP::CRLF);
 
+			if (!m_body)
+				return (true);
+
 			m_state = S_BODY;
+
 			return (false);
 		}
 
 		case S_BODY:
 		{
-			if (m_body && m_body->store(buffer))
+			if (m_body->store(buffer))
 				m_state = S_FLUSH;
+
+			return (false);
 		}
 
 		case S_FLUSH:
