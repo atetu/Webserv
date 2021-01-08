@@ -6,7 +6,7 @@
 /*   By: atetu <atetu@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/27 17:29:02 by ecaceres          #+#    #+#             */
-/*   Updated: 2021/01/05 16:35:32 by atetu            ###   ########.fr       */
+/*   Updated: 2021/01/08 14:42:03 by atetu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@
 #include <cctype>
 #include <cstdlib>
 #include <config/block/LocationBlock.hpp>
+#include <libs/ft.hpp>
 
 #if 1
 #include <util/URL.hpp> /* Eclipse does not import it. */
@@ -28,6 +29,8 @@ HTTPRequestParser::HTTPRequestParser() :
 		m_method(),
 		m_major(),
 		m_minor(),
+		m_body(""),
+		m_chunkDecoder(m_body),
 		m_last(),
 		m_last2()
 {
@@ -51,7 +54,7 @@ HTTPRequestParser::consume(char c)
 			}
 			else
 			{
-				if (!::isupper(c))
+				if (!ft::isupper(c))
 					throw Exception("Method is only upper-case letter");
 
 				m_state = S_METHOD;
@@ -137,7 +140,7 @@ HTTPRequestParser::consume(char c)
 
 		case S_HTTP_SLASH:
 		{
-			if (!::isdigit(c))
+			if (!ft::isdigit(c))
 				throw Exception("Expected a number");
 
 			m_major = c - '0';
@@ -158,7 +161,7 @@ HTTPRequestParser::consume(char c)
 
 		case S_HTTP_DOT:
 		{
-			if (!::isdigit(c))
+			if (!ft::isdigit(c))
 				throw Exception("Expected a number");
 
 			m_minor = c - '0';
@@ -222,16 +225,22 @@ HTTPRequestParser::consume(char c)
 
 		case S_HEADER_FIELDS:
 		{
+		//	std:: cout << "c header: " << (int)c << std::endl;
 			m_headerFieldsParser.consume(c);
 
 			if (m_headerFieldsParser.state() == HTTPHeaderFieldsParser::S_END)
+			{
+	//			std::cout << "normally end\n";
 				m_state = S_END;
-
+			}
 			break;
 		}
 
 		case S_END:
+		{
+	//		std:: cout << "c end: " << (int)c << std::endl;
 			break;
+		}
 
 	}
 
@@ -266,18 +275,20 @@ HTTPRequestParser::body() const
 	return (m_body);
 }
 
-void
+int
 HTTPRequestParser::body(std::string &storage, const Optional<DataSize> &maxBodySize)
 {
 	long long max;
+	//std::cout << "storage: " << storage  << "  storage size : "<< storage.size()<< std::endl;
+	
 	if (maxBodySize.present())
 		max = maxBodySize.get().toBytes();
-	else
-		max = -1; // can we not have maxBodySize? 
+	// else
+	// 	max = -1; // can we not have maxBodySize? 
 	const Optional<std::string> contentLengthOptional = headerFieldsParser().headerFields().get(HTTPHeaderFields::CONTENT_LENGTH);
 	if (contentLengthOptional.present())
 	{
-		int bodySize = ::atoi(contentLengthOptional.get().c_str());
+		int bodySize = ft::atoi(contentLengthOptional.get().c_str());
 		if (max != -1 && bodySize < max)
 			m_body = storage.substr(0, bodySize);
 		else if (max != -1)
@@ -290,20 +301,47 @@ HTTPRequestParser::body(std::string &storage, const Optional<DataSize> &maxBodyS
 		const Optional<std::string> transfertEncodingOptional = headerFieldsParser().headerFields().get(HTTPHeaderFields::TRANSFER_ENCODING);
 		if (transfertEncodingOptional.present())
 		{
+		//	std::cout << "chunk\n";
 			const std::string &encoding = transfertEncodingOptional.get();
-
+		//	ChunkDecoder chunkDecoder;
 			if (encoding == "chunked" && max != -1)
-				m_body = ChunkDecoder(storage.substr(0, max)).decode();
+			{
+		//		std::cout << "first\n";
+				
+		
+				m_body = m_chunkDecoder.decode(storage.substr(0, max));
+				storage.erase(0, max);
+				if (m_chunkDecoder.state() != ChunkDecoder::S_OVER)
+				{
+			//		std::cout << "third\n";
+				return (0);
+				}
+			
+			}
 			else if (encoding == "chunked")
-				m_body = ChunkDecoder(storage).decode();
+			{
+			//	std::cout << "second\n";
+		
+				m_body += m_chunkDecoder.decode(storage);
+		//		std::cout << "after second\n";
+				storage.erase(0, max);
+				if (m_chunkDecoder.state() != ChunkDecoder::S_OVER)
+				{
+					std::cout << "third\n";
+				return (0);
+				}
+			}
 			else
 				throw Exception("transfer_encoding not supported");
+		
+		
 		}
 		else
 		{
 			// check with Nginx if error. RFC = content-length header SHOULD be sent...
 		}
 	}
+	return (1);
 }
 
 URL
@@ -317,7 +355,8 @@ HTTPRequestParser::url(const LocationBlock *locationBlockPtr)
 			path = m_pathParser.path().substr(locationBlockPtr->path().size(), std::string::npos);
 		else
 			path = "";
-			
+		
+	//	std::cout << "path2: " << path << std::endl;
 		return (URL(path, m_pathParser.query(), m_pathParser.fragment()));
 	}
 	

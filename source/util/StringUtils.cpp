@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   StringUtils.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ecaceres <ecaceres@student.42.fr>          +#+  +:+       +#+        */
+/*   By: atetu <atetu@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/21 20:48:42 by ecaceres          #+#    #+#             */
-/*   Updated: 2020/12/21 20:48:42 by ecaceres         ###   ########.fr       */
+/*   Updated: 2021/01/08 14:44:27 by atetu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,8 @@
 #include <util/StringUtils.hpp>
 #include <algorithm>
 #include <cctype>
+#include <libs/ft.hpp>
+
 
 StringUtils::StringUtils()
 {
@@ -46,7 +48,7 @@ StringUtils::toUpperCase(const std::string &string) // TODO Find something faste
 	std::string::size_type size = string.size();
 
 	for (std::string::size_type index = 0; index < size; index++)
-		out += ::toupper(cstr[index]);
+		out += ft::toupper(cstr[index]);
 
 	return (out);
 }

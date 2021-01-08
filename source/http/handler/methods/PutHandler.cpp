@@ -91,6 +91,7 @@ PutHandler::handle(HTTPRequest &request)
 {
 	HTTPHeaderFields headers;
 
+std::cout << "put : "<< request.body().size() << std::endl;
 	const std::string &path = request.root() + request.url().path();
 	//File file(path + "/" + request.getLocation());
 	File file(path);
@@ -103,8 +104,8 @@ PutHandler::handle(HTTPRequest &request)
 	{
 		try
 		{
-			std::cout << "create\n";
-			file.createNewFile(0666);
+		//	std::cout << "create\n";
+			file.createNewFile(0777);
 		}
 		catch (Exception &exception)
 		{

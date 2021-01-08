@@ -6,7 +6,7 @@
 /*   By: atetu <atetu@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/28 14:34:10 by ecaceres          #+#    #+#             */
-/*   Updated: 2021/01/05 16:53:35 by atetu            ###   ########.fr       */
+/*   Updated: 2021/01/08 14:13:05 by atetu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -185,7 +185,7 @@ HTTPOrchestrator::start()
 
 				throw IOException("select", errno);
 			}
-
+			
 			printSelectOutput(readFdSet, writeFdSet);
 
 			if (fdCount)
@@ -208,7 +208,7 @@ HTTPOrchestrator::start()
 
 							if (clientFds.size() >= (unsigned long)m_configuration.rootBlock().maxActiveClient().orElse(RootBlock::DEFAULT_MAX_ACTIVE_CLIENT))
 								httpClient.response() = HTTPMethodHandler::status(*HTTPStatus::SERVICE_UNAVAILABLE, HTTPHeaderFields().retryAfter(10));
-
+						//	std::cout << "NewClient \n";
 							addClient(httpClient);
 						}
 					}
@@ -217,7 +217,7 @@ HTTPOrchestrator::start()
 				{
 					LOG.warn() << "Could not accept connection: " << exception.message() << std::endl;
 				}
-
+		//		std::cout << "ici\n";
 				try
 				{
 					typedef std::map<int, FileDescriptorBuffer*>::iterator iterator;
@@ -273,16 +273,25 @@ HTTPOrchestrator::start()
 
 						if (canRead && !client.response())
 						{
+												
 							if (client.in().size() != 0 || client.in().recv() > 0)
 							{
 								char c;
-
+								bool toContinue = false;
 								while (client.in().next(c))
 								{
-									std::cout << c;
+									if (toContinue == false)
+									{
+										
+								//	std::cout << c;
 									try
 									{
 										client.parser().consume(c);
+										if (client.parser().state() == HTTPRequestParser::S_END && c != '\n')
+										{
+											client.in().first(c); // I know you will have a panick attack when reading that but that's a temporary solution. I dont know it is not directly taken into account below
+										}
+								
 									}
 									catch (Exception &exception)
 									{
@@ -290,13 +299,26 @@ HTTPOrchestrator::start()
 
 										client.response() = GenericHTTPResponse::status(*HTTPStatus::BAD_REQUEST);
 									}
-
+									}
 									if (!client.response())
 									{
 										try
 										{
 											if (client.parser().state() == HTTPRequestParser::S_END)
-												HTTPRequestProcessor(m_configuration, m_environment).process(client);
+											{	
+											
+												if (!HTTPRequestProcessor(m_configuration, m_environment).process(client))
+												{
+													toContinue = true;
+											
+													continue;
+												}
+												else
+												{
+													toContinue = false;
+												}
+												
+											}
 										}
 										catch (Exception &exception)
 										{
@@ -358,7 +380,7 @@ HTTPOrchestrator::start()
 							continue;
 						}
 					}
-
+			//		std::cout << "end\n";
 					for (std::set<int>::iterator it = fdToRemove.begin(); it != fdToRemove.end(); it++)
 						removeClient(*it);
 				}
@@ -402,6 +424,7 @@ HTTPOrchestrator::start()
 				if (clientFds.empty() && fileReadFds.empty() && fileWriteFds.empty())
 				{
 					m_running = false;
+				//	std::cout << "false\n";
 					break;
 				}
 			}

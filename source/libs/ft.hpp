@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft.hpp                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ecaceres <ecaceres@student.42.fr>          +#+  +:+       +#+        */
+/*   By: atetu <atetu@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/20 17:24:32 by ecaceres          #+#    #+#             */
-/*   Updated: 2020/12/20 17:24:32 by ecaceres         ###   ########.fr       */
+/*   Updated: 2021/01/08 14:40:14 by atetu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,6 +46,12 @@ namespace ft
 
 	char
 	toupper(char c);
+
+	bool
+	isdigit(char c);
+
+	int	atoi
+	(const char *str);
 }
 
 #endif /* FT_HPP_ */

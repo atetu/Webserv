@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   File.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
+/*   By: atetu <atetu@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/21 23:36:43 by ecaceres          #+#    #+#             */
-/*   Updated: 2021/01/05 20:11:51 by alicetetu        ###   ########.fr       */
+/*   Updated: 2021/01/08 14:36:58 by atetu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -107,8 +107,42 @@ bool
 File::createNewFile(mode_t mode) const
 {
 	int fd;
-	//std::cout << "path: " <<  m_path << std::endl; // TODO split the path ind directories and sub directories
-	//mkdir ("put_test",0777);
+
+
+	// std::cout << "path: " <<  m_path << std::endl; // TODO split the path ind directories and sub directories
+	std::string copy = m_path;
+	std::string previousStr = "";
+	std::size_t found;
+	//found = copy.find('/');
+	while ((found = copy.find('/')) != std::string::npos)
+	{
+		// std::cout << "found: " << found << std::endl;
+		std::string newPath = copy.substr(0, found);
+		std::string remainedPath = copy.substr(found + 1, std::string::npos);
+		if (newPath == "./" || newPath == "/")
+		{
+			previousStr = newPath;
+			copy = remainedPath;
+		//	found = copy.find('/');
+		}
+		else
+		{
+			// std::cout << "new: " <<  newPath <<std::endl;
+			// std::cout << "rem: " <<  remainedPath <<std::endl;
+			File file(previousStr + "/" + newPath);
+			if (!file.exists())
+			{
+				// std::cout << "new file: " << file.path() << std::endl;
+				mkdir(file.path().c_str(), 0777);
+			}
+			previousStr = newPath;
+			copy = remainedPath;
+		//	found = copy.find('/');
+			
+		}
+		
+	}
+	// mkdir ("put_test/test",0777);
 	if ((fd = ::open(m_path.c_str(), O_CREAT, mode)) == -1) //TOTO create directory if needed
 	{
 		errno = 0;
@@ -148,13 +182,6 @@ File::open(int flags, mode_t mode) const
 		throw ioException();
 
 	return (FileDescriptor::wrap(fd));
-}
-
-void
-File::remove(void) const
-{
-	if (::remove(m_path.c_str()) == -1)
-		throw ioException();
 }
 
 File

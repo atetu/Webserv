@@ -17,6 +17,7 @@
 #include <buffer/IReadableBuffer.hpp>
 #include <buffer/IWritableBuffer.hpp>
 #include <string>
+#include <iostream>
 
 class BaseBuffer :
 		public IWritableBuffer,
@@ -82,6 +83,7 @@ class BaseBuffer :
 		inline std::string&
 		storage()
 		{
+			// std::cout << "storage size: " << m_storage.size() << std::endl;
 			return (m_storage);
 		}
 
@@ -90,6 +92,9 @@ class BaseBuffer :
 		{
 			return (m_storage);
 		}
+		
+		void
+		first(char &c);
 };
 
 #endif /* BASEBUFFER_HPP_ */

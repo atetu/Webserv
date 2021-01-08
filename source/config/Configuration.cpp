@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Configuration.cpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
+/*   By: atetu <atetu@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/28 11:33:47 by ecaceres          #+#    #+#             */
-/*   Updated: 2020/12/16 13:13:57 by alicetetu        ###   ########.fr       */
+/*   Updated: 2021/01/08 15:46:07 by atetu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,7 @@
 #include <log/LoggerFactory.hpp>
 #include <util/Optional.hpp>
 #include <unit/DataSize.hpp>
+#include <libs/ft.hpp>
 #include <cctype>
 #include <iostream>
 #include <iterator>
@@ -569,6 +570,41 @@ Configuration::Validator::validate(const RootBlock &rootBlock)
 		for (slist::const_iterator sit = serverBlocks.begin(); sit != serverBlocks.end(); sit++)
 		{
 			const ServerBlock &serverBlock = *(*sit);
+			
+			if (serverBlock.host().present())
+			{
+				std::string host = serverBlock.host().get();
+				size_t found;
+				int loop = 4;
+				while (loop--)
+				{
+					if (((found = host.find(".")) != std::string::npos) || loop == 0)
+					{
+						std::string subHost = host.substr(0, found);
+						host.erase(0, found + 1);
+						std::cout << subHost << std::endl;
+						int res;
+						if (!subHost.empty() && subHost.size() <= 3)
+						{
+							size_t i = -1;
+							while (++i < subHost.size())
+							{
+								std::cout << subHost[i] << std::endl;
+								if (!(ft::isdigit(subHost[i])))
+									throw ConfigurationValidateException("Host value should only be made of digits.");
+							}
+						}
+						else
+						{
+							throw ConfigurationValidateException("Host value should be made of 4 units, made up of 1 to 3 digits maximum, separated by dots.");
+						}
+						if (!((res = ft::atoi(subHost.c_str())) >= 0 && res <= 255))
+							throw ConfigurationValidateException("Host value should be made of 4 numbers, ranged between 0 and 255");
+					}
+					else
+						throw ConfigurationValidateException("Host value should be made of 4 units, made up of 1 to 3 digits maximum, separated by dots2.");
+				}
+			}
 
 			if (serverBlock.locations().present())
 			{

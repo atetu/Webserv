@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ChunkDecoder.hpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
+/*   By: atetu <atetu@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/19 14:47:44 by alicetetu         #+#    #+#             */
-/*   Updated: 2020/12/23 16:57:33 by alicetetu        ###   ########.fr       */
+/*   Updated: 2021/01/07 14:32:35 by atetu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,20 +23,21 @@ class ChunkDecoder
 		{
 			S_NOT_STARTED,
 			S_SIZE,
-			S_EXTENSION,
-			S_SIZE_END,
+		//	S_EXTENSION,
+		//	S_SIZE_END,
 		//	S_SIZE_END2,
 			S_CHUNK,
 		//	S_CHUNK_END_EXPECTED,
 			S_CHUNK_END,
-			S_CHUNK_END2,
+		//	S_CHUNK_END2,
 			S_NULL,
-			S_END,
+		//	S_END,
 			S_OVER
 		};
 
 		ChunkDecoder();
 		ChunkDecoder(const std::string &input);
+		// ChunkDecoder(std::string &body);
 		ChunkDecoder(const ChunkDecoder &other);
 
 		virtual
@@ -46,7 +47,9 @@ class ChunkDecoder
 		operator=(const ChunkDecoder &other);
 
 		std::string
-		decode();
+		decode(std::string storage);
+		
+		ChunkDecoder::State state();
 
 		static inline bool // why inline?
 		isValidCharacter(char c)
@@ -63,6 +66,7 @@ class ChunkDecoder
 		std::string m_parsedChunk;
 		std::string m_extension;
 		char m_lastChar;
+		size_t m_totalSize;
 };
 
 #endif /* CHUNKDECODER_HPP_ */
