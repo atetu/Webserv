@@ -89,7 +89,7 @@ HTTPClient::readable(FileDescriptor &fd)
 
 			while (m_in.next(c))
 			{
-				std::cout << c << std::flush;
+//				std::cout << c << std::flush;
 
 				try
 				{

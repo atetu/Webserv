@@ -10,10 +10,16 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+#include <log/Logger.hpp>
+#include <log/LoggerFactory.hpp>
 #include <nio/NIOSelector.hpp>
-#include <stddef.h>
 #include <sys/select.h>
+#include <util/Collections.hpp>
+#include <util/System.hpp>
 #include <iostream>
+#include <string>
+
+Logger &NIOSelector::LOG = LoggerFactory::get("NIO Selector");
 
 NIOSelector::NIOSelector() :
 		m_fds(),
@@ -65,36 +71,45 @@ NIOSelector::add(FileDescriptor &fd, Callback &callback, int operations)
 
 	addToSets(fd, operations);
 
-	m_operationConfig[raw] = operations;
 	m_callbacks[raw] = &callback;
 	m_fileDescriptors[raw] = &fd;
+
+	if (LOG.isTraceEnabled())
+		LOG.trace() << "Added: " << raw << "  (opts=" << operations << ")" << std::endl;
 }
 
 void
 NIOSelector::update(FileDescriptor &fd, int operations)
 {
+	int opts = this->operations(fd);
+
 	if (removeFromSets(fd))
 		addToSets(fd, operations);
+
+	if (LOG.isTraceEnabled())
+		LOG.trace() << "Updated: " << fd.raw() << "  (from opts= " << opts << ", to opts=" << operations << ")" << std::endl;
 }
 
 void
 NIOSelector::remove(FileDescriptor &fd)
 {
+	int opts = operations(fd);
+
 	if (removeFromSets(fd))
 	{
 		int raw = fd.raw();
 
-		OperationConfigMap::iterator it1 = m_operationConfig.find(raw);
-		if (it1 != m_operationConfig.end())
-			m_operationConfig.erase(it1);
+		Collections::remove(m_operationConfig, raw);
+		Collections::remove(m_callbacks, raw);
+		Collections::remove(m_fileDescriptors, raw);
 
-		CallbackMap::iterator it2 = m_callbacks.find(raw);
-		if (it2 != m_callbacks.end())
-			m_callbacks.erase(it2);
-
-		FileDescriptorMap::iterator it3 = m_fileDescriptors.find(raw);
-		if (it3 != m_fileDescriptors.end())
-			m_fileDescriptors.erase(it3);
+		if (LOG.isTraceEnabled())
+			LOG.trace() << "Removed: " << fd.raw() << "  (opts=" << opts << ")" << std::endl;
+	}
+	else
+	{
+		if (LOG.isTraceEnabled())
+			LOG.trace() << "Not Removed: " << fd.raw() << std::endl;
 	}
 }
 
@@ -181,6 +196,8 @@ NIOSelector::addToSets(FileDescriptor &fd, int operations)
 
 	if (raw > m_highest)
 		m_highest = raw;
+
+	m_operationConfig[raw] = operations;
 }
 
 bool
@@ -188,15 +205,18 @@ NIOSelector::removeFromSets(FileDescriptor &fd)
 {
 	int opts = operations(fd);
 
-	if (opts)
+	if (opts != -1)
 	{
 		int raw = fd.raw();
 
-		if (opts & (ACCEPT | READ))
-			m_read.clear(raw);
+		if (opts)
+		{
+			if (opts & (ACCEPT | READ))
+				m_read.clear(raw);
 
-		if (opts & (WRITE))
-			m_write.clear(raw);
+			if (opts & (WRITE))
+				m_write.clear(raw);
+		}
 
 		m_fds.clear(raw);
 
@@ -223,4 +243,61 @@ bool
 NIOSelector::Callback::writable(FileDescriptor&)
 {
 	return (false);
+}
+
+void
+NIOSelector::debug(const Logger &logger, FileDescriptorSet &readFds, FileDescriptorSet &writeFds, bool forced)
+{
+	debug(logger, *this, readFds, writeFds, forced);
+}
+
+void
+NIOSelector::debug(const Logger &logger, const NIOSelector &selector, FileDescriptorSet &readFds, FileDescriptorSet &writeFds, bool forced)
+{
+	if (!logger.isDebugEnabled())
+		return;
+
+	static std::string last;
+	static unsigned long lastTime = System::currentTimeSeconds();
+
+	int highest = selector.m_highest + 3;
+
+	std::string line;
+	line.reserve(highest + 1);
+
+	for (int i = 0; i < highest; i++)
+	{
+		char c = selector.fds().test(i) ? '-' : '.';
+
+		bool canRead = readFds.test(i);
+		bool canWrite = writeFds.test(i);
+
+		if (canRead && canWrite)
+			c = 'X';
+		else if (canRead)
+			c = 'R';
+		else if (canWrite)
+			c = 'W';
+
+		line += c;
+	}
+
+	if (forced)
+		line += "  (F)";
+
+	unsigned long now = System::currentTimeSeconds();
+
+	if (forced || line != last || lastTime + 3 < now)
+	{
+		last = line;
+		lastTime = now;
+
+		logger.debug() << line << std::endl;
+
+		logger.debug();
+		for (int i = 0; i < highest; i++)
+			std::cout << i;
+
+		std::cout << std::endl;
+	}
 }

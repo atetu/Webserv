@@ -18,6 +18,7 @@
 #include <util/Singleton.hpp>
 #include <map>
 
+class Logger;
 class Time;
 class FileDescriptorBuffer;
 
@@ -38,6 +39,9 @@ class NIOSelector :
 		typedef std::map<int, int> OperationConfigMap;
 		typedef std::map<int, Callback*> CallbackMap;
 		typedef std::map<int, FileDescriptor*> FileDescriptorMap;
+
+	public:
+		static Logger &LOG;
 
 	private:
 		FileDescriptorSet m_fds;
@@ -88,6 +92,13 @@ class NIOSelector :
 
 		bool
 		removeFromSets(FileDescriptor &fd);
+
+	public:
+		void
+		debug(const Logger &logger, FileDescriptorSet &readFds, FileDescriptorSet &writeFds, bool forced = false);
+
+		static void
+		debug(const Logger &logger, const NIOSelector &selector, FileDescriptorSet &readFds, FileDescriptorSet &writeFds, bool forced = false);
 
 	public:
 		class Callback

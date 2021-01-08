@@ -61,6 +61,15 @@ class Collections
 
 				return (out);
 			}
+
+		template<typename K, typename V>
+			static void
+			remove(std::map<K, V> &map, const K &key)
+			{
+				typename std::map<K, V>::iterator it = map.find(key);
+				if (it != map.end())
+					map.erase(it);
+			}
 };
 
 #endif /* COLLECTIONS_HPP_ */

@@ -10,42 +10,24 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <buffer/impl/SocketBuffer.hpp>
 #include <config/block/RootBlock.hpp>
 #include <config/block/ServerBlock.hpp>
 #include <config/Configuration.hpp>
 #include <exception/IOException.hpp>
-#include <http/enums/HTTPMethod.hpp>
-#include <http/enums/HTTPStatus.hpp>
-#include <http/enums/HTTPVersion.hpp>
-#include <http/filter/FilterChain.hpp>
-#include <http/header/HTTPDate.hpp>
 #include <http/HTTPOrchestrator.hpp>
-#include <http/parser/HTTPRequestParser.hpp>
-#include <http/request/HTTPRequest.hpp>
-#include <http/response/body/IResponseBody.hpp>
-#include <http/response/HTTPResponse.hpp>
 #include <io/Socket.hpp>
 #include <log/Logger.hpp>
 #include <log/LoggerFactory.hpp>
-#include <net/address/InetAddress.hpp>
-#include <net/address/InetSocketAddress.hpp>
 #include <nio/NIOSelector.hpp>
 #include <sys/errno.h>
-#include <sys/types.h>
-#include <util/Enum.hpp>
 #include <util/Environment.hpp>
 #include <util/FileDescriptorSet.hpp>
 #include <util/Optional.hpp>
 #include <util/Singleton.hpp>
 #include <util/System.hpp>
-#include <util/URL.hpp>
-#include <cstring>
 #include <iostream>
 #include <new>
-#include <set>
 #include <string>
-#include <utility>
 
 class NIOSelector;
 
@@ -140,13 +122,6 @@ HTTPOrchestrator::start()
 {
 	prepare();
 
-	FileDescriptorSet readSet;
-	FileDescriptorSet writeSet;
-
-	struct timeval timeout = {
-		.tv_sec = 0,
-		.tv_usec = 5000 };
-
 	for (server_iterator it = m_servers.begin(); it != m_servers.end(); it++)
 	{
 		HTTPServer &httpServer = *(*it);
@@ -156,6 +131,13 @@ HTTPOrchestrator::start()
 
 	try
 	{
+		FileDescriptorSet readSet;
+		FileDescriptorSet writeSet;
+
+		struct timeval timeout = {
+			.tv_sec = 0,
+			.tv_usec = 5000 };
+
 		m_running = true;
 		while (m_running)
 		{
@@ -165,11 +147,13 @@ HTTPOrchestrator::start()
 				if (m_stopping && errno == EINTR)
 					continue;
 
+				NIOSelector::instance().debug(LOG, readSet, writeSet, true);
+
 				throw IOException("select", errno);
 			}
 
 			if (fdCount)
-				printSelectOutput(readSet.storage(), writeSet.storage());
+				NIOSelector::instance().debug(LOG, readSet, writeSet, false);
 			else if (m_stopping)
 			{
 				if (!NIOSelector::instance().fds().empty())
