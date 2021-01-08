@@ -40,10 +40,9 @@ class FileDescriptor :
 				throw IllegalStateException("already closed");
 		}
 
-	protected:
+	public:
 		FileDescriptor(int fd);
 
-	public:
 		virtual
 		~FileDescriptor();
 
@@ -55,6 +54,9 @@ class FileDescriptor :
 
 		void
 		close();
+
+		void
+		nonBlocking();
 
 		int
 		raw() const;

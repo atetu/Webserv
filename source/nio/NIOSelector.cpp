@@ -154,6 +154,18 @@ NIOSelector::fds() const
 	return (m_fds);
 }
 
+const FileDescriptorSet&
+NIOSelector::readFds() const
+{
+	return (m_read);
+}
+
+const FileDescriptorSet&
+NIOSelector::writeFds() const
+{
+	return (m_write);
+}
+
 void
 NIOSelector::addToSets(FileDescriptor &fd, int operations)
 {

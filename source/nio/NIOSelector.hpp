@@ -76,6 +76,12 @@ class NIOSelector :
 		const FileDescriptorSet&
 		fds() const;
 
+		const FileDescriptorSet&
+		readFds() const;
+
+		const FileDescriptorSet&
+		writeFds() const;
+
 	private:
 		void
 		addToSets(FileDescriptor &fd, int operations);
