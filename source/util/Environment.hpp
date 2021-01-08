@@ -25,6 +25,9 @@ class Environment
 		typedef map::const_iterator const_iterator;
 
 	private:
+		static Environment PROGRAM;
+
+	private:
 		map m_storage;
 
 	public:
@@ -53,7 +56,13 @@ class Environment
 
 	public:
 		static Environment
-		envp(char **envp);
+		fromEnvp(char **envp);
+
+		static void
+		set(char **envp);
+
+		static Environment&
+		get();
 };
 
 template<>

@@ -29,6 +29,15 @@ class HTTPClient :
 		public NIOSelector::Callback
 {
 	public:
+		enum State
+		{
+			S_NOT_STARTED = 0,
+			S_HEADER,
+			S_BODY,
+			S_END,
+		};
+
+	public:
 		static Logger &LOG;
 
 	private:
@@ -38,6 +47,7 @@ class HTTPClient :
 		SocketBuffer &m_out;
 		HTTPServer &m_server;
 		HTTPRequestParser m_parser;
+		State m_state;
 		unsigned long m_lastAction;
 		HTTPRequest m_request;
 		HTTPResponse m_response;

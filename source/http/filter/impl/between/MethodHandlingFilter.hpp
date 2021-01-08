@@ -16,10 +16,15 @@
 #include <http/filter/Filter.hpp>
 #include <util/Singleton.hpp>
 
+class Logger;
+
 class MethodHandlingFilter :
 		public Filter,
 		public Singleton<MethodHandlingFilter>
 {
+	public:
+		static Logger &LOG;
+
 	public:
 		MethodHandlingFilter();
 		MethodHandlingFilter(const MethodHandlingFilter &other);

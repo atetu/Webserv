@@ -13,8 +13,11 @@
 #include <http/filter/FilterChain.hpp>
 #include <http/filter/impl/after/FinalFilter.hpp>
 #include <http/header/HTTPHeaderFields.hpp>
+#include <http/HTTPClient.hpp>
 #include <http/request/HTTPRequest.hpp>
 #include <http/response/HTTPResponse.hpp>
+#include <io/Socket.hpp>
+#include <nio/NIOSelector.hpp>
 #include <util/Macros.hpp>
 #include <util/Optional.hpp>
 #include <util/StringUtils.hpp>
@@ -42,7 +45,7 @@ FinalFilter::operator=(const FinalFilter &other)
 }
 
 void
-FinalFilter::doFilter(UNUSED HTTPClient &client, UNUSED HTTPRequest &request, HTTPResponse &response, FilterChain &next)
+FinalFilter::doFilter(HTTPClient &client, UNUSED HTTPRequest &request, HTTPResponse &response, FilterChain &next)
 {
 	{
 		static std::string keepAlive = "keep-alive";
@@ -57,6 +60,8 @@ FinalFilter::doFilter(UNUSED HTTPClient &client, UNUSED HTTPRequest &request, HT
 	response.headers().date();
 	response.headers().server();
 	response.end();
+
+	NIOSelector::instance().update(client.socket(), NIOSelector::WRITE);
 
 	return (next());
 }

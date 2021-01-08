@@ -35,7 +35,6 @@ class HTTPOrchestrator
 		static Logger &LOG;
 
 	private:
-		const Environment &m_environment;
 		server_container m_servers;
 		fd_set m_fds;
 		int m_highestFd;
@@ -49,7 +48,7 @@ class HTTPOrchestrator
 
 	private:
 		HTTPOrchestrator(void);
-		HTTPOrchestrator(const Environment &environment, const server_container &servers);
+		HTTPOrchestrator(const server_container &servers);
 		HTTPOrchestrator(const HTTPOrchestrator &other);
 
 		HTTPOrchestrator&
@@ -108,7 +107,7 @@ class HTTPOrchestrator
 
 	public:
 		static HTTPOrchestrator*
-		create(const Environment &environment);
+		create();
 
 		bool
 		running() const

@@ -54,6 +54,9 @@ class FilterChain
 		void
 		doChaining();
 
+		void
+		doChainingOf(State state);
+
 		inline void
 		operator()()
 		{

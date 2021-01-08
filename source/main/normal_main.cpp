@@ -134,7 +134,7 @@ normal_main(int argc, char **argv, char **envp)
 
 	LOG.debug() << "Set log level to: " << level->name() << std::endl;
 
-	Environment environment = Environment::envp(envp);
+	Environment::set(envp);
 
 	try
 	{
@@ -180,7 +180,7 @@ normal_main(int argc, char **argv, char **envp)
 
 		try
 		{
-			httpOrchestrator = HTTPOrchestrator::create(environment);
+			httpOrchestrator = HTTPOrchestrator::create();
 			httpOrchestrator->start();
 		}
 		catch (Exception &exception)

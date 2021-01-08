@@ -33,8 +33,7 @@ class NIOSelector;
 
 Logger &HTTPOrchestrator::LOG = LoggerFactory::get("Orchestrator");
 
-HTTPOrchestrator::HTTPOrchestrator(const Environment &environment, const server_container &servers) :
-		m_environment(environment),
+HTTPOrchestrator::HTTPOrchestrator(const server_container &servers) :
 		m_servers(servers),
 		m_fds(),
 		m_highestFd(0),
@@ -215,7 +214,7 @@ HTTPOrchestrator::terminate()
 }
 
 HTTPOrchestrator*
-HTTPOrchestrator::create(const Environment &environment)
+HTTPOrchestrator::create()
 {
 	typedef std::map<short, std::list<ServerBlock const*> > port_map;
 	typedef port_map::const_iterator port_iterator;
@@ -253,5 +252,5 @@ HTTPOrchestrator::create(const Environment &environment)
 		}
 	}
 
-	return (new HTTPOrchestrator(environment, httpServers));
+	return (new HTTPOrchestrator(httpServers));
 }

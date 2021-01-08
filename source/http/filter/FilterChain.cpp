@@ -61,20 +61,22 @@ FilterChain::doChaining()
 	{
 		m_beforePassed = true;
 
-		nextState(S_BEFORE);
-		next();
+		doChainingOf(S_BEFORE);
 	}
 	else
 	{
 		if (m_response.status().absent())
-		{
-			nextState(S_BETWEEN);
-			next();
-		}
+			doChainingOf(S_BETWEEN);
 
-		nextState(S_AFTER);
-		next();
+		doChainingOf(S_AFTER);
 	}
+}
+
+void
+FilterChain::doChainingOf(State state)
+{
+	nextState(state);
+	next();
 }
 
 bool
@@ -99,8 +101,6 @@ FilterChain::nextState(State state)
 		{
 			m_current.push_back(&CGIFilter::instance());
 			m_current.push_back(&MethodHandlingFilter::instance());
-
-			break;
 		}
 
 		case S_AFTER:

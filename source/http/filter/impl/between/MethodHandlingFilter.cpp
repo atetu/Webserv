@@ -10,15 +10,19 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+#include <exception/Exception.hpp>
 #include <http/enums/HTTPMethod.hpp>
+#include <http/enums/HTTPStatus.hpp>
 #include <http/filter/FilterChain.hpp>
 #include <http/filter/impl/between/MethodHandlingFilter.hpp>
 #include <http/handler/HTTPMethodHandler.hpp>
 #include <http/request/HTTPRequest.hpp>
 #include <http/response/HTTPResponse.hpp>
+#include <log/LoggerFactory.hpp>
 #include <util/Macros.hpp>
 #include <util/Optional.hpp>
-#include <iostream>
+
+Logger &MethodHandlingFilter::LOG = LoggerFactory::get("Meth. Handl. Filter");
 
 MethodHandlingFilter::MethodHandlingFilter()
 {
@@ -44,7 +48,19 @@ MethodHandlingFilter::operator=(const MethodHandlingFilter &other)
 void
 MethodHandlingFilter::doFilter(UNUSED HTTPClient &client, UNUSED HTTPRequest &request, UNUSED HTTPResponse &response, FilterChain &next)
 {
-	request.method().get()->handler().handle(request, response);
+	if (response.status().absent())
+	{
+		try
+		{
+			request.method().get()->handler().handle(request, response);
+		}
+		catch (Exception &exception)
+		{
+			LOG.trace() << "Failed to handle method: " << exception.message() << std::endl;
+
+			response.status(*HTTPStatus::INTERNAL_SERVER_ERROR);
+		}
+	}
 
 	return (next());
 }

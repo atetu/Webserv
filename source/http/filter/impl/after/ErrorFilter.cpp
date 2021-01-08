@@ -33,8 +33,6 @@
 #include <iostream>
 #include <string>
 
-class DefaultPages;
-
 Logger &ErrorFilter::LOG = LoggerFactory::get("Error Filter");
 
 ErrorFilter::ErrorFilter()

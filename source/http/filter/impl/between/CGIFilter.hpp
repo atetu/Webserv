@@ -16,10 +16,15 @@
 #include <http/filter/Filter.hpp>
 #include <util/Singleton.hpp>
 
+class Logger;
+
 class CGIFilter :
 		public Filter,
 		public Singleton<CGIFilter>
 {
+	public:
+		static Logger &LOG;
+
 	public:
 		CGIFilter();
 		CGIFilter(const CGIFilter &other);

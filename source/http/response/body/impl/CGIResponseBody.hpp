@@ -14,7 +14,9 @@
 # define CGIRESPONSEBODY_HPP_
 
 #include <buffer/impl/BaseBuffer.hpp>
+#include <http/parser/HTTPHeaderFieldsParser.hpp>
 #include <http/response/body/IResponseBody.hpp>
+#include <io/FileDescriptor.hpp>
 #include <nio/NIOSelector.hpp>
 
 class CommonGatewayInterface;
@@ -24,9 +26,11 @@ class CGIResponseBody :
 		public NIOSelector::Callback
 {
 	private:
+		HTTPClient &m_client;
 		CommonGatewayInterface &m_cgi;
 		FileDescriptorBuffer &m_bufferedIn;
 		FileDescriptorBuffer &m_bufferedOut;
+		HTTPHeaderFieldsParser m_headerFieldsParser;
 
 	private:
 		CGIResponseBody();
@@ -36,7 +40,7 @@ class CGIResponseBody :
 		operator=(const CGIResponseBody &other);
 
 	public:
-		CGIResponseBody(CommonGatewayInterface &cgi);
+		CGIResponseBody(HTTPClient &client, CommonGatewayInterface &cgi);
 
 		virtual
 		~CGIResponseBody();

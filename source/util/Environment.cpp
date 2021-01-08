@@ -15,6 +15,8 @@
 #include <iostream>
 #include <utility>
 
+Environment Environment::PROGRAM;
+
 Environment::Environment() :
 		m_storage()
 {
@@ -68,8 +70,25 @@ Environment::setProperty(const std::string &key, const std::string &value, bool 
 	return (true);
 }
 
+char**
+Environment::allocate() const
+{
+	char **envp = new char*[m_storage.size() + 1];
+
+	map::size_type index = 0;
+	for (const_iterator it = m_storage.begin(); it != m_storage.end(); it++)
+	{
+		std::string line = it->first + '=' + it->second;
+		envp[index++] = ft::strdup(line.c_str());
+	}
+
+	envp[index] = NULL;
+
+	return (envp);
+}
+
 Environment
-Environment::envp(char **envp)
+Environment::fromEnvp(char **envp)
 {
 	Environment environment;
 
@@ -96,19 +115,14 @@ Environment::envp(char **envp)
 	return (environment);
 }
 
-char**
-Environment::allocate() const
+void
+Environment::set(char **envp)
 {
-	char **envp = new char*[m_storage.size() + 1];
+	PROGRAM = fromEnvp(envp);
+}
 
-	map::size_type index = 0;
-	for (const_iterator it = m_storage.begin(); it != m_storage.end(); it++)
-	{
-		std::string line = it->first + '=' + it->second;
-		envp[index++] = ft::strdup(line.c_str());
-	}
-
-	envp[index] = NULL;
-
-	return (envp);
+Environment&
+Environment::get()
+{
+	return (PROGRAM);
 }
