@@ -119,9 +119,9 @@ MimeRegistry::MimeRegistry::findByMimeType(const std::string &type) const
 }
 
 const Mime*
-MimeRegistry::findByFileExtension(const std::string &type) const
+MimeRegistry::findByFileExtension(const std::string &extension) const
 {
-	const_iterator it = m_reverse_mapping.find(type);
+	const_iterator it = m_reverse_mapping.find(extension);
 
 	if (it == m_reverse_mapping.end())
 		return (NULL);

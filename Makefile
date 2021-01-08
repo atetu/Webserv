@@ -44,9 +44,13 @@ run: RUN_TESTS=0
 run: all
 	@$(PROJECT_MAKE) ARGS="$(ARGS)" run
 
+run-with-valgrind: RUN_TESTS=0
+run-with-valgrind: all
+	@$(PROJECT_MAKE) ARGS="$(ARGS)" VALGRIND_ARGS="$(VALGRIND_ARGS)" run-with-valgrind
+
 test: RUN_TESTS=1
 test: all
-	@$(PROJECT_MAKE) ARGS="$(ARGS)" run
+	@$(PROJECT_MAKE) ARGS="$(ARGS)" VALGRIND_ARGS="$(VALGRIND_ARGS)" run
 
 docker-build-base:
 	@$(DOCKER) build -t webserv-base -f docker/Dockerfile.base .

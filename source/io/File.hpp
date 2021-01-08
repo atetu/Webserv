@@ -20,6 +20,13 @@
 #include <list>
 #include <string>
 
+class Time;
+
+#if 1
+#include <sys/fcntl.h>
+#include <util/Time.hpp>
+#endif
+
 class FileDescriptor;
 
 class File
@@ -72,8 +79,17 @@ class File
 		FileDescriptor*
 		open(int flags, mode_t mode = 0) const;
 
+		void
+		remove(void) const;
+
+		bool
+		tryRemove(void) const;
+
 		size_t
 		length() const;
+
+		Time
+		lastModified() const;
 
 		std::string
 		name() const;

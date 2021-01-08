@@ -15,7 +15,7 @@
 
 #include <vector>
 
-template<typename T, typename Container = std::vector<T> > // enzo est ce que tu pourrais me reexpliquer ca?
+template<typename T, typename Container = std::vector<T> >
 	class ContainerBuilder
 	{
 		private:

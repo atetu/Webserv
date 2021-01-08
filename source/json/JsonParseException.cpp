@@ -95,7 +95,7 @@ JsonParseException::expectedChar(char got, char expected, const JsonLocation &lo
 }
 
 JsonParseException
-JsonParseException::parsing(JsonToken *token, std::string expectedTokens, const JsonLocation &location)
+JsonParseException::parsing(const JsonToken *token, std::string expectedTokens, const JsonLocation &location)
 {
 	std::stringstream sstream;
 
@@ -110,7 +110,7 @@ JsonParseException::parsing(JsonToken *token, std::string expectedTokens, const 
 }
 
 JsonParseException
-JsonParseException::expectedEndOfFile(JsonToken *token, const JsonLocation &location)
+JsonParseException::expectedEndOfFile(const JsonToken *token, const JsonLocation &location)
 {
 	std::stringstream sstream;
 

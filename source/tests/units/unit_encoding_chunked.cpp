@@ -25,13 +25,13 @@ encode(const char *str)
 static std::string
 decode(const char *str)
 {
-	return (ChunkDecoder(str).decode());
+	return (ChunkDecoder().decode(str));
 }
 
 CASE("chunked", "encode")
 {
 	ASSERT(encode("Hello") == "5\r\nHello\r\n0\r\n\r\n");
-	ASSERT(encode("World") == "5\r\nWorld\r\n0\r\n\r\n"); // TODO Shouldn't there be an empty CRLF between 2 chunks?
+	ASSERT(encode("World") == "5\r\nWorld\r\n0\r\n\r\n");
 
 	return (0);
 }

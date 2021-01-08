@@ -13,12 +13,13 @@
 #ifndef HTTPREQUESTPARSER_HPP_
 # define HTTPREQUESTPARSER_HPP_
 
+#include <encoding/default/chunk/ChunkDecoder.hpp>
+#include <http/enums/HTTPVersion.hpp>
 #include <http/parser/HTTPHeaderFieldsParser.hpp>
 #include <http/parser/HTTPRequestPathParser.hpp>
 #include <unit/DataSize.hpp>
+#include <util/Optional.hpp>
 #include <string>
-#include <config/block/LocationBlock.hpp>
-#include <encoding/default/chunk/ChunkDecoder.hpp>
 
 class URL;
 
@@ -52,6 +53,7 @@ class HTTPRequestParser
 			S_HTTP_END2,
 			S_HTTP_END3,
 			S_HEADER_FIELDS,
+			S_BODY,
 			S_END,
 		};
 
@@ -72,6 +74,9 @@ class HTTPRequestParser
 
 		void
 		consume(char c);
+
+		State&
+		state();
 
 		State
 		state() const;
@@ -97,6 +102,12 @@ class HTTPRequestParser
 			return (m_major);
 		}
 
+		inline HTTPVersion
+		version()
+		{
+			return (HTTPVersion(m_major, m_minor));
+		}
+
 		inline const HTTPHeaderFieldsParser&
 		headerFieldsParser() const
 		{
@@ -119,7 +130,7 @@ class HTTPRequestParser
 		body(std::string &storage, const Optional<DataSize> &maxBodySize);
 
 		URL
-		url(const LocationBlock *locationBlockPtr);
+		url(/*const LocationBlock *locationBlockPtr*/);
 };
 
 #endif /* HTTPREQUESTPARSER_HPP_ */

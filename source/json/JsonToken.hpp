@@ -22,7 +22,7 @@ class JsonToken :
 {
 	private:
 		std::string m_displayable;
-		JsonParserEvent *m_event;
+		const JsonParserEvent *m_event;
 		bool m_isValue;
 
 	public:
@@ -33,7 +33,7 @@ class JsonToken :
 		{
 		}
 
-		JsonToken(const std::string &displayable, JsonParserEvent *event, bool isValue) :
+		JsonToken(const std::string &displayable, const JsonParserEvent *event, bool isValue) :
 				m_displayable(displayable),
 				m_event(event),
 				m_isValue(isValue)
@@ -66,7 +66,7 @@ class JsonToken :
 			return (m_displayable);
 		}
 
-		inline JsonParserEvent*
+		inline const JsonParserEvent*
 		getEvent(void) const
 		{
 			return (m_event);
@@ -79,18 +79,18 @@ class JsonToken :
 		}
 
 	public:
-		static JsonToken *CURLYOPEN;
-		static JsonToken *SQUAREOPEN;
-		static JsonToken *COLON;
-		static JsonToken *COMMA;
-		static JsonToken *STRING;
-		static JsonToken *NUMBER;
-		static JsonToken *TRUE;
-		static JsonToken *FALSE;
-		static JsonToken *NULL_; /* Collide with NULL */
-		static JsonToken *CURLYCLOSE;
-		static JsonToken *SQUARECLOSE;
-		static JsonToken *END_OF_FILE;
+		static const JsonToken *CURLYOPEN;
+		static const JsonToken *SQUAREOPEN;
+		static const JsonToken *COLON;
+		static const JsonToken *COMMA;
+		static const JsonToken *STRING;
+		static const JsonToken *NUMBER;
+		static const JsonToken *TRUE;
+		static const JsonToken *FALSE;
+		static const JsonToken *NULL_; /* Collide with NULL */
+		static const JsonToken *CURLYCLOSE;
+		static const JsonToken *SQUARECLOSE;
+		static const JsonToken *END_OF_FILE;
 };
 
 #endif /* JSONTOKEN_HPP_ */

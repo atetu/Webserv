@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   CONNECT.cpp                                        :+:      :+:    :+:   */
+/*   ConnectHandler.cpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ecaceres <ecaceres@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -12,25 +12,32 @@
 
 #include <http/enums/HTTPStatus.hpp>
 #include <http/handler/methods/ConnectHandler.hpp>
+#include <http/response/HTTPResponse.hpp>
+#include <util/Macros.hpp>
 
 ConnectHandler::ConnectHandler()
 {
+}
+
+ConnectHandler::ConnectHandler(const ConnectHandler &other)
+{
+	(void)other;
 }
 
 ConnectHandler::~ConnectHandler()
 {
 }
 
-HTTPResponse*
-ConnectHandler::handle(HTTPRequest &request)
+ConnectHandler&
+ConnectHandler::operator =(const ConnectHandler &other)
 {
-	return (error(request, *HTTPStatus::BAD_REQUEST));
+	(void)other;
+
+	return (*this);
 }
 
-ConnectHandler&
-ConnectHandler::get(void)
+void
+ConnectHandler::handle(UNUSED HTTPRequest &request, HTTPResponse &response)
 {
-	static ConnectHandler handler;
-
-	return (handler);
+	response.status(*HTTPStatus::BAD_REQUEST);
 }

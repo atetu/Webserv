@@ -35,7 +35,6 @@ class HTTPOrchestrator
 		static Logger &LOG;
 
 	private:
-		const Configuration &m_configuration;
 		const Environment &m_environment;
 		server_container m_servers;
 		fd_set m_fds;
@@ -50,7 +49,7 @@ class HTTPOrchestrator
 
 	private:
 		HTTPOrchestrator(void);
-		HTTPOrchestrator(const Configuration &configuration, const Environment &environment, const server_container &servers);
+		HTTPOrchestrator(const Environment &environment, const server_container &servers);
 		HTTPOrchestrator(const HTTPOrchestrator &other);
 
 		HTTPOrchestrator&
@@ -74,7 +73,7 @@ class HTTPOrchestrator
 		clearFd(int fd);
 
 		void
-		printSelectOutput(fd_set &readFds, fd_set &writeFds);
+		printSelectOutput(fd_set &readFds, fd_set &writeFds, bool forced = false);
 
 		void
 		addServer(HTTPServer &server);
@@ -109,7 +108,7 @@ class HTTPOrchestrator
 
 	public:
 		static HTTPOrchestrator*
-		create(const Configuration &configuration, const Environment &environment);
+		create(const Environment &environment);
 
 		bool
 		running() const

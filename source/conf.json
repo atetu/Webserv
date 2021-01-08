@@ -45,6 +45,12 @@
 			},
 			"root": "../",
 			"locations": {
+				"/": {
+					"index": [
+						"index.html"
+					],
+					"listing": true
+				},
 				"/wordpress": {
 					"root": "/root/",
 					"cgi": "php-cgi",

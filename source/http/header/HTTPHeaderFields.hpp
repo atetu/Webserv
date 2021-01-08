@@ -67,10 +67,10 @@ class HTTPHeaderFields
 		allow(const HTTPMethod &method);
 
 		HTTPHeaderFields&
-		allow(const std::vector<HTTPMethod> &methods);
+		allow(const std::vector<const HTTPMethod*> &methods);
 
 		HTTPHeaderFields&
-		allow(const std::list<HTTPMethod> &methods);
+		allow(const std::list<const HTTPMethod*> &methods);
 
 		HTTPHeaderFields&
 		allow(const std::string &value);
@@ -100,6 +100,9 @@ class HTTPHeaderFields
 		contentType(const Mime &mime);
 
 		HTTPHeaderFields&
+		contentType(const Optional<const Mime*> &optional);
+
+		HTTPHeaderFields&
 		date(void);
 
 		HTTPHeaderFields&
@@ -110,6 +113,12 @@ class HTTPHeaderFields
 
 		HTTPHeaderFields&
 		host(const std::string &value);
+
+		HTTPHeaderFields&
+		lastModified(long seconds);
+
+		HTTPHeaderFields&
+		lastModified(const Time &time);
 
 		HTTPHeaderFields&
 		lastModified(const HTTPDate &date);
@@ -163,6 +172,9 @@ class HTTPHeaderFields
 		wwwAuthenticate(const std::string &type, const Optional<std::string> realm);
 
 		HTTPHeaderFields&
+		connection(const std::string &value);
+
+		HTTPHeaderFields&
 		html(void);
 
 		HTTPHeaderFields&
@@ -212,6 +224,7 @@ class HTTPHeaderFields
 		static const std::string USER_AGENT;
 		static const std::string WWW_AUTHENTICATE;
 		static const std::string SET_COOKIE;
+		static const std::string CONNECTION;
 
 		static const std::string MIME_HTML;
 		static const std::string MIME_HTTP;

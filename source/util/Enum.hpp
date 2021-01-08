@@ -14,21 +14,23 @@
 # define ENUM_HPP_
 
 #include <exception/Exception.hpp>
+#include <util/Object.hpp>
 #include <util/Objects.hpp>
 #include <iostream>
+#include <list>
 #include <string>
 #include <typeinfo>
-#include <vector>
 
-# define ENUM_DEFINE(clazz, name, constructor) clazz *clazz::name = clazz::enumValue(#name, constructor);
+# define ENUM_DEFINE(clazz, name, constructor) const clazz *clazz::name = clazz::enumValue(#name, constructor);
 
 template<typename E>
-	class Enum
+	class Enum :
+			public Object
 	{
 		public:
-			typedef E *Pointer;
-			typedef std::vector<Pointer> Container;
-			typedef typename Container::const_iterator iterator;
+			typedef std::list<const E*> Container;
+			typedef typename Container::iterator iterator;
+			typedef typename Container::const_iterator const_iterator;
 
 		private:
 			class ContainerWrapper
@@ -39,7 +41,7 @@ template<typename E>
 				public:
 					~ContainerWrapper() /* std::vector<*> don't free pointers. */
 					{
-						for (iterator it = m_container.begin(); it != m_container.end(); it++)
+						for (const_iterator it = m_container.begin(); it != m_container.end(); it++)
 							delete *it;
 					}
 
@@ -56,6 +58,7 @@ template<typename E>
 
 		protected:
 			Enum() :
+					Object(),
 					m_name(""),
 					m_ordinal(-1)
 			{
@@ -77,17 +80,22 @@ template<typename E>
 				return (ordinal++);
 			}
 
-			static const Pointer
+			static const E*
 			enumValue(const std::string &name, const E &from)
 			{
-				//std::cout << name << std::endl;
-				Pointer value = new E(from);
+				E *value = new E(from);
 				value->m_name = name;
 				value->m_ordinal = nextOrdinal();
 
 				enumConstants().storage().push_back(value);
 
 				return (value);
+			}
+
+			virtual std::string
+			toString() const
+			{
+				return (m_name);
 			}
 
 		public:
@@ -120,7 +128,7 @@ template<typename E>
 				return (m_ordinal);
 			}
 
-			inline static const Container&
+			inline static Container&
 			values()
 			{
 				return (enumConstants().storage());
@@ -129,7 +137,7 @@ template<typename E>
 			inline static const E*
 			find(const std::string &string)
 			{
-				const Container &storage = values();
+				Container &storage = enumConstants().storage();
 
 				for (iterator it = storage.begin(); it != storage.end(); it++)
 					if ((*it)->name() == string)
@@ -141,7 +149,7 @@ template<typename E>
 			inline static const E&
 			valueOf(const std::string &string)
 			{
-				const Container &storage = values();
+				Container &storage = enumConstants().storage();
 
 				for (iterator it = storage.begin(); it != storage.end(); it++)
 					if ((*it)->name() == string)

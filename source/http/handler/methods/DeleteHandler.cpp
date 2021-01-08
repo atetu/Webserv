@@ -13,42 +13,40 @@
 #include <http/enums/HTTPStatus.hpp>
 #include <http/handler/methods/DeleteHandler.hpp>
 #include <http/request/HTTPRequest.hpp>
-#include <sys/stat.h>
-#include <util/URL.hpp>
-#include <iostream>
-#include <string>
+#include <http/response/HTTPResponse.hpp>
+#include <io/File.hpp>
 
 DeleteHandler::DeleteHandler()
 {
+}
+
+DeleteHandler::DeleteHandler(const DeleteHandler &other)
+{
+	(void)other;
 }
 
 DeleteHandler::~DeleteHandler()
 {
 }
 
-HTTPResponse*
-DeleteHandler::handle(HTTPRequest &request)
+DeleteHandler&
+DeleteHandler::operator =(const DeleteHandler &other)
 {
-	const char *filepath = request.url().path().c_str();
-	struct stat st;
+	(void)other;
 
-	if (::stat(filepath, &st) == 0)
-	{
-		std::cout << filepath << std::endl;
-		/*if (::remove(filepath) == 0) // TODO Disabled to avoid mistakes
-			return (status(*HTTPStatus::OK));
-		else
-			return (status(*HTTPStatus::ACCEPTED));*/
-		return (status(*HTTPStatus::OK));
-	}
-	else
-		return (status(*HTTPStatus::NO_CONTENT));
+	return (*this);
 }
 
-DeleteHandler&
-DeleteHandler::get(void)
+void
+DeleteHandler::handle(HTTPRequest &request, HTTPResponse &response)
 {
-	static DeleteHandler handler;
+	File targetFile(request.targetFile());
 
-	return (handler);
+	if (!targetFile.exists())
+		return (response.status(*HTTPStatus::NO_CONTENT));
+
+	if (targetFile.tryRemove())
+		return (response.status(*HTTPStatus::OK));
+	else
+		return (response.status(*HTTPStatus::ACCEPTED));
 }

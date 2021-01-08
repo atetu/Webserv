@@ -10,17 +10,16 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+#include <dirent.h>
+#include <exception/IllegalStateException.hpp>
 #include <io/File.hpp>
 #include <io/FileDescriptor.hpp>
 #include <stdlib.h>
 #include <sys/fcntl.h>
-#include <dirent.h>
 #include <sys/stat.h>
 #include <sys/unistd.h>
-#include <unistd.h>
-#include <cstdio>
-#include <iostream>
 #include <util/StringUtils.hpp>
+#include <cstddef>
 
 File::File() :
 		m_path()
@@ -108,7 +107,6 @@ File::createNewFile(mode_t mode) const
 {
 	int fd;
 
-
 	// std::cout << "path: " <<  m_path << std::endl; // TODO split the path ind directories and sub directories
 	std::string copy = m_path;
 	std::string previousStr = "";
@@ -123,7 +121,7 @@ File::createNewFile(mode_t mode) const
 		{
 			previousStr = newPath;
 			copy = remainedPath;
-		//	found = copy.find('/');
+			//	found = copy.find('/');
 		}
 		else
 		{
@@ -137,17 +135,17 @@ File::createNewFile(mode_t mode) const
 			}
 			previousStr = newPath;
 			copy = remainedPath;
-		//	found = copy.find('/');
-			
+			//	found = copy.find('/');
+
 		}
-		
+
 	}
 	// mkdir ("put_test/test",0777);
 	if ((fd = ::open(m_path.c_str(), O_CREAT, mode)) == -1) //TOTO create directory if needed
 	{
 		errno = 0;
-	//	std::cout << "error\n";
-		return (false);//TODO handle errors
+		//	std::cout << "error\n";
+		return (false); //TODO handle errors
 	}
 
 	close(fd);
@@ -163,6 +161,16 @@ File::length() const
 		throw ioException();
 
 	return (st.st_size);
+}
+
+Time
+File::lastModified() const
+{
+	struct stat st;
+	if (::stat(m_path.c_str(), &st) == -1)
+		throw ioException();
+
+	return (Time(st.st_mtim));
 }
 
 std::string
@@ -181,7 +189,42 @@ File::open(int flags, mode_t mode) const
 	if ((fd = ::open(m_path.c_str(), flags, mode)) == -1)
 		throw ioException();
 
-	return (FileDescriptor::wrap(fd));
+	try
+	{
+		return (FileDescriptor::wrap(fd));
+	}
+	catch (...)
+	{
+		::close(fd);
+
+		throw;
+	}
+}
+
+void
+File::remove(void) const
+{
+	if (isDirectory())
+		::rmdir(m_path.c_str());
+	else if (isFile())
+		::unlink(m_path.c_str());
+	else
+		throw IllegalStateException(m_path + ": not a directory or a file");
+}
+
+bool
+File::tryRemove(void) const
+{
+	try
+	{
+		remove();
+
+		return (true);
+	}
+	catch (Exception &exception)
+	{
+		return (false);
+	}
 }
 
 File

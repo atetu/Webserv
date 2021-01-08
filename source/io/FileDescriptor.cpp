@@ -15,35 +15,17 @@
 #include <sys/fcntl.h>
 #include <sys/errno.h>
 #include <sys/unistd.h>
-#include <unistd.h>
-#include <iostream>
 
 FileDescriptor::FileDescriptor(int fd) :
 		m_fd(fd),
 		m_closed(false)
 {
-	if (::fcntl(fd, F_SETFL, O_NONBLOCK) == -1)
-		throw IOException("fcntl", errno);
 }
 
 FileDescriptor::~FileDescriptor()
 {
 	if (!m_closed)
 		::close(m_fd);
-}
-
-void
-FileDescriptor::close()
-{
-	ensureNotClosed();
-
-	if (!m_closed)
-	{
-		::close(m_fd);
-
-		m_fd = -1;
-		m_closed = true;
-	}
 }
 
 ssize_t
@@ -62,6 +44,27 @@ FileDescriptor::write(const void *buf, size_t nbyte)
 	return (::write(m_fd, buf, nbyte));
 }
 
+void
+FileDescriptor::close()
+{
+	ensureNotClosed();
+
+	if (!m_closed)
+	{
+		::close(m_fd);
+
+		m_fd = -1;
+		m_closed = true;
+	}
+}
+
+void
+FileDescriptor::nonBlocking()
+{
+	if (::fcntl(m_fd, F_SETFL, O_NONBLOCK) == -1)
+		throw IOException("fcntl", errno);
+}
+
 int
 FileDescriptor::raw() const
 {
@@ -77,5 +80,18 @@ FileDescriptor::isClosed() const
 FileDescriptor*
 FileDescriptor::wrap(int fd)
 {
-	return (new FileDescriptor(fd));
+	FileDescriptor *fileDescriptor = new FileDescriptor(fd);
+
+	try
+	{
+		fileDescriptor->nonBlocking();
+	}
+	catch (...)
+	{
+		delete fileDescriptor;
+
+		throw;
+	}
+
+	return (fileDescriptor);
 }

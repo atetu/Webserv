@@ -15,25 +15,24 @@
 
 #include <http/handler/HTTPMethodHandler.hpp>
 #include <io/File.hpp>
+#include <util/Singleton.hpp>
 
 class PutHandler :
-		public HTTPMethodHandler
+		public HTTPMethodHandler,
+		public Singleton<PutHandler>
 {
 	public:
 		PutHandler();
+		PutHandler(const PutHandler &other);
 
 		virtual
 		~PutHandler();
 
-		HTTPResponse*
-		handle(HTTPRequest &request);
+		PutHandler&
+		operator =(const PutHandler &other);
 
-		int
-		checkExtension(HTTPRequest &request, File &file);
-
-	public:
-		static PutHandler&
-		get(void);
+		void
+		handle(HTTPRequest &request, HTTPResponse &response);
 };
 
 #endif /* PutHANDLER_HPP_ */

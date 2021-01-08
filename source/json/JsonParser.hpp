@@ -42,16 +42,16 @@ class JsonParser
 				{
 				}
 
-				virtual JsonParserEvent*
-				nextEvent(JsonParser &parser, JsonTokenizer &tokenizer, JsonParserEvent *&currentEvent, Context *&currentContext, std::stack<Context*> &stack) = 0;
+				virtual const JsonParserEvent*
+				nextEvent(JsonParser &parser, JsonTokenizer &tokenizer, const JsonParserEvent *&currentEvent, Context *&currentContext, std::stack<Context*> &stack) = 0;
 		};
 
 		class NoneContext :
 				public Context
 		{
 			public:
-				JsonParserEvent*
-				nextEvent(JsonParser &parser, JsonTokenizer &tokenizer, JsonParserEvent *&currentEvent, Context *&currentContext, std::stack<Context*> &stack);
+				const JsonParserEvent*
+				nextEvent(JsonParser &parser, JsonTokenizer &tokenizer, const JsonParserEvent *&currentEvent, Context *&currentContext, std::stack<Context*> &stack);
 		};
 
 		class ObjectContext :
@@ -63,8 +63,8 @@ class JsonParser
 			public:
 				ObjectContext();
 
-				JsonParserEvent*
-				nextEvent(JsonParser &parser, JsonTokenizer &tokenizer, JsonParserEvent *&currentEvent, Context *&currentContext, std::stack<Context*> &stack);
+				const JsonParserEvent*
+				nextEvent(JsonParser &parser, JsonTokenizer &tokenizer, const JsonParserEvent *&currentEvent, Context *&currentContext, std::stack<Context*> &stack);
 		};
 
 		class ArrayContext :
@@ -76,13 +76,13 @@ class JsonParser
 			public:
 				ArrayContext();
 
-				JsonParserEvent*
-				nextEvent(JsonParser &parser, JsonTokenizer &tokenizer, JsonParserEvent *&currentEvent, Context *&currentContext, std::stack<Context*> &stack);
+				const JsonParserEvent*
+				nextEvent(JsonParser &parser, JsonTokenizer &tokenizer, const JsonParserEvent *&currentEvent, Context *&currentContext, std::stack<Context*> &stack);
 		};
 
 	private:
 		Context *m_currentContext;
-		JsonParserEvent *m_currentEvent;
+		const JsonParserEvent *m_currentEvent;
 
 		std::stack<Context*> m_stack;
 		JsonTokenizer m_tokenizer;
@@ -93,7 +93,7 @@ class JsonParser
 
 	protected:
 		JsonParseException
-		parsingException(JsonToken *token, const std::string &expectedTokens)
+		parsingException(const JsonToken *token, const std::string &expectedTokens)
 		{
 			return (JsonParseException::parsing(token, expectedTokens, m_tokenizer.location()));
 		}
@@ -135,7 +135,7 @@ class JsonParser
 		bool
 		hasNext();
 
-		JsonParserEvent*
+		const JsonParserEvent*
 		next();
 
 		JsonValue*

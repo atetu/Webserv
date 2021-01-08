@@ -14,22 +14,24 @@
 # define CONNECTHANDLER_HPP_
 
 #include <http/handler/HTTPMethodHandler.hpp>
+#include <util/Singleton.hpp>
 
 class ConnectHandler :
-		public HTTPMethodHandler
+		public HTTPMethodHandler,
+		public Singleton<ConnectHandler>
 {
 	public:
 		ConnectHandler();
+		ConnectHandler(const ConnectHandler &other);
 
 		virtual
 		~ConnectHandler();
 
-		HTTPResponse*
-		handle(HTTPRequest &request);
+		ConnectHandler&
+		operator =(const ConnectHandler &other);
 
-	public:
-		static ConnectHandler&
-		get(void);
+		void
+		handle(HTTPRequest &request, HTTPResponse &response);
 };
 
 #endif /* CONNECTHANDLER_HPP_ */

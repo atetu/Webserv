@@ -14,22 +14,24 @@
 # define DELETEHANDLER_HPP_
 
 #include <http/handler/HTTPMethodHandler.hpp>
+#include <util/Singleton.hpp>
 
 class DeleteHandler :
-		public HTTPMethodHandler
+		public HTTPMethodHandler,
+		public Singleton<DeleteHandler>
 {
 	public:
 		DeleteHandler();
+		DeleteHandler(const DeleteHandler &other);
 
 		virtual
 		~DeleteHandler();
 
-		HTTPResponse*
-		handle(HTTPRequest &request);
+		DeleteHandler&
+		operator =(const DeleteHandler &other);
 
-	public:
-		static DeleteHandler&
-		get(void);
+		void
+		handle(HTTPRequest &request, HTTPResponse &response);
 };
 
 #endif /* DELETEHANDLER_HPP_ */

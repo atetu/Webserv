@@ -20,21 +20,23 @@
 #include <config/Configuration.hpp>
 #include <config/exceptions/ConfigurationBindException.hpp>
 #include <config/exceptions/ConfigurationValidateException.hpp>
+#include <exception/IllegalStateException.hpp>
 #include <http/mime/Mime.hpp>
-#include <util/Convert.hpp>
-#include <util/helper/DeleteHelper.hpp>
-#include <util/helper/JsonBinderHelper.hpp>
 #include <json/JsonArray.hpp>
 #include <json/JsonBoolean.hpp>
 #include <json/JsonNumber.hpp>
 #include <json/JsonReader.hpp>
 #include <json/JsonString.hpp>
 #include <json/JsonValue.hpp>
+#include <libs/ft.hpp>
 #include <log/Logger.hpp>
 #include <log/LoggerFactory.hpp>
-#include <util/Optional.hpp>
+#include <stddef.h>
 #include <unit/DataSize.hpp>
-#include <libs/ft.hpp>
+#include <util/Convert.hpp>
+#include <util/helper/DeleteHelper.hpp>
+#include <util/helper/JsonBinderHelper.hpp>
+#include <util/Optional.hpp>
 #include <cctype>
 #include <iostream>
 #include <iterator>
@@ -43,6 +45,7 @@
 #include <utility>
 
 Logger &Configuration::LOG = LoggerFactory::get("Configuration");
+Configuration *Configuration::INSTANCE = NULL;
 
 Configuration::Configuration() :
 		m_file(),
@@ -82,6 +85,25 @@ Configuration::operator =(const Configuration &other)
 	}
 
 	return (*this);
+}
+
+void
+Configuration::setInstance(Configuration *configuration)
+{
+	if (INSTANCE == configuration)
+		return;
+
+	DeleteHelper::pointer<Configuration>(INSTANCE);
+	INSTANCE = configuration;
+}
+
+Configuration&
+Configuration::instance()
+{
+	if (!INSTANCE)
+		throw IllegalStateException("no configuration defined");
+
+	return (*INSTANCE);
 }
 
 Configuration*

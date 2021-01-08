@@ -66,8 +66,14 @@ class FileDescriptorBuffer :
 			return (m_readEverything);
 		}
 
-		inline const FileDescriptor&
+		inline FileDescriptor&
 		descriptor(void)
+		{
+			return (m_fd);
+		}
+
+		inline const FileDescriptor&
+		descriptor(void) const
 		{
 			return (m_fd);
 		}

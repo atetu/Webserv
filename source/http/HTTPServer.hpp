@@ -14,15 +14,21 @@
 # define HTTPSERVER_HPP_
 
 #include <config/block/ServerBlock.hpp>
+#include <io/FileDescriptor.hpp>
+#include <nio/NIOSelector.hpp>
 #include <list>
 #include <string>
 
+class Logger;
 class HTTPClient;
-
 class Socket;
 
-class HTTPServer
+class HTTPServer :
+		public NIOSelector::Callback
 {
+	public:
+		static Logger &LOG;
+
 	private:
 		std::string m_host;
 		short m_port;
@@ -48,6 +54,9 @@ class HTTPServer
 		void
 		terminate(void);
 
+		Socket&
+		socket(void);
+
 		const Socket&
 		socket(void) const;
 
@@ -62,6 +71,9 @@ class HTTPServer
 
 		ServerBlock const*
 		defaultServerBlock(void) const;
+
+		bool
+		readable(FileDescriptor &fd);
 };
 
 #endif /* HTTPSERVER_HPP_ */

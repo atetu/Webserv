@@ -21,7 +21,7 @@ class HTTPStatusLine
 {
 	private:
 		HTTPVersion m_version;
-		HTTPStatus m_status;
+		const HTTPStatus *m_status;
 
 	public:
 		HTTPStatusLine(void);
@@ -41,7 +41,7 @@ class HTTPStatusLine
 		const HTTPStatus&
 		status() const
 		{
-			return (m_status);
+			return (*m_status);
 		}
 
 		const HTTPVersion&

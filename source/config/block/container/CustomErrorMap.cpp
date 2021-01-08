@@ -48,7 +48,7 @@ CustomErrorMap::has(int status) const
 }
 
 bool
-CustomErrorMap::has(HTTPStatus &status) const
+CustomErrorMap::has(const HTTPStatus &status) const
 {
 	return (has(status.code()));
 }
@@ -60,7 +60,7 @@ CustomErrorMap::get(int status) const
 }
 
 const std::string&
-CustomErrorMap::get(HTTPStatus &status) const
+CustomErrorMap::get(const HTTPStatus &status) const
 {
 	return (get(status.code()));
 }

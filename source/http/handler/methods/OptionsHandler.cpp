@@ -10,47 +10,36 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <config/block/LocationBlock.hpp>
 #include <http/enums/HTTPStatus.hpp>
 #include <http/handler/methods/OptionsHandler.hpp>
 #include <http/header/HTTPHeaderFields.hpp>
 #include <http/request/HTTPRequest.hpp>
-#include <util/Convert.hpp>
-#include <util/Optional.hpp>
-#include <list>
-#include <string>
+#include <http/response/HTTPResponse.hpp>
 
 OptionsHandler::OptionsHandler()
 {
+}
+
+OptionsHandler::OptionsHandler(const OptionsHandler &other)
+{
+	(void)other;
 }
 
 OptionsHandler::~OptionsHandler()
 {
 }
 
-HTTPResponse*
-OptionsHandler::handle(HTTPRequest &request)
+OptionsHandler&
+OptionsHandler::operator =(const OptionsHandler &other)
 {
-	static std::string comaAndSpace = ", ";
+	(void)other;
 
-	std::string allowValue;
-
-	if (request.location().present() && request.location().get()->methods().present())
-		allowValue = Convert::join(request.location().get()->methods().get(), comaAndSpace);
-	else
-		allowValue = "GET, PUT, POST, CONNECT, DELETE, HEAD, TRACE, OPTIONS";
-
-	HTTPHeaderFields headers;
-	headers.contentLength(0);
-	headers.allow(allowValue);
-
-	return (status(*HTTPStatus::CREATED, headers));
+	return (*this);
 }
 
-OptionsHandler&
-OptionsHandler::get(void)
+void
+OptionsHandler::handle(HTTPRequest &request, HTTPResponse &response)
 {
-	static OptionsHandler handler;
-
-	return (handler);
+	response.headers().allow(request.allowedMethods());
+	response.status(*HTTPStatus::OK);
 }

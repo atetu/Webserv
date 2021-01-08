@@ -223,8 +223,3 @@ URL::encode(const std::string &input)
 {
 	return (input);
 }
-void 
-URL::path(const std::string path)
-{
-	m_path = path;
-}

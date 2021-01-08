@@ -22,13 +22,13 @@ HTTPStatusLine::HTTPStatusLine(void) :
 
 HTTPStatusLine::HTTPStatusLine(const HTTPStatus &status) :
 		m_version(HTTPVersion::HTTP_1_1),
-		m_status(status)
+		m_status(&status)
 {
 }
 
 HTTPStatusLine::HTTPStatusLine(const HTTPVersion &version, const HTTPStatus &status) :
 		m_version(version),
-		m_status(status)
+		m_status(&status)
 {
 }
 
@@ -57,5 +57,5 @@ HTTPStatusLine::operator =(const HTTPStatusLine &other)
 std::string
 HTTPStatusLine::format(void) const
 {
-	return (m_version.format() + HTTP::SP + Convert::toString(m_status.code()) + HTTP::SP + m_status.reasonPhrase());
+	return (m_version.format() + HTTP::SP + Convert::toString(m_status->code()) + HTTP::SP + m_status->reasonPhrase());
 }

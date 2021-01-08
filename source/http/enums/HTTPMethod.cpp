@@ -20,14 +20,14 @@
 
 #define DEFINE_METHOD(name, hasBody, handler) ENUM_DEFINE(HTTPMethod, name, HTTPMethod(hasBody, &handler));
 
-DEFINE_METHOD(GET,/*     */false, GetHandler::get());
-DEFINE_METHOD(HEAD,/*    */false, GetHandler::get());
-DEFINE_METHOD(POST,/*     */true, PutHandler::get());
-DEFINE_METHOD(PUT,/*      */true, PutHandler::get());
-DEFINE_METHOD(DELETE,/*  */false, DeleteHandler::get());
-DEFINE_METHOD(CONNECT,/* */false, ConnectHandler::get());
-DEFINE_METHOD(OPTIONS,/* */false, OptionsHandler::get());
-DEFINE_METHOD(TRACE,/*   */false, TraceHandler::get());
+DEFINE_METHOD(GET,/*     */false, GetHandler::instance());
+DEFINE_METHOD(HEAD,/*    */false, GetHandler::instance());
+DEFINE_METHOD(POST,/*     */true, PutHandler::instance());
+DEFINE_METHOD(PUT,/*      */true, PutHandler::instance());
+DEFINE_METHOD(DELETE,/*  */false, DeleteHandler::instance());
+DEFINE_METHOD(CONNECT,/* */false, ConnectHandler::instance());
+DEFINE_METHOD(OPTIONS,/* */false, OptionsHandler::instance());
+DEFINE_METHOD(TRACE,/*   */false, TraceHandler::instance());
 
 HTTPMethod::HTTPMethod(void) :
 		m_hasBody(),

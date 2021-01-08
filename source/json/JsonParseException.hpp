@@ -47,10 +47,10 @@ class JsonParseException :
 		expectedChar(char got, char expected, const JsonLocation &location);
 
 		static JsonParseException
-		parsing(JsonToken *token, std::string expectedTokens, const JsonLocation &location);
+		parsing(const JsonToken *token, std::string expectedTokens, const JsonLocation &location);
 
 		static JsonParseException
-		expectedEndOfFile(JsonToken *token, const JsonLocation &location);
+		expectedEndOfFile(const JsonToken *token, const JsonLocation &location);
 };
 
 #endif /* JSONPARSEEXCEPTION_HPP_ */

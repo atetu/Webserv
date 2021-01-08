@@ -13,14 +13,8 @@
 #ifndef HTTPMETHODHANDLER_HPP_
 # define HTTPMETHODHANDLER_HPP_
 
-#include <http/header/HTTPHeaderFields.hpp>
-#include <io/FileDescriptor.hpp>
-#include <string>
-
-class URL;
 class HTTPRequest;
 class HTTPResponse;
-class HTTPStatus;
 
 class HTTPMethodHandler
 {
@@ -28,39 +22,8 @@ class HTTPMethodHandler
 		virtual
 		~HTTPMethodHandler();
 
-		virtual HTTPResponse*
-		handle(HTTPRequest &request) = 0;
-
-	public:
-		static HTTPResponse*
-		status(HTTPStatus &status, const HTTPHeaderFields &headers = HTTPHeaderFields());
-
-		static HTTPResponse*
-		statusHead(HTTPStatus &status, const HTTPHeaderFields &headers= HTTPHeaderFields());
-
-		static HTTPResponse*
-		statusEmpty(HTTPStatus &status, const HTTPHeaderFields &headers = HTTPHeaderFields());
-
-		static HTTPResponse*
-		file(HTTPStatus &httpStatus, int fd, const HTTPHeaderFields &headers = HTTPHeaderFields());
-
-		static HTTPResponse*
-		file(HTTPStatus &httpStatus, FileDescriptor &fileDescriptor, const HTTPHeaderFields &headers = HTTPHeaderFields());
-
-		static HTTPResponse*
-		string(HTTPStatus &httpStatus, const std::string &string, const HTTPHeaderFields &headers = HTTPHeaderFields());
-
-		static HTTPResponse*
-		filePut(HTTPStatus &httpStatus, FileDescriptor &fileDescriptor, const std::string &body, const std::string &string, const HTTPHeaderFields &headers);
-
-		static HTTPResponse*
-		error(const HTTPRequest &request, HTTPStatus &httpStatus, const HTTPHeaderFields &headers = HTTPHeaderFields());
-
-		static HTTPResponse*
-		errorHead(const HTTPRequest &request, HTTPStatus &httpStatus, const HTTPHeaderFields &headers);
-
-		static HTTPResponse*
-		redirect(HTTPStatus &httpStatus, const URL &to, const HTTPHeaderFields &headers = HTTPHeaderFields());
+		virtual void
+		handle(HTTPRequest &request, HTTPResponse &response) = 0;
 };
 
 #endif /* HTTPMETHODHANDLER_HPP_ */

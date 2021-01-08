@@ -10,33 +10,16 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <config/block/LocationBlock.hpp>
-#include <config/block/RootBlock.hpp>
-#include <exception/Exception.hpp>
-#include <http/cgi/CommonGatewayInterface.hpp>
-#include <http/enums/HTTPMethod.hpp>
-#include <http/enums/HTTPStatus.hpp>
-#include <http/enums/HTTPVersion.hpp>
-#include <http/handler/HTTPMethodHandler.hpp>
-#include <http/header/HTTPHeaderFields.hpp>
 #include <http/HTTPClient.hpp>
 #include <http/HTTPServer.hpp>
-#include <http/mime/MimeRegistry.hpp>
-#include <http/request/HTTPRequest.hpp>
-#include <http/parser/HTTPRequestParser.hpp>
-#include <http/response/HTTPStatusLine.hpp>
-#include <http/response/impl/cgi/CGIHTTPResponse.hpp>
-#include <http/response/impl/generic/GenericHTTPResponse.hpp>
-#include <http/route/HTTPFindLocation.hpp>
 #include <io/Socket.hpp>
-#include <buffer/impl/BaseBuffer.hpp>
-#include <buffer/impl/SocketBuffer.hpp>
-#include <util/Enum.hpp>
-#include <util/Environment.hpp>
+#include <log/Logger.hpp>
+#include <log/LoggerFactory.hpp>
+#include <net/address/InetSocketAddress.hpp>
 #include <util/Optional.hpp>
-#include <util/URL.hpp>
-#include <algorithm>
-#include <map>
+#include <util/Singleton.hpp>
+
+Logger &HTTPServer::LOG = LoggerFactory::get("HTTP Server");
 
 HTTPServer::HTTPServer(const std::string &host, short port, const std::list<ServerBlock const*> &serverBlocks) :
 		m_host(host),
@@ -57,12 +40,20 @@ HTTPServer::start(void)
 	m_socket.bind(m_host, m_port);
 	m_socket.reusable();
 	m_socket.listen();
+
+	NIOSelector::instance().add(m_socket, *this, NIOSelector::ACCEPT);
 }
 
 void
 HTTPServer::terminate(void)
 {
 	m_socket.close();
+}
+
+Socket&
+HTTPServer::socket(void)
+{
+	return (m_socket);
 }
 
 const Socket&
@@ -101,4 +92,27 @@ HTTPServer::defaultServerBlock(void) const
 	}
 
 	return (NULL);
+}
+
+bool
+HTTPServer::readable(FileDescriptor &fd)
+{
+	Socket &serverSocket = static_cast<Socket&>(fd);
+
+	InetSocketAddress socketAddress;
+	Socket *socket = serverSocket.accept(&socketAddress);
+
+	HTTPClient &httpClient = *(new HTTPClient(*socket, socketAddress, *this));
+
+//	if (clientFds.size() >= (unsigned long)Configuration::instance().rootBlock().maxActiveClient().orElse(RootBlock::DEFAULT_MAX_ACTIVE_CLIENT))
+//	{
+//		httpClient.response().status(*HTTPStatus::SERVICE_UNAVAILABLE);
+//		httpClient.response().headers().retryAfter(10);
+//	}
+
+	LOG.info() << "accepted " << socketAddress.hostAddress() << std::endl;
+
+	NIOSelector::instance().add(httpClient.socket(), httpClient, NIOSelector::READ);
+
+	return (false);
 }
