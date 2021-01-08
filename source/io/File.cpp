@@ -6,7 +6,7 @@
 /*   By: atetu <atetu@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/21 23:36:43 by ecaceres          #+#    #+#             */
-/*   Updated: 2021/01/06 11:53:50 by atetu            ###   ########.fr       */
+/*   Updated: 2021/01/08 14:36:58 by atetu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -182,13 +182,6 @@ File::open(int flags, mode_t mode) const
 		throw ioException();
 
 	return (FileDescriptor::wrap(fd));
-}
-
-void
-File::remove(void) const
-{
-	if (::remove(m_path.c_str()) == -1)
-		throw ioException();
 }
 
 File

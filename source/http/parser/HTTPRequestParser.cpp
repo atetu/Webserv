@@ -6,7 +6,7 @@
 /*   By: atetu <atetu@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/27 17:29:02 by ecaceres          #+#    #+#             */
-/*   Updated: 2021/01/08 13:20:38 by atetu            ###   ########.fr       */
+/*   Updated: 2021/01/08 14:42:03 by atetu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@
 #include <cctype>
 #include <cstdlib>
 #include <config/block/LocationBlock.hpp>
+#include <libs/ft.hpp>
 
 #if 1
 #include <util/URL.hpp> /* Eclipse does not import it. */
@@ -53,7 +54,7 @@ HTTPRequestParser::consume(char c)
 			}
 			else
 			{
-				if (!::isupper(c))
+				if (!ft::isupper(c))
 					throw Exception("Method is only upper-case letter");
 
 				m_state = S_METHOD;
@@ -139,7 +140,7 @@ HTTPRequestParser::consume(char c)
 
 		case S_HTTP_SLASH:
 		{
-			if (!::isdigit(c))
+			if (!ft::isdigit(c))
 				throw Exception("Expected a number");
 
 			m_major = c - '0';
@@ -160,7 +161,7 @@ HTTPRequestParser::consume(char c)
 
 		case S_HTTP_DOT:
 		{
-			if (!::isdigit(c))
+			if (!ft::isdigit(c))
 				throw Exception("Expected a number");
 
 			m_minor = c - '0';
@@ -287,7 +288,7 @@ HTTPRequestParser::body(std::string &storage, const Optional<DataSize> &maxBodyS
 	const Optional<std::string> contentLengthOptional = headerFieldsParser().headerFields().get(HTTPHeaderFields::CONTENT_LENGTH);
 	if (contentLengthOptional.present())
 	{
-		int bodySize = ::atoi(contentLengthOptional.get().c_str());
+		int bodySize = ft::atoi(contentLengthOptional.get().c_str());
 		if (max != -1 && bodySize < max)
 			m_body = storage.substr(0, bodySize);
 		else if (max != -1)

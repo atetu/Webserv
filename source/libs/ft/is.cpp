@@ -3,12 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   is.cpp                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ecaceres <ecaceres@student.42.fr>          +#+  +:+       +#+        */
+/*   By: atetu <atetu@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/05 01:22:51 by ecaceres          #+#    #+#             */
-/*   Updated: 2021/01/05 01:22:51 by ecaceres         ###   ########.fr       */
+/*   Updated: 2021/01/08 14:43:43 by atetu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
+#include <libs/ft.hpp>
 
 namespace ft
 {
@@ -22,5 +24,11 @@ namespace ft
 	isupper(char c)
 	{
 		return (c >= 'A' && c <= 'Z');
+	}
+
+	bool
+	isdigit(char c)
+	{
+		return (c >= '0' && c <= '9');
 	}
 }
