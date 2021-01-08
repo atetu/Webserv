@@ -26,6 +26,7 @@ static const int g_true = 1;
 Socket::Socket(int fd) :
 		FileDescriptor(fd)
 {
+	m_verified = true;
 }
 
 Socket::~Socket()

@@ -18,13 +18,14 @@
 
 FileDescriptor::FileDescriptor(int fd) :
 		m_fd(fd),
+		m_verified(false),
 		m_closed(false)
 {
 }
 
 FileDescriptor::~FileDescriptor()
 {
-	if (!m_closed)
+	if (m_verified && !m_closed)
 		::close(m_fd);
 }
 
@@ -33,7 +34,12 @@ FileDescriptor::read(void *buf, size_t nbyte)
 {
 	ensureNotClosed();
 
-	return (::read(m_fd, buf, nbyte));
+	ssize_t r = ::read(m_fd, buf, nbyte);
+
+	if (!m_verified && r != -1)
+		m_verified = true;
+
+	return (r);
 }
 
 ssize_t
@@ -41,7 +47,12 @@ FileDescriptor::write(const void *buf, size_t nbyte)
 {
 	ensureNotClosed();
 
-	return (::write(m_fd, buf, nbyte));
+	ssize_t r = ::write(m_fd, buf, nbyte);
+
+	if (!m_verified && r != -1)
+		m_verified = true;
+
+	return (r);
 }
 
 void
@@ -63,6 +74,8 @@ FileDescriptor::nonBlocking()
 {
 	if (::fcntl(m_fd, F_SETFL, O_NONBLOCK) == -1)
 		throw IOException("fcntl", errno);
+
+	m_verified = true;
 }
 
 int
