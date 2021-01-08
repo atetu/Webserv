@@ -65,6 +65,9 @@ class Configuration
 		static Logger &LOG;
 
 	private:
+		static Configuration *INSTANCE;
+
+	private:
 		std::string m_file;
 		const MimeRegistry *m_mimeRegistry;
 		const RootBlock *m_rootBlock;
@@ -97,6 +100,13 @@ class Configuration
 		{
 			return (*m_rootBlock);
 		}
+
+	public:
+		static void
+		setInstance(Configuration *configuration);
+
+		static Configuration&
+		instance();
 
 	public:
 		static Configuration*

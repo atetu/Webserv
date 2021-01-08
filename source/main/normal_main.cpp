@@ -17,10 +17,6 @@
 #include <encoding/default/base64/Base64.hpp>
 #include <exception/IOException.hpp>
 #include <http/HTTPOrchestrator.hpp>
-#include <util/ContainerBuilder.hpp>
-#include <util/Enum.hpp>
-#include <util/Environment.hpp>
-#include <util/helper/DeleteHelper.hpp>
 #include <json/JsonException.hpp>
 #include <log/Logger.hpp>
 #include <log/LoggerFactory.hpp>
@@ -28,6 +24,10 @@
 #include <options/CommandLine.hpp>
 #include <options/Option.hpp>
 #include <options/OptionParser.hpp>
+#include <util/ContainerBuilder.hpp>
+#include <util/Enum.hpp>
+#include <util/Environment.hpp>
+#include <util/helper/DeleteHelper.hpp>
 #include <webserv.hpp>
 #include <csignal>
 #include <iostream>
@@ -44,7 +44,6 @@ const Option OPT_IGNORE_MIME_INCLUDES_ERROR('m', "ignore-mime-includes-error", "
 const Option OPT_IGNORE_GRACEFUL_STOP('s', "ignore-graceful-stop", "avoid doing a graceful stop when receiving a TERM signal");
 
 static Logger &LOG = LoggerFactory::get("main");
-static Configuration *configuration = NULL;
 static HTTPOrchestrator *httpOrchestrator = NULL;
 
 void
@@ -141,7 +140,7 @@ normal_main(int argc, char **argv, char **envp)
 	{
 		LOG.debug() << "Loading configuration... (path: " << configFile << ")" << std::endl;
 
-		configuration = Configuration::fromJsonFile(configFile, ignoreMimeIncludesError);
+		Configuration::setInstance(Configuration::fromJsonFile(configFile, ignoreMimeIncludesError));
 	}
 	catch (IOException &exception)
 	{
@@ -181,13 +180,12 @@ normal_main(int argc, char **argv, char **envp)
 
 		try
 		{
-			httpOrchestrator = HTTPOrchestrator::create(*configuration, environment);
+			httpOrchestrator = HTTPOrchestrator::create(environment);
 			httpOrchestrator->start();
 		}
 		catch (Exception &exception)
 		{
 			DeleteHelper::pointer<HTTPOrchestrator>(httpOrchestrator);
-			DeleteHelper::pointer<Configuration>(configuration);
 
 			LOG.fatal() << "Failed to orchestre: " << exception.message() << std::endl;
 			return (1);
@@ -195,7 +193,6 @@ normal_main(int argc, char **argv, char **envp)
 	}
 
 	DeleteHelper::pointer<HTTPOrchestrator>(httpOrchestrator);
-	DeleteHelper::pointer<Configuration>(configuration);
 
 	return (0);
 }

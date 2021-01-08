@@ -10,9 +10,12 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+#include <bits/exception.h>
+#include <config/Configuration.hpp>
 #include <signal.h>
 #include <log/LoggerFactory.hpp>
 #include <main/normal_main.hpp>
+#include <stddef.h>
 #include <tests/test_unit.hpp>
 #include <csignal>
 #include <iostream>
@@ -40,6 +43,7 @@ main(int argc, char **argv, char **envp)
 		std::cerr << "unhandled " << typeid(exception).name() << ": " << exception.what() << std::endl;
 	}
 
+	Configuration::setInstance(NULL);
 	LoggerFactory::destroy();
 
 	return (exitCode);

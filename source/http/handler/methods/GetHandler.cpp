@@ -67,7 +67,7 @@ GetHandler::handle(HTTPRequest &request, HTTPResponse &response)
 
 		std::string extension;
 		if (request.url().extension(extension))
-			contentType = Optional<const Mime*>::ofNullable(request.configuration().mimeRegistry().findByFileExtension(extension));
+			contentType = Optional<const Mime*>::ofNullable(Configuration::instance().mimeRegistry().findByFileExtension(extension));
 
 		FileDescriptor *fd = NULL;
 		FileDescriptorBuffer *fdBuffer = NULL;

@@ -19,7 +19,6 @@
 #include <map>
 
 HTTPRequest::HTTPRequest() :
-		m_configuration(NULL),
 		m_version(),
 		m_url(),
 		m_headers(),
@@ -30,8 +29,7 @@ HTTPRequest::HTTPRequest() :
 {
 }
 
-HTTPRequest::HTTPRequest(const Configuration &configuration, const HTTPVersion &version, const URL &url, const HTTPHeaderFields &headers) :
-		m_configuration(&configuration),
+HTTPRequest::HTTPRequest(const HTTPVersion &version, const URL &url, const HTTPHeaderFields &headers) :
 		m_version(version),
 		m_url(url),
 		m_headers(headers),
@@ -43,7 +41,6 @@ HTTPRequest::HTTPRequest(const Configuration &configuration, const HTTPVersion &
 }
 
 HTTPRequest::HTTPRequest(const HTTPRequest &other) :
-		m_configuration(other.m_configuration),
 		m_version(other.m_version),
 		m_url(other.m_url),
 		m_headers(other.m_headers),
@@ -63,7 +60,6 @@ HTTPRequest::operator=(const HTTPRequest &other)
 {
 	if (this != &other)
 	{
-		m_configuration = other.m_configuration;
 		m_version = other.m_version;
 		m_url = other.m_url;
 		m_headers = other.m_headers;
@@ -184,8 +180,8 @@ HTTPRequest::authBlock() const
 	if (m_locationBlock && m_locationBlock->auth().present())
 		return (m_locationBlock->auth().get());
 
-//	if (m_serverBlock && m_serverBlock->auth().present())
-//		return (m_serverBlock->auth().get());
+	if (m_serverBlock && m_serverBlock->auth().present())
+		return (m_serverBlock->auth().get());
 
 	return (Optional<const AuthBlock*>());
 }
@@ -215,16 +211,10 @@ HTTPRequest::root(void) const
 			return (serverBlock.root().get());
 	}
 
-	if (m_configuration && m_configuration->rootBlock().root().present())
-		return (m_configuration->rootBlock().root().get());
+	if (Configuration::instance().rootBlock().root().present())
+		return (Configuration::instance().rootBlock().root().get());
 
 	return (File::currentDirectory().path());
-}
-
-const Configuration&
-HTTPRequest::configuration()
-{
-	return (*m_configuration);
 }
 
 bool

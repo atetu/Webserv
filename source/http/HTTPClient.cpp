@@ -12,8 +12,18 @@
 
 #include <buffer/impl/FileDescriptorBuffer.hpp>
 #include <buffer/impl/SocketBuffer.hpp>
+#include <exception/Exception.hpp>
+#include <http/enums/HTTPStatus.hpp>
 #include <http/HTTPClient.hpp>
+#include <log/Logger.hpp>
+#include <log/LoggerFactory.hpp>
+#include <util/Optional.hpp>
+#include <util/Singleton.hpp>
 #include <util/System.hpp>
+#include <iostream>
+#include <string>
+
+Logger &HTTPClient::LOG = LoggerFactory::get("HTTP Client");
 
 HTTPClient::HTTPClient(Socket &socket, InetSocketAddress socketAddress, const HTTPServer &server) :
 		m_socket(socket),
@@ -34,6 +44,8 @@ HTTPClient::~HTTPClient(void)
 {
 	delete &m_in;
 	delete &m_out;
+
+	NIOSelector::instance().remove(m_socket);
 	delete &m_socket;
 }
 
@@ -44,4 +56,79 @@ HTTPClient::updateLastAction()
 
 	if (time)
 		m_lastAction = time;
+}
+
+bool
+HTTPClient::writable(FileDescriptor &fd)
+{
+	(void)fd;
+
+	bool finished = false;
+	if (m_out.capacity() && m_response.store(m_out))
+		finished = true;
+
+	if (m_out.send() > 0)
+		updateLastAction();
+
+	if (finished && m_out.empty())
+		delete this;
+
+	return (finished);
+}
+
+bool
+HTTPClient::readable(FileDescriptor &fd)
+{
+	(void)fd;
+
+	if (m_response.status().absent())
+	{
+		if (m_in.size() != 0 || m_in.recv() > 0)
+		{
+			char c;
+
+			while (m_in.next(c))
+			{
+				std::cout << c << std::flush;
+
+				try
+				{
+					m_parser.consume(c);
+				}
+				catch (Exception &exception)
+				{
+					LOG.debug() << exception.message() << std::endl;
+
+					m_response.status(*HTTPStatus::BAD_REQUEST);
+				}
+
+				if (m_response.status().absent())
+				{
+					try
+					{
+						if (m_parser.state() == HTTPRequestParser::S_END)
+						{
+							m_request = HTTPRequest(m_parser.version(), m_parser.url(), m_parser.headerFields());
+							m_filterChain.doChaining();
+
+							if (m_response.status().absent() && m_request.method().present() && m_request.method().get()->hasBody())
+								m_parser.state() = HTTPRequestParser::S_BODY;
+
+							if (!m_response.body())
+							{
+								m_filterChain.doChaining();
+								NIOSelector::instance().update(m_socket, NIOSelector::WRITE);
+							}
+						}
+					}
+					catch (Exception &exception)
+					{
+						m_response.status(*HTTPStatus::INTERNAL_SERVER_ERROR);
+					}
+				}
+			}
+		}
+	}
+
+	return (false);
 }

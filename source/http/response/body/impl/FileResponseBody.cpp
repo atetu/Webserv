@@ -12,30 +12,35 @@
 
 #include <buffer/impl/FileDescriptorBuffer.hpp>
 #include <http/response/body/impl/FileResponseBody.hpp>
-#include <io/FileDescriptor.hpp>
+#include <util/Singleton.hpp>
 
 FileResponseBody::FileResponseBody(FileDescriptorBuffer &fdBuffer) :
 		m_fdBuffer(fdBuffer)
 {
+	NIOSelector::instance().add(m_fdBuffer.descriptor(), *this, NIOSelector::READ);
 }
 
 FileResponseBody::~FileResponseBody()
 {
+	NIOSelector::instance().remove(m_fdBuffer.descriptor());
+
 	delete &m_fdBuffer;
-}
-
-void
-FileResponseBody::io(FileDescriptorBuffer **in, FileDescriptorBuffer **out)
-{
-	(void)out;
-
-	*in = &m_fdBuffer;
 }
 
 bool
 FileResponseBody::store(BaseBuffer &buffer)
 {
 	buffer.store(m_fdBuffer);
+
+	return (isDone());
+}
+
+bool
+FileResponseBody::readable(FileDescriptor &fd)
+{
+	(void)fd;
+
+	m_fdBuffer.read();
 
 	return (isDone());
 }

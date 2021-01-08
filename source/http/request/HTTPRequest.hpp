@@ -30,7 +30,6 @@ class File;
 class HTTPRequest
 {
 	private:
-		const Configuration *m_configuration;
 		HTTPVersion m_version;
 		URL m_url;
 		HTTPHeaderFields m_headers;
@@ -41,7 +40,7 @@ class HTTPRequest
 
 	public:
 		HTTPRequest();
-		HTTPRequest(const Configuration &configuration, const HTTPVersion &version, const URL &url, const HTTPHeaderFields &headers);
+		HTTPRequest(const HTTPVersion &version, const URL &url, const HTTPHeaderFields &headers);
 		HTTPRequest(const HTTPRequest &other);
 
 		virtual
@@ -94,9 +93,6 @@ class HTTPRequest
 
 		File
 		targetFile();
-
-		const Configuration&
-		configuration();
 
 		bool
 		listing() const;

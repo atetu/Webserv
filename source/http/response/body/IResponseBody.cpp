@@ -18,13 +18,6 @@ IResponseBody::~IResponseBody()
 {
 }
 
-void
-IResponseBody::io(FileDescriptorBuffer **in, FileDescriptorBuffer **out)
-{
-	*in = NULL;
-	*out = NULL;
-}
-
 bool
 IResponseBody::isSelfManaged() const
 {

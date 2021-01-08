@@ -15,11 +15,14 @@
 
 #include <buffer/impl/BaseBuffer.hpp>
 #include <http/response/body/IResponseBody.hpp>
+#include <io/FileDescriptor.hpp>
+#include <nio/NIOSelector.hpp>
 
 class FileDescriptorBuffer;
 
 class FileResponseBody :
-		public IResponseBody
+		public IResponseBody,
+		NIOSelector::Callback
 {
 	private:
 		FileDescriptorBuffer &m_fdBuffer;
@@ -37,11 +40,11 @@ class FileResponseBody :
 		virtual
 		~FileResponseBody();
 
-		void
-		io(FileDescriptorBuffer **in, FileDescriptorBuffer **out);
-
 		bool
 		store(BaseBuffer &buffer);
+
+		bool
+		readable(FileDescriptor &fd);
 
 		bool
 		isDone();

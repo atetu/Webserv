@@ -26,9 +26,6 @@ class IResponseBody
 		virtual bool
 		store(BaseBuffer &buffer) = 0;
 
-		virtual void
-		io(FileDescriptorBuffer **in, FileDescriptorBuffer **out);
-
 		virtual bool
 		isSelfManaged() const;
 };

@@ -13,12 +13,15 @@
 #ifndef CGIRESPONSEBODY_HPP_
 # define CGIRESPONSEBODY_HPP_
 
+#include <buffer/impl/BaseBuffer.hpp>
 #include <http/response/body/IResponseBody.hpp>
+#include <nio/NIOSelector.hpp>
 
 class CommonGatewayInterface;
 
 class CGIResponseBody :
-		public IResponseBody
+		public IResponseBody,
+		public NIOSelector::Callback
 {
 	private:
 		CommonGatewayInterface &m_cgi;
@@ -38,14 +41,17 @@ class CGIResponseBody :
 		virtual
 		~CGIResponseBody();
 
-		void
-		io(FileDescriptorBuffer **in, FileDescriptorBuffer **out);
-
 		bool
 		isSelfManaged() const;
 
 		bool
 		store(BaseBuffer &buffer);
+
+		bool
+		writable(FileDescriptor &fd);
+
+		bool
+		readable(FileDescriptor &fd);
 
 		bool
 		isDone();

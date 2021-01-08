@@ -25,13 +25,6 @@ CGIResponseBody::~CGIResponseBody()
 {
 }
 
-void
-CGIResponseBody::io(FileDescriptorBuffer **in, FileDescriptorBuffer **out)
-{
-	*in = &m_bufferedIn;
-	*out = &m_bufferedOut;
-}
-
 bool
 CGIResponseBody::isSelfManaged() const
 {
@@ -42,6 +35,26 @@ bool
 CGIResponseBody::store(BaseBuffer &buffer)
 {
 	buffer.store(m_bufferedOut);
+
+	return (isDone());
+}
+
+bool
+CGIResponseBody::writable(FileDescriptor &fd)
+{
+	(void)fd;
+
+	m_bufferedIn.write();
+
+	return (m_bufferedIn.empty());
+}
+
+bool
+CGIResponseBody::readable(FileDescriptor &fd)
+{
+	(void)fd;
+
+	m_bufferedOut.read();
 
 	return (isDone());
 }

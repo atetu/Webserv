@@ -48,7 +48,7 @@ FilterChain::next()
 		Filter *filter = m_current.front();
 		m_current.pop_front();
 
-//		std::cout << typeid(*filter).name() << std::endl;
+		std::cout << typeid(*filter).name() << std::endl;
 
 		filter->doFilter(m_client, m_request, m_response, *this);
 	}

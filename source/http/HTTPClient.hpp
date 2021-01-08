@@ -19,12 +19,18 @@
 #include <http/response/HTTPResponse.hpp>
 #include <io/Socket.hpp>
 #include <net/address/InetSocketAddress.hpp>
+#include <nio/NIOSelector.hpp>
 
+class Logger;
 class HTTPServer;
 class SocketBuffer;
 
-class HTTPClient
+class HTTPClient :
+		public NIOSelector::Callback
 {
+	public:
+		static Logger &LOG;
+
 	private:
 		Socket &m_socket;
 		InetSocketAddress m_socketAddress;
@@ -129,6 +135,12 @@ class HTTPClient
 		{
 			return (m_filterChain);
 		}
+
+		bool
+		writable(FileDescriptor &fd);
+
+		bool
+		readable(FileDescriptor &fd);
 };
 
 #endif /* HTTPCLIENT_HPP_ */
