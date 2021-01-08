@@ -14,6 +14,7 @@
 # define HTTPSERVER_HPP_
 
 #include <config/block/ServerBlock.hpp>
+#include <http/HTTPClient.hpp>
 #include <io/FileDescriptor.hpp>
 #include <nio/NIOSelector.hpp>
 #include <list>
@@ -24,8 +25,12 @@ class HTTPClient;
 class Socket;
 
 class HTTPServer :
+		public Closable,
 		public NIOSelector::Callback
 {
+	public:
+		typedef std::list<HTTPClient*> client_list;
+
 	public:
 		static Logger &LOG;
 
@@ -34,6 +39,7 @@ class HTTPServer :
 		short m_port;
 		std::list<ServerBlock const*> m_serverBlocks;
 		Socket &m_socket;
+		client_list m_clients;
 
 	private:
 		HTTPServer(void);
@@ -52,7 +58,10 @@ class HTTPServer :
 		start(void);
 
 		void
-		terminate(void);
+		close(void);
+
+		void
+		watchForTimeouts();
 
 		Socket&
 		socket(void);
@@ -71,6 +80,12 @@ class HTTPServer :
 
 		ServerBlock const*
 		defaultServerBlock(void) const;
+
+		void
+		untrack(HTTPClient &client);
+
+		client_list::size_type
+		tracked();
 
 		bool
 		readable(FileDescriptor &fd);

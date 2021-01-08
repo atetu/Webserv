@@ -10,7 +10,6 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <http/HTTPClient.hpp>
 #include <http/HTTPServer.hpp>
 #include <io/Socket.hpp>
 #include <log/Logger.hpp>
@@ -18,6 +17,8 @@
 #include <net/address/InetSocketAddress.hpp>
 #include <util/Optional.hpp>
 #include <util/Singleton.hpp>
+#include <util/System.hpp>
+#include <iostream>
 
 Logger &HTTPServer::LOG = LoggerFactory::get("HTTP Server");
 
@@ -45,9 +46,33 @@ HTTPServer::start(void)
 }
 
 void
-HTTPServer::terminate(void)
+HTTPServer::close(void)
 {
 	m_socket.close();
+}
+
+void
+HTTPServer::watchForTimeouts()
+{
+	typedef std::list<HTTPClient*> lst;
+
+	if (m_clients.empty())
+		return;
+
+	unsigned long now = System::currentTimeSeconds();
+	for (lst::iterator it = m_clients.begin(); it != m_clients.end();)
+	{
+		HTTPClient &client = *(*it);
+		it++;
+
+		if (client.lastAction() + 5 /* TODO */< now)
+		{
+			if (LOG.isTraceEnabled())
+				LOG.trace() << "Timeout-ed: " << client.socketAddress().hostAddress() << " (fd=" << client.socket().raw() << ")" << std::endl;
+
+			delete &client;
+		}
+	}
 }
 
 Socket&
@@ -112,7 +137,21 @@ HTTPServer::readable(FileDescriptor &fd)
 
 	LOG.info() << "accepted " << socketAddress.hostAddress() << std::endl;
 
+	m_clients.push_back(&httpClient);
+
 	NIOSelector::instance().add(httpClient.socket(), httpClient, NIOSelector::READ);
 
 	return (false);
+}
+
+void
+HTTPServer::untrack(HTTPClient &client)
+{
+	m_clients.remove(&client);
+}
+
+HTTPServer::client_list::size_type
+HTTPServer::tracked()
+{
+	return (m_clients.size());
 }

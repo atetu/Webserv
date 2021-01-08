@@ -13,19 +13,23 @@
 #include <buffer/impl/FileDescriptorBuffer.hpp>
 #include <buffer/impl/SocketBuffer.hpp>
 #include <exception/Exception.hpp>
+#include <http/enums/HTTPMethod.hpp>
 #include <http/enums/HTTPStatus.hpp>
+#include <http/enums/HTTPVersion.hpp>
 #include <http/HTTPClient.hpp>
+#include <http/HTTPServer.hpp>
 #include <log/Logger.hpp>
 #include <log/LoggerFactory.hpp>
 #include <util/Optional.hpp>
 #include <util/Singleton.hpp>
 #include <util/System.hpp>
+#include <util/URL.hpp>
 #include <iostream>
 #include <string>
 
 Logger &HTTPClient::LOG = LoggerFactory::get("HTTP Client");
 
-HTTPClient::HTTPClient(Socket &socket, InetSocketAddress socketAddress, const HTTPServer &server) :
+HTTPClient::HTTPClient(Socket &socket, InetSocketAddress socketAddress, HTTPServer &server) :
 		m_socket(socket),
 		m_socketAddress(socketAddress),
 		m_in(*SocketBuffer::from(socket, FileDescriptorBuffer::NOTHING)),
@@ -47,6 +51,8 @@ HTTPClient::~HTTPClient(void)
 
 	NIOSelector::instance().remove(m_socket);
 	delete &m_socket;
+
+	httpServer().untrack(*this);
 }
 
 void

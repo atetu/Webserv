@@ -77,7 +77,7 @@ void
 HTTPOrchestrator::unprepare(void)
 {
 	for (server_iterator it = m_servers.begin(); it != m_servers.end(); it++)
-		(*it)->terminate();
+		(*it)->close();
 }
 
 void
@@ -162,6 +162,9 @@ HTTPOrchestrator::start()
 					break;
 				}
 			}
+
+			for (server_iterator it = m_servers.begin(); it != m_servers.end(); it++)
+				(*it)->watchForTimeouts();
 		}
 	}
 	catch (Exception &exception)
@@ -183,7 +186,7 @@ HTTPOrchestrator::start()
 		try
 		{
 			NIOSelector::instance().remove(httpServer.socket());
-			httpServer.terminate();
+			httpServer.close();
 		}
 		catch (Exception &exception)
 		{

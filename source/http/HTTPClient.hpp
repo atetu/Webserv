@@ -21,8 +21,8 @@
 #include <net/address/InetSocketAddress.hpp>
 #include <nio/NIOSelector.hpp>
 
-class Logger;
 class HTTPServer;
+class Logger;
 class SocketBuffer;
 
 class HTTPClient :
@@ -36,7 +36,7 @@ class HTTPClient :
 		InetSocketAddress m_socketAddress;
 		SocketBuffer &m_in;
 		SocketBuffer &m_out;
-		const HTTPServer &m_server;
+		HTTPServer &m_server;
 		HTTPRequestParser m_parser;
 		unsigned long m_lastAction;
 		HTTPRequest m_request;
@@ -50,7 +50,7 @@ class HTTPClient :
 		operator =(const HTTPClient &other);
 
 	public:
-		HTTPClient(Socket &socket, InetSocketAddress socketAddress, const HTTPServer &server);
+		HTTPClient(Socket &socket, InetSocketAddress socketAddress, HTTPServer &server);
 
 		virtual
 		~HTTPClient();
@@ -70,8 +70,8 @@ class HTTPClient :
 			return (m_socketAddress);
 		}
 
-		const HTTPServer&
-		httpServer() const
+		HTTPServer&
+		httpServer()
 		{
 			return (m_server);
 		}
