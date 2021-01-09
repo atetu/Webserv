@@ -12,8 +12,10 @@
 
 #include <http/parser/exception/status/HTTPRequestURLTooLongException.hpp>
 #include <http/parser/HTTPRequestPathParser.hpp>
+#include <io/File.hpp>
 #include <unit/DataSize.hpp>
 #include <util/Number.hpp>
+#include <iostream>
 
 DataSize HTTPRequestPathParser::MAX_LENGTH = DataSize::ofKilobytes(4);
 
@@ -24,10 +26,12 @@ HTTPRequestPathParser::HTTPRequestPathParser() :
 		m_queryKey(),
 		m_queryValue(),
 		m_hexBeforeState(),
-		m_hexStoreTarget(),
+		m_hexStorer(),
 		m_hex(),
 		m_query(),
-		m_fragment()
+		m_fragment(),
+		m_dot(),
+		m_level()
 {
 	m_path.reserve(60);
 	m_original.reserve(60);
@@ -42,8 +46,10 @@ HTTPRequestPathParser::consume(char c)
 		{
 			if (c == ' ')
 				m_state = S_END;
+			else if (c == '+')
+				commitHexToPath(' ');
 			else if (c == '%')
-				hexStart(&m_path);
+				hexStart(&HTTPRequestPathParser::commitHexToPath);
 			else if (c == '?')
 			{
 				m_query.set();
@@ -55,7 +61,7 @@ HTTPRequestPathParser::consume(char c)
 				commitQueryKeyValue(S_FRAGMENT);
 			}
 			else
-				m_path += c;
+				commitHexToPath(c);
 
 			break;
 		}
@@ -65,18 +71,18 @@ HTTPRequestPathParser::consume(char c)
 			if (c == '=')
 				m_state = S_QUERY_STRING_VALUE;
 			else if (c == '%')
-				hexStart(&m_queryKey);
+				hexStart(&HTTPRequestPathParser::commitHexToKey);
 			else if (c == '#')
 			{
 				m_fragment.set();
 				commitQueryKeyValue(S_FRAGMENT);
 			}
-//			else if (c == '+')
-//				m_queryKey += ' '; // TODO @atetu can you explain???
+			else if (c == '+')
+				commitHexToKey(' ');
 			else if (c == ' ')
 				commitQueryKeyValue(S_END);
 			else
-				m_queryKey += c;
+				commitHexToKey(c);
 
 			break;
 		}
@@ -84,7 +90,7 @@ HTTPRequestPathParser::consume(char c)
 		case S_QUERY_STRING_VALUE:
 		{
 			if (c == '%')
-				hexStart(&m_queryValue);
+				hexStart(&HTTPRequestPathParser::commitHexToValue);
 			else if (c == '&')
 				commitQueryKeyValue(S_QUERY_STRING_KEY);
 			else if (c == '#')
@@ -92,10 +98,12 @@ HTTPRequestPathParser::consume(char c)
 				m_fragment.set();
 				commitQueryKeyValue(S_FRAGMENT);
 			}
+			else if (c == '+')
+				commitHexToValue(' ');
 			else if (c == ' ')
 				commitQueryKeyValue(S_END);
 			else
-				m_queryValue += c;
+				commitHexToValue(c);
 
 			break;
 		}
@@ -105,9 +113,9 @@ HTTPRequestPathParser::consume(char c)
 			if (c == ' ')
 				m_state = S_END;
 			else if (c == '%')
-				hexStart(&m_fragment.get());
+				hexStart(&HTTPRequestPathParser::commitHexToFragment);
 			else
-				m_fragment.get() += c;
+				commitHexToFragment(c);
 
 			break;
 		}
@@ -130,7 +138,7 @@ HTTPRequestPathParser::consume(char c)
 			if (h == 0)
 				throw Exception("Decoded hex value cannot be a null terminator");
 
-			*m_hexStoreTarget += h;
+			((this)->*(m_hexStorer))(h); /* Function pointer. */
 			m_state = m_hexBeforeState;
 
 			break;
@@ -144,6 +152,47 @@ HTTPRequestPathParser::consume(char c)
 
 	if (static_cast<long>(m_original.size()) >= MAX_LENGTH.toBytes())
 		throw HTTPRequestURLTooLongException();
+}
+
+void
+HTTPRequestPathParser::commitHexToPath(char c)
+{
+	m_path += c;
+
+	if (c == '/')
+	{
+		if (m_dot == 2)
+		{
+			m_path = File(m_path).parent().parent().path();
+
+			if (--m_level == -1)
+				throw Exception("Out of root directory");
+		}
+		else
+			m_level++;
+
+		m_dot = 0;
+	}
+	else if (c == '.')
+		m_dot++;
+}
+
+void
+HTTPRequestPathParser::commitHexToKey(char c)
+{
+	m_queryKey += c;
+}
+
+void
+HTTPRequestPathParser::commitHexToValue(char c)
+{
+	m_queryValue += c;
+}
+
+void
+HTTPRequestPathParser::commitHexToFragment(char c)
+{
+	m_fragment.get() += c;
 }
 
 void

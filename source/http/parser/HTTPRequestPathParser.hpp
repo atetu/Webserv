@@ -22,6 +22,9 @@ class DataSize;
 class HTTPRequestPathParser
 {
 	public:
+		typedef void
+		(HTTPRequestPathParser::*HexStorer)(char);
+
 		enum State
 		{
 			S_PATH,
@@ -43,10 +46,12 @@ class HTTPRequestPathParser
 		std::string m_queryKey;
 		std::string m_queryValue;
 		State m_hexBeforeState;
-		std::string *m_hexStoreTarget;
+		HexStorer m_hexStorer;
 		std::string m_hex;
 		Optional<std::map<std::string, std::string> > m_query;
 		Optional<std::string> m_fragment;
+		long m_dot;
+		long m_level;
 
 	public:
 		HTTPRequestPathParser();
@@ -86,14 +91,26 @@ class HTTPRequestPathParser
 
 	private:
 		void
+		commitHexToPath(char c);
+
+		void
+		commitHexToKey(char c);
+
+		void
+		commitHexToValue(char c);
+
+		void
+		commitHexToFragment(char c);
+
+		void
 		commitQueryKeyValue(State nextState);
 
 		inline void
-		hexStart(std::string *storeInto)
+		hexStart(HexStorer hexStorer)
 		{
 			m_hexBeforeState = m_state;
 			m_state = S_HEX_START;
-			m_hexStoreTarget = storeInto;
+			m_hexStorer = hexStorer;
 		}
 };
 
