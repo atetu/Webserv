@@ -11,7 +11,7 @@
 /* ************************************************************************** */
 
 #include <buffer/impl/FileDescriptorBuffer.hpp>
-#include <encoding/default/chunk/ChunkEncoder.hpp>
+#include <http/body/encoding/chunked/ChunkEncoder.hpp>
 #include <http/cgi/CommonGatewayInterface.hpp>
 #include <http/enums/HTTPStatus.hpp>
 #include <http/filter/FilterChain.hpp>
@@ -20,7 +20,6 @@
 #include <http/response/body/impl/CGIResponseBody.hpp>
 #include <http/response/HTTPResponse.hpp>
 #include <io/Socket.hpp>
-#include <stddef.h>
 #include <util/Number.hpp>
 #include <util/Optional.hpp>
 #include <util/Singleton.hpp>

@@ -10,22 +10,23 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <encoding/default/chunk/ChunkDecoder.hpp>
-#include <encoding/default/chunk/ChunkEncoder.hpp>
+#include <http/body/encoding/chunked/ChunkDecoder.hpp>
+#include <http/body/encoding/chunked/ChunkEncoder.hpp>
 #include <tests/test_unit.hpp>
-#include <log/LoggerFactory.hpp>
 #include <string>
+
+class ChunkEncoder;
 
 static std::string
 encode(const char *str)
 {
-	return (ChunkEncoder(str).encode());
+	return (ChunkEncoder().encode(str));
 }
 
 static std::string
 decode(const char *str)
 {
-	return (ChunkDecoder().decode(str));
+	return (ChunkDecoder(false).decode(str));
 }
 
 CASE("chunked", "encode")

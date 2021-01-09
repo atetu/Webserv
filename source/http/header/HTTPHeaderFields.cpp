@@ -156,10 +156,6 @@ HTTPHeaderFields::contentType(const MimeRegistry &registry, const std::string &e
 
 	if (mime)
 		return (contentType(*mime));
-	// else
-	// {
-	// 	return (contentType("text/plain"));
-	// }
 
 	return (*this);
 }

@@ -13,52 +13,31 @@
 #ifndef CHUNKENCODER_HPP_
 # define CHUNKENCODER_HPP_
 
+#include <http/body/encoding/IHTTPBodyEncoder.hpp>
+#include <util/Singleton.hpp>
 #include <string>
 
-class ChunkEncoder
+class ChunkEncoder :
+		public IHTTPBodyEncoder,
+		public Singleton<ChunkEncoder>
 {
-	public:
-		enum State
-		{
-			S_NOT_STARTED,
-			S_SIZE,
-			S_EXTENSION,
-			S_SIZE_END,
-			S_SIZE_END2,
-			S_CHUNK,
-			S_CHUNK_END_EXPECTED,
-			S_CHUNK_END,
-			S_NULL,
-			S_END,
-			S_OVER
-		};
-
 	public:
 		static const std::string ZERO;
 
-	public:
-		ChunkEncoder();
-		ChunkEncoder(const std::string &input);
+	private:
 		ChunkEncoder(const ChunkEncoder &other);
-
-		virtual
-		~ChunkEncoder();
 
 		ChunkEncoder&
 		operator=(const ChunkEncoder &other);
 
+	public:
+		ChunkEncoder();
+
+		virtual
+		~ChunkEncoder();
+
 		std::string
-		encode();
-
-		static inline bool // why inline?
-		isValidCharacter(char c)
-		{
-			return (std::isalnum(c));
-		}
-
-	private:
-		std::string m_input;
-		std::string m_parsedData;
+		encode(const std::string &input);
 
 	public:
 		static std::string

@@ -14,7 +14,6 @@
 #include <config/exceptions/ConfigurationBindException.hpp>
 #include <config/exceptions/ConfigurationValidateException.hpp>
 #include <signal.h>
-#include <encoding/default/base64/Base64.hpp>
 #include <exception/IOException.hpp>
 #include <http/HTTPOrchestrator.hpp>
 #include <json/JsonException.hpp>
@@ -175,8 +174,6 @@ normal_main(int argc, char **argv, char **envp)
 			::signal(SIGINT, &sighandler_term);
 			LOG.debug() << "Installed signal handler: " << (void*)&sighandler_term << std::endl;
 		}
-
-		Base64::load();
 
 		try
 		{

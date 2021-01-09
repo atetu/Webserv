@@ -49,6 +49,7 @@ class HTTPClient :
 		SocketBuffer &m_out;
 		HTTPServer &m_server;
 		HTTPRequestParser m_parser;
+		std::string m_body;
 		State m_state;
 		unsigned long m_lastAction;
 		HTTPRequest m_request;

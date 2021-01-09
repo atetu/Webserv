@@ -13,9 +13,6 @@
 #ifndef BASE64_HPP_
 # define BASE64_HPP_
 
-#include <encoding/default/base64/Base64Decoder.hpp>
-#include <encoding/default/base64/Base64Encoder.hpp>
-#include <encoding/EncodingRegistry.hpp>
 #include <cctype>
 #include <string>
 
@@ -25,11 +22,7 @@
 class Base64
 {
 	public:
-		static const std::string NAME;
 		static const std::string CHARACTERS;
-
-		static Base64Encoder ENCODER;
-		static Base64Decoder DECODER;
 
 	private:
 		Base64();
@@ -42,20 +35,11 @@ class Base64
 		virtual
 		~Base64();
 
-		static void
-		load();
+		static std::string
+		encode(const std::string &input);
 
-		static inline Base64Encoder&
-		encoder()
-		{
-			return (ENCODER);
-		}
-
-		static inline Base64Decoder&
-		decoder()
-		{
-			return (DECODER);
-		}
+		static std::string
+		decode(const std::string &input);
 
 		static inline bool
 		isValidCharacter(char c)

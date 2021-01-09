@@ -13,7 +13,7 @@
 #ifndef HTTPREQUESTPARSER_HPP_
 # define HTTPREQUESTPARSER_HPP_
 
-#include <encoding/default/chunk/ChunkDecoder.hpp>
+#include <http/body/encoding/chunked/ChunkDecoder.hpp>
 #include <http/enums/HTTPVersion.hpp>
 #include <http/parser/HTTPHeaderFieldsParser.hpp>
 #include <http/parser/HTTPRequestPathParser.hpp>
@@ -54,6 +54,7 @@ class HTTPRequestParser
 			S_HTTP_END3,
 			S_HEADER_FIELDS,
 			S_BODY,
+			S_BODY_DECODE,
 			S_END,
 		};
 
@@ -64,13 +65,15 @@ class HTTPRequestParser
 		int m_major;
 		int m_minor;
 		HTTPHeaderFieldsParser m_headerFieldsParser;
-		std::string m_body;
-		ChunkDecoder m_chunkDecoder;
 		char m_last;
 		char m_last2;
+		std::string &m_body;
+		IHTTPBodyDecoder *m_bodyDecoder;
 
 	public:
-		HTTPRequestParser();
+		HTTPRequestParser(std::string &body); // FIXME Missing coplien
+
+		~HTTPRequestParser();
 
 		void
 		consume(char c);
@@ -120,14 +123,8 @@ class HTTPRequestParser
 			return (m_headerFieldsParser.headerFields());
 		}
 
-		void
-		body(const std::string &storage);
-
 		const std::string&
 		body() const;
-
-		int
-		body(std::string &storage, const Optional<DataSize> &maxBodySize);
 
 		URL
 		url(/*const LocationBlock *locationBlockPtr*/);

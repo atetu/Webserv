@@ -10,21 +10,20 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <encoding/default/base64/Base64.hpp>
-#include <encoding/default/base64/Base64Encoder.hpp>
+#include <base64/Base64.hpp>
 #include <tests/test_unit.hpp>
-#include <log/LoggerFactory.hpp>
+#include <string>
 
 static std::string
 encode(const char *str)
 {
-	return (Base64::encoder().encode(str));
+	return (Base64::encode(str));
 }
 
 static std::string
 decode(const char *str)
 {
-	return (Base64::decoder().decode(str));
+	return (Base64::decode(str));
 }
 
 CASE("base64", "encode")

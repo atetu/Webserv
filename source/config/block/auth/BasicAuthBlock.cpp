@@ -10,9 +10,8 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+#include <base64/Base64.hpp>
 #include <config/block/auth/BasicAuthBlock.hpp>
-#include <encoding/default/base64/Base64.hpp>
-#include <encoding/default/base64/Base64Decoder.hpp>
 #include <stddef.h>
 #include <util/Optional.hpp>
 #include <string>
@@ -70,7 +69,7 @@ BasicAuthBlock::password(const std::string &password)
 bool
 BasicAuthBlock::authorize(const std::string &credentials) const
 {
-	std::string decoded = Base64::decoder().decode(credentials);
+	std::string decoded = Base64::decode(credentials);
 
 	size_t pos = decoded.find(":");
 
