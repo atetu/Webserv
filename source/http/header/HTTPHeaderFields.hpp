@@ -187,7 +187,7 @@ class HTTPHeaderFields
 		set(const std::string &key, const std::string &value, bool folding = false);
 
 		HTTPHeaderFields&
-		merge(const HTTPHeaderFields &headerFields, bool folding = false);
+		merge(const HTTPHeaderFields &headerFields);
 
 		const Optional<std::string>
 		get(const std::string &key) const;

@@ -113,7 +113,7 @@ CGIResponseBody::readable(FileDescriptor &fd)
 
 		if (parsed)
 		{
-			m_client.response().headers().merge(m_headerFieldsParser.headerFields(), true);
+			m_client.response().headers().merge(m_headerFieldsParser.headerFields());
 
 			Optional<std::string> statusOpt = m_headerFieldsParser.headerFields().get(HTTPHeaderFields::STATUS);
 			if (statusOpt.present())
@@ -126,6 +126,8 @@ CGIResponseBody::readable(FileDescriptor &fd)
 				if (newStatus)
 					m_client.response().status(*newStatus);
 			}
+
+			std::cout << m_headerFieldsParser.headerFields().format() << std::endl;
 
 			m_client.response().headers().chunkedTransferEncoding();
 			m_client.filterChain().next();

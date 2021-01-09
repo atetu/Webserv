@@ -367,10 +367,10 @@ HTTPHeaderFields::set(const std::string &key, const std::string &value, bool fol
 }
 
 HTTPHeaderFields&
-HTTPHeaderFields::merge(const HTTPHeaderFields &headerFields, bool folding)
+HTTPHeaderFields::merge(const HTTPHeaderFields &headerFields)
 {
 	for (mconst_iterator it = headerFields.begin(); it != headerFields.end(); it++)
-		set(it->first, it->second.front(), folding);
+		m_storage[it->first] = it->second;
 
 	return (*this);
 }
