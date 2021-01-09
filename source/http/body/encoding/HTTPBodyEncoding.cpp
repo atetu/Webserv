@@ -16,7 +16,6 @@
 #include <http/body/encoding/identity/IdentityDecoder.hpp>
 #include <util/Number.hpp>
 #include <util/Optional.hpp>
-#include <util/Singleton.hpp>
 #include <string>
 
 HTTPBodyEncoding::~HTTPBodyEncoding()
@@ -37,18 +36,18 @@ HTTPBodyEncoding::decoderFor(const HTTPHeaderFields &headerFields)
 		throw HTTPBodyEncodingException("unsupported transfert-encoding:" + transfertEncoding);
 	}
 
-	Optional<std::string> contentLengthOpt = headerFields.get(HTTPHeaderFields::CONTENT_TYPE);
+	Optional<std::string> contentLengthOpt = headerFields.get(HTTPHeaderFields::CONTENT_LENGTH);
 	if (contentLengthOpt.present())
 	{
+		const std::string &contentLength = contentLengthOpt.get();
+
 		try
 		{
-			Number::parse<long>(contentLengthOpt.get());
-
-			return (IdentityDecoder::instance());
+			return (*(new IdentityDecoder(true, Number::parse<long long>(contentLength))));
 		}
 		catch (Exception &exception)
 		{
-			throw HTTPBodyEncodingException("content-length is not a valid number: " + exception.message());
+			throw HTTPBodyEncodingException("content-length `" + contentLength + "` is not a valid number: " + exception.message());
 		}
 	}
 

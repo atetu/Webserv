@@ -154,6 +154,15 @@ class HTTPClient :
 
 		bool
 		readable(FileDescriptor &fd);
+
+		bool
+		readableHead(void);
+
+		bool
+		readableBody(void);
+
+		const std::string&
+		body();
 };
 
 #endif /* HTTPCLIENT_HPP_ */

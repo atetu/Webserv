@@ -123,95 +123,114 @@ HTTPClient::readable(FileDescriptor &fd)
 			case S_NOT_STARTED:
 				m_state = S_HEADER;
 
+				/* Falling */
+
 			case S_HEADER:
+				return (readableHead());
+
+			case S_BODY:
+				return (readableBody());
+
+			case S_END:
+				return (true);
+		}
+	}
+
+	return (false);
+}
+
+bool
+HTTPClient::readableHead(void)
+{
+	char c;
+
+	while (m_in.next(c))
+	{
+		try
+		{
+			m_parser.consume(c);
+
+			if (m_parser.state() == HTTPRequestParser::S_END)
 			{
-				char c;
+				m_request = HTTPRequest(m_parser.version(), m_parser.url(), m_parser.headerFields());
 
-				while (m_in.next(c))
+				m_filterChain.doChainingOf(FilterChain::S_BEFORE);
+
+				if (m_response.status().present())
 				{
-					try
+					m_filterChain.doChainingOf(FilterChain::S_AFTER);
+					NIOSelector::instance().update(m_socket, NIOSelector::WRITE);
+					m_state = S_END;
+				}
+				else
+				{
+					if (m_request.method().present() && m_request.method().get()->hasBody())
 					{
-						m_parser.consume(c);
-
-						if (m_parser.state() == HTTPRequestParser::S_END)
-						{
-							m_request = HTTPRequest(m_parser.version(), m_parser.url(), m_parser.headerFields());
-
-							m_filterChain.doChainingOf(FilterChain::S_BEFORE);
-
-							if (m_response.status().present())
-							{
-								m_filterChain.doChainingOf(FilterChain::S_AFTER);
-								NIOSelector::instance().update(m_socket, NIOSelector::WRITE);
-								m_state = S_END;
-							}
-							else
-							{
-								if (m_request.method().present() && m_request.method().get()->hasBody())
-								{
-									m_parser.state() = HTTPRequestParser::S_BODY;
-									m_state = S_BODY;
-								}
-								else
-								{
-									NIOSelector::instance().update(m_socket, NIOSelector::NONE);
-									m_filterChain.doChainingOf(FilterChain::S_BETWEEN);
-									m_state = S_END;
-								}
-							}
-
-							break;
-						}
-
+						m_parser.state() = HTTPRequestParser::S_BODY;
+						m_state = S_BODY;
+						return (readableBody());
 					}
-					catch (Exception &exception)
+					else
 					{
-						LOG.debug() << exception.message() << std::endl;
-
-						m_response.status(*HTTPStatus::BAD_REQUEST);
-						m_filterChain.doChainingOf(FilterChain::S_AFTER);
-						NIOSelector::instance().update(m_socket, NIOSelector::WRITE);
+						NIOSelector::instance().update(m_socket, NIOSelector::NONE);
+						m_filterChain.doChainingOf(FilterChain::S_BETWEEN);
 						m_state = S_END;
 					}
 				}
 
 				break;
 			}
+		}
+		catch (Exception &exception)
+		{
+			LOG.debug() << exception.message() << std::endl;
 
-			case S_BODY:
-			{
-//				if (m_response.status().absent())
-//				{
-//					try
-//					{
-//						if (m_parser.state() == HTTPRequestParser::S_END)
-//						{
-//							m_request = HTTPRequest(m_parser.version(), m_parser.url(), m_parser.headerFields());
-//							m_filterChain.doChaining();
-//
-//							if (m_response.status().absent() && m_request.method().present() && m_request.method().get()->hasBody())
-//								m_parser.state() = HTTPRequestParser::S_BODY;
-//
-//							if (!m_response.body())
-//							{
-//								m_filterChain.doChaining();
-//								NIOSelector::instance().update(m_socket, NIOSelector::WRITE);
-//							}
-//						}
-//					}
-//					catch (Exception &exception)
-//					{
-//						m_response.status(*HTTPStatus::INTERNAL_SERVER_ERROR);
-//					}
-//				}
-				break;
-			}
-
-			case S_END:
-				break;
-
+			m_response.status(*HTTPStatus::BAD_REQUEST);
+			m_filterChain.doChainingOf(FilterChain::S_AFTER);
+			NIOSelector::instance().update(m_socket, NIOSelector::WRITE);
+			m_state = S_END;
 		}
 	}
 
 	return (false);
+}
+
+bool
+HTTPClient::readableBody(void)
+{
+	char c;
+
+	while (m_in.next(c))
+	{
+		try
+		{
+			m_parser.consume(c);
+
+			if (m_parser.state() == HTTPRequestParser::S_END)
+			{
+				NIOSelector::instance().update(m_socket, NIOSelector::NONE);
+				m_filterChain.doChainingOf(FilterChain::S_BETWEEN);
+				m_state = S_END;
+
+				break;
+			}
+		}
+		catch (Exception &exception)
+		{
+			LOG.debug() << exception.message() << std::endl;
+
+			m_response.status(*HTTPStatus::UNPROCESSABLE_ENTITY); /* TODO Need more specific message based on the problem. */
+			m_filterChain.doChainingOf(FilterChain::S_AFTER);
+			NIOSelector::instance().update(m_socket, NIOSelector::WRITE);
+			m_state = S_END;
+		}
+	}
+
+	return (false);
+}
+
+const std::string&
+HTTPClient::body()
+{
+	return (m_body);
 }

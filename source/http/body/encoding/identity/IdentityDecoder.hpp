@@ -17,23 +17,31 @@
 #include <util/Singleton.hpp>
 
 class IdentityDecoder :
-		public IHTTPBodyDecoder,
-		public Singleton<IdentityDecoder>
+		public IHTTPBodyDecoder
 {
 	private:
+		bool m_isAllocated;
+		long long m_contentLength;
+		long long m_consumed;
+
+	private:
+		IdentityDecoder();
 		IdentityDecoder(const IdentityDecoder &other);
 
 		IdentityDecoder&
 		operator=(const IdentityDecoder &other);
 
 	public:
-		IdentityDecoder();
+		IdentityDecoder(bool isAllocated, long long contentLength);
 
 		virtual
 		~IdentityDecoder();
 
 		bool
 		consume(std::string &out, char c);
+
+		void
+		cleanup();
 };
 
 #endif /* IDENTITYDECODER_HPP_ */

@@ -39,7 +39,8 @@ HTTPRequestParser::HTTPRequestParser(std::string &body) :
 
 HTTPRequestParser::~HTTPRequestParser()
 {
-	DeleteHelper::pointer(m_bodyDecoder);
+	if (m_bodyDecoder)
+		m_bodyDecoder->cleanup();
 }
 
 void
@@ -217,7 +218,7 @@ HTTPRequestParser::consume(char c)
 		{
 			if (m_last2 == '\n' && m_last == '\r' && c == '\n')
 				m_state = S_END;
-			else if (c == ' ') // ou erreur
+			else if (c == ' ')
 				throw Exception("Space before field");
 			else
 			{
@@ -230,20 +231,19 @@ HTTPRequestParser::consume(char c)
 
 		case S_HEADER_FIELDS:
 		{
-			//	std:: cout << "c header: " << (int)c << std::endl;
 			m_headerFieldsParser.consume(c);
 
 			if (m_headerFieldsParser.state() == HTTPHeaderFieldsParser::S_END)
-			{
-				//			std::cout << "normally end\n";
 				m_state = S_END;
-			}
+
 			break;
 		}
 
 		case S_BODY:
 			m_state = S_BODY_DECODE;
 			m_bodyDecoder = &HTTPBodyEncoding::decoderFor(m_headerFieldsParser.headerFields());
+
+			/* Falling */
 
 		case S_BODY_DECODE:
 		{
@@ -254,10 +254,7 @@ HTTPRequestParser::consume(char c)
 		}
 
 		case S_END:
-		{
-			//		std:: cout << "c end: " << (int)c << std::endl;
 			break;
-		}
 
 	}
 

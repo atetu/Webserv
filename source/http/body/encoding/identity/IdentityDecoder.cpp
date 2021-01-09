@@ -12,7 +12,10 @@
 
 #include <http/body/encoding/identity/IdentityDecoder.hpp>
 
-IdentityDecoder::IdentityDecoder()
+IdentityDecoder::IdentityDecoder(bool isAllocated, long long contentLength) :
+		m_isAllocated(isAllocated),
+		m_contentLength(contentLength),
+		m_consumed()
 {
 }
 
@@ -25,5 +28,12 @@ IdentityDecoder::consume(std::string &out, char c)
 {
 	out += c;
 
-	return (true);
+	return (++m_consumed >= m_contentLength);
+}
+
+void
+IdentityDecoder::cleanup()
+{
+	if (m_isAllocated)
+		delete this;
 }

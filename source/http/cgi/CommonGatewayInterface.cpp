@@ -28,6 +28,7 @@
 #include <sys/errno.h>
 #include <sys/unistd.h>
 #include <util/Convert.hpp>
+#include <util/Enum.hpp>
 #include <util/helper/DeleteHelper.hpp>
 #include <util/Optional.hpp>
 #include <util/StringUtils.hpp>
@@ -155,7 +156,7 @@ CommonGatewayInterface::execute(HTTPClient &client, const CGIBlock &cgiBlock, co
 
 	if (request.method().get()->hasBody())
 	{
-//		env.setProperty(ENV_CONTENT_LENGTH, Convert::toString(request.body().length()));
+		env.setProperty(ENV_CONTENT_LENGTH, Convert::toString(client.body().length()));
 
 		Optional<std::string> optional = request.headers().get(HTTPHeaderFields::CONTENT_TYPE);
 		if (optional.present())
@@ -254,11 +255,11 @@ CommonGatewayInterface::execute(HTTPClient &client, const CGIBlock &cgiBlock, co
 
 		CommonGatewayInterface *cgi = new CommonGatewayInterface(pid, *stdin, *stdout);
 
-//		if (request.method().get().hasBody()) // TODO Operation is blocking
-//		{
-//			cgi->in().write(request.body().c_str(), request.body().length());
-//			//::write(1, request.body().c_str(), request.body().length());
-//		}
+		if (request.method().get()->hasBody()) // TODO Operation is blocking
+		{
+			cgi->in().write(client.body().c_str(), client.body().length());
+			//::write(1, request.body().c_str(), request.body().length());
+		}
 
 		return (cgi);
 	}
