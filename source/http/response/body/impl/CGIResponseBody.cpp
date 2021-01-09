@@ -127,8 +127,6 @@ CGIResponseBody::readable(FileDescriptor &fd)
 					m_client.response().status(*newStatus);
 			}
 
-			std::cout << m_headerFieldsParser.headerFields().format() << std::endl;
-
 			m_client.response().headers().chunkedTransferEncoding();
 			m_client.filterChain().next();
 

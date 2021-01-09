@@ -56,9 +56,6 @@ GetHandler::operator =(const GetHandler &other)
 void
 GetHandler::handle(HTTPRequest &request, HTTPResponse &response)
 {
-	std::cout << request.targetFile().path() << std::endl;
-	std::cout << request.targetFile().exists() << std::endl;
-
 	File targetFile(request.targetFile());
 
 	if (!targetFile.exists())

@@ -117,7 +117,7 @@ HTTPOrchestrator::start()
 				NIOSelector::instance().debug(LOG, readSet, writeSet, false);
 			else if (m_stopping)
 			{
-				if (!NIOSelector::instance().fds().empty())
+				if (NIOSelector::instance().fds().empty())
 				{
 					m_running = false;
 					break;
