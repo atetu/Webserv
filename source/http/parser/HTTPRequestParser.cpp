@@ -12,13 +12,10 @@
 
 #include <exception/Exception.hpp>
 #include <http/body/encoding/HTTPBodyEncoding.hpp>
-#include <http/header/HTTPHeaderFields.hpp>
+#include <http/body/encoding/IHTTPBodyDecoder.hpp>
 #include <http/parser/HTTPRequestParser.hpp>
 #include <libs/ft.hpp>
-#include <util/helper/DeleteHelper.hpp>
-#include <iostream>
-
-class HTTPBodyEncoding;
+#include <util/Optional.hpp>
 
 #if 1
 #include <util/URL.hpp> /* Eclipse does not import it. */
@@ -62,6 +59,9 @@ HTTPRequestParser::consume(char c)
 			{
 				if (!ft::isupper(c))
 					throw Exception("Method is only upper-case letter");
+
+				if (m_method.length() > 20)
+					throw Exception("Method is over 20 characters");
 
 				m_state = S_METHOD;
 				m_method += c;
@@ -200,7 +200,7 @@ HTTPRequestParser::consume(char c)
 
 		case S_HTTP_END2:
 		{
-			m_state = S_END;
+			m_state = S_END; // FIXME
 			if (m_last2 == '\r' && m_last == '\n' && c == '\r')
 				m_state = S_HTTP_END3;
 			else if (c == ' ')
@@ -289,87 +289,8 @@ HTTPRequestParser::body() const
 	return (m_body);
 }
 
-//int
-//HTTPRequestParser::body(std::string &storage, const Optional<DataSize> &maxBodySize)
-//{
-//	long long max;
-//	//std::cout << "storage: " << storage  << "  storage size : "<< storage.size()<< std::endl;
-//
-//	if (maxBodySize.present())
-//		max = maxBodySize.get().toBytes();
-//	// else
-//	// 	max = -1; // can we not have maxBodySize?
-//	const Optional<std::string> contentLengthOptional = headerFieldsParser().headerFields().get(HTTPHeaderFields::CONTENT_LENGTH);
-//	if (contentLengthOptional.present())
-//	{
-//		int bodySize = ft::atoi(contentLengthOptional.get().c_str());
-//		if (max != -1 && bodySize < max)
-//			m_body = storage.substr(0, bodySize);
-//		else if (max != -1)
-//			m_body = storage.substr(0, max);
-//		else
-//			m_body = storage;
-//	}
-//	else
-//	{
-//		const Optional<std::string> transfertEncodingOptional = headerFieldsParser().headerFields().get(HTTPHeaderFields::TRANSFER_ENCODING);
-//		if (transfertEncodingOptional.present())
-//		{
-//			//	std::cout << "chunk\n";
-//			const std::string &encoding = transfertEncodingOptional.get();
-//			//	ChunkDecoder chunkDecoder;
-//			if (encoding == "chunked" && max != -1)
-//			{
-//				//		std::cout << "first\n";
-//
-//				m_body = m_chunkDecoder.decode(storage.substr(0, max));
-//				storage.erase(0, max);
-//				if (m_chunkDecoder.state() != ChunkDecoder::S_OVER)
-//				{
-//					//		std::cout << "third\n";
-//					return (0);
-//				}
-//
-//			}
-//			else if (encoding == "chunked")
-//			{
-//				//	std::cout << "second\n";
-//
-//				m_body += m_chunkDecoder.decode(storage);
-//				//		std::cout << "after second\n";
-//				storage.erase(0, max);
-//				if (m_chunkDecoder.state() != ChunkDecoder::S_OVER)
-//				{
-//					std::cout << "third\n";
-//					return (0);
-//				}
-//			}
-//			else
-//				throw Exception("transfer_encoding not supported");
-//
-//		}
-//		else
-//		{
-//			// check with Nginx if error. RFC = content-length header SHOULD be sent...
-//		}
-//	}
-//	return (1);
-//}
-
 URL
-HTTPRequestParser::url(/*const LocationBlock *locationBlockPtr*/)
+HTTPRequestParser::url()
 {
-//	if (locationBlockPtr &&locationBlockPtr->root().present())
-//	{
-//		std::string path;
-//
-//		if (locationBlockPtr->path().size() <= m_pathParser.path().size())
-//			path = m_pathParser.path().substr(locationBlockPtr->path().size(), std::string::npos);
-//		else
-//			path = "";
-//
-//		return (URL(path, m_pathParser.query(), m_pathParser.fragment()));
-//	}
-
 	return (URL(m_pathParser.path(), m_pathParser.query(), m_pathParser.fragment()));
 }

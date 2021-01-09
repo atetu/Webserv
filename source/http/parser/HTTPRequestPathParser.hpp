@@ -17,6 +17,8 @@
 #include <map>
 #include <string>
 
+class DataSize;
+
 class HTTPRequestPathParser
 {
 	public:
@@ -31,9 +33,13 @@ class HTTPRequestPathParser
 			S_END,
 		};
 
+	public:
+		static DataSize MAX_LENGTH;
+
 	private:
 		State m_state;
 		std::string m_path;
+		std::string m_original;
 		std::string m_queryKey;
 		std::string m_queryValue;
 		State m_hexBeforeState;
@@ -56,6 +62,12 @@ class HTTPRequestPathParser
 
 		inline const std::string&
 		path() const
+		{
+			return (m_path);
+		}
+
+		inline const std::string&
+		original() const
 		{
 			return (m_path);
 		}

@@ -10,15 +10,19 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <exception/Exception.hpp>
+#include <http/parser/exception/status/HTTPRequestHeaderTooBigException.hpp>
 #include <http/parser/HTTPHeaderFieldsParser.hpp>
-#include <iostream>
+#include <unit/DataSize.hpp>
 
-HTTPHeaderFieldsParser::HTTPHeaderFieldsParser() :
+DataSize HTTPHeaderFieldsParser::MAX_SIZE = DataSize::ofKilobytes(8);
+
+HTTPHeaderFieldsParser::HTTPHeaderFieldsParser(bool limited) :
+		m_limited(limited),
 		m_state(S_FIELD),
 		m_headerFields(),
 		m_key(),
-		m_value()
+		m_value(),
+		m_consumed(limited)
 {
 }
 
@@ -131,8 +135,11 @@ HTTPHeaderFieldsParser::consume(char c)
 		}
 
 		case S_END:
-			break;
+			return;
 	}
+
+	if (m_limited && ++m_consumed >= MAX_SIZE.toBytes())
+		throw HTTPRequestHeaderTooBigException();
 }
 
 void

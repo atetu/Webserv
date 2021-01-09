@@ -12,19 +12,20 @@
 
 #include <buffer/impl/FileDescriptorBuffer.hpp>
 #include <buffer/impl/SocketBuffer.hpp>
-#include <exception/Exception.hpp>
 #include <http/enums/HTTPMethod.hpp>
 #include <http/enums/HTTPStatus.hpp>
 #include <http/enums/HTTPVersion.hpp>
-#include <http/header/HTTPDate.hpp>
 #include <http/HTTPClient.hpp>
 #include <http/HTTPServer.hpp>
+#include <http/parser/exception/status/HTTPRequestHeaderTooBigException.hpp>
+#include <http/parser/exception/status/HTTPRequestURLTooLongException.hpp>
 #include <log/Logger.hpp>
 #include <log/LoggerFactory.hpp>
 #include <util/Enum.hpp>
 #include <util/Optional.hpp>
 #include <util/Singleton.hpp>
 #include <util/System.hpp>
+#include <util/Time.hpp>
 #include <util/URL.hpp>
 #include <iostream>
 #include <string>
@@ -146,6 +147,8 @@ HTTPClient::readableHead(void)
 
 	while (m_in.next(c))
 	{
+		bool catched = true;
+
 		try
 		{
 			m_parser.consume(c);
@@ -177,15 +180,28 @@ HTTPClient::readableHead(void)
 						m_state = S_END;
 					}
 				}
-
 				break;
 			}
+
+			catched = false;
+		}
+		catch (HTTPRequestHeaderTooBigException &exception)
+		{
+			m_response.status(*HTTPStatus::REQUEST_ENTITY_TOO_LARGE);
+		}
+		catch (HTTPRequestURLTooLongException &exception)
+		{
+			m_response.status(*HTTPStatus::URI_TOO_LONG);
 		}
 		catch (Exception &exception)
 		{
 			LOG.debug() << exception.message() << std::endl;
 
 			m_response.status(*HTTPStatus::BAD_REQUEST);
+		}
+
+		if (catched)
+		{
 			m_filterChain.doChainingOf(FilterChain::S_AFTER);
 			NIOSelector::instance().update(m_socket, NIOSelector::WRITE);
 			m_state = S_END;

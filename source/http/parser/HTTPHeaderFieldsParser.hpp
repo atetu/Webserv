@@ -16,6 +16,8 @@
 #include <http/header/HTTPHeaderFields.hpp>
 #include <string>
 
+class DataSize;
+
 class HTTPHeaderFieldsParser
 {
 	public:
@@ -32,14 +34,19 @@ class HTTPHeaderFieldsParser
 			S_END,
 		};
 
+	public:
+		static DataSize MAX_SIZE;
+
 	private:
+		bool m_limited;
 		State m_state;
 		HTTPHeaderFields m_headerFields;
 		std::string m_key;
 		std::string m_value;
+		long m_consumed;
 
 	public:
-		HTTPHeaderFieldsParser();
+		HTTPHeaderFieldsParser(bool limited = true);
 
 		void
 		consume(char c);

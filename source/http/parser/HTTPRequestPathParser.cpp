@@ -10,13 +10,17 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <exception/Exception.hpp>
+#include <http/parser/exception/status/HTTPRequestURLTooLongException.hpp>
 #include <http/parser/HTTPRequestPathParser.hpp>
+#include <unit/DataSize.hpp>
 #include <util/Number.hpp>
+
+DataSize HTTPRequestPathParser::MAX_LENGTH = DataSize::ofKilobytes(4);
 
 HTTPRequestPathParser::HTTPRequestPathParser() :
 		m_state(S_PATH),
 		m_path("/"),
+		m_original("/"),
 		m_queryKey(),
 		m_queryValue(),
 		m_hexBeforeState(),
@@ -26,6 +30,7 @@ HTTPRequestPathParser::HTTPRequestPathParser() :
 		m_fragment()
 {
 	m_path.reserve(60);
+	m_original.reserve(60);
 }
 
 void
@@ -132,9 +137,13 @@ HTTPRequestPathParser::consume(char c)
 		}
 
 		case S_END:
-			break;
-
+			return;
 	}
+
+	m_original += c;
+
+	if (static_cast<long>(m_original.size()) >= MAX_LENGTH.toBytes())
+		throw HTTPRequestURLTooLongException();
 }
 
 void
