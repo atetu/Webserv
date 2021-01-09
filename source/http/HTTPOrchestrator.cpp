@@ -20,11 +20,10 @@
 #include <log/LoggerFactory.hpp>
 #include <nio/NIOSelector.hpp>
 #include <sys/errno.h>
-#include <util/Environment.hpp>
 #include <util/FileDescriptorSet.hpp>
 #include <util/Optional.hpp>
 #include <util/Singleton.hpp>
-#include <util/System.hpp>
+#include <cstdio>
 #include <iostream>
 #include <new>
 #include <string>
@@ -164,16 +163,10 @@ HTTPOrchestrator::start()
 void
 HTTPOrchestrator::terminate()
 {
-//	m_stopping = true;
-//
-//	typedef std::map<int, HTTPServer const*>::iterator iterator;
-//
-//	std::set<int> fdToRemove;
-//	for (iterator it = serverFds.begin(); it != serverFds.end(); it++)
-//		fdToRemove.insert(fdToRemove.end(), it->first);
-//
-//	for (std::set<int>::iterator it = fdToRemove.begin(); it != fdToRemove.end(); it++)
-//		removeServer(*it);
+	m_stopping = true;
+
+	for (server_iterator it = m_servers.begin(); it != m_servers.end(); it++)
+		NIOSelector::instance().remove((*it)->socket());
 }
 
 HTTPOrchestrator*
