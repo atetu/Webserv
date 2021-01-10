@@ -29,6 +29,7 @@
 #include <util/URL.hpp>
 #include <iostream>
 #include <list>
+#include <util/Macros.hpp>
 
 class FileDescriptorBuffer;
 
@@ -53,13 +54,16 @@ GetHandler::operator =(const GetHandler &other)
 	return (*this);
 }
 
-void
-GetHandler::handle(HTTPRequest &request, HTTPResponse &response)
+bool
+GetHandler::handle(UNUSED HTTPClient &client, HTTPRequest &request, HTTPResponse &response)
 {
 	File targetFile(request.targetFile());
 
 	if (!targetFile.exists())
-		return (response.status(*HTTPStatus::NOT_FOUND));
+	{
+		response.status(*HTTPStatus::NOT_FOUND);
+		return (true);
+	}
 
 	if (targetFile.isFile())
 	{
@@ -95,21 +99,25 @@ GetHandler::handle(HTTPRequest &request, HTTPResponse &response)
 			throw;
 		}
 
-		return;
+		return (true);
 	}
 
 	if (targetFile.isDirectory())
 	{
 		if (!request.listing())
-			return (response.status(*HTTPStatus::NOT_FOUND));
-			//return (response.status(*HTTPStatus::FORBIDDEN));
+			response.status(*HTTPStatus::NOT_FOUND);
+		else
+		{
+			response.string(listing(request.url(), targetFile));
+			response.headers().html();
+			response.status(*HTTPStatus::OK);
+		}
 
-		response.string(listing(request.url(), targetFile));
-		response.headers().html();
-		return (response.status(*HTTPStatus::OK));
+		return (true);
 	}
 
-	return (response.status(*HTTPStatus::NOT_FOUND));
+	response.status(*HTTPStatus::NOT_FOUND);
+	return (true);
 }
 
 std::string

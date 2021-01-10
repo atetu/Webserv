@@ -46,6 +46,10 @@
 			"root": "../",
 			"locations": {
 				"/": {
+					"methods": [
+						"GET",
+						"PUT"
+					],
 					"index": [
 						"index.html"
 					],

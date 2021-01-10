@@ -13,6 +13,7 @@
 #ifndef HTTPMETHODHANDLER_HPP_
 # define HTTPMETHODHANDLER_HPP_
 
+class HTTPClient;
 class HTTPRequest;
 class HTTPResponse;
 
@@ -22,8 +23,16 @@ class HTTPMethodHandler
 		virtual
 		~HTTPMethodHandler();
 
-		virtual void
-		handle(HTTPRequest &request, HTTPResponse &response) = 0;
+		/**
+		 * Handle a HTTP method.
+		 *
+		 * @param client Asking client.
+		 * @param request Input request.
+		 * @param response Output response.
+		 * @return Whether or not the filter chain can continue or if the method handler need time to do actions. In which case, the filter chain will not next().
+		 */
+		virtual bool
+		handle(HTTPClient &client, HTTPRequest &request, HTTPResponse &response) = 0;
 };
 
 #endif /* HTTPMETHODHANDLER_HPP_ */

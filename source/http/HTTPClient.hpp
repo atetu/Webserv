@@ -20,6 +20,9 @@
 #include <io/Socket.hpp>
 #include <net/address/InetSocketAddress.hpp>
 #include <nio/NIOSelector.hpp>
+#include <string>
+
+class HTTPTask;
 
 # define HTTPCLIENT_LOG_TIME_FORMAT "%Y-%m-%d %H:%M:%S"
 
@@ -55,6 +58,7 @@ class HTTPClient :
 		HTTPRequest m_request;
 		HTTPResponse m_response;
 		FilterChain m_filterChain;
+		HTTPTask *m_task;
 
 		HTTPClient(void);
 		HTTPClient(const HTTPClient &other);
@@ -163,6 +167,12 @@ class HTTPClient :
 
 		const std::string&
 		body();
+
+		HTTPTask*
+		task();
+
+		void
+		task(HTTPTask &task, bool removePrevious = true);
 };
 
 #endif /* HTTPCLIENT_HPP_ */

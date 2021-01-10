@@ -30,8 +30,8 @@ class TraceHandler :
 		TraceHandler&
 		operator =(const TraceHandler &other);
 
-		void
-		handle(HTTPRequest &request, HTTPResponse &response);
+		bool
+		handle(HTTPClient &client, HTTPRequest &request, HTTPResponse &response);
 };
 
 #endif /* TraceHANDLER_HPP_ */

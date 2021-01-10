@@ -31,8 +31,8 @@ class PutHandler :
 		PutHandler&
 		operator =(const PutHandler &other);
 
-		void
-		handle(HTTPRequest &request, HTTPResponse &response);
+		bool
+		handle(HTTPClient &client, HTTPRequest &request, HTTPResponse &response);
 };
 
 #endif /* PutHANDLER_HPP_ */

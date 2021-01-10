@@ -34,8 +34,8 @@ class GetHandler :
 		GetHandler&
 		operator =(const GetHandler &other);
 
-		void
-		handle(HTTPRequest &request, HTTPResponse &response);
+		bool
+		handle(HTTPClient &client, HTTPRequest &request, HTTPResponse &response);
 
 	private:
 		std::string

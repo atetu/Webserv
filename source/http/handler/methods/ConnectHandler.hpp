@@ -30,8 +30,8 @@ class ConnectHandler :
 		ConnectHandler&
 		operator =(const ConnectHandler &other);
 
-		void
-		handle(HTTPRequest &request, HTTPResponse &response);
+		bool
+		handle(HTTPClient &client, HTTPRequest &request, HTTPResponse &response);
 };
 
 #endif /* CONNECTHANDLER_HPP_ */

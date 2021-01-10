@@ -15,6 +15,7 @@
 #include <http/request/HTTPRequest.hpp>
 #include <http/response/HTTPResponse.hpp>
 #include <io/File.hpp>
+#include <util/Macros.hpp>
 
 DeleteHandler::DeleteHandler()
 {
@@ -37,16 +38,20 @@ DeleteHandler::operator =(const DeleteHandler &other)
 	return (*this);
 }
 
-void
-DeleteHandler::handle(HTTPRequest &request, HTTPResponse &response)
+bool
+DeleteHandler::handle(UNUSED HTTPClient &client, HTTPRequest &request, HTTPResponse &response)
 {
 	File targetFile(request.targetFile());
 
 	if (!targetFile.exists())
-		return (response.status(*HTTPStatus::NO_CONTENT));
-
-	if (targetFile.tryRemove())
-		return (response.status(*HTTPStatus::OK));
+		response.status(*HTTPStatus::NO_CONTENT);
 	else
-		return (response.status(*HTTPStatus::ACCEPTED));
+	{
+		if (targetFile.tryRemove())
+			response.status(*HTTPStatus::OK);
+		else
+			response.status(*HTTPStatus::ACCEPTED);
+	}
+
+	return (true);
 }

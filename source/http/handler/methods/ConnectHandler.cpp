@@ -36,8 +36,10 @@ ConnectHandler::operator =(const ConnectHandler &other)
 	return (*this);
 }
 
-void
-ConnectHandler::handle(UNUSED HTTPRequest &request, HTTPResponse &response)
+bool
+ConnectHandler::handle(UNUSED HTTPClient &client, UNUSED HTTPRequest &request, HTTPResponse &response)
 {
 	response.status(*HTTPStatus::BAD_REQUEST);
+
+	return (true);
 }

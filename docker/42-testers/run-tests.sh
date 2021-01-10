@@ -1,3 +1,7 @@
+FT_TESTER_DIR=YoupiBanane
+
+cp -r $FT_TESTER_DIR /tmp/$FT_TESTER_DIR
+
 valgrind --track-fds=yes --leak-check=full ./webserv -f conf2.json &> valgrind_out.log &
 jobpid=$!
 
@@ -18,5 +22,15 @@ wait $jobpid
 
 printf "\n\n\n-- valgrind logs --\n"
 cat valgrind_out.log
+
+printf "\n\n\n-- files --\n"
+find $FT_TESTER_DIR
+
+printf "\n\n\n-- files diff --\n"
+find $FT_TESTER_DIR > /tmp/a
+BACK=$(pwd) ; cd /tmp/ ; find $FT_TESTER_DIR > /tmp/b ; cd $BACK
+diff /tmp/a /tmp/b
+
+printf "\n\n\nexit code $out\n"
 
 exit $out

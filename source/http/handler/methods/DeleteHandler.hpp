@@ -30,8 +30,8 @@ class DeleteHandler :
 		DeleteHandler&
 		operator =(const DeleteHandler &other);
 
-		void
-		handle(HTTPRequest &request, HTTPResponse &response);
+		bool
+		handle(HTTPClient &client, HTTPRequest &request, HTTPResponse &response);
 };
 
 #endif /* DELETEHANDLER_HPP_ */

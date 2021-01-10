@@ -42,8 +42,8 @@ TraceHandler::operator =(const TraceHandler &other)
 	return (*this);
 }
 
-void
-TraceHandler::handle(UNUSED HTTPRequest &request, HTTPResponse &response)
+bool
+TraceHandler::handle(UNUSED HTTPClient &client,  HTTPRequest &request, HTTPResponse &response)
 {
 	std::string method = request.method().get()->name();
 	std::string path = request.url().format();
@@ -55,4 +55,6 @@ TraceHandler::handle(UNUSED HTTPRequest &request, HTTPResponse &response)
 	response.headers().httpMessage();
 	response.headers().contentLength(head.size());
 	response.string(head);
+
+	return (true);
 }

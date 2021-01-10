@@ -15,6 +15,7 @@
 #include <http/header/HTTPHeaderFields.hpp>
 #include <http/request/HTTPRequest.hpp>
 #include <http/response/HTTPResponse.hpp>
+#include <util/Macros.hpp>
 
 OptionsHandler::OptionsHandler()
 {
@@ -37,9 +38,11 @@ OptionsHandler::operator =(const OptionsHandler &other)
 	return (*this);
 }
 
-void
-OptionsHandler::handle(HTTPRequest &request, HTTPResponse &response)
+bool
+OptionsHandler::handle(UNUSED HTTPClient &client, HTTPRequest &request, HTTPResponse &response)
 {
 	response.headers().allow(request.allowedMethods());
 	response.status(*HTTPStatus::OK);
+
+	return (true);
 }

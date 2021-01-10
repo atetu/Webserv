@@ -19,16 +19,17 @@
 #include <http/HTTPServer.hpp>
 #include <http/parser/exception/status/HTTPRequestHeaderTooBigException.hpp>
 #include <http/parser/exception/status/HTTPRequestURLTooLongException.hpp>
+#include <http/task/HTTPTask.hpp>
 #include <log/Logger.hpp>
 #include <log/LoggerFactory.hpp>
 #include <util/Enum.hpp>
+#include <util/helper/DeleteHelper.hpp>
 #include <util/Optional.hpp>
 #include <util/Singleton.hpp>
 #include <util/System.hpp>
 #include <util/Time.hpp>
 #include <util/URL.hpp>
 #include <iostream>
-#include <string>
 
 Logger &HTTPClient::LOG = LoggerFactory::get("HTTP Client");
 
@@ -44,7 +45,8 @@ HTTPClient::HTTPClient(Socket &socket, InetSocketAddress socketAddress, HTTPServ
 		m_lastAction(),
 		m_request(),
 		m_response(),
-		m_filterChain(*this, m_request, m_response)
+		m_filterChain(*this, m_request, m_response),
+		m_task()
 {
 	updateLastAction();
 }
@@ -53,6 +55,8 @@ HTTPClient::~HTTPClient(void)
 {
 	delete &m_in;
 	delete &m_out;
+
+	DeleteHelper::pointer(m_task);
 
 	NIOSelector::instance().remove(m_socket);
 	delete &m_socket;
@@ -98,7 +102,7 @@ bool
 HTTPClient::writable(FileDescriptor &fd)
 {
 	(void)fd;
-	
+
 	bool finished = false;
 	if (m_out.capacity() && m_response.store(m_out))
 		finished = true;
@@ -155,11 +159,11 @@ HTTPClient::readableHead(void)
 
 			if (m_parser.state() == HTTPRequestParser::S_END)
 			{
-				
-				m_request = HTTPRequest(m_parser.version(),m_parser.url(), m_parser.headerFields());
-		
+
+				m_request = HTTPRequest(m_parser.version(), m_parser.url(), m_parser.headerFields());
+
 				m_filterChain.doChainingOf(FilterChain::S_BEFORE);
-				
+
 				if (m_response.status().present())
 				{
 					m_filterChain.doChainingOf(FilterChain::S_AFTER);
@@ -250,4 +254,19 @@ const std::string&
 HTTPClient::body()
 {
 	return (m_body);
+}
+
+HTTPTask*
+HTTPClient::task()
+{
+	return (m_task);
+}
+
+void
+HTTPClient::task(HTTPTask &task, bool removePrevious)
+{
+	if (removePrevious && m_task)
+		delete m_task;
+
+	m_task = &task;
 }

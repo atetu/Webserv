@@ -30,8 +30,8 @@ class OptionsHandler :
 		OptionsHandler&
 		operator =(const OptionsHandler &other);
 
-		void
-		handle(HTTPRequest &request, HTTPResponse &response);
+		bool
+		handle(HTTPClient &client, HTTPRequest &request, HTTPResponse &response);
 };
 
 #endif /* OptionsHANDLER_HPP_ */
