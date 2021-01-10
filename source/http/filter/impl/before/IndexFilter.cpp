@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   IndexFilter.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ecaceres <ecaceres@student.42.fr>          +#+  +:+       +#+        */
+/*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/06 23:46:45 by ecaceres          #+#    #+#             */
-/*   Updated: 2021/01/06 23:46:45 by ecaceres         ###   ########.fr       */
+/*   Updated: 2021/01/10 15:26:10 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,7 +72,8 @@ IndexFilter::doFilter(UNUSED HTTPClient &client, HTTPRequest &request, UNUSED HT
 
 							if (anIndex.exists() && anIndex.isFile())
 							{
-								request.resource(File(request.url().path(), *it).path());
+								//request.resource(File(request.url().path(), *it).path());
+								request.resource(File(request.resource(), *it).path());
 								break;
 							}
 						}

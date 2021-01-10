@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HTTPRequestParser.hpp                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: atetu <atetu@student.42.fr>                +#+  +:+       +#+        */
+/*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/27 17:29:02 by ecaceres          #+#    #+#             */
-/*   Updated: 2021/01/07 14:23:08 by atetu            ###   ########.fr       */
+/*   Updated: 2021/01/10 14:43:59 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@
 #include <http/parser/HTTPHeaderFieldsParser.hpp>
 #include <http/parser/HTTPRequestPathParser.hpp>
 #include <string>
+#include <config/block/LocationBlock.hpp>
 
 class IHTTPBodyDecoder;
 class URL;
@@ -125,7 +126,7 @@ class HTTPRequestParser
 		body() const;
 
 		URL
-		url(/*const LocationBlock *locationBlockPtr*/);
+		url();
 };
 
 #endif /* HTTPREQUESTPARSER_HPP_ */

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   IHTTPBodyDecoder.hpp                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ecaceres <ecaceres@student.42.fr>          +#+  +:+       +#+        */
+/*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/09 01:00:24 by ecaceres          #+#    #+#             */
-/*   Updated: 2021/01/09 01:00:24 by ecaceres         ###   ########.fr       */
+/*   Updated: 2021/01/10 10:57:10 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,6 +39,8 @@ class IHTTPBodyDecoder
 		 */
 		virtual void
 		cleanup();
+
+		
 };
 
 #endif /* IHTTPBODYDECODER_HPP_ */

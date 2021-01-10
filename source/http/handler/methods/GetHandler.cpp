@@ -101,7 +101,8 @@ GetHandler::handle(HTTPRequest &request, HTTPResponse &response)
 	if (targetFile.isDirectory())
 	{
 		if (!request.listing())
-			return (response.status(*HTTPStatus::FORBIDDEN));
+			return (response.status(*HTTPStatus::NOT_FOUND));
+			//return (response.status(*HTTPStatus::FORBIDDEN));
 
 		response.string(listing(request.url(), targetFile));
 		response.headers().html();

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HTTPRequestParser.cpp                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: atetu <atetu@student.42.fr>                +#+  +:+       +#+        */
+/*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/27 17:29:02 by ecaceres          #+#    #+#             */
-/*   Updated: 2021/01/08 14:42:03 by atetu            ###   ########.fr       */
+/*   Updated: 2021/01/10 14:44:45 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -294,3 +294,4 @@ HTTPRequestParser::url()
 {
 	return (URL(m_pathParser.path(), m_pathParser.query(), m_pathParser.fragment()));
 }
+

@@ -96,6 +96,10 @@ class HTTPRequest
 
 		bool
 		listing() const;
+
+		void
+		urlPath(const std::string & path);
+
 };
 
 #endif /* HTTPREQUEST_HPP_ */

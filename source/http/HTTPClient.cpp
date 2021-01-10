@@ -98,7 +98,7 @@ bool
 HTTPClient::writable(FileDescriptor &fd)
 {
 	(void)fd;
-
+	
 	bool finished = false;
 	if (m_out.capacity() && m_response.store(m_out))
 		finished = true;
@@ -155,10 +155,11 @@ HTTPClient::readableHead(void)
 
 			if (m_parser.state() == HTTPRequestParser::S_END)
 			{
-				m_request = HTTPRequest(m_parser.version(), m_parser.url(), m_parser.headerFields());
-
+				
+				m_request = HTTPRequest(m_parser.version(),m_parser.url(), m_parser.headerFields());
+		
 				m_filterChain.doChainingOf(FilterChain::S_BEFORE);
-
+				
 				if (m_response.status().present())
 				{
 					m_filterChain.doChainingOf(FilterChain::S_AFTER);
