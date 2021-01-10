@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   File.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: atetu <atetu@student.42.fr>                +#+  +:+       +#+        */
+/*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/21 23:36:43 by ecaceres          #+#    #+#             */
-/*   Updated: 2021/01/08 14:36:58 by atetu            ###   ########.fr       */
+/*   Updated: 2021/01/10 15:33:36 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,8 +18,10 @@
 #include <sys/fcntl.h>
 #include <sys/stat.h>
 #include <sys/unistd.h>
+#include <unistd.h>
 #include <util/StringUtils.hpp>
 #include <cstddef>
+#include <iostream>
 
 File::File() :
 		m_path()
@@ -170,7 +172,7 @@ File::lastModified() const
 	if (::stat(m_path.c_str(), &st) == -1)
 		throw ioException();
 
-	return (Time(st.st_mtim));
+	return (Time(st.st_mtime));
 }
 
 std::string

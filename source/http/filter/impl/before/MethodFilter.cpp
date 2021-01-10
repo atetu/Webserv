@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   MethodFilter.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ecaceres <ecaceres@student.42.fr>          +#+  +:+       +#+        */
+/*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/06 19:16:46 by ecaceres          #+#    #+#             */
-/*   Updated: 2021/01/06 19:16:46 by ecaceres         ###   ########.fr       */
+/*   Updated: 2021/01/10 13:21:45 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,11 +55,11 @@ MethodFilter::doFilter(UNUSED HTTPClient &client, HTTPRequest &request, HTTPResp
 		if (isAcceptable(request.serverBlock(), request.locationBlock(), method))
 		{
 			request.method(method);
-
 			return (next());
 		}
 	}
-
+	const HTTPMethod &method = *methodPtr; // for head method when it is not allowed, body should not appear
+	request.method(method);
 	response.headers().allow(request.allowedMethods());
 	response.status(*HTTPStatus::METHOD_NOT_ALLOWED);
 }
@@ -73,5 +73,5 @@ MethodFilter::isAcceptable(const Optional<const ServerBlock*> &serverBlock, cons
 	if (serverBlock.present() && (*serverBlock.get()).hasMethod(method.name()))
 		return (true);
 
-	return (true /* TODO: For now */);
+	return (false /* TODO: For now */);
 }

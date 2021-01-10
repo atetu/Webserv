@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HTTPRequestParser.cpp                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: atetu <atetu@student.42.fr>                +#+  +:+       +#+        */
+/*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/27 17:29:02 by ecaceres          #+#    #+#             */
-/*   Updated: 2021/01/08 14:42:03 by atetu            ###   ########.fr       */
+/*   Updated: 2021/01/10 14:44:45 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -357,19 +357,24 @@ HTTPRequestParser::body() const
 //}
 
 URL
-HTTPRequestParser::url(/*const LocationBlock *locationBlockPtr*/)
+HTTPRequestParser::url()
 {
-//	if (locationBlockPtr &&locationBlockPtr->root().present())
-//	{
-//		std::string path;
-//
-//		if (locationBlockPtr->path().size() <= m_pathParser.path().size())
-//			path = m_pathParser.path().substr(locationBlockPtr->path().size(), std::string::npos);
-//		else
-//			path = "";
-//
-//		return (URL(path, m_pathParser.query(), m_pathParser.fragment()));
-//	}
+//	std::cout << "entry\n";
+	// if (locationBlockPtr)
+	// 	std::cout<< "pesent\n";
+	// if (locationBlockPtr &&locationBlockPtr->root().present())
+	// {
+	// 	// std::cout << "path\n";
+	// 	std::string path;
+
+	// 	if (locationBlockPtr->path().size() <= m_pathParser.path().size())
+	// 		path = m_pathParser.path().substr(locationBlockPtr->path().size(), std::string::npos);
+	// 	else
+	// 		path = "";
+	// std::cout << "new path: " << path << std::endl;
+	// 	return (URL(path, m_pathParser.query(), m_pathParser.fragment()));
+	// }
 
 	return (URL(m_pathParser.path(), m_pathParser.query(), m_pathParser.fragment()));
 }
+

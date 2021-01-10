@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ErrorFilter.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ecaceres <ecaceres@student.42.fr>          +#+  +:+       +#+        */
+/*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/07 00:30:02 by ecaceres          #+#    #+#             */
-/*   Updated: 2021/01/07 00:30:02 by ecaceres         ###   ########.fr       */
+/*   Updated: 2021/01/10 12:31:11 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -107,7 +107,8 @@ ErrorFilter::doFilter(UNUSED HTTPClient &client, UNUSED HTTPRequest &request, HT
 	}
 
 	if (!success)
-		response.body(new StringResponseBody(DefaultPages::instance().resolve(status)));
-
+		response.string(DefaultPages::instance().resolve(status));
+//	response.body(new StringResponseBody(DefaultPages::instance().resolve(status)));
+		
 	return (next());
 }

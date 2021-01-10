@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Response.cpp                                       :+:      :+:    :+:   */
+/*   HTTPResponse.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ecaceres <ecaceres@student.42.fr>          +#+  +:+       +#+        */
+/*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/06 18:51:19 by ecaceres          #+#    #+#             */
-/*   Updated: 2021/01/06 18:51:19 by ecaceres         ###   ########.fr       */
+/*   Updated: 2021/01/10 12:31:35 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,6 +80,7 @@ HTTPResponse::body(IResponseBody *body, bool deletePrevious)
 		delete m_body;
 
 	m_body = body;
+//	headers().contentLength(body->store().length());
 }
 
 IResponseBody*

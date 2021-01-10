@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ChunkDecoder.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: atetu <atetu@student.42.fr>                +#+  +:+       +#+        */
+/*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/19 14:51:33 by alicetetu         #+#    #+#             */
-/*   Updated: 2021/01/07 14:37:56 by atetu            ###   ########.fr       */
+/*   Updated: 2021/01/10 15:35:52 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,6 +37,7 @@ ChunkDecoder::~ChunkDecoder()
 		m_sizeNb = strtol(hex_intro.c_str(), &endPtr, 16);			\
 		if (endPtr == hex_intro.c_str())							\
 			throw Exception ("Hexadecimal conversion impossible"); 	\
+		m_sizeStr = "";												\
 		std::cout << "hex: " << hex_intro << std::endl; \
 		std::cout << "nb : " << m_sizeNb << std::endl;
 
@@ -208,11 +209,138 @@ ChunkDecoder::consume(std::string &out, char c)
 {
 	(void)out;
 	(void)c;
-	// TODO
-	// switch (m_state)
-	// ...
+	
+	switch (m_state)
+	{
+		case S_NOT_STARTED :
+		case S_SIZE:
+		{
+			if (ChunkDecoder::isValidCharacter(c))
+			{
+				m_sizeStr += c;
+				m_state = S_SIZE;
+			}
+			else if (c == '\r')
+			{
+				m_state = S_SIZE_END;
+				SIZE_CONVERSION();
+			}
+			else if (c == ';')
+			{
+				m_state = S_EXTENSION;
+				SIZE_CONVERSION();
+			}
+			else
+			{
+				throw Exception ("Character not recognized"); // check error
+			}
+					
+			break;
+		}
+		
+		case S_EXTENSION:
+		{
+			if (c == '\r')
+			{
+				m_state = S_SIZE_END;
+				m_extension = "";
+			}
+			else
+			{
+				m_extension += c;
+				if (m_extension.size() >= 50)
+					throw Exception ("Too long extensions"); // 4xx error;
+			}
+			
+			break;
+		}
+		
+		case S_SIZE_END:
+		{
+			if (c == '\n' && m_sizeNb == 0)
+				m_state = S_NULL;
+			else if (c == '\n')
+				m_state = S_CHUNK;		
+			else
+				throw Exception ("\n excepted"); // check error
+			
+			break;
+		}
+		
+		case S_CHUNK:
+		{
+			//std::cout << "chunk: \n" << m_parsedChunk << std::endl;
+			//	std::cout << "size: " << m_sizeNb << std::endl;
+			m_parsedChunk += c;
+			m_sizeNb--;
+			if (m_sizeNb == 0)
+			{
+				m_parsedData += m_parsedChunk;
+			//	std::cout << "parsed: \n" << m_parsedData << std::endl;
+				m_parsedChunk = "";
+				m_sizeNb = 0;
+				m_state = S_CHUNK_END;
+			}
+			else
+				m_state = S_CHUNK;	
+			
+			break;
+		}
+		
+		case S_CHUNK_END:
+		{
+			if (c == '\r')
+				m_state = S_CHUNK_END2;
+		
+			else
+			{
+				throw Exception ("Character not recognized"); // check error
+			}
+		
+			break;
+		}
 
-	return (true);
+		case S_CHUNK_END2:
+		{
+			if (c == '\n')
+				m_state = S_SIZE;
+			else if (c == '\r')
+				m_state = S_CHUNK_END2;
+			else
+				m_state = S_CHUNK_END;
+						
+			break;
+		}
+		
+		case S_NULL:
+		{
+			if (c == '\r')
+				m_state = S_END;
+			else
+				throw Exception ("\r excepted");
+			
+			break;
+		}
+	
+		case S_END:
+		{
+			if (c == '\n')
+				m_state = S_OVER;
+			else
+				throw Exception ("\n excepted");
+			
+			break;
+		}
+	
+		case S_OVER:
+		{
+			break;
+		}
+	}
+	m_lastChar = c ;
+
+	// std::cout << "parsed: \n" << m_parsedData << std::endl;
+	return (m_state == S_OVER);
 }
 
 std::string
