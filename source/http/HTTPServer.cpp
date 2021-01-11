@@ -26,7 +26,9 @@ HTTPServer::HTTPServer(const std::string &host, short port, const std::list<Serv
 		m_host(host),
 		m_port(port),
 		m_serverBlocks(serverBlocks),
-		m_socket(*Socket::create())
+		m_socket(*Socket::create()),
+		m_clients(),
+		m_endingClients()
 {
 }
 
@@ -38,8 +40,9 @@ HTTPServer::~HTTPServer(void)
 void
 HTTPServer::start(void)
 {
-	m_socket.bind(m_host, m_port);
 	m_socket.reusable();
+	m_socket.nonBlocking();
+	m_socket.bind(m_host, m_port);
 	m_socket.listen();
 
 	NIOSelector::instance().add(m_socket, *this, NIOSelector::ACCEPT);
@@ -72,6 +75,16 @@ HTTPServer::watchForTimeouts()
 
 			delete &client;
 		}
+	}
+
+	for (lst::iterator it = m_endingClients.begin(); it != m_endingClients.end();)
+	{
+		HTTPClient &client = *(*it);
+		it++;
+
+		char c;
+		if (client.socket().read(&c, 1) == -1)
+			delete &client;
 	}
 }
 
@@ -148,6 +161,16 @@ void
 HTTPServer::untrack(HTTPClient &client)
 {
 	m_clients.remove(&client);
+	m_endingClients.remove(&client);
+}
+
+void
+HTTPServer::ending(HTTPClient &client)
+{
+	untrack(client);
+	m_endingClients.push_back(&client);
+	NIOSelector::instance().update(client.socket(), NIOSelector::READ);
+	std::cout << "ending " << client.socket().raw() << std::endl;
 }
 
 HTTPServer::client_list::size_type

@@ -46,7 +46,8 @@ HTTPClient::HTTPClient(Socket &socket, InetSocketAddress socketAddress, HTTPServ
 		m_request(),
 		m_response(),
 		m_filterChain(*this, m_request, m_response),
-		m_task()
+		m_task(),
+		m_ending(false)
 {
 	updateLastAction();
 }
@@ -107,11 +108,17 @@ HTTPClient::writable(FileDescriptor &fd)
 	if (m_out.capacity() && m_response.store(m_out))
 		finished = true;
 
-	if (m_out.send() > 0)
+	ssize_t r = 0;
+	if ((r = m_out.send()) > 0)
 		updateLastAction();
 
-	if (finished && m_out.empty())
+	if (r == -1)
 		delete this;
+	else if (finished && m_out.empty())
+	{
+		m_ending = true;
+		m_server.ending(*this);
+	}
 
 	return (finished);
 }
@@ -121,23 +128,31 @@ HTTPClient::readable(FileDescriptor &fd)
 {
 	(void)fd;
 
-	if (m_in.size() != 0 || m_in.recv() > 0)
+	ssize_t r = 1;
+	bool cond = m_in.size() != 0 || (r = m_in.recv()) > 0;
+
+	if (r == -1 || (m_ending && r == 0))
+		delete this;
+	else
 	{
-		switch (m_state)
+		if (cond)
 		{
-			case S_NOT_STARTED:
-				m_state = S_HEADER;
+			switch (m_state)
+			{
+				case S_NOT_STARTED:
+					m_state = S_HEADER;
 
-				/* Falling */
+					/* Falling */
 
-			case S_HEADER:
-				return (readableHead());
+				case S_HEADER:
+					return (readableHead());
 
-			case S_BODY:
-				return (readableBody());
+				case S_BODY:
+					return (readableBody());
 
-			case S_END:
-				return (true);
+				case S_END:
+					return (true);
+			}
 		}
 	}
 
@@ -159,7 +174,6 @@ HTTPClient::readableHead(void)
 
 			if (m_parser.state() == HTTPRequestParser::S_END)
 			{
-
 				m_request = HTTPRequest(m_parser.version(), m_parser.url(), m_parser.headerFields());
 
 				m_filterChain.doChainingOf(FilterChain::S_BEFORE);

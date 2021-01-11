@@ -59,6 +59,7 @@ class HTTPClient :
 		HTTPResponse m_response;
 		FilterChain m_filterChain;
 		HTTPTask *m_task;
+		bool m_ending;
 
 		HTTPClient(void);
 		HTTPClient(const HTTPClient &other);

@@ -40,6 +40,7 @@ class HTTPServer :
 		std::list<ServerBlock const*> m_serverBlocks;
 		Socket &m_socket;
 		client_list m_clients;
+		client_list m_endingClients;
 
 	private:
 		HTTPServer(void);
@@ -83,6 +84,9 @@ class HTTPServer :
 
 		void
 		untrack(HTTPClient &client);
+
+		void
+		ending(HTTPClient &client);
 
 		client_list::size_type
 		tracked();
