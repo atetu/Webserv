@@ -60,18 +60,18 @@ LocationFilter::doFilter(UNUSED HTTPClient &client, HTTPRequest &request, UNUSED
 
 		if (findLocation.parse().location().present())
 		{
-			request.locationBlock(*findLocation.parse().location().get());
-		
-			if (request.locationBlock().get()->root().present())
+			const LocationBlock &locationBlock = *findLocation.parse().location().get();
+
+			request.locationBlock(locationBlock);
+
+			if (locationBlock.root().present())
 			{
 				std::string path;
 
-				if (request.locationBlock().get()->path().size() <= request.resource().size())
-					path = request.resource().substr(request.locationBlock().get()->path().size(), std::string::npos);
-				else
-					path = "";
-			
-				request.urlPath(path);
+				if (locationBlock.path().size() <= request.resource().size())
+					path = request.resource().substr(locationBlock.path().size(), std::string::npos);
+
+				request.resource(path);
 			}
 		}
 	}
