@@ -14,27 +14,29 @@
 
 namespace ft
 {
-    int	atoi(const char *str)
-    {
-        unsigned int		nb;
-        int					negative;
+	int
+	atoi(const char *str)
+	{
+		int nb = 0;
+		int negative = 1;
 
-        nb = 0;
-        negative = 1;
-        while (*str && (*str == '\t' || *str == '\n' || *str == '\v' ||
-            *str == '\f' || *str == '\r' || *str == ' '))
-            str++;
-        if (*str == '+' || *str == '-')
-        {
-            if (*str == '-')
-                negative = -1;
-            str++;
-        }
-        while ((*str >= 48 && *str <= 57) && *str)
-        {
-            nb = nb * 10 + (*str - 48);
-            str++;
-        }
-        return ((int)(nb * negative));
-    }
+		while (*str && (*str == '\t' || *str == '\n' || *str == '\v' || *str == '\f' || *str == '\r' || *str == ' '))
+			str++;
+
+		if (*str == '+' || *str == '-')
+		{
+			if (*str == '-')
+				negative = -1;
+			str++;
+		}
+
+		char c;
+		while (isdigit(c = *str))
+		{
+			nb = nb * 10 + (c - '0');
+			str++;
+		}
+
+		return (nb * negative);
+	}
 }

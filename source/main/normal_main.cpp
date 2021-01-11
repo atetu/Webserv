@@ -40,7 +40,7 @@ const Option OPT_LOG_LEVEL('l', "log-level", "change the log-level", "level");
 const Option OPT_CHECK('c', "check", "only check the config file");
 const Option OPT_CONFIG_FILE('f', "config-file", "specify the config file", "file");
 const Option OPT_IGNORE_MIME_INCLUDES_ERROR('m', "ignore-mime-includes-error", "only warn when a MIME file inclusion cause an error");
-const Option OPT_IGNORE_GRACEFUL_STOP('s', "ignore-graceful-stop", "avoid doing a graceful stop when receiving a TERM signal");
+const Option OPT_IGNORE_GRACEFUL_STOP('s', "ignore-graceful-stop", "avoid doing a graceful stop when receiving a INT signal");
 
 static Logger &LOG = LoggerFactory::get("main");
 static HTTPOrchestrator *httpOrchestrator = NULL;

@@ -50,8 +50,8 @@ namespace ft
 	bool
 	isdigit(char c);
 
-	int	atoi
-	(const char *str);
+	int
+	atoi(const char *str);
 }
 
 #endif /* FT_HPP_ */
