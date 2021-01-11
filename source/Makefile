@@ -6,7 +6,7 @@
 #    By: atetu <atetu@student.42.fr>                +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2019/08/13 15:11:33 by ecaceres          #+#    #+#              #
-#    Updated: 2021/01/08 14:46:21 by atetu            ###   ########.fr        #
+#    Updated: 2021/01/11 17:01:49 by atetu            ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -36,7 +36,7 @@ OBJECTS					= $(SOURCES:.cpp=.o)
 COMPILER				= clang++
 
 FRAMEWORKS				= 
-FLAGS					= -std=c++98 -Wall -Wextra -Werror -g3
+FLAGS					= -std=c++98 -Wall -Wextra -Werror -g3 -O3
 TARGET_REQUIRED_FLAGS	= -I.
 
 MAKE_PREFIX				= "$(COLOR_LIGHT_MAGENTA)[$(COLOR_LIGHT_GREEN) make: $(TARGET) $(COLOR_LIGHT_MAGENTA)]"

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HTTPServer.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
+/*   By: atetu <atetu@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/28 14:33:42 by ecaceres          #+#    #+#             */
-/*   Updated: 2020/12/09 14:58:48 by alicetetu        ###   ########.fr       */
+/*   Updated: 2021/01/11 17:26:56 by atetu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,9 +38,10 @@ HTTPServer::~HTTPServer(void)
 void
 HTTPServer::start(void)
 {
-	m_socket.bind(m_host, m_port);
 	m_socket.reusable();
+	m_socket.bind(m_host, m_port);
 	m_socket.listen();
+	m_socket.nonBlocking();
 
 	NIOSelector::instance().add(m_socket, *this, NIOSelector::ACCEPT);
 }

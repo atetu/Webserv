@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   MethodHandlingFilter.cpp                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ecaceres <ecaceres@student.42.fr>          +#+  +:+       +#+        */
+/*   By: atetu <atetu@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/07 00:28:17 by ecaceres          #+#    #+#             */
-/*   Updated: 2021/01/07 00:28:17 by ecaceres         ###   ########.fr       */
+/*   Updated: 2021/01/11 16:01:18 by atetu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,6 +54,7 @@ MethodHandlingFilter::doFilter(HTTPClient &client, HTTPRequest &request, HTTPRes
 	{
 		try
 		{
+			std::cout << "method handler\n";
 			if (request.method().get()->handler().handle(client, request, response))
 				next();
 		}

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   File.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
+/*   By: atetu <atetu@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/21 23:36:43 by ecaceres          #+#    #+#             */
-/*   Updated: 2021/01/10 15:33:36 by alicetetu        ###   ########.fr       */
+/*   Updated: 2021/01/11 16:26:43 by atetu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -339,6 +339,49 @@ File::findExtension(const std::string &path, std::string &out)
 
 	out = filename.substr(lastDotPos + 1);
 
+	return (true);
+}
+
+bool
+File::findMime(std::string &out, HTTPRequest &request)
+{
+	const MimeRegistry &mimeRegistry = Configuration::instance().mimeRegistry();
+	std::string type = request.headers().get(HTTPHeaderFields::CONTENT_TYPE).orElse("");
+	//std::cout << "path inside mime: " << m_path << std::endl;
+	if (!type.empty())
+	{
+		const Mime *mime = mimeRegistry.findByMimeType(type);
+		if (mime == NULL)
+		{
+			//LOG.warn() << "Extension conversion not handled (1)" << std::endl;
+			return (false);
+		}
+
+		// std::string path = file.path();
+		std::size_t found = m_path.find_last_of(out);
+				
+		if (!out.empty())
+		{
+			Mime::iterator ext_it = std::find(mime->extensions().begin(), mime->extensions().end(), out);
+			if (ext_it != mime->extensions().end())
+				; // TODO Bad conditional
+			else if (ext_it == mime->extensions().end() && exists())
+			{
+			//	std::cout << "not handled\n";
+				//LOG.warn() << "Extension conversion not handled(2)" << std::endl;
+				return (false);
+			}
+			else
+			{
+			//	std::cout << "right\n";
+				m_path = m_path.substr(0, found) + "." + *(mime->extensions().begin());
+			}
+		}
+		
+		else if (!exists())
+			m_path = m_path + "." + *(mime->extensions().begin());
+	}
+//	std::cout << "path: "  << m_path << std::endl;
 	return (true);
 }
 

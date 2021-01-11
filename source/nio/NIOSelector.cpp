@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Selector.cpp                                       :+:      :+:    :+:   */
+/*   NIOSelector.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ecaceres <ecaceres@student.42.fr>          +#+  +:+       +#+        */
+/*   By: atetu <atetu@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/07 23:38:08 by ecaceres          #+#    #+#             */
-/*   Updated: 2021/01/07 23:38:08 by ecaceres         ###   ########.fr       */
+/*   Updated: 2021/01/11 16:16:44 by atetu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -142,7 +142,7 @@ NIOSelector::select(FileDescriptorSet *read, FileDescriptorSet *write, struct ti
 				if (read->test(index))
 					m_callbacks[index]->readable(*m_fileDescriptors[index]);
 			}
-
+	
 		if (write)
 			for (int index = 0; index <= m_highest; index++)
 			{

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   PutTask.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ecaceres <ecaceres@student.42.fr>          +#+  +:+       +#+        */
+/*   By: atetu <atetu@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/10 19:55:50 by ecaceres          #+#    #+#             */
-/*   Updated: 2021/01/10 19:55:50 by ecaceres         ###   ########.fr       */
+/*   Updated: 2021/01/11 15:17:53 by atetu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,7 @@ class PutTask :
 		HTTPClient &m_client;
 		FileDescriptor &m_fileDescriptor;
 		ssize_t m_storedCount;
+		bool m_justCreated;
 
 	private:
 		PutTask();
@@ -38,7 +39,7 @@ class PutTask :
 		operator=(const PutTask &other);
 
 	public:
-		PutTask(HTTPClient &client, FileDescriptor &fileDescriptor);
+		PutTask(HTTPClient &client, FileDescriptor &fileDescriptor, bool justCreated);
 
 		virtual
 		~PutTask();

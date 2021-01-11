@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   PutTask.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ecaceres <ecaceres@student.42.fr>          +#+  +:+       +#+        */
+/*   By: atetu <atetu@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/10 19:55:50 by ecaceres          #+#    #+#             */
-/*   Updated: 2021/01/10 19:55:50 by ecaceres         ###   ########.fr       */
+/*   Updated: 2021/01/11 14:28:49 by atetu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,13 +14,16 @@
 #include <http/handler/methods/task/PutTask.hpp>
 #include <http/HTTPClient.hpp>
 #include <http/response/HTTPResponse.hpp>
+#include <http/response/body/IResponseBody.hpp>
+#include <http/response/body/impl/StringResponseBody.hpp>
 #include <util/Singleton.hpp>
 #include <string>
 
-PutTask::PutTask(HTTPClient &client, FileDescriptor &fileDescriptor) :
+PutTask::PutTask(HTTPClient &client, FileDescriptor &fileDescriptor, bool justCreated) :
 		m_client(client),
 		m_fileDescriptor(fileDescriptor),
-		m_storedCount(0)
+		m_storedCount(0),
+		m_justCreated(justCreated)
 {
 	NIOSelector::instance().add(fileDescriptor, *this, NIOSelector::WRITE);
 }
@@ -56,7 +59,12 @@ PutTask::writable(FileDescriptor &fd)
 	}
 	else if (stored == 0 && m_storedCount == static_cast<ssize_t>(m_client.body().length()))
 	{
-		m_client.response().status(*HTTPStatus::OK);
+		if (m_justCreated)
+			m_client.response().status(*HTTPStatus::CREATED);
+		else
+			m_client.response().status(*HTTPStatus::OK);
+		
+		//m_client.response().string("Ressource created");
 		m_client.filterChain().next();
 
 		return (true);

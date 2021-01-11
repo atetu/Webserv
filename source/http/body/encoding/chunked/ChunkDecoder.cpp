@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ChunkDecoder.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
+/*   By: atetu <atetu@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/19 14:51:33 by alicetetu         #+#    #+#             */
-/*   Updated: 2021/01/10 15:35:52 by alicetetu        ###   ########.fr       */
+/*   Updated: 2021/01/11 16:53:49 by atetu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -207,8 +207,8 @@ ChunkDecoder::~ChunkDecoder()
 bool
 ChunkDecoder::consume(std::string &out, char c)
 {
-	(void)out;
-	(void)c;
+	//(void)out;
+//	(void)c;
 	
 	switch (m_state)
 	{
@@ -258,7 +258,12 @@ ChunkDecoder::consume(std::string &out, char c)
 		case S_SIZE_END:
 		{
 			if (c == '\n' && m_sizeNb == 0)
-				m_state = S_NULL;
+			{
+				//std::cout << m_parsedData << std::endl;
+			//	std::cout << "size: " << m_parsedData.size() << std::endl;
+			//	out = m_parsedData;
+				m_state = S_OVER;
+			}
 			else if (c == '\n')
 				m_state = S_CHUNK;		
 			else
@@ -269,15 +274,16 @@ ChunkDecoder::consume(std::string &out, char c)
 		
 		case S_CHUNK:
 		{
-			//std::cout << "chunk: \n" << m_parsedChunk << std::endl;
-			//	std::cout << "size: " << m_sizeNb << std::endl;
-			m_parsedChunk += c;
+			//std::cout << "chunk: \n" << m_parsedData << std::endl;
+		//	std::cout << "size: " << m_sizeNb << std::endl;
+			out += c;
 			m_sizeNb--;
 			if (m_sizeNb == 0)
 			{
-				m_parsedData += m_parsedChunk;
-			//	std::cout << "parsed: \n" << m_parsedData << std::endl;
-				m_parsedChunk = "";
+				//m_parsedData += m_parsedChunk;
+			//	std::cout << "parsed: \n" << out << std::endl;
+			//	std::cout << "parsed: \n" << out.size() << std::endl;
+			//	m_parsedChunk = "";
 				m_sizeNb = 0;
 				m_state = S_CHUNK_END;
 			}
@@ -334,10 +340,11 @@ ChunkDecoder::consume(std::string &out, char c)
 	
 		case S_OVER:
 		{
+			//std::cout << m_parsedData << std::endl;
 			break;
 		}
 	}
-	m_lastChar = c ;
+	//m_lastChar = c ;
 
 	// std::cout << "parsed: \n" << m_parsedData << std::endl;
 	return (m_state == S_OVER);
