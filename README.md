@@ -51,6 +51,7 @@ Some of the available commands are:
 | `make test`          | Compile and run the tests                                             |
 | `make docker-run`    | Start a throw-away docker container with the projet.                  |
 | `make docker-test`   | Start a throw-away docker with the 42's included testing program      |
+| `make siege`         | Stress a running webserv with the 'siege' program                     |
 
 ## Project stucture
 
@@ -59,7 +60,6 @@ Some of the available commands are:
 | /source              | Source directory                                              |
 | /source/buffer       | Byte buffer with FD integration                               |
 | /source/config/block | Possible configuration blocks                                 |
-| /source/encoding     | Encoder and decoder classes with default impl. (e.g.: base64) |
 | /source/http         | HTTP related classes and logic                                |
 | /source/io           | IO releated classes                                           |
 | /source/json         | JSON parser and type classes                                  |

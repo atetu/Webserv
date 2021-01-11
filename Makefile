@@ -12,6 +12,10 @@
 
 USE_FSANITIZE			= false
 RUN_TESTS				= 0
+SIEGE_URL				= host.docker.internal
+SIEGE_FILE				= /wordpress/
+ARGS					=
+VALGRIND_ARGS			=
 
 SOURCE_DIR				= source
 PROJECT_MAKE			= make -s -C $(SOURCE_DIR) USE_FSANITIZE=$(USE_FSANITIZE) RUN_TESTS=$(RUN_TESTS)
@@ -52,6 +56,9 @@ test: RUN_TESTS=1
 test: all
 	@$(PROJECT_MAKE) ARGS="$(ARGS)" VALGRIND_ARGS="$(VALGRIND_ARGS)" run
 
+docker-build-siege:
+	@$(DOCKER) build -t siege -f docker/siege/Dockerfile .
+
 docker-build-base:
 	@$(DOCKER) build -t webserv-base -f docker/Dockerfile.base .
 
@@ -66,6 +73,9 @@ docker-run: docker-build-run
 
 docker-test: docker-build-test
 	@$(DOCKER) run --rm -it -p 80:80 webserv-test $(ARGS)
+
+siege: docker-build-siege
+	@$(DOCKER) run --rm -it -t siege -d1 -c50 -b -i $(SIEGE_URL)$(SIEGE_FILE)
 
 --touch-test-files:
 	@#echo ${RUN_TESTS} $$(bash -c "test -f '.test'; echo $$?") # DEBUG
