@@ -44,6 +44,9 @@
 				"400": "not-found.html"
 			},
 			"root": "../",
+			"methods": [
+				"GET"
+			],
 			"locations": {
 				"/": {
 					"methods": [
@@ -56,7 +59,10 @@
 					"listing": true
 				},
 				"/wordpress": {
-					"root": "/root/",
+					"methods": [
+						"POST"
+					],
+					"root": "/root/wordpress",
 					"cgi": "php-cgi",
 					"index": [
 						"index.php"

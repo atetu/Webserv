@@ -50,19 +50,19 @@ MethodHandlingFilter::operator=(const MethodHandlingFilter &other)
 void
 MethodHandlingFilter::doFilter(HTTPClient &client, HTTPRequest &request, HTTPResponse &response, FilterChain &next)
 {
-	if (response.status().absent())
-	{
-		try
-		{
-			if (request.method().get()->handler().handle(client, request, response))
-				next();
-		}
-		catch (Exception &exception)
-		{
-			LOG.trace() << "Failed to handle method: " << exception.message() << std::endl;
+	if (response.status().present())
+		return (next());
 
-			response.status(*HTTPStatus::INTERNAL_SERVER_ERROR);
+	try
+	{
+		if (request.method().get()->handler().handle(client, request, response))
 			next();
-		}
+	}
+	catch (Exception &exception)
+	{
+		LOG.trace() << "Failed to handle method: " << exception.message() << std::endl;
+
+		response.status(*HTTPStatus::INTERNAL_SERVER_ERROR);
+		next();
 	}
 }
