@@ -51,15 +51,12 @@ MethodFilter::doFilter(UNUSED HTTPClient &client, HTTPRequest &request, HTTPResp
 	if (methodPtr)
 	{
 		const HTTPMethod &method = *methodPtr;
+		request.method(method);
 
 		if (isAcceptable(request.serverBlock(), request.locationBlock(), method))
-		{
-			request.method(method);
 			return (next());
-		}
 	}
-	const HTTPMethod &method = *methodPtr; // for head method when it is not allowed, body should not appear
-	request.method(method);
+
 	response.headers().allow(request.allowedMethods());
 	response.status(*HTTPStatus::METHOD_NOT_ALLOWED);
 }
@@ -73,5 +70,5 @@ MethodFilter::isAcceptable(const Optional<const ServerBlock*> &serverBlock, cons
 	if (serverBlock.present() && (*serverBlock.get()).hasMethod(method.name()))
 		return (true);
 
-	return (false /* TODO: For now */);
+	return (true /* TODO: For now */);
 }
