@@ -51,10 +51,66 @@ PutHandler::handle(HTTPClient &client, HTTPRequest &request, HTTPResponse &respo
 			response.status(*HTTPStatus::LOCKED);
 			return (true);
 		}
+
+		std::string created = "Ressource created";
+		response.headers().contentLength(created.size());
+		if (request.method().get()->name() == "POST")
+		{
+			return (HTTPMethodHandler::filePut(*HTTPStatus::OK, *file.open(O_WRONLY|O_APPEND), request.body(), created, headers));
+		}
+		else if (request.method().name() == "PUT")
+			return (HTTPMethodHandler::filePut(*HTTPStatus::OK, *file.open(O_WRONLY), request.body(), created, headers));
 	}
 
+	else
+	{
+		try
+		{
+			targetFile.createNewFile(0777);
+			std::string created = "Ressource created";
+			response.headers().contentLength(created.size());
+		}
+		catch (Exception &exception)
+		{
+			LOG.warn() << exception.what() << std::endl;
+		//	return (GenericHTTPResponse::status(*HTTPStatus::NOT_FOUND));
+			return (error(request, *HTTPStatus::NOT_FOUND));
+		}
+	}
+
+	if (targetFile.isFile())
+	{
+		std::string created = "Ressource created";
+		headers.contentLength(created.size());
+		if (request.method().name() == "POST")
+		{
+			return (HTTPMethodHandler::filePut(*HTTPStatus::OK, *file.open(O_WRONLY|O_APPEND), request.body(), created, headers));
+		}
+		else if (request.method().name() == "PUT")
+			return (HTTPMethodHandler::filePut(*HTTPStatus::OK, *file.open(O_WRONLY), request.body(), created, headers));
+	}
+
+
+	
 	FileDescriptor &fd = *targetFile.open(O_CREAT | O_WRONLY, 0664);
 	client.task(*(new PutTask(client, fd)));
+
+
+	HTTPHeaderFields headers;
+
+	const std::string &path = request.root() + request.url().path();
+	//File file(path + "/" + request.getLocation());
+	File file(path);
+	if (!checkExtension(request, file))
+	//	return (status(*HTTPStatus::CONFLICT, headers));
+	//	return (error(request, *HTTPStatus::BAD_REQUEST));
+		return (statusEmpty(*HTTPStatus::UNSUPPORTED_MEDIA_TYPE, headers));
+
+	
+
+	return (error(request, *HTTPStatus::NOT_FOUND));
+// //	return (GenericHTTPResponse::status(*HTTPStatus::NOT_FOUND));
+
 
 	// TODO @atetu this is a very basic version, can you finish it?
 	// The PUT task will only be used after every condition has been done. DO NOT EDIT IT.
