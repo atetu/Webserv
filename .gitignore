@@ -222,4 +222,7 @@ $RECYCLE.BIN/
 /updater.py
 /find_libs_bin.py
 
-.test
+.test*.gcno
+*.gcno
+*.gcda
+callgrind.out.*

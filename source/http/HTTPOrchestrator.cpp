@@ -96,8 +96,8 @@ HTTPOrchestrator::start()
 		FileDescriptorSet writeSet;
 
 		struct timeval timeout = {
-			.tv_sec = 0,
-			.tv_usec = 5000 };
+			.tv_sec = 1,
+			.tv_usec = 0 };
 
 		m_running = true;
 		while (m_running)
