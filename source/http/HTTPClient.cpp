@@ -167,7 +167,7 @@ HTTPClient::readableHead(void)
 	while (m_in.next(c))
 	{
 		bool catched = true;
-
+		std::cout << c;
 		try
 		{
 			m_parser.consume(c);
@@ -175,9 +175,8 @@ HTTPClient::readableHead(void)
 			if (m_parser.state() == HTTPRequestParser::S_END)
 			{
 				m_request = HTTPRequest(m_parser.version(), m_parser.url(), m_parser.headerFields());
-
 				m_filterChain.doChainingOf(FilterChain::S_BEFORE);
-
+				
 				if (m_response.status().present())
 				{
 					m_filterChain.doChainingOf(FilterChain::S_AFTER);
@@ -259,8 +258,7 @@ HTTPClient::readableBody(void)
 			NIOSelector::instance().update(m_socket, NIOSelector::WRITE);
 			m_state = S_END;
 		}
-	}
-
+	}//TODO Fix when there is no body
 	return (false);
 }
 

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HTTPRequestParser.cpp                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
+/*   By: atetu <atetu@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/27 17:29:02 by ecaceres          #+#    #+#             */
-/*   Updated: 2021/01/10 14:44:45 by alicetetu        ###   ########.fr       */
+/*   Updated: 2021/01/11 15:44:22 by atetu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -242,6 +242,8 @@ HTTPRequestParser::consume(char c)
 		case S_BODY:
 			m_state = S_BODY_DECODE;
 			m_bodyDecoder = &HTTPBodyEncoding::decoderFor(m_headerFieldsParser.headerFields());
+
+//			std::cout << typeid(*m_bodyDecoder).name() << std::endl;
 
 			/* Falling */
 

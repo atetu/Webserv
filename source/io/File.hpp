@@ -6,7 +6,7 @@
 /*   By: atetu <atetu@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/21 23:36:43 by ecaceres          #+#    #+#             */
-/*   Updated: 2021/01/08 14:36:52 by atetu            ###   ########.fr       */
+/*   Updated: 2021/01/11 15:16:47 by atetu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,9 @@
 #include <sys/types.h>
 #include <list>
 #include <string>
+#include <http/request/HTTPRequest.hpp>
+#include <http/mime/Mime.hpp>
+#include <config/Configuration.hpp>
 
 class Time;
 
@@ -118,6 +121,9 @@ class File
 
 		static bool
 		findExtension(const std::string &path, std::string &out);
+
+		bool
+		findMime(std::string &out, HTTPRequest &request);
 
 	public:
 		static File

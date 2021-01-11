@@ -11,12 +11,15 @@
 /* ************************************************************************** */
 
 #include <http/body/encoding/identity/IdentityDecoder.hpp>
+#include <iostream>
+#include <string>
 
 IdentityDecoder::IdentityDecoder(bool isAllocated, long long contentLength) :
 		m_isAllocated(isAllocated),
 		m_contentLength(contentLength),
 		m_consumed()
 {
+//	std::cout << "IdentityDecoder" << contentLength << std::endl;
 }
 
 IdentityDecoder::~IdentityDecoder()

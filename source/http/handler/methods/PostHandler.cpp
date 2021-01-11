@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   PutHandler.cpp                                     :+:      :+:    :+:   */
+/*   PostHandler.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -11,28 +11,28 @@
 /* ************************************************************************** */
 
 #include <http/enums/HTTPStatus.hpp>
-#include <http/handler/methods/PutHandler.hpp>
+#include <http/handler/methods/PostHandler.hpp>
 #include <http/handler/methods/task/PutTask.hpp>
 #include <http/HTTPClient.hpp>
 #include <http/request/HTTPRequest.hpp>
 #include <http/response/HTTPResponse.hpp>
 #include <sys/fcntl.h>
 
-PutHandler::PutHandler()
+PostHandler::PostHandler()
 {
 }
 
-PutHandler::PutHandler(const PutHandler &other)
+PostHandler::PostHandler(const PostHandler &other)
 {
 	(void)other;
 }
 
-PutHandler::~PutHandler()
+PostHandler::~PostHandler()
 {
 }
 
-PutHandler&
-PutHandler::operator =(const PutHandler &other)
+PostHandler&
+PostHandler::operator =(const PostHandler &other)
 {
 	(void)other;
 
@@ -40,7 +40,7 @@ PutHandler::operator =(const PutHandler &other)
 }
 
 bool
-PutHandler::handle(HTTPClient &client, HTTPRequest &request, HTTPResponse &response)
+PostHandler::handle(HTTPClient &client, HTTPRequest &request, HTTPResponse &response)
 {
 	File targetFile(request.targetFile());
 
@@ -62,12 +62,12 @@ PutHandler::handle(HTTPClient &client, HTTPRequest &request, HTTPResponse &respo
 			response.status(*HTTPStatus::LOCKED);
 			return (true);
 		}
-	}
 	else
 	{
 		try
 		{
 			targetFile.createNewFile(0777);
+			response.headers().contentLocation(targetFile.path());
 			justCreated = true;
 		}
 		catch (Exception &exception)
@@ -80,7 +80,7 @@ PutHandler::handle(HTTPClient &client, HTTPRequest &request, HTTPResponse &respo
 		}
 	}
 	
-	FileDescriptor &fd = *targetFile.open(O_CREAT | O_WRONLY | O_TRUNC, 0664);
+	FileDescriptor &fd = *targetFile.open(O_CREAT | O_WRONLY | O_APPEND, 0664);
 
 	client.task(*(new PutTask(client, fd, justCreated)));
 
@@ -88,7 +88,7 @@ PutHandler::handle(HTTPClient &client, HTTPRequest &request, HTTPResponse &respo
 }
 
 // int
-// PutHandler::checkExtension(HTTPRequest &request, File &file)
+// PostHandler::checkExtension(HTTPRequest &request, File &file)
 // {
 // 	std::string type = request.headers().get(HTTPHeaderFields::CONTENT_TYPE).orElse("");
 
@@ -133,7 +133,7 @@ PutHandler::handle(HTTPClient &client, HTTPRequest &request, HTTPResponse &respo
 // }
 
 // HTTPResponse*
-// PutHandler::handle(HTTPRequest &request)
+// PostHandler::handle(HTTPRequest &request)
 // {
 // 	HTTPHeaderFields headers;
 
@@ -165,18 +165,18 @@ PutHandler::handle(HTTPClient &client, HTTPRequest &request, HTTPResponse &respo
 // 		headers.contentLength(created.size());
 // 		if (request.method().name() == "POST")
 // 		{
-// 			return (HTTPMethodHandler::filePut(*HTTPStatus::OK, *file.open(O_WRONLY|O_APPEND), request.body(), created, headers));
+// 			return (HTTPMethodHandler::filePost(*HTTPStatus::OK, *file.open(O_WRONLY|O_APPEND), request.body(), created, headers));
 // 		}
-// 		else if (request.method().name() == "PUT")
-// 			return (HTTPMethodHandler::filePut(*HTTPStatus::OK, *file.open(O_WRONLY), request.body(), created, headers));
+// 		else if (request.method().name() == "Post")
+// 			return (HTTPMethodHandler::filePost(*HTTPStatus::OK, *file.open(O_WRONLY), request.body(), created, headers));
 // 	}
 
 // 	if (file.isDirectory())
 // 	{
 // 		return (error(request, *HTTPStatus::METHOD_NOT_ALLOWED));
 // 		return (statusEmpty(*HTTPStatus::OK, headers));
-// 		//return (HTTPMethodHandler::filePut(*HTTPStatus::OK, *file.open(O_WRONLY|O_APPEND), request.body(), created, headers));
-// 		LOG.warn() << "Put method not handled for directories" << std::endl;
+// 		//return (HTTPMethodHandler::filePost(*HTTPStatus::OK, *file.open(O_WRONLY|O_APPEND), request.body(), created, headers));
+// 		LOG.warn() << "Post method not handled for directories" << std::endl;
 // 		return (error(request, *HTTPStatus::METHOD_NOT_ALLOWED));
 // 	//	return (statusEmpty(*HTTPStatus::UNSUPPORTED_MEDIA_TYPE, headers));
 // 	//	return (GenericHTTPResponse::status(*HTTPStatus::UNSUPPORTED_MEDIA_TYPE));
