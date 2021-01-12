@@ -6,7 +6,7 @@
 /*   By: atetu <atetu@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/15 17:11:25 by alicetetu         #+#    #+#             */
-/*   Updated: 2021/01/11 18:33:30 by atetu            ###   ########.fr       */
+/*   Updated: 2021/01/05 14:38:06 by atetu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,7 +46,6 @@ class HTTPLocationInterpretor
 		std::string m_exact;
 		const LocationBlock *m_locationBlock;
 
-		char m_firstChar;
 		char m_lastChar;
 		
 	public:
@@ -71,9 +70,6 @@ class HTTPLocationInterpretor
 
 		const char&
 		lastChar(void);
-		
-		const char&
-		firstChar(void);
 		
 		std::list<std::string>&
 		middleList(void);

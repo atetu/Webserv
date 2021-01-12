@@ -6,7 +6,7 @@
 /*   By: atetu <atetu@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/15 17:11:28 by alicetetu         #+#    #+#             */
-/*   Updated: 2021/01/11 18:33:15 by atetu            ###   ########.fr       */
+/*   Updated: 2021/01/05 14:38:15 by atetu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -109,10 +109,7 @@ HTTPLocationInterpretor::consume(char &c)
 				m_state = S_OVER;
 			}
 			else if (c == '*')
-			{
-				m_firstChar = '*';
 				m_state = S_MIDDLE_START;
-			}
 
 			break;
 		}
@@ -298,12 +295,6 @@ const char&
 HTTPLocationInterpretor::lastChar(void)
 {
 	return (m_lastChar);
-}
-
-const char&
-HTTPLocationInterpretor::firstChar(void)
-{
-	return (m_firstChar);
 }
 
 std::list<std::string>&
