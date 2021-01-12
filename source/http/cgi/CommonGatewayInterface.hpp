@@ -19,6 +19,8 @@
 #include <util/Environment.hpp>
 #include <string>
 
+class CGITask;
+
 class Logger;
 class FileDescriptor;
 class CGIBlock;
@@ -71,7 +73,7 @@ class CommonGatewayInterface
 		}
 
 	public:
-		static CommonGatewayInterface*
+		static CGITask*
 		execute(HTTPClient &client, const CGIBlock &cgiBlock, const Environment &environment);
 
 	public:

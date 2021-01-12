@@ -51,7 +51,8 @@
 			},
 			"root": "../",
 			"methods": [
-				"GET"
+				"GET",
+				"HEAD"
 			],
 			"locations": {
 				"/": {

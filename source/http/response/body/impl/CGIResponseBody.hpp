@@ -14,12 +14,11 @@
 # define CGIRESPONSEBODY_HPP_
 
 #include <buffer/impl/BaseBuffer.hpp>
-#include <http/parser/HTTPHeaderFieldsParser.hpp>
 #include <http/response/body/IResponseBody.hpp>
-#include <io/FileDescriptor.hpp>
 #include <nio/NIOSelector.hpp>
 
-class CommonGatewayInterface;
+class CGITask;
+class HTTPClient;
 
 class CGIResponseBody :
 		public IResponseBody,
@@ -27,10 +26,7 @@ class CGIResponseBody :
 {
 	private:
 		HTTPClient &m_client;
-		CommonGatewayInterface &m_cgi;
-		FileDescriptorBuffer &m_bufferedIn;
-		FileDescriptorBuffer &m_bufferedOut;
-		HTTPHeaderFieldsParser m_headerFieldsParser;
+		CGITask &m_task;
 
 	private:
 		CGIResponseBody();
@@ -40,7 +36,7 @@ class CGIResponseBody :
 		operator=(const CGIResponseBody &other);
 
 	public:
-		CGIResponseBody(HTTPClient &client, CommonGatewayInterface &cgi);
+		CGIResponseBody(HTTPClient &client, CGITask &task);
 
 		virtual
 		~CGIResponseBody();
@@ -50,15 +46,6 @@ class CGIResponseBody :
 
 		bool
 		store(BaseBuffer &buffer);
-
-		bool
-		writable(FileDescriptor &fd);
-
-		bool
-		readable(FileDescriptor &fd);
-
-		bool
-		isDone();
 };
 
 #endif /* CGIRESPONSEBODY_HPP_ */

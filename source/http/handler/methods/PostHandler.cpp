@@ -45,10 +45,10 @@ PostHandler::handle(HTTPClient &client, HTTPRequest &request, HTTPResponse &resp
 	File targetFile(request.targetFile());
 
 	bool justCreated = false;
-	
+
 	std::string out;
 	targetFile.findExtension(targetFile.path(), out);
-	
+
 	if (!targetFile.findMime(out, request))
 	{
 		response.status(*HTTPStatus::CONFLICT); // don't know the status 
@@ -62,6 +62,7 @@ PostHandler::handle(HTTPClient &client, HTTPRequest &request, HTTPResponse &resp
 			response.status(*HTTPStatus::LOCKED);
 			return (true);
 		}
+	}
 	else
 	{
 		try
@@ -74,12 +75,12 @@ PostHandler::handle(HTTPClient &client, HTTPRequest &request, HTTPResponse &resp
 		{
 			response.status(*HTTPStatus::INTERNAL_SERVER_ERROR); // don't know the status
 			return (true);
-	//		LOG.warn() << exception.what() << std::endl;
-		//	return (GenericHTTPResponse::status(*HTTPStatus::NOT_FOUND));
-		//	return (error(request, *HTTPStatus::NOT_FOUND));
+			//		LOG.warn() << exception.what() << std::endl;
+			//	return (GenericHTTPResponse::status(*HTTPStatus::NOT_FOUND));
+			//	return (error(request, *HTTPStatus::NOT_FOUND));
 		}
 	}
-	
+
 	FileDescriptor &fd = *targetFile.open(O_CREAT | O_WRONLY | O_APPEND, 0664);
 
 	client.task(*(new PutTask(client, fd, justCreated)));

@@ -14,6 +14,7 @@
 #include <signal.h>
 #include <exception/IOException.hpp>
 #include <http/cgi/CommonGatewayInterface.hpp>
+#include <http/cgi/task/CGITask.hpp>
 #include <http/enums/HTTPMethod.hpp>
 #include <http/enums/HTTPVersion.hpp>
 #include <http/header/HTTPHeaderFields.hpp>
@@ -104,7 +105,7 @@ CommonGatewayInterface::running()
 	return (false);
 }
 
-CommonGatewayInterface*
+CGITask*
 CommonGatewayInterface::execute(HTTPClient &client, const CGIBlock &cgiBlock, const Environment &environment)
 {
 	int inPipe[2];
@@ -122,10 +123,7 @@ CommonGatewayInterface::execute(HTTPClient &client, const CGIBlock &cgiBlock, co
 		throw IOException("pipe (out)", err);
 	}
 
-//	Environment env = environment;
-
-	(void)environment;
-	Environment env;
+	Environment env = environment;
 
 	if (cgiBlock.environment().present())
 	{
@@ -215,7 +213,6 @@ CommonGatewayInterface::execute(HTTPClient &client, const CGIBlock &cgiBlock, co
 
 		::close(inPipe[1]);
 		::close(outPipe[0]);
-//		::close(0);
 
 //		if (cgiBlock.redirectErrToOut().orElse(true)) // TODO Need debug
 //			::dup2(1, 2);
@@ -241,11 +238,17 @@ CommonGatewayInterface::execute(HTTPClient &client, const CGIBlock &cgiBlock, co
 
 		FileDescriptor *stdin = NULL;
 		FileDescriptor *stdout = NULL;
+		CommonGatewayInterface *cgi = NULL;
+		CGITask *cgiTask = NULL;
 
 		try
 		{
 			stdin = FileDescriptor::wrap(inPipe[1]);
 			stdout = FileDescriptor::wrap(outPipe[0]);
+			cgi = new CommonGatewayInterface(pid, *stdin, *stdout);
+			cgiTask = new CGITask(client, *cgi);
+
+			return (cgiTask);
 		}
 		catch (...)
 		{
@@ -261,19 +264,10 @@ CommonGatewayInterface::execute(HTTPClient &client, const CGIBlock &cgiBlock, co
 			else
 				::close(outPipe[0]);
 
+			DeleteHelper::pointer(cgi);
+			DeleteHelper::pointer(cgiTask);
+
 			throw;
 		}
-
-		CommonGatewayInterface *cgi = new CommonGatewayInterface(pid, *stdin, *stdout);
-
-		if (request.method().get()->hasBody()) // TODO Operation is blocking
-		{
-			cgi->in().write(client.body().c_str(), client.body().length());
-			//::write(1, request.body().c_str(), request.body().length());
-		}
-
-		stdin->close();
-
-		return (cgi);
 	}
 }

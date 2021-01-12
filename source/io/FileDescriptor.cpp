@@ -62,13 +62,10 @@ FileDescriptor::close()
 {
 	ensureNotClosed();
 
-	std::cout << "qlreqdy closed? " << m_closed << std::endl;
 	if (!m_closed)
 	{
-		int r = ::close(m_fd);
-		std::cout << "closing: " << r << std::endl;
+		::close(m_fd);
 
-		m_fd = -1;
 		m_closed = true;
 	}
 }
