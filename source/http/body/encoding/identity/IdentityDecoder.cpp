@@ -25,12 +25,16 @@ IdentityDecoder::~IdentityDecoder()
 {
 }
 
-bool
-IdentityDecoder::consume(std::string &out, char c)
+size_t
+IdentityDecoder::consume(const std::string &in, std::string &out)
 {
-	out += c;
+	size_t willConsume = std::min(in.size(), size_t(m_contentLength - m_consumed));
 
-	return (++m_consumed >= m_contentLength);
+	out.append(in.c_str(), in.c_str() + willConsume);
+
+	m_consumed += willConsume;
+
+	return (willConsume);
 }
 
 void

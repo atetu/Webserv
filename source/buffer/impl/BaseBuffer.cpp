@@ -11,11 +11,8 @@
 /* ************************************************************************** */
 
 #include <buffer/impl/BaseBuffer.hpp>
-#include <buffer/impl/SocketBuffer.hpp>
 #include <algorithm>
-#include <iostream>
 #include <iterator>
-#include <typeinfo>
 
 BaseBuffer::BaseBuffer() :
 		m_storage(),
@@ -134,6 +131,14 @@ BaseBuffer::next(std::string &str, bool crlf)
 	}
 
 	return (false);
+}
+
+bool
+BaseBuffer::skip(size_t n)
+{
+	m_storage.erase(0, std::min(n, m_storage.length()));
+
+	return (!m_storage.empty());
 }
 
 size_t

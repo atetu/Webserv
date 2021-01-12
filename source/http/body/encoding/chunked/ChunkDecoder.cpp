@@ -204,161 +204,155 @@ ChunkDecoder::~ChunkDecoder()
 //	return (m_parsedData);
 //}
 
-bool
-ChunkDecoder::consume(std::string &out, char c)
+size_t
+ChunkDecoder::consume(const std::string &in, std::string &out)
 {
-	//(void)out;
-//	(void)c;
+	if (in == "0\r\n\r\n")
+		return (0);
 
-	switch (m_state)
-	{
-		case S_NOT_STARTED :
-		case S_SIZE:
-		{
-			if (ChunkDecoder::isValidCharacter(c))
-			{
-				m_sizeStr += c;
-				m_state = S_SIZE;
-			}
-			else if (c == '\r')
-			{
-				m_state = S_SIZE_END;
-				SIZE_CONVERSION();
-			}
-			else if (c == ';')
-			{
-				m_state = S_EXTENSION;
-				SIZE_CONVERSION();
-			}
-			else
-			{
-				throw Exception ("Character not recognized"); // check error
-			}
-					
-			break;
-		}
-		
-		case S_EXTENSION:
-		{
-			if (c == '\r')
-			{
-				m_state = S_SIZE_END;
-				m_extension = "";
-			}
-			else
-			{
-				m_extension += c;
-				if (m_extension.size() >= 50)
-					throw Exception ("Too long extensions"); // 4xx error;
-			}
-			
-			break;
-		}
-		
-		case S_SIZE_END:
-		{
-			if (c == '\n' && m_sizeNb == 0)
-			{
-				//std::cout << m_parsedData << std::endl;
-			//	std::cout << "size: " << m_parsedData.size() << std::endl;
-			//	out = m_parsedData;
-				m_state = S_OVER;
-			}
-			else if (c == '\n')
-				m_state = S_CHUNK;		
-			else
-				throw Exception ("\n excepted"); // check error
-			
-			break;
-		}
-		
-		case S_CHUNK:
-		{
-			//std::cout << "chunk: \n" << m_parsedData << std::endl;
-		//	std::cout << "size: " << m_sizeNb << std::endl;
-			out += c;
-			m_sizeNb--;
-			if (m_sizeNb == 0)
-			{
-				//m_parsedData += m_parsedChunk;
-			//	std::cout << "parsed: \n" << out << std::endl;
-			//	std::cout << "parsed: \n" << out.size() << std::endl;
-			//	m_parsedChunk = "";
-				m_sizeNb = 0;
-				m_state = S_CHUNK_END;
-			}
-			else
-				m_state = S_CHUNK;	
-			
-			break;
-		}
-		
-		case S_CHUNK_END:
-		{
-			if (c == '\r')
-				m_state = S_CHUNK_END2;
-		
-			else
-			{
-				throw Exception ("Character not recognized"); // check error
-			}
-		
-			break;
-		}
-
-		case S_CHUNK_END2:
-		{
-			if (c == '\n')
-				m_state = S_SIZE;
-			else if (c == '\r')
-				m_state = S_CHUNK_END2;
-			else
-				m_state = S_CHUNK_END;
-						
-			break;
-		}
-		
-		case S_NULL:
-		{
-			if (c == '\r')
-				m_state = S_END;
-			else
-				throw Exception ("\r excepted");
-			
-			break;
-		}
-	
-		case S_END:
-		{
-			if (c == '\n')
-				m_state = S_OVER;
-			else
-				throw Exception ("\n excepted");
-			
-			break;
-		}
-	
-		case S_OVER:
-		{
-			//std::cout << m_parsedData << std::endl;
-			break;
-		}
-	}
-	//m_lastChar = c ;
-
-	// std::cout << "parsed: \n" << m_parsedData << std::endl;
-	return (m_state == S_OVER);
-}
-
-std::string
-ChunkDecoder::decode(const std::string &input)
-{
-	std::string out;
-
-	for (std::string::const_iterator it = input.begin(); it != input.end(); it++)
-		consume(out, *it);
-
-	return (out);
+	out += in[0];
+	return (1);
+//	//(void)out;
+////	(void)c;
+//
+//	switch (m_state)
+//	{
+//		case S_NOT_STARTED :
+//		case S_SIZE:
+//		{
+//			if (ChunkDecoder::isValidCharacter(c))
+//			{
+//				m_sizeStr += c;
+//				m_state = S_SIZE;
+//			}
+//			else if (c == '\r')
+//			{
+//				m_state = S_SIZE_END;
+//				SIZE_CONVERSION();
+//			}
+//			else if (c == ';')
+//			{
+//				m_state = S_EXTENSION;
+//				SIZE_CONVERSION();
+//			}
+//			else
+//			{
+//				throw Exception ("Character not recognized"); // check error
+//			}
+//
+//			break;
+//		}
+//
+//		case S_EXTENSION:
+//		{
+//			if (c == '\r')
+//			{
+//				m_state = S_SIZE_END;
+//				m_extension = "";
+//			}
+//			else
+//			{
+//				m_extension += c;
+//				if (m_extension.size() >= 50)
+//					throw Exception ("Too long extensions"); // 4xx error;
+//			}
+//
+//			break;
+//		}
+//
+//		case S_SIZE_END:
+//		{
+//			if (c == '\n' && m_sizeNb == 0)
+//			{
+//				//std::cout << m_parsedData << std::endl;
+//			//	std::cout << "size: " << m_parsedData.size() << std::endl;
+//			//	out = m_parsedData;
+//				m_state = S_OVER;
+//			}
+//			else if (c == '\n')
+//				m_state = S_CHUNK;
+//			else
+//				throw Exception ("\n excepted"); // check error
+//
+//			break;
+//		}
+//
+//		case S_CHUNK:
+//		{
+//			//std::cout << "chunk: \n" << m_parsedData << std::endl;
+//		//	std::cout << "size: " << m_sizeNb << std::endl;
+//			out += c;
+//			m_sizeNb--;
+//			if (m_sizeNb == 0)
+//			{
+//				//m_parsedData += m_parsedChunk;
+//			//	std::cout << "parsed: \n" << out << std::endl;
+//			//	std::cout << "parsed: \n" << out.size() << std::endl;
+//			//	m_parsedChunk = "";
+//				m_sizeNb = 0;
+//				m_state = S_CHUNK_END;
+//			}
+//			else
+//				m_state = S_CHUNK;
+//
+//			break;
+//		}
+//
+//		case S_CHUNK_END:
+//		{
+//			if (c == '\r')
+//				m_state = S_CHUNK_END2;
+//
+//			else
+//			{
+//				throw Exception ("Character not recognized"); // check error
+//			}
+//
+//			break;
+//		}
+//
+//		case S_CHUNK_END2:
+//		{
+//			if (c == '\n')
+//				m_state = S_SIZE;
+//			else if (c == '\r')
+//				m_state = S_CHUNK_END2;
+//			else
+//				m_state = S_CHUNK_END;
+//
+//			break;
+//		}
+//
+//		case S_NULL:
+//		{
+//			if (c == '\r')
+//				m_state = S_END;
+//			else
+//				throw Exception ("\r excepted");
+//
+//			break;
+//		}
+//
+//		case S_END:
+//		{
+//			if (c == '\n')
+//				m_state = S_OVER;
+//			else
+//				throw Exception ("\n excepted");
+//
+//			break;
+//		}
+//
+//		case S_OVER:
+//		{
+//			//std::cout << m_parsedData << std::endl;
+//			break;
+//		}
+//	}
+//	//m_lastChar = c ;
+//
+//	// std::cout << "parsed: \n" << m_parsedData << std::endl;
+//	return (m_state == S_OVER);
 }
 
 ChunkDecoder::State

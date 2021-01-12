@@ -68,6 +68,9 @@ class BaseBuffer :
 		bool
 		next(std::string &str, bool crlf = false);
 
+		bool
+		skip(size_t n);
+
 		size_t
 		size() const;
 
@@ -92,7 +95,7 @@ class BaseBuffer :
 		{
 			return (m_storage);
 		}
-		
+
 		void
 		first(char &c);
 };

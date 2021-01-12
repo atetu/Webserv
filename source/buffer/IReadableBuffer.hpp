@@ -33,6 +33,15 @@ class IReadableBuffer :
 
 		virtual bool
 		next(std::string &str, bool crlf = false) = 0;
+
+		/**
+		 * Skip the next n byte in the buffer.
+		 *
+		 * @param n Number of byte to skip.
+		 * @return If there is still data remaining after the skip.
+		 */
+		virtual bool
+		skip(size_t n) = 0;
 };
 
 #endif /* IREADABLEBUFFER_HPP_ */

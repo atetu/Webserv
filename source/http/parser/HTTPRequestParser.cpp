@@ -10,25 +10,31 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+#include <buffer/impl/BaseBuffer.hpp>
+#include <buffer/impl/SocketBuffer.hpp>
 #include <exception/Exception.hpp>
 #include <http/body/encoding/HTTPBodyEncoding.hpp>
 #include <http/body/encoding/IHTTPBodyDecoder.hpp>
+#include <http/HTTPClient.hpp>
 #include <http/parser/HTTPRequestParser.hpp>
 #include <libs/ft.hpp>
+#include <stddef.h>
 #include <util/Optional.hpp>
+
+class HTTPClient;
 
 #if 1
 #include <util/URL.hpp> /* Eclipse does not import it. */
 #endif
 
-HTTPRequestParser::HTTPRequestParser(std::string &body) :
+HTTPRequestParser::HTTPRequestParser(HTTPClient &client) :
 		m_state(S_NOT_STARTED),
 		m_method(),
 		m_major(),
 		m_minor(),
 		m_last(),
 		m_last2(),
-		m_body(body),
+		m_client(client),
 		m_bodyDecoder()
 {
 	m_method.reserve(16);
@@ -252,7 +258,11 @@ HTTPRequestParser::consume(char c)
 
 		case S_BODY_DECODE:
 		{
-			if (m_bodyDecoder->consume(m_body, c))
+			size_t r = m_bodyDecoder->consume(m_client.body(), m_client.in().storage());
+
+			m_client.in().skip(r);
+
+			if (r == 0)
 				m_state = S_END;
 
 			break;
@@ -291,7 +301,7 @@ HTTPRequestParser::method() const
 const std::string&
 HTTPRequestParser::body() const
 {
-	return (m_body);
+	return (m_client.body());
 }
 
 URL

@@ -16,6 +16,16 @@ IHTTPBodyDecoder::~IHTTPBodyDecoder()
 {
 }
 
+std::string
+IHTTPBodyDecoder::decode(const std::string &input)
+{
+	std::string out;
+
+	consume(input, out);
+
+	return (out);
+}
+
 void
 IHTTPBodyDecoder::cleanup()
 {

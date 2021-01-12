@@ -39,7 +39,7 @@ HTTPClient::HTTPClient(Socket &socket, InetSocketAddress socketAddress, HTTPServ
 		m_in(*SocketBuffer::from(socket, FileDescriptorBuffer::NOTHING)),
 		m_out(*SocketBuffer::from(socket, FileDescriptorBuffer::NOTHING)),
 		m_server(server),
-		m_parser(m_body),
+		m_parser(*this),
 		m_body(),
 		m_state(S_NOT_STARTED),
 		m_lastAction(),

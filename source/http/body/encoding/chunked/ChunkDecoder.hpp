@@ -55,11 +55,8 @@ class ChunkDecoder :
 		virtual
 		~ChunkDecoder();
 
-		bool
-		consume(std::string &out, char c);
-
-		std::string
-		decode(const std::string &input);
+		size_t
+		consume(const std::string &in, std::string &out);
 
 		void
 		cleanup();

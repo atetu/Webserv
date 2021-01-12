@@ -24,12 +24,15 @@ class IHTTPBodyDecoder
 		/**
 		 * Consume a character.
 		 *
+		 * @param in Input data.
 		 * @param out Output storage.
-		 * @param c Character to consume.
-		 * @return Whether or not the decoding is complete.
+		 * @return Consumed character, if the number is 0, that mean that no character has been consumed and the body has been fully read.
 		 */
-		virtual bool
-		consume(std::string &out, char c) = 0;
+		virtual size_t
+		consume(const std::string &in, std::string &out) = 0;
+
+		std::string
+		decode(const std::string &input);
 
 		/**
 		 * Cleanup the memory after usage.

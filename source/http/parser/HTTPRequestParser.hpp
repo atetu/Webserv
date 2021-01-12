@@ -66,11 +66,11 @@ class HTTPRequestParser
 		HTTPHeaderFieldsParser m_headerFieldsParser;
 		char m_last;
 		char m_last2;
-		std::string &m_body;
+		HTTPClient &m_client;
 		IHTTPBodyDecoder *m_bodyDecoder;
 
 	public:
-		HTTPRequestParser(std::string &body); // FIXME Missing coplien
+		HTTPRequestParser(HTTPClient &client); // FIXME Missing coplien
 
 		~HTTPRequestParser();
 

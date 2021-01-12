@@ -37,8 +37,8 @@ class IdentityDecoder :
 		virtual
 		~IdentityDecoder();
 
-		bool
-		consume(std::string &out, char c);
+		size_t
+		consume(const std::string &in, std::string &out);
 
 		void
 		cleanup();
