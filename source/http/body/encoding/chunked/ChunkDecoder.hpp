@@ -6,7 +6,7 @@
 /*   By: atetu <atetu@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/19 14:47:44 by alicetetu         #+#    #+#             */
-/*   Updated: 2021/01/12 16:27:42 by atetu            ###   ########.fr       */
+/*   Updated: 2021/01/12 18:16:08 by atetu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,7 @@ class ChunkDecoder :
 		operator=(const ChunkDecoder &other);
 
 	public:
-		ChunkDecoder(bool isAllocated, long long maxBodySize);
+		ChunkDecoder(bool isAllocated);
 
 		virtual
 		~ChunkDecoder();
@@ -81,7 +81,6 @@ class ChunkDecoder :
 		std::string m_extension;
 		char m_lastChar;
 		long long m_totalSize;
-		long long m_maxBodySize;
 };
 
 #endif /* CHUNKDECODER_HPP_ */

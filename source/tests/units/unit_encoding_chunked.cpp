@@ -26,7 +26,7 @@ encode(const char *str)
 static std::string
 decode(const char *str)
 {
-	return (ChunkDecoder(false, -1).decode(str));
+	return (ChunkDecoder(false).decode(str));
 }
 
 CASE("chunked", "encode")

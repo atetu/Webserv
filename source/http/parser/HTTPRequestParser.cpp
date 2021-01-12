@@ -6,7 +6,7 @@
 /*   By: atetu <atetu@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/27 17:29:02 by ecaceres          #+#    #+#             */
-/*   Updated: 2021/01/12 17:47:17 by atetu            ###   ########.fr       */
+/*   Updated: 2021/01/12 18:20:36 by atetu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,8 @@ HTTPRequestParser::HTTPRequestParser(std::string &body) :
 		m_last2(),
 		m_body(body),
 		m_bodyDecoder(),
-		m_maxBodySize(-1)
+		m_maxBodySize(-1),
+		m_totalSize(0)
 {
 	m_method.reserve(16);
 }
@@ -236,9 +237,8 @@ HTTPRequestParser::consume(char c)
 
 		case S_BODY:
 			m_state = S_BODY_DECODE;
-			m_bodyDecoder = HTTPBodyEncoding::decoderFor(m_headerFieldsParser.headerFields(), m_maxBodySize);
+			m_bodyDecoder = HTTPBodyEncoding::decoderFor(m_headerFieldsParser.headerFields());
 
-//			std::cout << typeid(*m_bodyDecoder).name() << std::endl;
 
 			if (m_bodyDecoder == NULL)
 			{
@@ -253,10 +253,17 @@ HTTPRequestParser::consume(char c)
 
 		case S_BODY_DECODE:
 		{
-		//	std::cout << "biody\n";
+			m_totalSize++;
+	
+			if (m_maxBodySize != -1 && m_totalSize > m_maxBodySize)
+			{
+				m_state = S_END;
+				throw Exception("Too large payload");
+				break;
+			}
 			if (m_bodyDecoder->consume(m_body, c))
 				m_state = S_END;
-
+		
 			break;
 		}
 

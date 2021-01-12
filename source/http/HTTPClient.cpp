@@ -197,11 +197,11 @@ HTTPClient::readableHead(void)
 						// if (m_request.serverBlock().present() && m_request.serverBlock().get()->maxBodySize().present())
 						// 	m_parser.maxBodySize(m_request.serverBlock().get()->maxBodySize().get().toBytes());
 						long long maxBodySize = isMaxBodySize(m_request.serverBlock(), m_request.locationBlock());
-						std::cout << "max : " << maxBodySize << std::endl;
+					//	std::cout << "max : " << maxBodySize << std::endl;
 						if (maxBodySize != -1)
 						{
 							m_parser.maxBodySize(maxBodySize);
-							std::cout << "max : " << maxBodySize << std::endl;
+					//		std::cout << "max : " << maxBodySize << std::endl;
 						}
 						m_parser.state() = HTTPRequestParser::S_BODY;
 						m_state = S_BODY;
