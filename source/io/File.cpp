@@ -6,7 +6,7 @@
 /*   By: atetu <atetu@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/21 23:36:43 by ecaceres          #+#    #+#             */
-/*   Updated: 2021/01/11 16:26:43 by atetu            ###   ########.fr       */
+/*   Updated: 2021/01/12 14:10:24 by atetu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@
 #include <stdlib.h>
 #include <sys/stat.h>
 #include <sys/unistd.h>
+#include <unistd.h>
 #include <util/Optional.hpp>
 #include <util/StringUtils.hpp>
 #include <algorithm>

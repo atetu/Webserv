@@ -233,6 +233,4 @@ void
 HTTPRequest::urlPath(const std::string & path)
 {
 	m_resource = path;
-
-	std::cout<< "resource inside : " << m_resource << std::endl;
 }

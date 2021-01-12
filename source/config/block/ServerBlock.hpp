@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ServerBlock.hpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
+/*   By: atetu <atetu@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/28 11:34:45 by ecaceres          #+#    #+#             */
-/*   Updated: 2020/12/18 11:17:58 by alicetetu        ###   ########.fr       */
+/*   Updated: 2021/01/12 17:03:59 by atetu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -163,6 +163,9 @@ class ServerBlock
 
 		bool
 		hasMethod(const std::string &name) const;
+
+		bool
+		hasMaxBodySize() const;
 };
 
 #endif /* SERVERBLOCK_HPP_ */

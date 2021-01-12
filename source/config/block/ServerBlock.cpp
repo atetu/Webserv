@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ServerBlock.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
+/*   By: atetu <atetu@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/28 11:34:45 by ecaceres          #+#    #+#             */
-/*   Updated: 2020/12/18 11:27:34 by alicetetu        ###   ########.fr       */
+/*   Updated: 2021/01/12 17:25:02 by atetu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -180,4 +180,13 @@ ServerBlock::hasMethod(const std::string &name) const
 	const std::list<std::string> &methods = m_methods.get();
 
 	return (std::find(methods.begin(), methods.end(), name) != methods.end());
+}
+
+bool
+ServerBlock::hasMaxBodySize() const
+{
+	if (!m_maxBodySize.present())
+		return (false);
+
+	return(true);
 }

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   LocationBlock.cpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
+/*   By: atetu <atetu@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/28 19:10:59 by ecaceres          #+#    #+#             */
-/*   Updated: 2020/12/16 17:15:49 by alicetetu        ###   ########.fr       */
+/*   Updated: 2021/01/12 17:02:52 by atetu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,8 @@ LocationBlock::LocationBlock(void) :
 		m_listing(),
 		m_index(),
 		m_cgi(),
-		m_auth()
+		m_auth(),
+		m_maxBodySize(-1)
 {
 }
 
@@ -36,7 +37,8 @@ LocationBlock::LocationBlock(std::string path) :
 		m_listing(),
 		m_index(),
 		m_cgi(),
-		m_auth()
+		m_auth(),
+		m_maxBodySize()
 {
 }
 
@@ -48,7 +50,8 @@ LocationBlock::LocationBlock(const LocationBlock &other) :
 		m_listing(other.m_listing),
 		m_index(other.m_index),
 		m_cgi(other.m_cgi),
-		m_auth(other.m_auth)
+		m_auth(other.m_auth),
+		m_maxBodySize()
 {
 }
 
@@ -131,6 +134,14 @@ LocationBlock::auth(const AuthBlock &auth)
 	return (*this);
 }
 
+LocationBlock&
+LocationBlock::maxBodySize(const DataSize &maxBodySize)
+{
+	m_maxBodySize.set(maxBodySize);
+
+	return (*this);
+}
+
 bool
 LocationBlock::hasMethod(const std::string &name) const
 {
@@ -140,4 +151,13 @@ LocationBlock::hasMethod(const std::string &name) const
 	const std::list<std::string> &methods = m_methods.get();
 
 	return (std::find(methods.begin(), methods.end(), name) != methods.end());
+}
+
+bool
+LocationBlock::hasMaxBodySize() const
+{
+	if (!m_maxBodySize.present())
+		return (false);
+
+	return(true);
 }

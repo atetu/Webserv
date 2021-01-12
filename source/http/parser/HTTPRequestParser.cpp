@@ -6,7 +6,7 @@
 /*   By: atetu <atetu@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/27 17:29:02 by ecaceres          #+#    #+#             */
-/*   Updated: 2021/01/11 15:44:22 by atetu            ###   ########.fr       */
+/*   Updated: 2021/01/12 17:47:17 by atetu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,8 @@ HTTPRequestParser::HTTPRequestParser(std::string &body) :
 		m_last(),
 		m_last2(),
 		m_body(body),
-		m_bodyDecoder()
+		m_bodyDecoder(),
+		m_maxBodySize(-1)
 {
 	m_method.reserve(16);
 }
@@ -235,7 +236,7 @@ HTTPRequestParser::consume(char c)
 
 		case S_BODY:
 			m_state = S_BODY_DECODE;
-			m_bodyDecoder = HTTPBodyEncoding::decoderFor(m_headerFieldsParser.headerFields());
+			m_bodyDecoder = HTTPBodyEncoding::decoderFor(m_headerFieldsParser.headerFields(), m_maxBodySize);
 
 //			std::cout << typeid(*m_bodyDecoder).name() << std::endl;
 
@@ -252,6 +253,7 @@ HTTPRequestParser::consume(char c)
 
 		case S_BODY_DECODE:
 		{
+		//	std::cout << "biody\n";
 			if (m_bodyDecoder->consume(m_body, c))
 				m_state = S_END;
 
@@ -286,6 +288,12 @@ std::string
 HTTPRequestParser::method() const
 {
 	return (m_method);
+}
+
+void
+HTTPRequestParser::maxBodySize(long long maxBodySize)
+{
+	m_maxBodySize = maxBodySize;
 }
 
 const std::string&

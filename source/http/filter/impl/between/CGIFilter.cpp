@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   CGIFilter.cpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ecaceres <ecaceres@student.42.fr>          +#+  +:+       +#+        */
+/*   By: atetu <atetu@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/07 00:27:23 by ecaceres          #+#    #+#             */
-/*   Updated: 2021/01/07 00:27:23 by ecaceres         ###   ########.fr       */
+/*   Updated: 2021/01/12 15:14:10 by atetu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,7 +65,7 @@ CGIFilter::doFilter(UNUSED HTTPClient &client, UNUSED HTTPRequest &request, UNUS
 	const LocationBlock &locationBlock = *request.locationBlock().get();
 	if (locationBlock.cgi().absent())
 		return (next());
-
+	std::cout << "loc: " << locationBlock.cgi().get() << std::endl;
 	std::string extension;
 	if (!File::findExtension(request.resource(), extension))
 		return (next());

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HTTPBodyEncoding.cpp                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ecaceres <ecaceres@student.42.fr>          +#+  +:+       +#+        */
+/*   By: atetu <atetu@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/09 01:32:18 by ecaceres          #+#    #+#             */
-/*   Updated: 2021/01/09 01:32:18 by ecaceres         ###   ########.fr       */
+/*   Updated: 2021/01/12 16:01:26 by atetu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@ HTTPBodyEncoding::~HTTPBodyEncoding()
 }
 
 IHTTPBodyDecoder*
-HTTPBodyEncoding::decoderFor(const HTTPHeaderFields &headerFields)
+HTTPBodyEncoding::decoderFor(const HTTPHeaderFields &headerFields, long long maxBodySize)
 {
 	Optional<std::string> transfertEncodingOpt = headerFields.get(HTTPHeaderFields::TRANSFER_ENCODING);
 	if (transfertEncodingOpt.present())
@@ -31,7 +31,7 @@ HTTPBodyEncoding::decoderFor(const HTTPHeaderFields &headerFields)
 		const std::string &transfertEncoding = transfertEncodingOpt.get();
 
 		if (transfertEncoding == HTTPHeaderFields::CHUNKED)
-			return (new ChunkDecoder(true));
+			return (new ChunkDecoder(true, maxBodySize));
 
 		throw HTTPBodyEncodingException("unsupported transfert-encoding:" + transfertEncoding);
 	}
@@ -48,7 +48,7 @@ HTTPBodyEncoding::decoderFor(const HTTPHeaderFields &headerFields)
 			if (length == 0)
 				return (NULL);
 
-			return (new IdentityDecoder(true, length));
+			return (new IdentityDecoder(true, length, maxBodySize));
 		}
 		catch (Exception &exception)
 		{

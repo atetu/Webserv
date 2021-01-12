@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   LocationBlock.hpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
+/*   By: atetu <atetu@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/28 19:10:59 by ecaceres          #+#    #+#             */
-/*   Updated: 2020/12/16 16:04:00 by alicetetu        ###   ########.fr       */
+/*   Updated: 2021/01/12 16:59:33 by atetu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@
 #include <util/Optional.hpp>
 #include <list>
 #include <string>
+#include <unit/DataSize.hpp>
 
 class LocationBlock
 {
@@ -29,6 +30,7 @@ class LocationBlock
 		Optional<std::list<std::string> > m_index;
 		Optional<std::string> m_cgi;
 		Optional<AuthBlock const*> m_auth;
+		Optional<DataSize> m_maxBodySize;
 
 	public:
 		LocationBlock(void);
@@ -61,6 +63,9 @@ class LocationBlock
 
 		LocationBlock&
 		auth(const AuthBlock &auth);
+
+		LocationBlock&
+		maxBodySize(const DataSize &maxBodySize);
 
 		inline const std::string&
 		path(void) const
@@ -110,8 +115,17 @@ class LocationBlock
 			return (m_auth);
 		}
 
+		inline const Optional<DataSize>&
+		maxBodySize(void) const
+		{
+			return (m_maxBodySize);
+		}
+
 		bool
 		hasMethod(const std::string &name) const;
+
+		bool
+		hasMaxBodySize() const;
 
 	public:
 		static LocationBlock DEFAULT;
