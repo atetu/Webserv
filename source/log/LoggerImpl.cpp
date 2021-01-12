@@ -83,7 +83,7 @@ LoggerImpl::log(const LogLevel &level) const
 	if (!isEnabled(level))
 		return (VOID);
 
-	return (std::cout << "[" << std::setw(5) << level.name() << std::setw(0) << "] " << std::setw(LONGEST_NAME) << m_tag << ": ");
+	return (std::cout << "[\e[93m" << std::setw(5) << level.name() << std::setw(0) << "\e[0m] " << std::setw(LONGEST_NAME) << m_tag << ": ");
 }
 
 const std::string&
