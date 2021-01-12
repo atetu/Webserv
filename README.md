@@ -55,23 +55,24 @@ Some of the available commands are:
 
 ## Project stucture
 
-| Directory            | Description                                                   |
-|----------------------|---------------------------------------------------------------|
-| /source              | Source directory                                              |
-| /source/buffer       | Byte buffer with FD integration                               |
-| /source/config/block | Possible configuration blocks                                 |
-| /source/http         | HTTP related classes and logic                                |
-| /source/io           | IO releated classes                                           |
-| /source/json         | JSON parser and type classes                                  |
-| /source/libs/ft      | A small extract of libft                                      |
-| /source/log          | Logging                                                       |
-| /source/main         | main() versions (normal and test)                             |
-| /source/net/address  | Networking Address classes (4, 6, Socket)                     |
-| /source/options      | CLI parser                                                    |
-| /source/os           | OS related file                                               |
-| /source/tests/units  | Testing units used with `make test`                           |
-| /source/unit         | Unit classes                                                  |
-| /source/util         | Utilities classes and helpers                                 |
+| Directory            | Description                               |
+|----------------------|-------------------------------------------|
+| /source              | Source directory                          |
+| /source/buffer       | Byte buffer with FD integration           |
+| /source/config/block | Possible configuration blocks             |
+| /source/http         | HTTP related classes and logic            |
+| /source/io           | IO releated classes                       |
+| /source/json         | JSON parser and type classes              |
+| /source/libs/ft      | A small extract of libft                  |
+| /source/log          | Logging                                   |
+| /source/main         | main() versions (normal and test)         |
+| /source/net/address  | Networking Address classes (4, 6, Socket) |
+| /source/nio          | Non-blocking IO                           |
+| /source/options      | CLI parser                                |
+| /source/os           | OS related file                           |
+| /source/tests/units  | Testing units used with `make test`       |
+| /source/unit         | Unit classes                              |
+| /source/util         | Utilities classes and helpers             |
 
 ## Know issues
 
