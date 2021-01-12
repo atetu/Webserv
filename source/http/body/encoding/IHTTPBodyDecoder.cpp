@@ -21,7 +21,8 @@ IHTTPBodyDecoder::decode(const std::string &input)
 {
 	std::string out;
 
-	consume(input, out);
+	size_t consumed = 0;
+	consume(input, out, consumed);
 
 	return (out);
 }

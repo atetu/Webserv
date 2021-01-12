@@ -6,7 +6,7 @@
 /*   By: atetu <atetu@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/09 01:26:21 by ecaceres          #+#    #+#             */
-/*   Updated: 2021/01/12 17:47:08 by atetu            ###   ########.fr       */
+/*   Updated: 2021/01/12 18:21:44 by atetu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,11 +14,10 @@
 #include <iostream>
 #include <string>
 
-IdentityDecoder::IdentityDecoder(bool isAllocated, long long contentLength, long long maxBodySize) :
+IdentityDecoder::IdentityDecoder(bool isAllocated, long long contentLength) :
 		m_isAllocated(isAllocated),
 		m_contentLength(contentLength),
-		m_consumed(),
-		m_maxBodySize(maxBodySize)
+		m_consumed()
 {
 }
 
@@ -34,8 +33,6 @@ IdentityDecoder::consume(const std::string &in, std::string &out, size_t &consum
 	out.append(in.c_str(), in.c_str() + consumed);
 
 	m_consumed += consumed;
-	if (m_consumed > m_maxBodySize)
-		throw Exception("Too large payload");
 
 	return (m_consumed == m_contentLength);
 }

@@ -26,17 +26,18 @@ encode(const char *str)
 static std::string
 decode(const char *str)
 {
-	return (IdentityDecoder(false, ft::strlen(str), 10000).decode(str));
+	return (IdentityDecoder(false, ft::strlen(str)).decode(str));
 }
 
 static std::string
 decode2(const char *str, const char *str2)
 {
-	IdentityDecoder decoder(false, ft::strlen(str) + ft::strlen(str2), 1000);
+	IdentityDecoder decoder(false, ft::strlen(str) + ft::strlen(str2));
 
+	size_t consumed = 0;
 	std::string out;
-	decoder.consume(str, out);
-	decoder.consume(str2, out);
+	decoder.consume(str, out, consumed);
+	decoder.consume(str2, out, consumed);
 
 	return (out);
 }

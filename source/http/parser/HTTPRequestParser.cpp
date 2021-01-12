@@ -6,7 +6,7 @@
 /*   By: atetu <atetu@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/27 17:29:02 by ecaceres          #+#    #+#             */
-/*   Updated: 2021/01/12 17:47:17 by atetu            ###   ########.fr       */
+/*   Updated: 2021/01/12 18:20:36 by atetu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,8 @@ HTTPRequestParser::HTTPRequestParser(HTTPClient &client) :
 		m_last2(),
 		m_client(client),
 		m_bodyDecoder(),
-		m_maxBodySize(-1)
+		m_maxBodySize(-1),
+		m_totalSize(0)
 {
 	m_method.reserve(16);
 }
@@ -242,9 +243,7 @@ HTTPRequestParser::consume(char c)
 
 		case S_BODY:
 			m_state = S_BODY_DECODE;
-			m_bodyDecoder = HTTPBodyEncoding::decoderFor(m_headerFieldsParser.headerFields(), m_maxBodySize);
-
-//			std::cout << typeid(*m_bodyDecoder).name() << std::endl;
+			m_bodyDecoder = HTTPBodyEncoding::decoderFor(m_headerFieldsParser.headerFields());
 
 			if (m_bodyDecoder == NULL)
 			{
@@ -263,6 +262,10 @@ HTTPRequestParser::consume(char c)
 			bool finished = m_bodyDecoder->consume(m_client.in().storage(), m_client.body(), consumed);
 
 			m_client.in().skip(consumed);
+
+			m_totalSize += consumed;
+			if (m_maxBodySize != -1 && m_totalSize > m_maxBodySize)
+				throw Exception("Too large payload");
 
 			if (finished)
 				m_state = S_END;

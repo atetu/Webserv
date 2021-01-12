@@ -6,7 +6,7 @@
 /*   By: atetu <atetu@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/09 01:26:21 by ecaceres          #+#    #+#             */
-/*   Updated: 2021/01/12 16:20:25 by atetu            ###   ########.fr       */
+/*   Updated: 2021/01/12 18:19:28 by atetu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,8 +24,7 @@ class IdentityDecoder :
 		bool m_isAllocated;
 		long long m_contentLength;
 		long long m_consumed;
-		long long m_maxBodySize;
-
+	
 	private:
 		IdentityDecoder();
 		IdentityDecoder(const IdentityDecoder &other);
@@ -34,7 +33,7 @@ class IdentityDecoder :
 		operator=(const IdentityDecoder &other);
 
 	public:
-		IdentityDecoder(bool isAllocated, long long contentLength, long long maxBodySize);
+		IdentityDecoder(bool isAllocated, long long contentLength);
 
 		virtual
 		~IdentityDecoder();

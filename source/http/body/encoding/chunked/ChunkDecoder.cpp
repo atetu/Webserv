@@ -6,7 +6,7 @@
 /*   By: atetu <atetu@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/19 14:51:33 by alicetetu         #+#    #+#             */
-/*   Updated: 2021/01/12 16:04:23 by atetu            ###   ########.fr       */
+/*   Updated: 2021/01/12 18:16:25 by atetu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@
 #include <iostream>
 #include <config/Configuration.hpp>
 
-ChunkDecoder::ChunkDecoder(bool isAllocated, long long maxBodySize) :
+ChunkDecoder::ChunkDecoder(bool isAllocated) :
 		m_isAllocated(isAllocated),
 		m_state(S_NOT_STARTED),
 		m_sizeNb(0),
@@ -24,8 +24,7 @@ ChunkDecoder::ChunkDecoder(bool isAllocated, long long maxBodySize) :
 		m_parsedChunk(""),
 		m_extension(""),
 		m_lastChar(),
-		m_totalSize(0),
-		m_maxBodySize(maxBodySize)
+		m_totalSize(0)
 {
 }
 
@@ -209,10 +208,6 @@ ChunkDecoder::~ChunkDecoder()
 bool
 ChunkDecoder::consume(const std::string &in, std::string &out, size_t &consumed)
 {
-	m_totalSize++;
-	if(m_maxBodySize != -1 && m_totalSize > m_maxBodySize)
-		throw Exception ("Payload too large");
-
 	if (in == "0\r\n\r\n")
 		return (0);
 

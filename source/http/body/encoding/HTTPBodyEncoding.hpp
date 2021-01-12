@@ -6,7 +6,7 @@
 /*   By: atetu <atetu@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/09 01:32:18 by ecaceres          #+#    #+#             */
-/*   Updated: 2021/01/12 16:06:54 by atetu            ###   ########.fr       */
+/*   Updated: 2021/01/12 18:18:59 by atetu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@ class HTTPBodyEncoding
 
 	public:
 		static IHTTPBodyDecoder*
-		decoderFor(const HTTPHeaderFields &headerFields, long long maxBodySize);
+		decoderFor(const HTTPHeaderFields &headerFields);
 };
 
 #endif /* HTTPBODYENCODING_HPP_ */

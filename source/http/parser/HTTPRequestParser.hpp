@@ -6,7 +6,7 @@
 /*   By: atetu <atetu@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/27 17:29:02 by ecaceres          #+#    #+#             */
-/*   Updated: 2021/01/12 15:59:04 by atetu            ###   ########.fr       */
+/*   Updated: 2021/01/12 18:05:10 by atetu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,6 +69,7 @@ class HTTPRequestParser
 		HTTPClient &m_client;
 		IHTTPBodyDecoder *m_bodyDecoder;
 		long long m_maxBodySize;
+		long long m_totalSize;
 
 	public:
 		HTTPRequestParser(HTTPClient &client); // FIXME Missing coplien
