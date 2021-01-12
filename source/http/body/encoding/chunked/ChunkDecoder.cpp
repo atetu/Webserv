@@ -206,8 +206,8 @@ ChunkDecoder::~ChunkDecoder()
 //	return (m_parsedData);
 //}
 
-size_t
-ChunkDecoder::consume(const std::string &in, std::string &out)
+bool
+ChunkDecoder::consume(const std::string &in, std::string &out, size_t &consumed)
 {
 	m_totalSize++;
 	if(m_maxBodySize != -1 && m_totalSize > m_maxBodySize)
@@ -215,7 +215,8 @@ ChunkDecoder::consume(const std::string &in, std::string &out)
 
 	if (in == "0\r\n\r\n")
 		return (0);
-		
+
+	consumed = 1;
 	out += in[0];
 	return (1);
 //	//(void)out;

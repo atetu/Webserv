@@ -28,8 +28,8 @@ class IHTTPBodyDecoder
 		 * @param out Output storage.
 		 * @return Consumed character, if the number is 0, that mean that no character has been consumed and the body has been fully read.
 		 */
-		virtual size_t
-		consume(const std::string &in, std::string &out) = 0;
+		virtual bool
+		consume(const std::string &in, std::string &out, size_t &consumed) = 0;
 
 		std::string
 		decode(const std::string &input);

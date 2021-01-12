@@ -26,21 +26,18 @@ IdentityDecoder::~IdentityDecoder()
 {
 }
 
-size_t
-IdentityDecoder::consume(const std::string &in, std::string &out)
+bool
+IdentityDecoder::consume(const std::string &in, std::string &out, size_t &consumed)
 {
-	size_t willConsume = std::min(in.size(), size_t(m_contentLength - m_consumed));
-	std::cout << "willConsume: " << willConsume << std::endl;
-	std::cout << "in.size(): " << in.size() << std::endl;
-	std::cout << "size_t(m_contentLength - m_consumed): " << size_t(m_contentLength - m_consumed) << std::endl;
+	consumed = std::min(in.size(), size_t(m_contentLength - m_consumed));
 
-	out.append(in.c_str(), in.c_str() + willConsume);
+	out.append(in.c_str(), in.c_str() + consumed);
 
-	m_consumed += willConsume;
+	m_consumed += consumed;
 	if (m_consumed > m_maxBodySize)
 		throw Exception("Too large payload");
 
-	return (willConsume);
+	return (m_consumed == m_contentLength);
 }
 
 void
