@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   IdentityDecoder.hpp                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ecaceres <ecaceres@student.42.fr>          +#+  +:+       +#+        */
+/*   By: atetu <atetu@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/09 01:26:21 by ecaceres          #+#    #+#             */
-/*   Updated: 2021/01/09 01:26:21 by ecaceres         ###   ########.fr       */
+/*   Updated: 2021/01/12 16:20:25 by atetu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 
 #include <http/body/encoding/IHTTPBodyDecoder.hpp>
 #include <util/Singleton.hpp>
+#include <exception/Exception.hpp>
 
 class IdentityDecoder :
 		public IHTTPBodyDecoder
@@ -23,6 +24,7 @@ class IdentityDecoder :
 		bool m_isAllocated;
 		long long m_contentLength;
 		long long m_consumed;
+		long long m_maxBodySize;
 
 	private:
 		IdentityDecoder();
@@ -32,7 +34,7 @@ class IdentityDecoder :
 		operator=(const IdentityDecoder &other);
 
 	public:
-		IdentityDecoder(bool isAllocated, long long contentLength);
+		IdentityDecoder(bool isAllocated, long long contentLength, long long maxBodySize);
 
 		virtual
 		~IdentityDecoder();

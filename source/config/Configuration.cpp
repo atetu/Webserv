@@ -6,7 +6,7 @@
 /*   By: atetu <atetu@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/28 11:33:47 by ecaceres          #+#    #+#             */
-/*   Updated: 2021/01/08 15:46:07 by atetu            ###   ########.fr       */
+/*   Updated: 2021/01/12 16:48:53 by atetu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -446,6 +446,23 @@ Configuration::JsonBuilder::buildLocationBlock(const std::string &path, const st
 		BIND(jsonObject, KEY_LOCATION_ROOT, JsonString, std::string, locationBlock, root);
 		BIND(jsonObject, KEY_LOCATION_LISTING, JsonBoolean, bool, locationBlock, listing);
 		BIND(jsonObject, KEY_LOCATION_CGI, JsonString, std::string, locationBlock, cgi);
+		//BIND(jsonObject, KEY_LOCATION_MAXBODYSIZE, JsonString, std::string, locationBlock, maxBodySize);
+
+		BIND_CUSTOM(jsonObject, KEY_LOCATION_MAXBODYSIZE, JsonString, std::string,
+		{
+			try
+			{
+				locationBlock->maxBodySize(DataSize::parse(value))
+				;
+				/* <-- Strange Eclipse bug when in macros. */
+			}
+			catch (Exception &exception)
+			{
+				throw Exception(exception.message() + std::string(" (") + path + ")")
+				;
+				/* <-- Strange Eclipse bug when in macros. */
+			}
+		});
 
 		if (jsonObject.has(KEY_LOCATION_METHODS))
 		{

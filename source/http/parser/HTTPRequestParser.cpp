@@ -6,7 +6,7 @@
 /*   By: atetu <atetu@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/27 17:29:02 by ecaceres          #+#    #+#             */
-/*   Updated: 2021/01/11 15:44:22 by atetu            ###   ########.fr       */
+/*   Updated: 2021/01/12 17:47:17 by atetu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,8 @@ HTTPRequestParser::HTTPRequestParser(HTTPClient &client) :
 		m_last(),
 		m_last2(),
 		m_client(client),
-		m_bodyDecoder()
+		m_bodyDecoder(),
+		m_maxBodySize(-1)
 {
 	m_method.reserve(16);
 }
@@ -241,7 +242,7 @@ HTTPRequestParser::consume(char c)
 
 		case S_BODY:
 			m_state = S_BODY_DECODE;
-			m_bodyDecoder = HTTPBodyEncoding::decoderFor(m_headerFieldsParser.headerFields());
+			m_bodyDecoder = HTTPBodyEncoding::decoderFor(m_headerFieldsParser.headerFields(), m_maxBodySize);
 
 //			std::cout << typeid(*m_bodyDecoder).name() << std::endl;
 
@@ -258,7 +259,10 @@ HTTPRequestParser::consume(char c)
 
 		case S_BODY_DECODE:
 		{
-			size_t r = m_bodyDecoder->consume(m_client.body(), m_client.in().storage());
+			size_t r = m_bodyDecoder->consume(m_client.in().storage(), m_client.body());
+			std::cout << typeid(*m_bodyDecoder).name() << std::endl;
+			std::cout << m_client.in().storage() << std::endl;
+			std::cout << r << std::endl;
 
 			m_client.in().skip(r);
 
@@ -296,6 +300,12 @@ std::string
 HTTPRequestParser::method() const
 {
 	return (m_method);
+}
+
+void
+HTTPRequestParser::maxBodySize(long long maxBodySize)
+{
+	m_maxBodySize = maxBodySize;
 }
 
 const std::string&

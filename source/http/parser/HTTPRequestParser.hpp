@@ -6,7 +6,7 @@
 /*   By: atetu <atetu@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/27 17:29:02 by ecaceres          #+#    #+#             */
-/*   Updated: 2021/01/11 15:44:31 by atetu            ###   ########.fr       */
+/*   Updated: 2021/01/12 15:59:04 by atetu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,6 +68,7 @@ class HTTPRequestParser
 		char m_last2;
 		HTTPClient &m_client;
 		IHTTPBodyDecoder *m_bodyDecoder;
+		long long m_maxBodySize;
 
 	public:
 		HTTPRequestParser(HTTPClient &client); // FIXME Missing coplien
@@ -85,7 +86,10 @@ class HTTPRequestParser
 
 		std::string
 		method() const;
-
+		
+		void
+		maxBodySize(long long maxBodySize);
+		
 		inline const HTTPRequestPathParser&
 		pathParser() const
 		{

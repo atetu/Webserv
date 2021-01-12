@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Configuration.hpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
+/*   By: atetu <atetu@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/28 11:33:47 by ecaceres          #+#    #+#             */
-/*   Updated: 2020/12/24 16:19:59 by alicetetu        ###   ########.fr       */
+/*   Updated: 2021/01/12 16:43:17 by atetu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,6 +58,7 @@
 #define KEY_AUTH_BASIC_USER "user"
 #define KEY_AUTH_BASIC_PASSWORD "password"
 #define KEY_AUTH_BEARER_TOKEN "token"
+#define KEY_LOCATION_MAXBODYSIZE "maxBodySize"
 
 class Configuration
 {

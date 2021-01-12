@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   LocationFilter.cpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
+/*   By: atetu <atetu@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/06 19:10:43 by ecaceres          #+#    #+#             */
-/*   Updated: 2021/01/10 15:32:43 by alicetetu        ###   ########.fr       */
+/*   Updated: 2021/01/12 17:26:58 by atetu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,7 +74,7 @@ LocationFilter::doFilter(UNUSED HTTPClient &client, HTTPRequest &request, UNUSED
 
 				if (locationBlock.path().size() <= request.resource().size())
 					path = request.resource().substr(locationBlock.path().size(), std::string::npos);
-
+			//	std::cout << "path: " << path << std::endl;
 				request.resource(path);
 				LOG.trace() << path << std::endl;
 			}

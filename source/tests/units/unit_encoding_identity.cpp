@@ -26,13 +26,13 @@ encode(const char *str)
 static std::string
 decode(const char *str)
 {
-	return (IdentityDecoder(false, ft::strlen(str)).decode(str));
+	return (IdentityDecoder(false, ft::strlen(str), 10000).decode(str));
 }
 
 static std::string
 decode2(const char *str, const char *str2)
 {
-	IdentityDecoder decoder(false, ft::strlen(str) + ft::strlen(str2));
+	IdentityDecoder decoder(false, ft::strlen(str) + ft::strlen(str2), 1000);
 
 	std::string out;
 	decoder.consume(str, out);

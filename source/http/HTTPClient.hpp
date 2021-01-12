@@ -169,7 +169,7 @@ class HTTPClient :
 		bool
 		readableBody(void);
 
-		const std::string&
+		std::string&
 		body();
 
 		HTTPTask*
@@ -177,6 +177,9 @@ class HTTPClient :
 
 		void
 		task(HTTPTask &task, bool removePrevious = true);
+
+		long long
+		isMaxBodySize(const Optional<const ServerBlock*> &serverBlock, const Optional<const LocationBlock*> &locationBlock);
 };
 
 #endif /* HTTPCLIENT_HPP_ */

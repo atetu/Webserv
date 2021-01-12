@@ -195,6 +195,16 @@ HTTPClient::readableHead(void)
 				{
 					if (m_request.method().present() && m_request.method().get()->hasBody())
 					{
+						std::cout << "body first\n";
+						// if (m_request.serverBlock().present() && m_request.serverBlock().get()->maxBodySize().present())
+						// 	m_parser.maxBodySize(m_request.serverBlock().get()->maxBodySize().get().toBytes());
+						long long maxBodySize = isMaxBodySize(m_request.serverBlock(), m_request.locationBlock());
+						std::cout << "max : " << maxBodySize << std::endl;
+						if (maxBodySize != -1)
+						{
+							m_parser.maxBodySize(maxBodySize);
+							std::cout << "max : " << maxBodySize << std::endl;
+						}
 						m_parser.state() = HTTPRequestParser::S_BODY;
 						m_state = S_BODY;
 						m_parser.consume(0);
@@ -253,11 +263,11 @@ HTTPClient::readableBody(void)
 {
 	char c;
 
-	while (m_in.next(c))
+	while (m_in.peek(c))
 	{
 		try
 		{
-			m_parser.consume(c);
+			m_parser.consume(0);
 
 			if (m_parser.state() == HTTPRequestParser::S_END)
 			{
@@ -270,9 +280,12 @@ HTTPClient::readableBody(void)
 		}
 		catch (Exception &exception)
 		{
+			std::cout <<exception.message() << std::endl;
 			LOG.debug() << exception.message() << std::endl;
-
-			m_response.status(*HTTPStatus::UNPROCESSABLE_ENTITY); /* TODO Need more specific message based on the problem. */
+			if (exception.message() == "Too large payload")
+				m_response.status(*HTTPStatus::PAYLOAD_TOO_LARGE); 
+			else
+				m_response.status(*HTTPStatus::UNPROCESSABLE_ENTITY); /* TODO Need more specific message based on the problem. */
 			m_filterChain.doChainingOf(FilterChain::S_AFTER);
 			NIOSelector::instance().update(m_socket, NIOSelector::WRITE);
 			m_state = S_END;
@@ -281,7 +294,7 @@ HTTPClient::readableBody(void)
 	return (false);
 }
 
-const std::string&
+std::string&
 HTTPClient::body()
 {
 	return (m_body);
@@ -300,4 +313,17 @@ HTTPClient::task(HTTPTask &task, bool removePrevious)
 		delete m_task;
 
 	m_task = &task;
+}
+
+
+long long
+HTTPClient::isMaxBodySize(const Optional<const ServerBlock*> &serverBlock, const Optional<const LocationBlock*> &locationBlock)
+{
+	if (locationBlock.present() && (*locationBlock.get()).hasMaxBodySize())
+		return ((*locationBlock.get()).maxBodySize().get().toBytes());
+	
+	if (serverBlock.present() && (*serverBlock.get()).hasMaxBodySize())
+		return ((*serverBlock.get()).maxBodySize().get().toBytes());
+
+	return (-1);
 }
