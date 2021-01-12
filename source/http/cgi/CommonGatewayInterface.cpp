@@ -122,7 +122,10 @@ CommonGatewayInterface::execute(HTTPClient &client, const CGIBlock &cgiBlock, co
 		throw IOException("pipe (out)", err);
 	}
 
-	Environment env = environment;
+//	Environment env = environment;
+
+	(void)environment;
+	Environment env;
 
 	if (cgiBlock.environment().present())
 	{
@@ -137,7 +140,11 @@ CommonGatewayInterface::execute(HTTPClient &client, const CGIBlock &cgiBlock, co
 	HTTPRequest &request = client.request();
 
 	File scriptFile(request.resource());
-	File scriptAbsoluteFile(request.root(), scriptFile);
+	File scriptRelativeFile(request.root(), scriptFile);
+	File scriptAbsoluteFile(scriptRelativeFile);
+
+	if (StringUtils::first(scriptAbsoluteFile.path()) != '/')
+		scriptAbsoluteFile = File(File::currentDirectory(), scriptAbsoluteFile);
 
 	env.setProperty(ENV_GATEWAY_INTERFACE, "CGI/1.1");
 	env.setProperty(ENV_REMOTE_ADDR, client.socketAddress().address()->hostAddress());
@@ -150,8 +157,8 @@ CommonGatewayInterface::execute(HTTPClient &client, const CGIBlock &cgiBlock, co
 	env.setProperty(ENV_SERVER_PORT, Convert::toString(client.httpServer().port()));
 	env.setProperty(ENV_SERVER_PROTOCOL, request.version().format());
 	env.setProperty(ENV_SERVER_SOFTWARE, APPLICATION_NAME_AND_VERSION);
-	env.setProperty(ENV_PATH_INFO, scriptFile.parent().path());
-	env.setProperty(ENV_PATH_TRANSLATED, scriptAbsoluteFile.parent().path());
+	env.setProperty(ENV_PATH_INFO, request.url().path());
+	env.setProperty(ENV_PATH_TRANSLATED, "/mnt/c/Users/cacer/OneDrive/Developments/Workspace/webserv/source/YoupiBanane/youpi.bla");
 	env.setProperty(ENV_QUERY_STRING, request.url().queryString());
 
 	if (request.method().get()->hasBody())
@@ -205,6 +212,10 @@ CommonGatewayInterface::execute(HTTPClient &client, const CGIBlock &cgiBlock, co
 
 		::dup2(inPipe[0], 0);
 		::dup2(outPipe[1], 1);
+
+		::close(inPipe[1]);
+		::close(outPipe[0]);
+//		::close(0);
 
 //		if (cgiBlock.redirectErrToOut().orElse(true)) // TODO Need debug
 //			::dup2(1, 2);
@@ -260,6 +271,8 @@ CommonGatewayInterface::execute(HTTPClient &client, const CGIBlock &cgiBlock, co
 			cgi->in().write(client.body().c_str(), client.body().length());
 			//::write(1, request.body().c_str(), request.body().length());
 		}
+
+		stdin->close();
 
 		return (cgi);
 	}

@@ -38,8 +38,8 @@ ChunkDecoder::~ChunkDecoder()
 		if (endPtr == hex_intro.c_str())							\
 			throw Exception ("Hexadecimal conversion impossible"); 	\
 		m_sizeStr = "";												\
-		std::cout << "hex: " << hex_intro << std::endl; \
-		std::cout << "nb : " << m_sizeNb << std::endl;
+//		std::cout << "hex: " << hex_intro << std::endl; \
+//		std::cout << "nb : " << m_sizeNb << std::endl;
 
 //std::string
 //ChunkDecoder::decode(std::string storage)
@@ -209,7 +209,7 @@ ChunkDecoder::consume(std::string &out, char c)
 {
 	//(void)out;
 //	(void)c;
-	
+
 	switch (m_state)
 	{
 		case S_NOT_STARTED :

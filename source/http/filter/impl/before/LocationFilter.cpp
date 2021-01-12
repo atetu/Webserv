@@ -19,11 +19,14 @@
 #include <http/parser/HTTPRequestPathParser.hpp>
 #include <http/request/HTTPRequest.hpp>
 #include <http/route/HTTPFindLocation.hpp>
-#include <io/File.hpp>
+#include <log/LoggerFactory.hpp>
 #include <util/Macros.hpp>
 #include <util/Optional.hpp>
+#include <util/StringUtils.hpp>
 #include <list>
 #include <string>
+
+Logger &LocationFilter::LOG = LoggerFactory::get("Location Filter");
 
 LocationFilter::LocationFilter()
 {
@@ -62,9 +65,10 @@ LocationFilter::doFilter(UNUSED HTTPClient &client, HTTPRequest &request, UNUSED
 		{
 			const LocationBlock &locationBlock = *findLocation.parse().location().get();
 
+			LOG.trace() << locationBlock.path() << std::endl;
 			request.locationBlock(locationBlock);
 
-			if (locationBlock.root().present())
+			if (locationBlock.root().present() /* && StringUtils::last(locationBlock.path()) != '/'*/)
 			{
 				std::string path;
 
@@ -72,6 +76,7 @@ LocationFilter::doFilter(UNUSED HTTPClient &client, HTTPRequest &request, UNUSED
 					path = request.resource().substr(locationBlock.path().size(), std::string::npos);
 
 				request.resource(path);
+				LOG.trace() << path << std::endl;
 			}
 		}
 	}

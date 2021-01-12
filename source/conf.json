@@ -20,6 +20,12 @@
 		"bash0": {
 			"path": "/bin/ls"
 		},
+		"bla": {
+			"path": "/mnt/c/Users/cacer/OneDrive/Developments/Workspace/webserv/docker/42-testers/ubuntu_cgi_tester",
+			"extensions": [
+				"bla"
+			]
+		},
 		"php-cgi": {
 			"path": "/usr/bin/php-cgi",
 			"extensions": [
@@ -56,9 +62,10 @@
 					"index": [
 						"index.html"
 					],
+					"cgi": "bla",
 					"listing": true
 				},
-				"/wordpress": {
+				"/wordpress/": {
 					"methods": [
 						"POST"
 					],
@@ -74,6 +81,15 @@
 					"index": [
 						"index.php"
 					]
+				},
+				"/directory/": {
+					"root": "./YoupiBanane/",
+					"methods": [
+						"GET",
+						"POST",
+						"PUT"
+					],
+					"cgi": "bla"
 				},
 				"/x.py": {
 					"root": "../dummy-files/",

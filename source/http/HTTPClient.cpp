@@ -143,6 +143,8 @@ HTTPClient::readable(FileDescriptor &fd)
 	{
 		if (cond)
 		{
+			updateLastAction();
+
 			switch (m_state)
 			{
 				case S_NOT_STARTED:
@@ -173,7 +175,7 @@ HTTPClient::readableHead(void)
 	while (m_in.next(c))
 	{
 		bool catched = true;
-		std::cout << c;
+//		std::cout << c;
 		try
 		{
 			m_parser.consume(c);

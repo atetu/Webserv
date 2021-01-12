@@ -126,3 +126,18 @@ Environment::get()
 {
 	return (PROGRAM);
 }
+
+std::string
+Environment::join(const std::string &separator) const
+{
+	std::string out;
+	for (const_iterator it = m_storage.begin(); it != m_storage.end();)
+	{
+		out += it->first + '=' + it->second;
+
+		if (++it != m_storage.end())
+			out += separator;
+	}
+
+	return (out);
+}

@@ -16,9 +16,14 @@
 #include <http/filter/Filter.hpp>
 #include <util/Singleton.hpp>
 
+class Logger;
+
 class LocationFilter :
 		public Filter, public Singleton<LocationFilter>
 {
+	public:
+		static Logger &LOG;
+
 	public:
 		LocationFilter();
 		LocationFilter(const LocationFilter &other);

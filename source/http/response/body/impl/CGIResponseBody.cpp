@@ -31,7 +31,7 @@ CGIResponseBody::CGIResponseBody(HTTPClient &client, CommonGatewayInterface &cgi
 		m_bufferedIn(*FileDescriptorBuffer::from(m_cgi.in(), FileDescriptorBuffer::NOTHING)),
 		m_bufferedOut(*FileDescriptorBuffer::from(m_cgi.out(), FileDescriptorBuffer::NOTHING))
 {
-	NIOSelector::instance().add(m_cgi.in(), *this, NIOSelector::WRITE);
+//	NIOSelector::instance().add(m_cgi.in(), *this, NIOSelector::WRITE);
 	NIOSelector::instance().add(m_cgi.out(), *this, NIOSelector::READ);
 }
 
@@ -39,7 +39,7 @@ CGIResponseBody::~CGIResponseBody()
 {
 	m_cgi.exit();
 
-	NIOSelector::instance().remove(m_cgi.in());
+//	NIOSelector::instance().remove(m_cgi.in());
 	NIOSelector::instance().remove(m_cgi.out());
 
 	delete &m_bufferedIn;

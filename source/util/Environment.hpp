@@ -54,6 +54,9 @@ class Environment
 		char**
 		allocate() const;
 
+		std::string
+		join(const std::string &separator = " ") const;
+
 	public:
 		static Environment
 		fromEnvp(char **envp);

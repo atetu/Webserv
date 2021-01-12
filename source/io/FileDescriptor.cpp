@@ -56,14 +56,17 @@ FileDescriptor::write(const void *buf, size_t nbyte)
 	return (r);
 }
 
+#include <iostream>
 void
 FileDescriptor::close()
 {
 	ensureNotClosed();
 
+	std::cout << "qlreqdy closed? " << m_closed << std::endl;
 	if (!m_closed)
 	{
-		::close(m_fd);
+		int r = ::close(m_fd);
+		std::cout << "closing: " << r << std::endl;
 
 		m_fd = -1;
 		m_closed = true;
