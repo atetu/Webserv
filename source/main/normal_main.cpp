@@ -41,6 +41,7 @@ const Option OPT_CHECK('c', "check", "only check the config file");
 const Option OPT_CONFIG_FILE('f', "config-file", "specify the config file", "file");
 const Option OPT_IGNORE_MIME_INCLUDES_ERROR('m', "ignore-mime-includes-error", "only warn when a MIME file inclusion cause an error");
 const Option OPT_IGNORE_GRACEFUL_STOP('s', "ignore-graceful-stop", "avoid doing a graceful stop when receiving a INT signal");
+const Option OPT_NO_COLOR('n', "no-color", "don't use color in the console");
 
 static Logger &LOG = LoggerFactory::get("main");
 static HTTPOrchestrator *httpOrchestrator = NULL;
@@ -65,6 +66,7 @@ normal_main(int argc, char **argv, char **envp)
 	bool checkOnly = false;
 	bool ignoreMimeIncludesError = false;
 	bool ignoreGracefulStop = false;
+	bool noColor = false;
 	std::string configFile = "conf.json";
 
 	std::list<const Option*> lst;
@@ -75,6 +77,7 @@ normal_main(int argc, char **argv, char **envp)
 	lst.push_back(&OPT_CONFIG_FILE);
 	lst.push_back(&OPT_IGNORE_MIME_INCLUDES_ERROR);
 	lst.push_back(&OPT_IGNORE_GRACEFUL_STOP);
+	lst.push_back(&OPT_NO_COLOR);
 
 	OptionParser parser(lst);
 
@@ -121,6 +124,9 @@ normal_main(int argc, char **argv, char **envp)
 
 		if (commandLine.has(OPT_IGNORE_GRACEFUL_STOP))
 			ignoreGracefulStop = true;
+
+		if (commandLine.has(OPT_NO_COLOR))
+			noColor = true;
 	}
 	catch (Exception &exception)
 	{
@@ -130,6 +136,7 @@ normal_main(int argc, char **argv, char **envp)
 	}
 
 	LogLevel::ACTIVE = level;
+	LogLevel::COLORED = !noColor;
 
 	LOG.debug() << "Set log level to: " << level->name() << std::endl;
 
@@ -188,6 +195,8 @@ normal_main(int argc, char **argv, char **envp)
 			return (1);
 		}
 	}
+	else
+		std::cout << "well formatted and validated!" << std::endl;
 
 	DeleteHelper::pointer<HTTPOrchestrator>(httpOrchestrator);
 

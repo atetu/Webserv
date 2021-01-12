@@ -64,7 +64,7 @@ CGIFilter::doFilter(UNUSED HTTPClient &client, UNUSED HTTPRequest &request, UNUS
 	const LocationBlock &locationBlock = *request.locationBlock().get();
 	if (locationBlock.cgi().absent())
 		return (next());
-	std::cout << "loc: " << locationBlock.cgi().get() << std::endl;
+
 	std::string extension;
 	if (!File::findExtension(request.resource(), extension))
 		return (next());

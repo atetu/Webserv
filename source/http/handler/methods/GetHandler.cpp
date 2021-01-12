@@ -58,7 +58,7 @@ bool
 GetHandler::handle(UNUSED HTTPClient &client, HTTPRequest &request, HTTPResponse &response)
 {
 	File targetFile(request.targetFile());
-	std::cout << "get\n";
+
 	if (!targetFile.exists())
 	{
 		response.status(*HTTPStatus::NOT_FOUND);

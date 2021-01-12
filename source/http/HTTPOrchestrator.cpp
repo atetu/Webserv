@@ -99,6 +99,8 @@ HTTPOrchestrator::start()
 			.tv_sec = 1,
 			.tv_usec = 0 };
 
+		LOG.info() << "Ready to accept connection!" << std::endl;
+
 		m_running = true;
 		while (m_running)
 		{

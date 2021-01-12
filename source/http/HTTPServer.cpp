@@ -46,6 +46,8 @@ HTTPServer::start(void)
 	m_socket.listen();
 
 	NIOSelector::instance().add(m_socket, *this, NIOSelector::ACCEPT);
+
+	LOG.info() << "Listening on " << m_host << ":" << m_port << std::endl;
 }
 
 void

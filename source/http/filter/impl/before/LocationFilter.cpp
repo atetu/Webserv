@@ -65,18 +65,16 @@ LocationFilter::doFilter(UNUSED HTTPClient &client, HTTPRequest &request, UNUSED
 		{
 			const LocationBlock &locationBlock = *findLocation.parse().location().get();
 
-			LOG.trace() << locationBlock.path() << std::endl;
 			request.locationBlock(locationBlock);
 
-			if (locationBlock.root().present() /* && StringUtils::last(locationBlock.path()) != '/'*/)
+			if (locationBlock.root().present() /* && StringUtils::last(locationBlock.path()) != '/'*/) // TODO see comment
 			{
 				std::string path;
 
 				if (locationBlock.path().size() <= request.resource().size())
 					path = request.resource().substr(locationBlock.path().size(), std::string::npos);
-			//	std::cout << "path: " << path << std::endl;
+
 				request.resource(path);
-				LOG.trace() << path << std::endl;
 			}
 		}
 	}

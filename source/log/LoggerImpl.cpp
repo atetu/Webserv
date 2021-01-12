@@ -10,10 +10,11 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <stddef.h>
-#include <util/Enum.hpp>
 #include <log/LoggerImpl.hpp>
 #include <log/LogLevel.hpp>
+#include <stddef.h>
+#include <util/Convert.hpp>
+#include <util/Enum.hpp>
 #include <algorithm>
 #include <iomanip>
 
@@ -83,7 +84,20 @@ LoggerImpl::log(const LogLevel &level) const
 	if (!isEnabled(level))
 		return (VOID);
 
-	return (std::cout << "[\e[93m" << std::setw(5) << level.name() << std::setw(0) << "\e[0m] " << std::setw(LONGEST_NAME) << m_tag << ": ");
+	static std::string colorIn = "\e[";
+	static std::string colorOut = "\e[0m";
+
+	*LogLevel::OUTPUT << '[';
+
+	if (LogLevel::COLORED)
+		*LogLevel::OUTPUT << colorIn + Convert::toString(level.color()) + 'm';
+
+	*LogLevel::OUTPUT << std::setw(5) << level.name() << std::setw(0);
+
+	if (LogLevel::COLORED)
+		*LogLevel::OUTPUT << colorOut;
+
+	return (*LogLevel::OUTPUT << ']' << std::setw(LONGEST_NAME) << m_tag << ": ");
 }
 
 const std::string&

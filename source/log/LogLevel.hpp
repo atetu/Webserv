@@ -14,10 +14,20 @@
 # define LOGLEVEL_HPP_
 
 #include <util/Enum.hpp>
+#include <iostream>
 
 class LogLevel :
 		public Enum<LogLevel>
 {
+	private:
+		int m_color;
+
+	public:
+		LogLevel(int color);
+
+		int
+		color() const;
+
 	public:
 		static const LogLevel *TRACE;
 		static const LogLevel *DEBUG;
@@ -27,6 +37,8 @@ class LogLevel :
 		static const LogLevel *FATAL;
 
 		static const LogLevel *ACTIVE;
+		static bool COLORED;
+		static std::ostream *OUTPUT;
 };
 
 #endif /* LOGLEVEL_HPP_ */
