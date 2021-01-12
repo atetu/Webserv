@@ -22,7 +22,7 @@ HTTPBodyEncoding::~HTTPBodyEncoding()
 {
 }
 
-IHTTPBodyDecoder&
+IHTTPBodyDecoder*
 HTTPBodyEncoding::decoderFor(const HTTPHeaderFields &headerFields)
 {
 	Optional<std::string> transfertEncodingOpt = headerFields.get(HTTPHeaderFields::TRANSFER_ENCODING);
@@ -31,7 +31,7 @@ HTTPBodyEncoding::decoderFor(const HTTPHeaderFields &headerFields)
 		const std::string &transfertEncoding = transfertEncodingOpt.get();
 
 		if (transfertEncoding == HTTPHeaderFields::CHUNKED)
-			return (*(new ChunkDecoder(true)));
+			return (new ChunkDecoder(true));
 
 		throw HTTPBodyEncodingException("unsupported transfert-encoding:" + transfertEncoding);
 	}
@@ -43,7 +43,12 @@ HTTPBodyEncoding::decoderFor(const HTTPHeaderFields &headerFields)
 
 		try
 		{
-			return (*(new IdentityDecoder(true, Number::parse<long long>(contentLength))));
+			long long length = Number::parse<long long>(contentLength);
+
+			if (length == 0)
+				return (NULL);
+
+			return (new IdentityDecoder(true, length));
 		}
 		catch (Exception &exception)
 		{

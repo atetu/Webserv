@@ -47,15 +47,7 @@ FinalFilter::operator=(const FinalFilter &other)
 void
 FinalFilter::doFilter(HTTPClient &client, UNUSED HTTPRequest &request, HTTPResponse &response, FilterChain &next)
 {
-	{
-		static std::string keepAlive = "keep-alive";
-		static std::string close = "close";
-
-		Optional<std::string> connectionOpt = request.headers().get(HTTPHeaderFields::CONNECTION);
-
-		if (connectionOpt.present() && StringUtils::equalsIgnoreCase(connectionOpt.get(), keepAlive))
-			response.headers().connection(close);
-	}
+	response.headers().connection(HTTPHeaderFields::CLOSE);
 
 	response.headers().date();
 	response.headers().server();

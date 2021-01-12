@@ -74,6 +74,9 @@ class HTTPClient :
 		~HTTPClient();
 
 		void
+		log();
+
+		void
 		updateLastAction();
 
 		inline Socket&

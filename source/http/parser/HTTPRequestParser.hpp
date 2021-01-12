@@ -48,12 +48,12 @@ class HTTPRequestParser
 			S_HTTP_MAJOR,
 			S_HTTP_DOT,
 			S_HTTP_MINOR,
-			S_HTTP_END,
-			S_HTTP_END2,
-			S_HTTP_END3,
+			S_HTTP_END_R,
+			S_HTTP_END_N,
 			S_HEADER_FIELDS,
 			S_BODY,
 			S_BODY_DECODE,
+			S_END_R,
 			S_END,
 		};
 

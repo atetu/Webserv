@@ -70,5 +70,5 @@ MethodFilter::isAcceptable(const Optional<const ServerBlock*> &serverBlock, cons
 	if (serverBlock.present() && (*serverBlock.get()).hasMethod(method.name()))
 		return (true);
 
-	return (true /* TODO: For now */);
+	return (false /* TODO: For now */);
 }

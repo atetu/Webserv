@@ -179,32 +179,31 @@ HTTPRequestParser::consume(char c)
 		case S_HTTP_MINOR:
 		{
 			if (c == '\r')
-				m_state = S_HTTP_END;
+				m_state = S_HTTP_END_R;
 			else if (c == '\n')
-				m_state = S_HTTP_END2; // TODO Changed since the parser hang forever. //S_HTTP_END2;
+				m_state = S_HTTP_END_N;
 			else
 				throw Exception("Expected a \\r or \\n");
 
 			break;
 		}
 
-		case S_HTTP_END:
+		case S_HTTP_END_R:
 		{
 			if (c == '\n')
-				m_state = S_HTTP_END2; // TODO Changed since the parser hang forever. //S_HTTP_END2;
+				m_state = S_HTTP_END_N;
 			else
 				throw Exception("Expected a \\n");
 
 			break;
 		}
 
-		case S_HTTP_END2:
+		case S_HTTP_END_N:
 		{
-			m_state = S_END; // FIXME
-			if (m_last2 == '\r' && m_last == '\n' && c == '\r')
-				m_state = S_HTTP_END3;
-			else if (c == ' ')
-				throw Exception("Space before field");
+			if (c == '\r')
+				m_state = S_END_R;
+			else if (c == '\n')
+				m_state = S_END;
 			else
 			{
 				m_state = S_HEADER_FIELDS;
@@ -214,17 +213,12 @@ HTTPRequestParser::consume(char c)
 			break;
 		}
 
-		case S_HTTP_END3:
+		case S_END_R:
 		{
-			if (m_last2 == '\n' && m_last == '\r' && c == '\n')
+			if (c == '\n')
 				m_state = S_END;
-			else if (c == ' ')
-				throw Exception("Space before field");
 			else
-			{
-				m_state = S_HEADER_FIELDS;
-				m_headerFieldsParser.consume(c);
-			}
+				m_state = S_END; /* Body */ // TODO
 
 			break;
 		}
@@ -241,9 +235,18 @@ HTTPRequestParser::consume(char c)
 
 		case S_BODY:
 			m_state = S_BODY_DECODE;
-			m_bodyDecoder = &HTTPBodyEncoding::decoderFor(m_headerFieldsParser.headerFields());
+			m_bodyDecoder = HTTPBodyEncoding::decoderFor(m_headerFieldsParser.headerFields());
 
 //			std::cout << typeid(*m_bodyDecoder).name() << std::endl;
+
+			if (m_bodyDecoder == NULL)
+			{
+				m_state = S_END;
+				break;
+			}
+
+			if (c == 0)
+				break;
 
 			/* Falling */
 

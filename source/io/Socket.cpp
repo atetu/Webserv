@@ -13,6 +13,7 @@
 #include <arpa/inet.h>
 #include <netinet/in.h>
 #include <sys/socket.h>
+#include <unistd.h>
 #include <exception/IOException.hpp>
 #include <io/Socket.hpp>
 #include <libs/ft.hpp>
@@ -20,11 +21,14 @@
 #include <sys/errno.h>
 #include <sys/socket.h>
 #include <util/helper/DeleteHelper.hpp>
+#include <util/Convert.hpp>
 
 static const int g_true = 1;
+static int incre = 0;
 
 Socket::Socket(int fd) :
-		FileDescriptor(fd)
+		FileDescriptor(fd),
+		m_incr(++incre)
 {
 	m_verified = true;
 }
@@ -126,9 +130,12 @@ Socket::accept(InetSocketAddress *socketAddress) const
 	if (socketAddress)
 		*socketAddress = InetSocketAddress::from((struct sockaddr*)&addr, len);
 
-	try {
+	try
+	{
 		return (new Socket(fd));
-	} catch (...) {
+	}
+	catch (...)
+	{
 		DeleteHelper::pointer<InetSocketAddress>(socketAddress);
 
 		throw;

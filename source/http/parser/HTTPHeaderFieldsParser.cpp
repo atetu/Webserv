@@ -34,7 +34,12 @@ HTTPHeaderFieldsParser::consume(char c)
 		case S_FIELD:
 		{
 			if (c == ' ')
-				throw Exception("Space after field");
+			{
+				if (m_key.empty())
+					throw Exception("Space before field");
+				else
+					throw Exception("Space after field");
+			}
 			else if (c == ':')
 				m_state = S_COLON;
 			else

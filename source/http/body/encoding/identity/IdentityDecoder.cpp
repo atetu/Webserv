@@ -19,7 +19,6 @@ IdentityDecoder::IdentityDecoder(bool isAllocated, long long contentLength) :
 		m_contentLength(contentLength),
 		m_consumed()
 {
-//	std::cout << "IdentityDecoder" << contentLength << std::endl;
 }
 
 IdentityDecoder::~IdentityDecoder()

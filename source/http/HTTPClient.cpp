@@ -57,37 +57,43 @@ HTTPClient::~HTTPClient(void)
 	delete &m_in;
 	delete &m_out;
 
+	log();
+
 	DeleteHelper::pointer(m_task);
 
 	NIOSelector::instance().remove(m_socket);
 	delete &m_socket;
 
-	if (LOG.isInfoEnabled())
-	{
-		std::ostream &out = LOG.info()
-		/**/<< '[' << Time::now().cformat(HTTPCLIENT_LOG_TIME_FORMAT) << "] "
-		/**/<< m_socketAddress.hostAddress()
-		/**/<< " - ";
-
-		if (m_request.method().present())
-		{
-			out << m_request.method().get()->name()
-			/**/<< " "
-			/**/<< m_request.url().path()
-			/**/<< " :: ";
-
-			if (m_response.status().present())
-				out << m_response.status().get()->code();
-			else
-				out << "<no response>";
-		}
-		else
-			out << "<no request>";
-
-		out << std::endl;
-	}
-
 	httpServer().untrack(*this);
+}
+
+void
+HTTPClient::log()
+{
+	if (!LOG.isInfoEnabled())
+		return;
+
+	std::ostream &out = LOG.info()
+	/**/<< '[' << Time::now().cformat(HTTPCLIENT_LOG_TIME_FORMAT) << "] "
+	/**/<< m_socketAddress.hostAddress()
+	/**/<< " - ";
+
+	if (m_request.method().present())
+	{
+		out << m_request.method().get()->name()
+		/**/<< " "
+		/**/<< m_request.url().path()
+		/**/<< " :: ";
+
+		if (m_response.status().present())
+			out << m_response.status().get()->code();
+		else
+			out << "<no response>";
+	}
+	else
+		out << "<no request>";
+
+	out << std::endl;
 }
 
 void
@@ -176,7 +182,7 @@ HTTPClient::readableHead(void)
 			{
 				m_request = HTTPRequest(m_parser.version(), m_parser.url(), m_parser.headerFields());
 				m_filterChain.doChainingOf(FilterChain::S_BEFORE);
-				
+
 				if (m_response.status().present())
 				{
 					m_filterChain.doChainingOf(FilterChain::S_AFTER);
@@ -189,6 +195,17 @@ HTTPClient::readableHead(void)
 					{
 						m_parser.state() = HTTPRequestParser::S_BODY;
 						m_state = S_BODY;
+						m_parser.consume(0);
+
+						if (m_parser.state() == HTTPRequestParser::S_END) /* No body */
+						{
+							NIOSelector::instance().update(m_socket, NIOSelector::NONE);
+							m_filterChain.doChainingOf(FilterChain::S_BETWEEN);
+							m_state = S_END;
+
+							break;
+						}
+
 						return (readableBody());
 					}
 					else
@@ -258,7 +275,7 @@ HTTPClient::readableBody(void)
 			NIOSelector::instance().update(m_socket, NIOSelector::WRITE);
 			m_state = S_END;
 		}
-	}//TODO Fix when there is no body
+	} //TODO Fix when there is no body
 	return (false);
 }
 

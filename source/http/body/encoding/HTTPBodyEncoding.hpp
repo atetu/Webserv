@@ -31,7 +31,7 @@ class HTTPBodyEncoding
 		~HTTPBodyEncoding();
 
 	public:
-		static IHTTPBodyDecoder&
+		static IHTTPBodyDecoder*
 		decoderFor(const HTTPHeaderFields &headerFields);
 };
 

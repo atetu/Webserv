@@ -59,7 +59,7 @@ HTTPServer::watchForTimeouts()
 {
 	typedef std::list<HTTPClient*> lst;
 
-	if (m_clients.empty())
+	if (m_clients.empty() && m_endingClients.empty())
 		return;
 
 	unsigned long now = System::currentTimeSeconds();
@@ -82,8 +82,7 @@ HTTPServer::watchForTimeouts()
 		HTTPClient &client = *(*it);
 		it++;
 
-		char c;
-		if (client.socket().read(&c, 1) == -1)
+		if (client.lastAction() + 5 < now)
 			delete &client;
 	}
 }
@@ -140,6 +139,8 @@ HTTPServer::readable(FileDescriptor &fd)
 	InetSocketAddress socketAddress;
 	Socket *socket = serverSocket.accept(&socketAddress);
 
+	LOG.debug() << "Accepted: " << socketAddress.hostAddress() << " (fd=" << socket->raw() << ')' << std::endl;
+
 	HTTPClient &httpClient = *(new HTTPClient(*socket, socketAddress, *this));
 
 //	if (clientFds.size() >= (unsigned long)Configuration::instance().rootBlock().maxActiveClient().orElse(RootBlock::DEFAULT_MAX_ACTIVE_CLIENT))
@@ -167,10 +168,11 @@ HTTPServer::untrack(HTTPClient &client)
 void
 HTTPServer::ending(HTTPClient &client)
 {
-	untrack(client);
-	m_endingClients.push_back(&client);
-	NIOSelector::instance().update(client.socket(), NIOSelector::READ);
-	std::cout << "ending " << client.socket().raw() << std::endl;
+//	untrack(client);
+//	m_endingClients.push_back(&client);
+//	NIOSelector::instance().update(client.socket(), NIOSelector::READ);
+//	std::cout << "ending " << client.socket().raw() << std::endl;
+	delete &client;
 }
 
 HTTPServer::client_list::size_type
