@@ -37,7 +37,7 @@ HTTPResponse::HTTPResponse(const HTTPResponse &other) :
 
 HTTPResponse::~HTTPResponse()
 {
-	DeleteHelper::pointer<IResponseBody>(m_body);
+	DeleteHelper::pointer(m_body);
 }
 
 HTTPResponse&
@@ -45,6 +45,8 @@ HTTPResponse::operator=(const HTTPResponse &other)
 {
 	if (this != &other)
 	{
+		DeleteHelper::pointer(m_body);
+
 		m_status = other.m_status;
 		m_headers = other.m_headers;
 		m_body = other.m_body;
