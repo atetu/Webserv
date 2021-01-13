@@ -47,8 +47,9 @@ HTTPClient::HTTPClient(Socket &socket, InetSocketAddress socketAddress, HTTPServ
 		m_response(),
 		m_filterChain(*this, m_request, m_response),
 		m_task(),
-		m_ending(false)
+		m_keepAlive(true)
 {
+	NIOSelector::instance().add(m_socket, *this, NIOSelector::READ);
 	updateLastAction();
 }
 
@@ -65,6 +66,23 @@ HTTPClient::~HTTPClient(void)
 	delete &m_socket;
 
 	httpServer().untrack(*this);
+}
+
+void
+HTTPClient::reset()
+{
+	NIOSelector::instance().remove(m_socket);
+	NIOSelector::instance().add(m_socket, *this, NIOSelector::READ);
+
+	m_parser.reset();
+	m_body.clear();
+	m_state = S_NOT_STARTED;
+	m_request = HTTPRequest();
+	m_response = HTTPResponse();
+	DeleteHelper::pointer(m_task);
+	m_keepAlive = true;
+
+	updateLastAction();
 }
 
 void
@@ -122,8 +140,13 @@ HTTPClient::writable(FileDescriptor &fd)
 		delete this;
 	else if (finished && m_out.empty())
 	{
-		m_ending = true;
-		m_server.ending(*this);
+		if (m_keepAlive)
+		{
+			log();
+			reset();
+		}
+		else
+			delete this;
 	}
 
 	return (finished);
@@ -137,7 +160,7 @@ HTTPClient::readable(FileDescriptor &fd)
 	ssize_t r = 1;
 	bool cond = m_in.size() != 0 || (r = m_in.recv()) > 0;
 
-	if (r == -1 || (m_ending && r == 0))
+	if (r <= 0)
 		delete this;
 	else
 	{
@@ -282,7 +305,7 @@ HTTPClient::readableBody(void)
 		{
 			std::cout << exception.message() << std::endl;
 			LOG.debug() << exception.message() << std::endl;
-			if (exception.message() == "Too large payload")
+			if (exception.message() == "Too large payload") /* TODO Change for a better exception */
 				m_response.status(*HTTPStatus::PAYLOAD_TOO_LARGE);
 			else
 				m_response.status(*HTTPStatus::UNPROCESSABLE_ENTITY); /* TODO Need more specific message based on the problem. */
@@ -325,4 +348,10 @@ HTTPClient::isMaxBodySize(const Optional<const ServerBlock*> &serverBlock, const
 		return ((*serverBlock.get()).maxBodySize().get().toBytes());
 
 	return (-1);
+}
+
+void
+HTTPClient::keepAlive(bool keepAlive)
+{
+	m_keepAlive = keepAlive;
 }

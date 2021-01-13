@@ -145,6 +145,16 @@ template<typename T>
 				return (m_value);
 			}
 
+			template<typename U>
+				bool
+				equals(const U &other) const
+				{
+					if (m_present)
+						return (m_value == other);
+
+					return (false);
+				}
+
 			T&
 			orElse(const T &defaultValue)
 			{

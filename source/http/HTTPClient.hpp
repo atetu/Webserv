@@ -59,7 +59,7 @@ class HTTPClient :
 		HTTPResponse m_response;
 		FilterChain m_filterChain;
 		HTTPTask *m_task;
-		bool m_ending;
+		bool m_keepAlive;
 
 		HTTPClient(void);
 		HTTPClient(const HTTPClient &other);
@@ -75,6 +75,9 @@ class HTTPClient :
 
 		void
 		log();
+
+		void
+		reset();
 
 		void
 		updateLastAction();
@@ -180,6 +183,9 @@ class HTTPClient :
 
 		long long
 		isMaxBodySize(const Optional<const ServerBlock*> &serverBlock, const Optional<const LocationBlock*> &locationBlock);
+
+		void
+		keepAlive(bool keepAlive);
 };
 
 #endif /* HTTPCLIENT_HPP_ */

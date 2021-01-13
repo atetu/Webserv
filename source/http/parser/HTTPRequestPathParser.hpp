@@ -59,6 +59,9 @@ class HTTPRequestPathParser
 		void
 		consume(char c);
 
+		void
+		reset();
+
 		inline State
 		state() const
 		{

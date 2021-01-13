@@ -204,6 +204,9 @@ class HTTPHeaderFields
 		bool
 		empty(void) const;
 
+		void
+		clear();
+
 		map&
 		storage(void);
 

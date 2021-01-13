@@ -148,6 +148,16 @@ HTTPHeaderFieldsParser::consume(char c)
 }
 
 void
+HTTPHeaderFieldsParser::reset()
+{
+	m_state = S_FIELD;
+	m_headerFields.clear();
+	m_key.clear();
+	m_value.clear();
+	m_consumed = 0;
+}
+
+void
 HTTPHeaderFieldsParser::commit(State nextState)
 {
 	m_headerFields.set(m_key, m_value, true);

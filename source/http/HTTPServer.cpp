@@ -78,15 +78,15 @@ HTTPServer::watchForTimeouts()
 			delete &client;
 		}
 	}
-
-	for (lst::iterator it = m_endingClients.begin(); it != m_endingClients.end();)
-	{
-		HTTPClient &client = *(*it);
-		it++;
-
-		if (client.lastAction() + 5 < now)
-			delete &client;
-	}
+//
+//	for (lst::iterator it = m_endingClients.begin(); it != m_endingClients.end();)
+//	{
+//		HTTPClient &client = *(*it);
+//		it++;
+//
+//		if (client.lastAction() + 5 < now)
+//			delete &client;
+//	}
 }
 
 Socket&

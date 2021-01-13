@@ -155,6 +155,23 @@ HTTPRequestPathParser::consume(char c)
 }
 
 void
+HTTPRequestPathParser::reset()
+{
+	m_state = S_PATH;
+	m_path = "/";
+	m_original = m_path;
+	m_queryKey.clear();
+	m_queryValue.clear();
+	m_hexBeforeState = S_PATH;
+	m_hexStorer = NULL;
+	m_hex.clear();
+	m_query.unset();
+	m_fragment.unset();
+	m_dot = 0;
+	m_level = 0;
+}
+
+void
 HTTPRequestPathParser::commitHexToPath(char c)
 {
 	m_path += c;

@@ -64,8 +64,6 @@ class HTTPRequestParser
 		int m_major;
 		int m_minor;
 		HTTPHeaderFieldsParser m_headerFieldsParser;
-		char m_last;
-		char m_last2;
 		HTTPClient &m_client;
 		IHTTPBodyDecoder *m_bodyDecoder;
 		long long m_maxBodySize;
@@ -78,6 +76,9 @@ class HTTPRequestParser
 
 		void
 		consume(char c);
+
+		void
+		reset();
 
 		State&
 		state();

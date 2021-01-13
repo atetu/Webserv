@@ -422,6 +422,12 @@ HTTPHeaderFields::empty(void) const
 	return (m_storage.empty());
 }
 
+void
+HTTPHeaderFields::clear(void)
+{
+	return (m_storage.clear());
+}
+
 HTTPHeaderFields::map&
 HTTPHeaderFields::storage(void)
 {

@@ -19,6 +19,7 @@
 #include <http/parser/HTTPRequestParser.hpp>
 #include <libs/ft.hpp>
 #include <stddef.h>
+#include <util/helper/DeleteHelper.hpp>
 #include <util/Optional.hpp>
 
 class HTTPClient;
@@ -32,8 +33,6 @@ HTTPRequestParser::HTTPRequestParser(HTTPClient &client) :
 		m_method(),
 		m_major(),
 		m_minor(),
-		m_last(),
-		m_last2(),
 		m_client(client),
 		m_bodyDecoder(),
 		m_maxBodySize(-1),
@@ -280,9 +279,20 @@ HTTPRequestParser::consume(char c)
 
 //	std::cout << m_state << " -- " << c << std::endl;
 //	std::cout << c << std::flush;
+}
+void
+HTTPRequestParser::reset()
+{
+	m_state = S_NOT_STARTED;
+	m_method.clear();
+	m_major = 0;
+	m_minor = 0;
+	DeleteHelper::pointer(m_bodyDecoder);
+	m_maxBodySize = -1;
+	m_totalSize = 0;
 
-	m_last2 = m_last;
-	m_last = c;
+	m_pathParser.reset();
+	m_headerFieldsParser.reset();
 }
 
 HTTPRequestParser::State&
@@ -320,4 +330,3 @@ HTTPRequestParser::url()
 {
 	return (URL(m_pathParser.path(), m_pathParser.query(), m_pathParser.fragment()));
 }
-
