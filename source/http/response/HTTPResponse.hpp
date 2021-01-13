@@ -40,6 +40,8 @@ class HTTPResponse
 		HTTPHeaderFields m_headers;
 		IResponseBody *m_body;
 		bool m_ended;
+
+	public:
 		State m_state;
 
 	public:

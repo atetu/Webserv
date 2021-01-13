@@ -71,4 +71,5 @@ AuthenticationFilter::doFilter(UNUSED HTTPClient &client, HTTPRequest &request, 
 
 	response.headers().wwwAuthenticate(authBlock.type(), authBlock.realm());
 	response.status(*HTTPStatus::UNAUTHORIZED);
+	response.end();
 }

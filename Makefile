@@ -37,6 +37,9 @@ clean:
     
 re:
 	@$(PROJECT_MAKE) re
+    
+rej16:
+	@$(PROJECT_MAKE) re -j 16
 
 norm:
 	@$(PROJECT_MAKE) norm

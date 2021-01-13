@@ -52,9 +52,6 @@ class FilterChain
 		next();
 
 		void
-		doChaining();
-
-		void
 		doChainingOf(State state);
 
 		inline void

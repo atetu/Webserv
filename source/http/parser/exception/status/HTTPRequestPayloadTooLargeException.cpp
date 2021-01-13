@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   HTTPRequestPayloadTooLargeException.cpp            :+:      :+:    :+:   */
+/*   HTTPRequestHeaderTooBigException.cpp               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ecaceres <ecaceres@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -10,29 +10,29 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <http/parser/exception/status/HTTPRequestPayloadTooLargeException.hpp>
+#include <http/parser/exception/status/HTTPRequestHeaderTooBigException.hpp>
 
-HTTPRequestPayloadTooLargeException::HTTPRequestPayloadTooLargeException() :
+HTTPRequestHeaderTooBigException::HTTPRequestHeaderTooBigException() :
 		HTTPRequestException()
 {
 }
 
-HTTPRequestPayloadTooLargeException::HTTPRequestPayloadTooLargeException(const std::string &message) :
+HTTPRequestHeaderTooBigException::HTTPRequestHeaderTooBigException(const std::string &message) :
 		HTTPRequestException(message)
 {
 }
 
-HTTPRequestPayloadTooLargeException::HTTPRequestPayloadTooLargeException(const HTTPRequestPayloadTooLargeException &other) :
+HTTPRequestHeaderTooBigException::HTTPRequestHeaderTooBigException(const HTTPRequestHeaderTooBigException &other) :
 		HTTPRequestException(other)
 {
 }
 
-HTTPRequestPayloadTooLargeException::~HTTPRequestPayloadTooLargeException() throw ()
+HTTPRequestHeaderTooBigException::~HTTPRequestHeaderTooBigException() throw ()
 {
 }
 
-HTTPRequestPayloadTooLargeException&
-HTTPRequestPayloadTooLargeException::operator=(const HTTPRequestPayloadTooLargeException &other)
+HTTPRequestHeaderTooBigException&
+HTTPRequestHeaderTooBigException::operator=(const HTTPRequestHeaderTooBigException &other)
 {
 	RuntimeException::operator=(other);
 

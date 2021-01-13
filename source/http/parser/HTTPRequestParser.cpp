@@ -258,7 +258,6 @@ HTTPRequestParser::consume(char c)
 		case S_BODY_DECODE:
 		{
 			size_t consumed = 0;
-			std::cout << "ici\n";
 			bool finished = m_bodyDecoder->consume(m_client.in().storage(), m_client.body(), consumed);
 
 			m_client.in().skip(consumed);

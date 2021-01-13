@@ -112,6 +112,8 @@ HTTPResponse::store(BaseBuffer &buffer)
 	switch (m_state)
 	{
 		case S_NONE:
+			m_state = S_HEADERS;
+
 		case S_HEADERS:
 		{
 			buffer.store(HTTPStatusLine(*status().get()).format());

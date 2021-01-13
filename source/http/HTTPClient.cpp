@@ -10,18 +10,25 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+#include <buffer/impl/BaseBuffer.hpp>
 #include <buffer/impl/FileDescriptorBuffer.hpp>
 #include <buffer/impl/SocketBuffer.hpp>
+#include <config/block/LocationBlock.hpp>
+#include <config/block/ServerBlock.hpp>
 #include <http/enums/HTTPMethod.hpp>
 #include <http/enums/HTTPStatus.hpp>
 #include <http/enums/HTTPVersion.hpp>
 #include <http/HTTPClient.hpp>
 #include <http/HTTPServer.hpp>
 #include <http/parser/exception/status/HTTPRequestHeaderTooBigException.hpp>
+#include <http/parser/exception/status/HTTPRequestPayloadTooLargeException.hpp>
 #include <http/parser/exception/status/HTTPRequestURLTooLongException.hpp>
+#include <http/response/body/IResponseBody.hpp>
 #include <http/task/HTTPTask.hpp>
 #include <log/Logger.hpp>
 #include <log/LoggerFactory.hpp>
+#include <sys/types.h>
+#include <unit/DataSize.hpp>
 #include <util/Enum.hpp>
 #include <util/helper/DeleteHelper.hpp>
 #include <util/Optional.hpp>
@@ -30,6 +37,7 @@
 #include <util/Time.hpp>
 #include <util/URL.hpp>
 #include <iostream>
+#include <typeinfo>
 
 Logger &HTTPClient::LOG = LoggerFactory::get("HTTP Client");
 
@@ -71,9 +79,6 @@ HTTPClient::~HTTPClient(void)
 void
 HTTPClient::reset()
 {
-	NIOSelector::instance().remove(m_socket);
-	NIOSelector::instance().add(m_socket, *this, NIOSelector::READ);
-
 	m_parser.reset();
 	m_body.clear();
 	m_state = S_NOT_STARTED;
@@ -83,6 +88,15 @@ HTTPClient::reset()
 	m_keepAlive = true;
 
 	updateLastAction();
+
+	NIOSelector::instance().remove(m_socket);
+	NIOSelector::instance().add(m_socket, *this, NIOSelector::READ);
+
+	if (!m_in.empty())
+	{
+		m_state = S_HEADER;
+		readHead();
+	}
 }
 
 void
@@ -128,9 +142,12 @@ HTTPClient::writable(FileDescriptor &fd)
 {
 	(void)fd;
 
+	if (!m_response.ended())
+		return (false);
+
 	bool finished = false;
-	if (m_out.capacity() && m_response.store(m_out))
-		finished = true;
+	if (m_response.store(m_out))
+		finished = m_out.empty();
 
 	ssize_t r = 0;
 	if ((r = m_out.send()) > 0)
@@ -138,18 +155,17 @@ HTTPClient::writable(FileDescriptor &fd)
 
 	if (r == -1)
 		delete this;
-	else if (finished && m_out.empty())
+	else if (finished)
 	{
+		log();
+
 		if (m_keepAlive)
-		{
-			log();
 			reset();
-		}
 		else
 			delete this;
 	}
 
-	return (finished);
+	return (false);
 }
 
 bool
@@ -161,7 +177,7 @@ HTTPClient::readable(FileDescriptor &fd)
 	bool cond = m_in.size() != 0 || (r = m_in.recv()) > 0;
 
 	if (r <= 0)
-		delete this;
+		delete this; /* Closed or error. */
 	else
 	{
 		if (cond)
@@ -173,15 +189,16 @@ HTTPClient::readable(FileDescriptor &fd)
 				case S_NOT_STARTED:
 					m_state = S_HEADER;
 
-			//		__attribute__ ((fallthrough));
+					//		__attribute__ ((fallthrough));
 
 				case S_HEADER:
-					return (readableHead());
+					return (readHead());
 
 				case S_BODY:
-					return (readableBody());
+					return (readBody());
 
 				case S_END:
+					std::cout << "S_END" << std::endl;
 					return (true);
 			}
 		}
@@ -191,7 +208,7 @@ HTTPClient::readable(FileDescriptor &fd)
 }
 
 bool
-HTTPClient::readableHead(void)
+HTTPClient::readHead(void)
 {
 	char c;
 
@@ -199,6 +216,7 @@ HTTPClient::readableHead(void)
 	{
 		bool catched = true;
 //		std::cout << c;
+
 		try
 		{
 			m_parser.consume(c);
@@ -208,26 +226,20 @@ HTTPClient::readableHead(void)
 				m_request = HTTPRequest(m_parser.version(), m_parser.url(), m_parser.headerFields());
 				m_filterChain.doChainingOf(FilterChain::S_BEFORE);
 
-				if (m_response.status().present())
+				if (m_response.ended()) /* Must be an error */
 				{
 					m_filterChain.doChainingOf(FilterChain::S_AFTER);
-					NIOSelector::instance().update(m_socket, NIOSelector::WRITE);
 					m_state = S_END;
 				}
 				else
 				{
 					if (m_request.method().present() && m_request.method().get()->hasBody())
 					{
-						std::cout << "body first\n";
-						// if (m_request.serverBlock().present() && m_request.serverBlock().get()->maxBodySize().present())
-						// 	m_parser.maxBodySize(m_request.serverBlock().get()->maxBodySize().get().toBytes());
 						long long maxBodySize = isMaxBodySize(m_request.serverBlock(), m_request.locationBlock());
-						//	std::cout << "max : " << maxBodySize << std::endl;
+
 						if (maxBodySize != -1)
-						{
 							m_parser.maxBodySize(maxBodySize);
-							//		std::cout << "max : " << maxBodySize << std::endl;
-						}
+
 						m_parser.state() = HTTPRequestParser::S_BODY;
 						m_state = S_BODY;
 						m_parser.consume(0);
@@ -241,7 +253,7 @@ HTTPClient::readableHead(void)
 							break;
 						}
 
-						return (readableBody());
+						return (readBody());
 					}
 					else
 					{
@@ -250,6 +262,7 @@ HTTPClient::readableHead(void)
 						m_state = S_END;
 					}
 				}
+
 				break;
 			}
 
@@ -273,7 +286,6 @@ HTTPClient::readableHead(void)
 		if (catched)
 		{
 			m_filterChain.doChainingOf(FilterChain::S_AFTER);
-			NIOSelector::instance().update(m_socket, NIOSelector::WRITE);
 			m_state = S_END;
 		}
 	}
@@ -282,7 +294,7 @@ HTTPClient::readableHead(void)
 }
 
 bool
-HTTPClient::readableBody(void)
+HTTPClient::readBody(void)
 {
 	char c;
 
@@ -301,19 +313,20 @@ HTTPClient::readableBody(void)
 				break;
 			}
 		}
-		catch (Exception &exception)
+		catch (HTTPRequestPayloadTooLargeException &exception)
 		{
-			std::cout << exception.message() << std::endl;
-			LOG.debug() << exception.message() << std::endl;
-			if (exception.message() == "Too large payload") /* TODO Change for a better exception */
-				m_response.status(*HTTPStatus::PAYLOAD_TOO_LARGE);
-			else
-				m_response.status(*HTTPStatus::UNPROCESSABLE_ENTITY); /* TODO Need more specific message based on the problem. */
+			m_response.status(*HTTPStatus::PAYLOAD_TOO_LARGE);
 			m_filterChain.doChainingOf(FilterChain::S_AFTER);
-			NIOSelector::instance().update(m_socket, NIOSelector::WRITE);
 			m_state = S_END;
 		}
-	} //TODO Fix when there is no body
+		catch (Exception &exception)
+		{
+			m_response.status(*HTTPStatus::UNPROCESSABLE_ENTITY); /* TODO Need more specific message based on the problem. */
+			m_filterChain.doChainingOf(FilterChain::S_AFTER);
+			m_state = S_END;
+		}
+	}
+
 	return (false);
 }
 

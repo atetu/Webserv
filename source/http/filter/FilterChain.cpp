@@ -55,24 +55,6 @@ FilterChain::next()
 }
 
 void
-FilterChain::doChaining()
-{
-	if (!m_beforePassed)
-	{
-		m_beforePassed = true;
-
-		doChainingOf(S_BEFORE);
-	}
-	else
-	{
-		if (m_response.status().absent())
-			doChainingOf(S_BETWEEN);
-
-		doChainingOf(S_AFTER);
-	}
-}
-
-void
 FilterChain::doChainingOf(State state)
 {
 	nextState(state);
@@ -102,7 +84,11 @@ FilterChain::nextState(State state)
 			m_current.push_back(&CGIFilter::instance());
 			m_current.push_back(&MethodHandlingFilter::instance());
 
-//			__attribute__ ((fallthrough));
+			m_current.push_back(&ErrorFilter::instance()); /* Same as S_AFTER .*/
+			m_current.push_back(&HeadFilter::instance());
+			m_current.push_back(&FinalFilter::instance());
+
+			break;
 		}
 
 		case S_AFTER:

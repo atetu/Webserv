@@ -167,10 +167,10 @@ class HTTPClient :
 		readable(FileDescriptor &fd);
 
 		bool
-		readableHead(void);
+		readHead(void);
 
 		bool
-		readableBody(void);
+		readBody(void);
 
 		std::string&
 		body();

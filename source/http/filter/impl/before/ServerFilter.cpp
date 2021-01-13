@@ -57,6 +57,7 @@ ServerFilter::doFilter(HTTPClient &client, HTTPRequest &request, HTTPResponse &r
 	}
 
 	response.status(*HTTPStatus::NOT_FOUND);
+	response.end();
 }
 
 const ServerBlock*
