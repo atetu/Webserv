@@ -18,8 +18,9 @@
 extern std::map<std::string, std::list<TestCase> > g_test_units_and_cases;
 
 TestCase::TestCase() :
-		m_name(""),
-		m_location(""),
+		m_unit(),
+		m_name(),
+		m_location(),
 		m_function(NULL)
 {
 }
