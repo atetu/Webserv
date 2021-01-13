@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   FilterChain.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
+/*   By: atetu <atetu@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/06 18:46:58 by ecaceres          #+#    #+#             */
-/*   Updated: 2021/01/10 13:53:32 by alicetetu        ###   ########.fr       */
+/*   Updated: 2021/01/13 15:24:32 by atetu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -102,7 +102,7 @@ FilterChain::nextState(State state)
 			m_current.push_back(&CGIFilter::instance());
 			m_current.push_back(&MethodHandlingFilter::instance());
 
-			__attribute__ ((fallthrough));
+//			__attribute__ ((fallthrough));
 		}
 
 		case S_AFTER:

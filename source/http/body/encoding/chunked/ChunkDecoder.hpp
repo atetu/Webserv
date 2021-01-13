@@ -6,7 +6,7 @@
 /*   By: atetu <atetu@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/19 14:47:44 by alicetetu         #+#    #+#             */
-/*   Updated: 2021/01/12 18:16:08 by atetu            ###   ########.fr       */
+/*   Updated: 2021/01/13 15:14:30 by atetu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,17 +24,17 @@ class ChunkDecoder :
 
 	enum State
 		{
-			S_NOT_STARTED,
+			S_NOT_STARTED = 0,
 			S_SIZE,
-			S_EXTENSION,
-			S_SIZE_END,
+		//	S_EXTENSION,
+		//	S_SIZE_END,
 		//	S_SIZE_END2,
 			S_CHUNK,
 		//	S_CHUNK_END_EXPECTED,
 			S_CHUNK_END,
 			S_CHUNK_END2,
-			S_NULL,
-			S_END,
+		//	S_NULL,
+		//	S_END,
 			S_OVER
 		};
 
@@ -73,10 +73,7 @@ class ChunkDecoder :
 	private:
 		int m_sizeNb;
 		std::string m_sizeStr;
-		std::string m_parsedData;
 		std::string m_parsedChunk;
-		std::string m_extension;
-		char m_lastChar;
 		long long m_totalSize;
 };
 
