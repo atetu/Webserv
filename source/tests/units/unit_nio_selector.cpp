@@ -72,6 +72,28 @@ CASE("nio-selector", "update")
 	return (0);
 }
 
+CASE("nio-selector", "updateWithout")
+{
+	FileDescriptor fd0(0);
+	NIOSelector nioSelector;
+
+	NIOSelector::Callback callback;
+
+	nioSelector.add(fd0, callback);
+
+	nioSelector.updateWithout(fd0, NIOSelector::READ);
+	ASSERT(!nioSelector.readFds().test(0));
+	ASSERT(nioSelector.writeFds().test(0));
+	ASSERT(nioSelector.fds().test(0));
+
+	nioSelector.updateWithout(fd0, NIOSelector::WRITE);
+	ASSERT(!nioSelector.readFds().test(0));
+	ASSERT(!nioSelector.writeFds().test(0));
+	ASSERT(nioSelector.fds().test(0));
+
+	return (0);
+}
+
 CASE("nio-selector", "remove")
 {
 	FileDescriptor fd0(0);

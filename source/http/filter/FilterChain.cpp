@@ -101,6 +101,8 @@ FilterChain::nextState(State state)
 		{
 			m_current.push_back(&CGIFilter::instance());
 			m_current.push_back(&MethodHandlingFilter::instance());
+
+			__attribute__ ((fallthrough));
 		}
 
 		case S_AFTER:

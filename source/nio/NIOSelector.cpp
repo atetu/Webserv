@@ -70,33 +70,58 @@ NIOSelector::add(FileDescriptor &fd, Callback &callback, int operations)
 {
 	int raw = fd.raw();
 
-	addToSets(fd, operations);
+	addToSets(fd.raw(), operations);
 
 	m_callbacks[raw] = &callback;
 	m_fileDescriptors[raw] = &fd;
 
 	if (LOG.isTraceEnabled())
-		LOG.trace() << "Added: " << raw << "  (opts=" << operations << ")" << std::endl;
+		LOG.trace() << "Added: " << raw << " (opts=" << operations << ")" << std::endl;
 }
 
 void
 NIOSelector::update(FileDescriptor &fd, int operations)
 {
-	int opts = this->operations(fd);
+	update(fd.raw(), operations);
+}
+
+void
+NIOSelector::update(int fd, int operations)
+{
+	int opts = -42;
+	if (LOG.isTraceEnabled())
+		opts = this->operations(fd);
 
 	if (removeFromSets(fd))
 		addToSets(fd, operations);
 
 	if (LOG.isTraceEnabled())
-		LOG.trace() << "Updated: " << fd.raw() << "  (from opts= " << opts << ", to opts=" << operations << ")" << std::endl;
+		LOG.trace() << "Updated: " << fd << " (from opts=" << opts << ", to opts=" << operations << ")" << std::endl;
+}
+
+void
+NIOSelector::updateWithout(FileDescriptor &fd, int operations)
+{
+	updateWithout(fd.raw(), operations);
+}
+
+void
+NIOSelector::updateWithout(int fd, int operations)
+{
+	int opts = this->operations(fd);
+
+	if (opts != -1)
+		update(fd, opts & ~operations);
 }
 
 void
 NIOSelector::remove(FileDescriptor &fd)
 {
-	int opts = operations(fd);
+	int opts = -42;
+	if (LOG.isTraceEnabled())
+		opts = operations(fd);
 
-	if (removeFromSets(fd))
+	if (removeFromSets(fd.raw()))
 	{
 		int raw = fd.raw();
 
@@ -105,7 +130,7 @@ NIOSelector::remove(FileDescriptor &fd)
 		Collections::remove(m_fileDescriptors, raw);
 
 		if (LOG.isTraceEnabled())
-			LOG.trace() << "Removed: " << fd.raw() << "  (opts=" << opts << ")" << std::endl;
+			LOG.trace() << "Removed: " << fd.raw() << " (opts=" << opts << ")" << std::endl;
 	}
 	else
 	{
@@ -139,15 +164,25 @@ NIOSelector::select(FileDescriptorSet *read, FileDescriptorSet *write, struct ti
 		if (read)
 			for (int index = 0; index <= m_highest; index++)
 			{
-				if (read->test(index))
-					m_callbacks[index]->readable(*m_fileDescriptors[index]);
+				if (read->test(index) && m_read.test(index))
+				{
+					FileDescriptor &fd = *m_fileDescriptors[index];
+
+					if (m_callbacks[index]->readable(fd))
+						updateWithout(index, ACCEPT | READ);
+				}
 			}
-	
+
 		if (write)
 			for (int index = 0; index <= m_highest; index++)
 			{
-				if (write->test(index))
-					m_callbacks[index]->writable(*m_fileDescriptors[index]);
+				if (write->test(index) && m_write.test(index))
+				{
+					FileDescriptor &fd = *m_fileDescriptors[index];
+
+					if (m_callbacks[index]->writable(fd))
+						updateWithout(index, WRITE);
+				}
 			}
 	}
 
@@ -157,7 +192,13 @@ NIOSelector::select(FileDescriptorSet *read, FileDescriptorSet *write, struct ti
 int
 NIOSelector::operations(FileDescriptor &fd) const
 {
-	OperationConfigMap::const_iterator it = m_operationConfig.find(fd.raw());
+	return (operations(fd.raw()));
+}
+
+int
+NIOSelector::operations(int fd) const
+{
+	OperationConfigMap::const_iterator it = m_operationConfig.find(fd);
 	if (it == m_operationConfig.end())
 		return (-1);
 
@@ -183,46 +224,42 @@ NIOSelector::writeFds() const
 }
 
 void
-NIOSelector::addToSets(FileDescriptor &fd, int operations)
+NIOSelector::addToSets(int fd, int operations)
 {
-	int raw = fd.raw();
-
 	if (operations & (ACCEPT | READ))
-		m_read.set(raw);
+		m_read.set(fd);
 
 	if (operations & (WRITE))
-		m_write.set(raw);
+		m_write.set(fd);
 
-	m_fds.set(raw);
+	m_fds.set(fd);
 
-	if (raw > m_highest)
-		m_highest = raw;
+	if (fd > m_highest)
+		m_highest = fd;
 
-	m_operationConfig[raw] = operations;
+	m_operationConfig[fd] = operations;
 }
 
 bool
-NIOSelector::removeFromSets(FileDescriptor &fd)
+NIOSelector::removeFromSets(int fd)
 {
 	int opts = operations(fd);
 
 	if (opts != -1)
 	{
-		int raw = fd.raw();
-
 		if (opts)
 		{
 			if (opts & (ACCEPT | READ))
-				m_read.clear(raw);
+				m_read.clear(fd);
 
 			if (opts & (WRITE))
-				m_write.clear(raw);
+				m_write.clear(fd);
 		}
 
-		m_fds.clear(raw);
+		m_fds.clear(fd);
 
-		if (raw == m_highest)
-			m_highest--;
+		if (fd == m_highest)
+			recomputeHighestByDecreasing();
 
 		return (true);
 	}
@@ -250,6 +287,13 @@ void
 NIOSelector::debug(const Logger &logger, FileDescriptorSet &readFds, FileDescriptorSet &writeFds, bool forced)
 {
 	debug(logger, *this, readFds, writeFds, forced);
+}
+
+void
+NIOSelector::recomputeHighestByDecreasing()
+{
+	while (!m_fds.test(m_highest))
+		m_highest--;
 }
 
 void
@@ -309,6 +353,14 @@ NIOSelector::debug(const Logger &logger, const NIOSelector &selector, FileDescri
 				std::ostream &out = logger.trace();
 				for (int i = 0; i < highest; i++)
 					out << (i < 10 ? ' ' : Convert::toString(i)[1]);
+				out << std::endl;
+			}
+
+			if (highest >= 100)
+			{
+				std::ostream &out = logger.trace();
+				for (int i = 0; i < highest; i++)
+					out << (i < 100 ? ' ' : Convert::toString(i)[2]);
 				out << std::endl;
 			}
 		}

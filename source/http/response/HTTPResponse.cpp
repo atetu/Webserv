@@ -136,6 +136,8 @@ HTTPResponse::store(BaseBuffer &buffer)
 		case S_FLUSH:
 			return (buffer.empty());
 	}
+
+	return (false); /* Should not happen. */
 }
 
 void

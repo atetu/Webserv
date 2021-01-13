@@ -254,7 +254,7 @@ HTTPRequestParser::consume(char c)
 			if (c == 0)
 				break;
 
-			/* Falling */
+			__attribute__ ((fallthrough));
 
 		case S_BODY_DECODE:
 		{

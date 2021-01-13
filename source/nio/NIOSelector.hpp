@@ -69,6 +69,9 @@ class NIOSelector :
 		update(FileDescriptor &fd, int operations = READ | WRITE);
 
 		void
+		updateWithout(FileDescriptor &fd, int operations);
+
+		void
 		remove(FileDescriptor &fd);
 
 		int
@@ -88,10 +91,22 @@ class NIOSelector :
 
 	private:
 		void
-		addToSets(FileDescriptor &fd, int operations);
+		update(int fd, int operations);
+
+		void
+		updateWithout(int fd, int operations);
+
+		int
+		operations(int fd) const;
+
+		void
+		addToSets(int fd, int operations);
 
 		bool
-		removeFromSets(FileDescriptor &fd);
+		removeFromSets(int fd);
+
+		void
+		recomputeHighestByDecreasing();
 
 	public:
 		void

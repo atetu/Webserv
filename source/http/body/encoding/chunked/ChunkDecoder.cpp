@@ -38,8 +38,8 @@ ChunkDecoder::~ChunkDecoder()
 		m_sizeNb = strtol(hex_intro.c_str(), &endPtr, 16);			\
 		if (endPtr == hex_intro.c_str())							\
 			throw Exception ("Hexadecimal conversion impossible"); 	\
-		m_sizeStr = "";												\
-//		std::cout << "hex: " << hex_intro << std::endl; \
+		m_sizeStr = "";
+//		std::cout << "hex: " << hex_intro << std::endl;
 //		std::cout << "nb : " << m_sizeNb << std::endl;
 
 //std::string

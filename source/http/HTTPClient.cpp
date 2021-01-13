@@ -59,9 +59,9 @@ HTTPClient::~HTTPClient(void)
 
 	log();
 
+	NIOSelector::instance().remove(m_socket);
 	DeleteHelper::pointer(m_task);
 
-	NIOSelector::instance().remove(m_socket);
 	delete &m_socket;
 
 	httpServer().untrack(*this);
@@ -150,7 +150,7 @@ HTTPClient::readable(FileDescriptor &fd)
 				case S_NOT_STARTED:
 					m_state = S_HEADER;
 
-					/* Falling */
+					__attribute__ ((fallthrough));
 
 				case S_HEADER:
 					return (readableHead());
@@ -199,11 +199,11 @@ HTTPClient::readableHead(void)
 						// if (m_request.serverBlock().present() && m_request.serverBlock().get()->maxBodySize().present())
 						// 	m_parser.maxBodySize(m_request.serverBlock().get()->maxBodySize().get().toBytes());
 						long long maxBodySize = isMaxBodySize(m_request.serverBlock(), m_request.locationBlock());
-					//	std::cout << "max : " << maxBodySize << std::endl;
+						//	std::cout << "max : " << maxBodySize << std::endl;
 						if (maxBodySize != -1)
 						{
 							m_parser.maxBodySize(maxBodySize);
-					//		std::cout << "max : " << maxBodySize << std::endl;
+							//		std::cout << "max : " << maxBodySize << std::endl;
 						}
 						m_parser.state() = HTTPRequestParser::S_BODY;
 						m_state = S_BODY;
@@ -280,10 +280,10 @@ HTTPClient::readableBody(void)
 		}
 		catch (Exception &exception)
 		{
-			std::cout <<exception.message() << std::endl;
+			std::cout << exception.message() << std::endl;
 			LOG.debug() << exception.message() << std::endl;
 			if (exception.message() == "Too large payload")
-				m_response.status(*HTTPStatus::PAYLOAD_TOO_LARGE); 
+				m_response.status(*HTTPStatus::PAYLOAD_TOO_LARGE);
 			else
 				m_response.status(*HTTPStatus::UNPROCESSABLE_ENTITY); /* TODO Need more specific message based on the problem. */
 			m_filterChain.doChainingOf(FilterChain::S_AFTER);
@@ -315,13 +315,12 @@ HTTPClient::task(HTTPTask &task, bool removePrevious)
 	m_task = &task;
 }
 
-
 long long
 HTTPClient::isMaxBodySize(const Optional<const ServerBlock*> &serverBlock, const Optional<const LocationBlock*> &locationBlock)
 {
 	if (locationBlock.present() && (*locationBlock.get()).hasMaxBodySize())
 		return ((*locationBlock.get()).maxBodySize().get().toBytes());
-	
+
 	if (serverBlock.present() && (*serverBlock.get()).hasMaxBodySize())
 		return ((*serverBlock.get()).maxBodySize().get().toBytes());
 
