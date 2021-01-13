@@ -292,7 +292,7 @@ NIOSelector::debug(const Logger &logger, FileDescriptorSet &readFds, FileDescrip
 void
 NIOSelector::recomputeHighestByDecreasing()
 {
-	while (!m_fds.test(m_highest))
+	while (m_highest >= 0 && !m_fds.test(m_highest))
 		m_highest--;
 }
 

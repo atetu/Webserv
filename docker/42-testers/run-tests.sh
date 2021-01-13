@@ -2,14 +2,8 @@ FT_TESTER_DIR=YoupiBanane
 
 cp -r $FT_TESTER_DIR /tmp/$FT_TESTER_DIR
 
-valgrind --track-fds=yes --leak-check=full ./webserv -f conf2.json 2>&1 | tee valgrind_out.log &
+valgrind --track-fds=yes --leak-check=full ./webserv -f conf2.json &
 jobpid=$!
-
-while ! grep 'Command:' valgrind_out.log
-do
-	echo 'waiting for server to start...'
-	sleep 1;
-done
 
 ./ubuntu_tester http://localhost:80
 out=$?
@@ -19,9 +13,6 @@ kill -s INT $jobpid
 
 echo "waiting for program exit"
 wait $jobpid
-
-printf "\n\n\n-- valgrind logs --\n"
-cat valgrind_out.log
 
 printf "\n\n\n-- files --\n"
 find $FT_TESTER_DIR
