@@ -150,7 +150,7 @@ HTTPClient::readable(FileDescriptor &fd)
 				case S_NOT_STARTED:
 					m_state = S_HEADER;
 
-					__attribute__ ((fallthrough));
+			//		__attribute__ ((fallthrough));
 
 				case S_HEADER:
 					return (readableHead());
