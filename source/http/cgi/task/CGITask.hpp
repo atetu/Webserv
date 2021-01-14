@@ -17,6 +17,7 @@
 #include <http/task/HTTPTask.hpp>
 #include <io/FileDescriptor.hpp>
 #include <nio/NIOSelector.hpp>
+#include <stddef.h>
 
 class CommonGatewayInterface;
 class HTTPClient;
@@ -25,6 +26,9 @@ class CGITask :
 		public HTTPTask,
 		public NIOSelector::Callback
 {
+	public:
+		static Logger &LOG;
+
 	private:
 		HTTPClient &m_client;
 		CommonGatewayInterface &m_cgi;

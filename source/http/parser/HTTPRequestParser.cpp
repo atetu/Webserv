@@ -12,15 +12,16 @@
 
 #include <buffer/impl/BaseBuffer.hpp>
 #include <buffer/impl/SocketBuffer.hpp>
-#include <exception/Exception.hpp>
 #include <http/body/encoding/HTTPBodyEncoding.hpp>
 #include <http/body/encoding/IHTTPBodyDecoder.hpp>
 #include <http/HTTPClient.hpp>
+#include <http/parser/exception/status/HTTPRequestPayloadTooLargeException.hpp>
 #include <http/parser/HTTPRequestParser.hpp>
 #include <libs/ft.hpp>
 #include <stddef.h>
 #include <util/helper/DeleteHelper.hpp>
 #include <util/Optional.hpp>
+#include <iostream>
 
 class HTTPClient;
 
@@ -264,7 +265,7 @@ HTTPRequestParser::consume(char c)
 
 			m_totalSize += consumed;
 			if (m_maxBodySize != -1 && m_totalSize > m_maxBodySize)
-				throw Exception("Too large payload");
+				throw HTTPRequestPayloadTooLargeException();
 
 			if (finished)
 				m_state = S_END;

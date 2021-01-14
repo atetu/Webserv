@@ -47,7 +47,7 @@
 			"maxBodySize": "1MB",
 			"errors": {
 				"500": "500.html",
-				"400": "not-found.html"
+				"404": "not-found.html"
 			},
 			"root": "../",
 			"methods": [

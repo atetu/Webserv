@@ -167,6 +167,9 @@ class HTTPClient :
 		readable(FileDescriptor &fd);
 
 		bool
+		doRead();
+
+		bool
 		readHead(void);
 
 		bool

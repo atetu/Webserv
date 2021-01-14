@@ -41,20 +41,18 @@ FileDescriptorBuffer::read(size_t len)
 	else
 		capacity = this->capacity();
 
-	if (capacity)
-	{
-		char rbuffer[capacity];
-		ssize_t r = m_fd.read(rbuffer, std::min(capacity, len));
+	if (!capacity)
+		capacity = 1;
 
-		if (r >= 0)
-			BaseBuffer::store(rbuffer, r);
+	char rbuffer[capacity];
+	ssize_t r = m_fd.read(rbuffer, std::min(capacity, len));
 
-		m_readEverything = r == 0;
+	if (r >= 0)
+		BaseBuffer::store(rbuffer, r);
 
-		return (r);
-	}
+	m_readEverything = r == 0;
 
-	return (0);
+	return (r);
 }
 
 ssize_t

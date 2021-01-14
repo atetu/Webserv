@@ -14,7 +14,8 @@
 # define OPTIONAL_HPP_
 
 #include <exception/Exception.hpp>
-#include <iostream>
+#include <stddef.h>
+#include <util/TypeTraits.hpp>
 
 template<typename T>
 	class Optional

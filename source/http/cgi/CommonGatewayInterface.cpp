@@ -39,6 +39,7 @@
 #include <iostream>
 #include <list>
 #include <map>
+#include <cstring>
 
 const std::string CommonGatewayInterface::ENV_AUTH_TYPE = "AUTH_TYPE";
 const std::string CommonGatewayInterface::ENV_CONTENT_LENGTH = "CONTENT_LENGTH";
@@ -183,6 +184,8 @@ CommonGatewayInterface::execute(HTTPClient &client, const CGIBlock &cgiBlock, co
 		}
 	}
 
+	LOG.info() << "execve: " << cgiBlock.path().get() << std::endl;
+
 	const HTTPHeaderFields &headers = request.headers();
 	for (HTTPHeaderFields::mconst_iterator it = headers.begin(); it != headers.end(); it++)
 		env.setProperty("HTTP_" + StringUtils::toUpperCase(StringUtils::replace(StringUtils::replace(it->first, '=', '_'), '-', '_')), it->second.front());
@@ -206,6 +209,12 @@ CommonGatewayInterface::execute(HTTPClient &client, const CGIBlock &cgiBlock, co
 
 	if (pid == 0)
 	{
+		std::string path = cgiBlock.path().get();
+		if (StringUtils::first(path) != '/')
+			path = File(File::currentDirectory(), path).path();
+
+		std::string file = File(request.root(), request.url().path()).path();
+
 		::chdir(request.root().c_str());
 
 		::dup2(inPipe[0], 0);
@@ -217,8 +226,7 @@ CommonGatewayInterface::execute(HTTPClient &client, const CGIBlock &cgiBlock, co
 //		if (cgiBlock.redirectErrToOut().orElse(true)) // TODO Need debug
 //			::dup2(1, 2);
 
-		std::string path = cgiBlock.path().get();
-		std::string file = File(request.root(), request.url().path()).path();
+		LOG.trace() << "execve: " << path << std::endl;
 
 		char *const argv[] = {
 			const_cast<char*>(path.c_str()), /* Dangerous, but kernel allocate it anyway... */
@@ -226,6 +234,9 @@ CommonGatewayInterface::execute(HTTPClient &client, const CGIBlock &cgiBlock, co
 			NULL };
 
 		::execve(path.c_str(), argv, envp);
+
+		std::cout << "Status: 500\r\n\r\nFAILED TO RUN CGI\n" << path << "\n" << std::strerror(errno) << std::flush;
+
 		::exit(1);
 		return (NULL); /* Should not happen. */
 	}

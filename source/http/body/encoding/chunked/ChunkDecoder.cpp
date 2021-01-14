@@ -55,7 +55,7 @@ ChunkDecoder::consume(const std::string &in, std::string &out, size_t &consumed)
 			case S_NOT_STARTED:
 			case S_SIZE:
 			{
-				std::cout << copy << std::endl;
+//				std::cout << copy << std::endl;
 				size_t found;
 				found = copy.find("\r\n");
 				
@@ -77,12 +77,12 @@ ChunkDecoder::consume(const std::string &in, std::string &out, size_t &consumed)
 					SIZE_CONVERSION();
 				
 					m_sizeStr = "";
-					std::cout << "NB: "<< m_sizeNb << std::endl;
+//					std::cout << "NB: "<< m_sizeNb << std::endl;
 					copy.erase(0, found + 2);
 				}
 				else
 				{
-					std::cout << "consumed: "<< consumed << std::endl;
+//					std::cout << "consumed: "<< consumed << std::endl;
 					return (false);
 				}
 

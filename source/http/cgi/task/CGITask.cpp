@@ -11,6 +11,7 @@
 /* ************************************************************************** */
 
 #include <buffer/impl/FileDescriptorBuffer.hpp>
+#include <exception/Exception.hpp>
 #include <http/cgi/CommonGatewayInterface.hpp>
 #include <http/cgi/task/CGITask.hpp>
 #include <http/enums/HTTPMethod.hpp>
@@ -22,11 +23,15 @@
 #include <http/response/body/impl/CGIResponseBody.hpp>
 #include <http/response/HTTPResponse.hpp>
 #include <io/Socket.hpp>
+#include <log/LoggerFactory.hpp>
 #include <sys/types.h>
 #include <util/Number.hpp>
 #include <util/Optional.hpp>
 #include <util/Singleton.hpp>
+#include <iostream>
 #include <string>
+
+Logger &CGITask::LOG = LoggerFactory::get("CGI Task");
 
 CGITask::CGITask(HTTPClient &client, CommonGatewayInterface &cgi) :
 		m_client(client),
@@ -91,50 +96,72 @@ CGITask::readable(FileDescriptor &fd)
 {
 	(void)fd;
 
-	m_bufferedOut.read(); // TODO Handle -1
+	ssize_t r = m_bufferedOut.read();
+	if (r == -1)
+	{
+		m_client.response().status(*HTTPStatus::INTERNAL_SERVER_ERROR);
+		m_client.filterChain().next();
+
+		NIOSelector::instance().update(m_client.socket(), NIOSelector::WRITE);
+		return (true);
+	}
 
 	if (m_headerFieldsParser.state() != HTTPHeaderFieldsParser::S_END)
 	{
 		char c;
-
 		bool parsed = false;
-		while (m_bufferedOut.peek(c))
-		{
-			m_headerFieldsParser.consume(c);
 
-			if (m_headerFieldsParser.state() == HTTPHeaderFieldsParser::S_END)
+		try
+		{
+			while (m_bufferedOut.peek(c))
 			{
-				parsed = true;
-				break;
+				m_headerFieldsParser.consume(c);
+				std::cout << c << std::flush;
+
+				if (m_headerFieldsParser.state() == HTTPHeaderFieldsParser::S_END)
+				{
+					parsed = true;
+					break;
+				}
+
+				m_bufferedOut.next(c);
 			}
 
-			m_bufferedOut.next(c);
+			if (parsed)
+			{
+				m_client.response().headers().merge(m_headerFieldsParser.headerFields());
+
+				Optional<std::string> statusOpt = m_headerFieldsParser.headerFields().get(HTTPHeaderFields::STATUS);
+				if (statusOpt.present())
+				{
+					std::string codePart = statusOpt.get().substr(0, statusOpt.get().find(' '));
+
+					int code = Number::parse<int>(codePart);
+					const HTTPStatus *newStatus = HTTPStatus::find(code);
+
+					if (newStatus)
+						m_client.response().status(*newStatus);
+				}
+
+				m_client.response().headers().chunkedTransferEncoding();
+				m_client.response().body(new CGIResponseBody(m_client, *this));
+				m_client.filterChain().next();
+
+				NIOSelector::instance().update(m_client.socket(), NIOSelector::WRITE);
+			}
+
+			return (false);
 		}
-
-		if (parsed)
+		catch (Exception &exception)
 		{
-			m_client.response().headers().merge(m_headerFieldsParser.headerFields());
+			LOG.warn() << "CGI produced an error: " << exception.message() << std::endl;
 
-			Optional<std::string> statusOpt = m_headerFieldsParser.headerFields().get(HTTPHeaderFields::STATUS);
-			if (statusOpt.present())
-			{
-				std::string codePart = statusOpt.get().substr(0, statusOpt.get().find(' '));
-
-				int code = Number::parse<int>(codePart);
-				const HTTPStatus *newStatus = HTTPStatus::find(code);
-
-				if (newStatus)
-					m_client.response().status(*newStatus);
-			}
-
-			m_client.response().headers().chunkedTransferEncoding();
-			m_client.response().body(new CGIResponseBody(m_client, *this));
+			m_client.response().status(*HTTPStatus::INTERNAL_SERVER_ERROR);
 			m_client.filterChain().next();
 
 			NIOSelector::instance().update(m_client.socket(), NIOSelector::WRITE);
+			return (true);
 		}
-
-		return (false);
 	}
 
 	if (m_bufferedOut.hasReadEverything())

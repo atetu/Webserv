@@ -24,6 +24,23 @@ template<typename T>
 			typedef T type;
 	};
 
+template<bool Condition, typename T, typename E>
+	struct enable_if_else
+	{
+	};
+
+template<typename T, typename E>
+	struct enable_if_else<true, T, E>
+	{
+			typedef T type;
+	};
+
+template<typename T, typename E>
+	struct enable_if_else<false, T, E>
+	{
+			typedef E type;
+	};
+
 template<typename T>
 	struct is_integral
 	{

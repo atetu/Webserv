@@ -33,20 +33,18 @@ SocketBuffer::recv(int flags, size_t len)
 	else
 		capacity = this->capacity();
 
-	if (capacity)
-	{
-		char rbuffer[capacity];
-		ssize_t r = static_cast<Socket&>(m_fd).recv(rbuffer, std::min(capacity, len), flags);
+	if (!capacity)
+		capacity = 1;
 
-		if (r >= 0)
-			BaseBuffer::store(rbuffer, r);
+	char rbuffer[capacity];
+	ssize_t r = static_cast<Socket&>(m_fd).recv(rbuffer, std::min(capacity, len), flags);
 
-		m_readEverything = r == 0;
+	if (r >= 0)
+		BaseBuffer::store(rbuffer, r);
 
-		return (r);
-	}
+	m_readEverything = r == 0;
 
-	return (1);
+	return (r);
 }
 
 ssize_t

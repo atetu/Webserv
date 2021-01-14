@@ -175,35 +175,44 @@ HTTPClient::readable(FileDescriptor &fd)
 {
 	(void)fd;
 
-	ssize_t r = 1;
-	bool cond = m_in.size() != 0 || (r = m_in.recv()) > 0;
-
-	if (r <= 0)
-		delete this; /* Closed or error. */
-	else
+	if (m_in.size())
 	{
-		if (cond)
+		if (m_in.recv(0, 1) <= 0)
 		{
-			updateLastAction();
-
-			switch (m_state)
-			{
-				case S_NOT_STARTED:
-					m_state = S_HEADER;
-
-					//		__attribute__ ((fallthrough));
-
-				case S_HEADER:
-					return (readHead());
-
-				case S_BODY:
-					return (readBody());
-
-				case S_END:
-					std::cout << "S_END" << std::endl;
-					return (true);
-			}
+			delete this;
+			return (true);
 		}
+
+		return (doRead());
+	}
+
+	if (m_in.recv() <= 0)
+	{
+		delete this;
+		return (true);
+	}
+
+	return (doRead());
+}
+
+bool
+HTTPClient::doRead(void)
+{
+	updateLastAction();
+
+	switch (m_state)
+	{
+		case S_NOT_STARTED:
+			m_state = S_HEADER;
+
+		case S_HEADER:
+			return (readHead());
+
+		case S_BODY:
+			return (readBody());
+
+		case S_END:
+			return (true);
 	}
 
 	return (false);
@@ -217,7 +226,6 @@ HTTPClient::readHead(void)
 	while (m_in.next(c))
 	{
 		bool catched = true;
-//		std::cout << c << " -- " << m_parser.state() << std::endl;
 
 		try
 		{
@@ -228,36 +236,33 @@ HTTPClient::readHead(void)
 				m_request = HTTPRequest(m_parser.version(), m_parser.url(), m_parser.headerFields());
 				m_filterChain.doChainingOf(FilterChain::S_BEFORE);
 
-				if (m_response.ended()) /* Must be an error */
+				if (m_response.ended())
 				{
 					m_filterChain.doChainingOf(FilterChain::S_AFTER);
 					m_state = S_END;
+					return (true);
+				}
+
+				if (m_request.method().get()->hasBody())
+				{
+					long long maxBodySize = isMaxBodySize(m_request.serverBlock(), m_request.locationBlock());
+
+					if (maxBodySize != -1)
+						m_parser.maxBodySize(maxBodySize);
+
+					m_parser.state() = HTTPRequestParser::S_BODY;
+					m_state = S_BODY;
+					m_parser.consume(0);
+
+					if (m_parser.state() != HTTPRequestParser::S_END) /* No body */
+						return (readBody());
 				}
 				else
 				{
-					if (m_request.method().get()->hasBody())
-					{
-						long long maxBodySize = isMaxBodySize(m_request.serverBlock(), m_request.locationBlock());
-
-						if (maxBodySize != -1)
-							m_parser.maxBodySize(maxBodySize);
-
-						m_parser.state() = HTTPRequestParser::S_BODY;
-						m_state = S_BODY;
-						m_parser.consume(0);
-
-						if (m_parser.state() != HTTPRequestParser::S_END) /* No body */
-							return (readBody());
-					}
-					else
-					{
-						NIOSelector::instance().update(m_socket, NIOSelector::NONE);
-						m_filterChain.doChainingOf(FilterChain::S_BETWEEN);
-						m_state = S_END;
-					}
+					NIOSelector::instance().update(m_socket, NIOSelector::NONE);
+					m_filterChain.doChainingOf(FilterChain::S_BETWEEN);
+					m_state = S_END;
 				}
-
-				break;
 			}
 
 			catched = false;
@@ -272,16 +277,19 @@ HTTPClient::readHead(void)
 		}
 		catch (Exception &exception)
 		{
-			LOG.debug() << exception.message() << std::endl;
+			LOG.debug() << "Failed to process header: " << exception.message() << std::endl;
 
 			m_response.status(*HTTPStatus::BAD_REQUEST);
 		}
 
 		if (catched)
 		{
+			LOG.debug() << "doing after" << std::endl;
 			NIOSelector::instance().update(m_socket, NIOSelector::NONE);
 			m_filterChain.doChainingOf(FilterChain::S_AFTER);
 			m_state = S_END;
+
+			break;
 		}
 	}
 
