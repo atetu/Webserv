@@ -37,10 +37,10 @@ class SocketBuffer :
 		~SocketBuffer();
 
 		ssize_t
-		recv(int flags = 0, size_t len = 2048);
+		recv(int flags = 0, size_t len = 32768);
 
 		ssize_t
-		send(int flags = 0, size_t len = 2048);
+		send(int flags = 0, size_t len = 32768);
 
 	public:
 		static SocketBuffer*

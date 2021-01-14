@@ -42,7 +42,12 @@ Socket::recv(void *buf, size_t len, int flags)
 {
 	ensureNotClosed();
 
-	return (::recv(m_fd, buf, len, flags));
+	ssize_t r = ::recv(m_fd, buf, len, flags);
+
+//	std::cout << "recv: " << r << std::endl;
+//	std::cout << "recv: " << std::string((char*)buf, r) << std::endl;
+
+	return (r);
 }
 
 ssize_t
@@ -50,7 +55,11 @@ Socket::send(const void *buf, size_t len, int flags)
 {
 	ensureNotClosed();
 
-	return (::send(m_fd, buf, len, flags));
+	ssize_t r = ::send(m_fd, buf, len, flags);
+
+//	std::cout << "send: " << r << std::endl;
+
+	return (r);
 }
 
 void

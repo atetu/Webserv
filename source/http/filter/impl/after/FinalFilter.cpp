@@ -47,11 +47,11 @@ FinalFilter::operator=(const FinalFilter &other)
 void
 FinalFilter::doFilter(HTTPClient &client, UNUSED HTTPRequest &request, HTTPResponse &response, FilterChain &next)
 {
-	if (request.headers().get(HTTPHeaderFields::CONNECTION).equals(HTTPHeaderFields::CLOSE))
-	{
+//	if (response.status().equals(HTTPStatus::BAD_REQUEST) || request.headers().get(HTTPHeaderFields::CONNECTION).equals(HTTPHeaderFields::CLOSE))
+//	{
 		client.keepAlive(false);
 		response.headers().connection(HTTPHeaderFields::CLOSE);
-	}
+//	}
 
 	response.headers().date();
 	response.headers().server();

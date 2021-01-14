@@ -23,8 +23,7 @@
 				"/": {
 					"listing": true,
 					"methods": [
-						"GET",
-						"HEAD"
+						"GET"
 					],
 					"cgi": "cgi_test"
 				},
@@ -42,7 +41,6 @@
 				"/directory/": {
 					"methods": [
 						"GET",
-						"HEAD",
 						"POST"
 					],
 					"index": [

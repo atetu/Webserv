@@ -68,45 +68,45 @@ ErrorFilter::doFilter(UNUSED HTTPClient &client, UNUSED HTTPRequest &request, HT
 	if (response.body() && response.body()->isSelfManaged())
 		return (next());
 
-	if (!request.serverBlock().present())
-		return (next());
-
-	const ServerBlock &serverBlock = *request.serverBlock().get();
-
 	bool success = false;
-	if (serverBlock.errors().present())
+	if (request.serverBlock().present())
 	{
-		const CustomErrorMap &errorMap = serverBlock.errors().get();
-		if (errorMap.has(status))
+		const ServerBlock &serverBlock = *request.serverBlock().get();
+
+		if (serverBlock.errors().present())
 		{
-			File errorFile(request.root(), errorMap.get(status));
-
-			FileDescriptor *fd = NULL;
-			FileDescriptorBuffer *fdBuffer = NULL;
-			try
+			const CustomErrorMap &errorMap = serverBlock.errors().get();
+			if (errorMap.has(status))
 			{
-				fd = errorFile.open(O_RDONLY);
-				fdBuffer = FileDescriptorBuffer::from(*fd, FileDescriptorBuffer::CLOSE | FileDescriptorBuffer::DELETE);
+				File errorFile(request.root(), errorMap.get(status));
 
-				response.body(new FileResponseBody(*fdBuffer));
+				FileDescriptor *fd = NULL;
+				FileDescriptorBuffer *fdBuffer = NULL;
+				try
+				{
+					fd = errorFile.open(O_RDONLY);
+					fdBuffer = FileDescriptorBuffer::from(*fd, FileDescriptorBuffer::CLOSE | FileDescriptorBuffer::DELETE);
 
-				success = true;
-			}
-			catch (Exception &exception)
-			{
-				if (fdBuffer)
-					DeleteHelper::pointer<FileDescriptorBuffer>(fdBuffer);
-				else
-					DeleteHelper::pointer<FileDescriptor>(fd); /* In case of memory allocation failing for the body. */
+					response.body(new FileResponseBody(*fdBuffer));
 
-				if (LOG.isDebugEnabled())
-					LOG.debug() << "Failed to open custom error file: " << exception.message() << std::endl;
+					success = true;
+				}
+				catch (Exception &exception)
+				{
+					if (fdBuffer)
+						DeleteHelper::pointer<FileDescriptorBuffer>(fdBuffer);
+					else
+						DeleteHelper::pointer<FileDescriptor>(fd); /* In case of memory allocation failing for the body. */
+
+					if (LOG.isDebugEnabled())
+						LOG.debug() << "Failed to open custom error file: " << exception.message() << std::endl;
+				}
 			}
 		}
 	}
 
 	if (!success)
 		response.string(DefaultPages::instance().resolve(status));
-		
+
 	return (next());
 }

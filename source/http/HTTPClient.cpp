@@ -63,6 +63,8 @@ HTTPClient::HTTPClient(Socket &socket, InetSocketAddress socketAddress, HTTPServ
 
 HTTPClient::~HTTPClient(void)
 {
+	LOG.trace() << "Deleting: " << m_socket.raw() << std::endl;
+
 	delete &m_in;
 	delete &m_out;
 
@@ -79,6 +81,8 @@ HTTPClient::~HTTPClient(void)
 void
 HTTPClient::reset()
 {
+	LOG.trace() << "Resetting: " << m_socket.raw() << std::endl;
+
 	m_parser.reset();
 	m_body.clear();
 	m_state = S_NOT_STARTED;
@@ -145,9 +149,7 @@ HTTPClient::writable(FileDescriptor &fd)
 	if (!m_response.ended())
 		return (false);
 
-	bool finished = false;
-	if (m_response.store(m_out))
-		finished = m_out.empty();
+	bool finished = m_response.store(m_out);
 
 	ssize_t r = 0;
 	if ((r = m_out.send()) > 0)
@@ -155,7 +157,7 @@ HTTPClient::writable(FileDescriptor &fd)
 
 	if (r == -1)
 		delete this;
-	else if (finished)
+	else if (finished && m_out.empty())
 	{
 		log();
 
@@ -215,7 +217,7 @@ HTTPClient::readHead(void)
 	while (m_in.next(c))
 	{
 		bool catched = true;
-//		std::cout << c;
+//		std::cout << c << " -- " << m_parser.state() << std::endl;
 
 		try
 		{
@@ -233,7 +235,7 @@ HTTPClient::readHead(void)
 				}
 				else
 				{
-					if (m_request.method().present() && m_request.method().get()->hasBody())
+					if (m_request.method().get()->hasBody())
 					{
 						long long maxBodySize = isMaxBodySize(m_request.serverBlock(), m_request.locationBlock());
 
@@ -244,16 +246,8 @@ HTTPClient::readHead(void)
 						m_state = S_BODY;
 						m_parser.consume(0);
 
-						if (m_parser.state() == HTTPRequestParser::S_END) /* No body */
-						{
-							NIOSelector::instance().update(m_socket, NIOSelector::NONE);
-							m_filterChain.doChainingOf(FilterChain::S_BETWEEN);
-							m_state = S_END;
-
-							break;
-						}
-
-						return (readBody());
+						if (m_parser.state() != HTTPRequestParser::S_END) /* No body */
+							return (readBody());
 					}
 					else
 					{
@@ -285,6 +279,7 @@ HTTPClient::readHead(void)
 
 		if (catched)
 		{
+			NIOSelector::instance().update(m_socket, NIOSelector::NONE);
 			m_filterChain.doChainingOf(FilterChain::S_AFTER);
 			m_state = S_END;
 		}

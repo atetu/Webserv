@@ -38,8 +38,9 @@ clean:
 re:
 	@$(PROJECT_MAKE) re
     
-rej16:
-	@$(PROJECT_MAKE) re -j 16
+rej:
+	@$(PROJECT_MAKE) fclean
+	@$(PROJECT_MAKE) all -j $(shell nproc)
 
 norm:
 	@$(PROJECT_MAKE) norm

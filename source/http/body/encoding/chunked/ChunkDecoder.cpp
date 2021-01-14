@@ -44,7 +44,7 @@ ChunkDecoder::~ChunkDecoder()
 bool
 ChunkDecoder::consume(const std::string &in, std::string &out, size_t &consumed)
 {
-std::cout << "IN: " << in.size() << std::endl;
+//std::cout << "IN: " << in.size() << std::endl;
 	switch (m_state)
 	{
 		case S_NOT_STARTED:

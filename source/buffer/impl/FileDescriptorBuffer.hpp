@@ -52,10 +52,10 @@ class FileDescriptorBuffer :
 		~FileDescriptorBuffer();
 
 		ssize_t
-		read(size_t len = 2048);
+		read(size_t len = 32768);
 
 		ssize_t
-		write(size_t len = 2048);
+		write(size_t len = 32768);
 
 		void
 		close(void);
