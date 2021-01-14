@@ -44,6 +44,20 @@ decode2(const char *str, const char *str2)
 	return (out);
 }
 
+static std::string
+decode3(const char *str, const char *str2, const char *str3)
+{
+	ChunkDecoder decoder(false);
+
+	size_t consumed = 0;
+	std::string out;
+	decoder.consume(str, out, consumed);
+	decoder.consume(str2, out, consumed);
+	decoder.consume(str3, out, consumed);
+
+	return (out);
+}
+
 CASE("chunked", "encode")
 {
 	ASSERT(encode("Hello") == "5\r\nHello\r\n0\r\n\r\n");
@@ -67,6 +81,15 @@ CASE("chunked", "decode2")
 
 	ASSERT(decode2("5\r\nHello\r\n0\r\n", "\r\n") == "Hello");
 	ASSERT(decode2("5\r\nWorld", "\r\n0\r\n\r\n") == "World");
+
+	return (0);
+}
+
+CASE("chunked", "decode3")
+{
+	ASSERT(decode3("5\r\nHello\r\n", "0\r\n", "\r\n") == "Hello");
+	ASSERT(decode3("5\r\nWorld\r\n", "0", "\r\n\r\n") == "World");
+	ASSERT(decode3("5", "\r\nWorld\r\n0", "\r\n\r\n") == "World");
 
 	return (0);
 }
