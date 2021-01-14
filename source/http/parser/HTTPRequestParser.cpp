@@ -6,7 +6,7 @@
 /*   By: atetu <atetu@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/27 17:29:02 by ecaceres          #+#    #+#             */
-/*   Updated: 2021/01/13 16:12:10 by atetu            ###   ########.fr       */
+/*   Updated: 2021/01/14 16:39:57 by atetu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -259,7 +259,7 @@ HTTPRequestParser::consume(char c)
 		{
 			size_t consumed = 0;
 			bool finished = m_bodyDecoder->consume(m_client.in().storage(), m_client.body(), consumed);
-
+			//std::cout << consumed << std::endl;
 			m_client.in().skip(consumed);
 
 			m_totalSize += consumed;
@@ -269,6 +269,7 @@ HTTPRequestParser::consume(char c)
 			if (finished)
 				m_state = S_END;
 
+			//std::cout << "finished: " << finished << std::endl;
 			break;
 		}
 

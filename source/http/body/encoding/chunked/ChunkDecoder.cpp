@@ -6,7 +6,7 @@
 /*   By: atetu <atetu@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/19 14:51:33 by alicetetu         #+#    #+#             */
-/*   Updated: 2021/01/14 15:02:37 by atetu            ###   ########.fr       */
+/*   Updated: 2021/01/14 18:22:22 by atetu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,14 +38,16 @@ ChunkDecoder::~ChunkDecoder()
 		if (endPtr == hex_intro.c_str())							\
 			throw Exception ("Hexadecimal conversion impossible"); 	\
 		m_sizeStr = "";												
-		// std::cout << "hex: " << hex_intro << std::endl; 			
-		// std::cout << "nb : " << m_sizeNb << std::endl;
+	//	 std::cout << "hex: " << hex_intro << std::endl; 			
+	//	 std::cout << "nb : " << m_sizeNb << std::endl;
 
 bool
 ChunkDecoder::consume(const std::string &in, std::string &out, size_t &consumed)
 {
-	//std::cout << "IN: " << in.size() << std::endl;
 	std::string copy = in;
+	
+	if (in.empty())
+		return (false);
 	while (1)
 	{
 		switch (m_state)
@@ -53,26 +55,34 @@ ChunkDecoder::consume(const std::string &in, std::string &out, size_t &consumed)
 			case S_NOT_STARTED:
 			case S_SIZE:
 			{
+				std::cout << copy << std::endl;
 				size_t found;
 				found = copy.find("\r\n");
+				
 				if (found != std::string::npos)
 				{
-					m_sizeStr = copy.substr(0, found);
+					if (found != 0)
+						m_sizeStr = copy.substr(0, found);
+					else
+						m_sizeStr = copy.substr(0, 1);
+					
 					consumed += found + 2;
 			
 					if (m_sizeStr.empty())
 					{
-						m_state = S_OVER;
-						return (true);
+						m_state = S_SIZE;
+						return (false);
 					}
 					
 					SIZE_CONVERSION();
 				
 					m_sizeStr = "";
+					std::cout << "NB: "<< m_sizeNb << std::endl;
 					copy.erase(0, found + 2);
 				}
 				else
 				{
+					std::cout << "consumed: "<< consumed << std::endl;
 					return (false);
 				}
 
@@ -91,7 +101,6 @@ ChunkDecoder::consume(const std::string &in, std::string &out, size_t &consumed)
 
 			case S_CHUNK:
 			{
-				
 				if (copy.size() <= (size_t)m_sizeNb)
 				{
 			
@@ -99,8 +108,6 @@ ChunkDecoder::consume(const std::string &in, std::string &out, size_t &consumed)
 					m_sizeNb -= copy.size();
 					consumed += copy.size();
 					copy.erase(0, std::string::npos);
-					return (false);
-					
 				}
 				else
 				{
@@ -108,23 +115,24 @@ ChunkDecoder::consume(const std::string &in, std::string &out, size_t &consumed)
 					out += m_parsedChunk;
 					consumed += m_sizeNb;
 					m_parsedChunk = "";
-					m_sizeNb = 0;
+					
 					copy.erase(0, m_sizeNb);
-			
+					m_sizeNb = 0;
 				}
-
+				
 				if (m_sizeNb == 0)
 				{
 					m_state = S_CHUNK_END;
 				}
-				
+				if (copy.empty())
+					return (false);
 				break;
 			}
 
 			case S_CHUNK_END:
 			{
 				size_t f;
-			
+				
 				f = copy.find("\r\n");
 				if (f != std::string::npos)
 				{
@@ -132,12 +140,18 @@ ChunkDecoder::consume(const std::string &in, std::string &out, size_t &consumed)
 					copy.erase(0, f + 2);
 					m_state = S_SIZE;
 				}
-			
+				else if ((f = copy.find("\r")) != std::string::npos)
+				{
+					consumed += f + 1;
+					copy.erase(0, f + 1);
+					m_state = S_CHUNK_END2;
+				}
 				else
 				{
 					return (false);
 				}
-				
+				if (copy.empty())
+					return (false);
 
 				break;
 			}
@@ -150,12 +164,16 @@ ChunkDecoder::consume(const std::string &in, std::string &out, size_t &consumed)
 				if (f != std::string::npos)
 				{
 					consumed += f + 1;
+					copy.erase(0, f + 1);
 					m_state = S_SIZE;
 				}
 				else if (copy.size() != 0)
 				{
 					m_state = S_CHUNK_END;
 				}
+				
+				if (copy.empty())
+					return (false);
 					
 				break;
 			}	

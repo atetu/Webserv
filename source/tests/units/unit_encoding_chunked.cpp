@@ -45,16 +45,24 @@ decode2(const char *str, const char *str2)
 }
 
 static std::string
-decode3(const char *str, const char *str2, const char *str3)
+decode3(std::string str, std::string str2, std::string str3)
 {
 	ChunkDecoder decoder(false);
+	// std::string copy1;
+	// std::string copy2;
+	// std::string copy3;
 
 	size_t consumed = 0;
 	std::string out;
 	decoder.consume(str, out, consumed);
+	if (consumed)
+		str.erase(0, consumed);
+	str2 = str +str2;
 	decoder.consume(str2, out, consumed);
+	str2.erase(0, consumed);
+	str3 = str2 +str3;
 	decoder.consume(str3, out, consumed);
-
+	
 	return (out);
 }
 
