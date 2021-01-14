@@ -6,7 +6,7 @@
 /*   By: atetu <atetu@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/19 14:51:33 by alicetetu         #+#    #+#             */
-/*   Updated: 2021/01/13 16:16:55 by atetu            ###   ########.fr       */
+/*   Updated: 2021/01/14 15:02:37 by atetu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,149 +44,126 @@ ChunkDecoder::~ChunkDecoder()
 bool
 ChunkDecoder::consume(const std::string &in, std::string &out, size_t &consumed)
 {
-//std::cout << "IN: " << in.size() << std::endl;
-	switch (m_state)
+	//std::cout << "IN: " << in.size() << std::endl;
+	std::string copy = in;
+	while (1)
 	{
-		case S_NOT_STARTED:
-		case S_SIZE:
+		switch (m_state)
 		{
-		//	std::cout << "size: "<< in << std::endl;
-			size_t found;
-			found = in.find("\r\n");
-			if (found != std::string::npos)
+			case S_NOT_STARTED:
+			case S_SIZE:
 			{
-				m_sizeStr = in.substr(0, found);
-			//	std::cout << "SIZE 1: "<< m_sizeStr << std::endl;
-				consumed += found + 2;
-			//	std::cout << "Consumed: "<< consumed << std::endl;
-				if (m_sizeStr.empty())
+				size_t found;
+				found = copy.find("\r\n");
+				if (found != std::string::npos)
+				{
+					m_sizeStr = copy.substr(0, found);
+					consumed += found + 2;
+			
+					if (m_sizeStr.empty())
+					{
+						m_state = S_OVER;
+						return (true);
+					}
+					
+					SIZE_CONVERSION();
+				
+					m_sizeStr = "";
+					copy.erase(0, found + 2);
+				}
+				else
+				{
+					return (false);
+				}
+
+				if (m_sizeNb == 0)
 				{
 					m_state = S_OVER;
 					return (true);
+				
+				}
+				else
+				{
+					m_state = S_CHUNK;	
+				}
+				break;
+			}
+
+			case S_CHUNK:
+			{
+				
+				if (copy.size() <= (size_t)m_sizeNb)
+				{
+			
+					out += copy;
+					m_sizeNb -= copy.size();
+					consumed += copy.size();
+					copy.erase(0, std::string::npos);
+					return (false);
+					
+				}
+				else
+				{
+					m_parsedChunk = copy.substr(0, m_sizeNb);
+					out += m_parsedChunk;
+					consumed += m_sizeNb;
+					m_parsedChunk = "";
+					m_sizeNb = 0;
+					copy.erase(0, m_sizeNb);
+			
 				}
 
-				SIZE_CONVERSION();
-			//	std::cout << "SIZE: "<< m_sizeNb << std::endl;
-				m_sizeStr = "";
+				if (m_sizeNb == 0)
+				{
+					m_state = S_CHUNK_END;
+				}
+				
+				break;
 			}
-			else
+
+			case S_CHUNK_END:
+			{
+				size_t f;
+			
+				f = copy.find("\r\n");
+				if (f != std::string::npos)
+				{
+					consumed += f + 2;
+					copy.erase(0, f + 2);
+					m_state = S_SIZE;
+				}
+			
+				else
+				{
+					return (false);
+				}
+				
+
+				break;
+			}
+			case S_CHUNK_END2:
 			{
 			
-				return (false);
-			}
-
-			if (m_sizeNb == 0)
-			{
-					//
-				m_state = S_OVER;
-			//	std::cout << "over\n";
-				return (true);
-				// std::cout << "data size: " << m_parsedData.size() << std::endl;
-				// break;
-			}
-			else
-			{
-				m_state = S_CHUNK;
-			//	std::cout << "chunk state\n";
-				
-			}
-			break;
-		}
-
-		case S_CHUNK:
-		{
-			size_t fn;
-			fn = in.find("\r\n");
-						
-			if (fn != std::string::npos)
-			{
-				//	std::cout << "found\n";
-			}
-	
-			if (in.size() <= (size_t)m_sizeNb)
-			{
-		
-				out += in;
-				m_sizeNb -= in.size();
-				consumed += in.size();
-				
-			}
-			else
-			{
-				m_parsedChunk = in.substr(0, m_sizeNb);
-				out += m_parsedChunk;
-				consumed += m_sizeNb;
-				m_parsedChunk = "";
-				m_sizeNb = 0;
-		
-			}
-
-			if (m_sizeNb == 0)
-			{
-				m_state = S_CHUNK_END;
-			}
+				size_t f;
 			
-			// std::cout << "sizeNB: " << m_sizeNb << std::endl;
-			// std::cout << "consumed: " << consumed << std::endl;
-			// std::cout << "out: " << out.size() << std::endl;
-			// std::cout << "state: " << m_state << std::endl;
-			break;
-		}
-
-		case S_CHUNK_END:
-		{
-		//	std::cout << "IBN:" ;
-			size_t f;
-		//	std::cout << "size: " << (int)in[0] << std::endl;;
-			f = in.find("\r\n");
-			if (f != std::string::npos)
-			{
-		//		std::cout << "chunk end\n";
-				consumed += f + 2;
-				//m_input.erase(0, f + 2);
-				m_state = S_SIZE;
-			}
-			else if ((f = in.find("\r")) != std::string::npos)
-			{
-				consumed += f + 1;
-				m_state = S_CHUNK_END2;
-			}
-			else
+				f = copy.find("\n");
+				if (f != std::string::npos)
+				{
+					consumed += f + 1;
+					m_state = S_SIZE;
+				}
+				else if (copy.size() != 0)
+				{
+					m_state = S_CHUNK_END;
+				}
+					
+				break;
+			}	
+		
+			case S_OVER:
 			{
 				return (true);
 			}
-				// if (in.size() == 0)
-				// {
-				// 	return (true);
-				// //	loop = false;
-				// }
-
-			break;
-		}
-		case S_CHUNK_END2:
-		{
-		//	std::cout << "IBN:" ;
-			size_t f;
-		//	std::cout << "size: " << (int)in[0] << std::endl;;
-			f = in.find("\n");
-			if (f != std::string::npos)
-			{
-			//	std::cout << "chunk end\n";
-				consumed += f + 1;
-				//m_input.erase(0, f + 2);
-				m_state = S_SIZE;
-			}
-			else if (in.size() != 0)
-			{
-				m_state = S_CHUNK_END;
-			}
-				
-			break;
-		}	
-	
-		case S_OVER:
-		{
-			return (true);
 		}
 	}
 
