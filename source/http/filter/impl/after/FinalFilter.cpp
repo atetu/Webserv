@@ -49,9 +49,14 @@ FinalFilter::doFilter(HTTPClient &client, UNUSED HTTPRequest &request, HTTPRespo
 {
 //	if (response.status().equals(HTTPStatus::BAD_REQUEST) || request.headers().get(HTTPHeaderFields::CONNECTION).equals(HTTPHeaderFields::CLOSE))
 //	{
-		client.keepAlive(false);
-		response.headers().connection(HTTPHeaderFields::CLOSE);
+	client.keepAlive(false);
+	response.headers().connection(HTTPHeaderFields::CLOSE);
 //	}
+
+	if (!response.body() && response.headers().get(HTTPHeaderFields::TRANSFER_ENCODING).otherwise(response.headers().get(HTTPHeaderFields::CONTENT_LENGTH)).absent())
+	{
+		response.headers().contentLength(0);
+	}
 
 	response.headers().date();
 	response.headers().server();

@@ -16,6 +16,7 @@
 #include <sys/errno.h>
 #include <sys/unistd.h>
 #include <unistd.h>
+#include <iostream>
 
 FileDescriptor::FileDescriptor(int fd) :
 		m_fd(fd),
@@ -37,6 +38,8 @@ FileDescriptor::read(void *buf, size_t nbyte)
 
 	ssize_t r = ::read(m_fd, buf, nbyte);
 
+	std::cout << m_fd << ": read()= " << r << std::endl;
+
 	if (!m_verified && r != -1)
 		m_verified = true;
 
@@ -49,6 +52,8 @@ FileDescriptor::write(const void *buf, size_t nbyte)
 	ensureNotClosed();
 
 	ssize_t r = ::write(m_fd, buf, nbyte);
+
+	std::cout << m_fd << ": write()= " << r << std::endl;
 
 	if (!m_verified && r != -1)
 		m_verified = true;

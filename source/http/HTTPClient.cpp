@@ -299,9 +299,7 @@ HTTPClient::readHead(void)
 bool
 HTTPClient::readBody(void)
 {
-	char c;
-
-	while (m_in.peek(c))
+	if (!m_in.empty())
 	{
 		try
 		{
@@ -312,8 +310,6 @@ HTTPClient::readBody(void)
 				NIOSelector::instance().update(m_socket, NIOSelector::NONE);
 				m_filterChain.doChainingOf(FilterChain::S_BETWEEN);
 				m_state = S_END;
-
-				break;
 			}
 		}
 		catch (HTTPRequestPayloadTooLargeException &exception)

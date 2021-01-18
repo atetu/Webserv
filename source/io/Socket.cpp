@@ -22,6 +22,7 @@
 #include <sys/socket.h>
 #include <util/helper/DeleteHelper.hpp>
 #include <util/Convert.hpp>
+#include <iostream>
 
 static const int g_true = 1;
 static int incre = 0;
@@ -44,6 +45,8 @@ Socket::recv(void *buf, size_t len, int flags)
 
 	ssize_t r = ::recv(m_fd, buf, len, flags);
 
+	std::cout << m_fd << ": recv()= " << r << std::endl;
+
 //	std::cout << "recv: " << r << std::endl;
 //	std::cout << "recv: " << std::string((char*)buf, r) << std::endl;
 
@@ -56,6 +59,8 @@ Socket::send(const void *buf, size_t len, int flags)
 	ensureNotClosed();
 
 	ssize_t r = ::send(m_fd, buf, len, flags);
+
+	std::cout << m_fd << ": send()= " << r << std::endl;
 
 //	std::cout << "send: " << r << std::endl;
 

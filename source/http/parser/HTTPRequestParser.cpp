@@ -260,7 +260,7 @@ HTTPRequestParser::consume(char c)
 		{
 			size_t consumed = 0;
 			bool finished = m_bodyDecoder->consume(m_client.in().storage(), m_client.body(), consumed);
-			//std::cout << consumed << std::endl;
+			std::cout << "consumed: " << consumed<< ", in size: " << m_client.in().storage().length() << ", body size: " << m_client.body().size() << ", first in body: " << (int)m_client.in().storage().c_str()[0] << ", finished: " << finished << std::endl;
 			m_client.in().skip(consumed);
 
 			m_totalSize += consumed;

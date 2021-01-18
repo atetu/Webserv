@@ -168,9 +168,9 @@ NIOSelector::select(FileDescriptorSet *read, FileDescriptorSet *write, struct ti
 				{
 					FileDescriptor &fd = *m_fileDescriptors[index];
 
-					LOG.trace() << "Calling readable(" << index << ");" << std::endl;
+//					LOG.trace() << "Calling readable(" << index << ");" << std::endl;
 					bool r = m_callbacks[index]->readable(fd);
-					LOG.trace() << "Returned from readable(" << index << "); -> " << r << std::endl;
+//					LOG.trace() << "Returned from readable(" << index << "); -> " << r << std::endl;
 
 					if (r)
 						updateWithout(index, ACCEPT | READ);
@@ -184,9 +184,9 @@ NIOSelector::select(FileDescriptorSet *read, FileDescriptorSet *write, struct ti
 				{
 					FileDescriptor &fd = *m_fileDescriptors[index];
 
-					LOG.trace() << "Calling writable(" << index << ");" << std::endl;
+//					LOG.trace() << "Calling writable(" << index << ");" << std::endl;
 					bool r = m_callbacks[index]->writable(fd);
-					LOG.trace() << "Returned from writable(" << index << "); -> " << r << std::endl;
+//					LOG.trace() << "Returned from writable(" << index << "); -> " << r << std::endl;
 
 					if (r)
 						updateWithout(index, WRITE);
