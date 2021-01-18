@@ -6,7 +6,7 @@
 /*   By: atetu <atetu@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/07 00:27:23 by ecaceres          #+#    #+#             */
-/*   Updated: 2021/01/12 15:14:10 by atetu            ###   ########.fr       */
+/*   Updated: 2021/01/18 10:43:28 by atetu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,11 +73,11 @@ CGIFilter::doFilter(UNUSED HTTPClient &client, UNUSED HTTPRequest &request, UNUS
 	if (!cgiBlock.hasExtension(extension))
 		return (next());
 
-	if (!request.targetFile().exists())
+	/*if (!request.targetFile().exists())
 	{
 		client.response().status(*HTTPStatus::NOT_FOUND);
 		return (next());
-	}
+	}*/
 
 	File cgiFile(cgiBlock.path().get());
 	if (!cgiFile.exists() || !cgiFile.isFile())

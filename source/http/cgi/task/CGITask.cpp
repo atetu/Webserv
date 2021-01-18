@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   CGITask.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ecaceres <ecaceres@student.42.fr>          +#+  +:+       +#+        */
+/*   By: atetu <atetu@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/12 16:41:55 by ecaceres          #+#    #+#             */
-/*   Updated: 2021/01/12 16:41:55 by ecaceres         ###   ########.fr       */
+/*   Updated: 2021/01/18 10:41:01 by atetu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -113,7 +113,7 @@ CGITask::readable(FileDescriptor &fd)
 
 		try
 		{
-			while (m_bufferedOut.peek(c))
+			while (m_bufferedOut.next(c))
 			{
 				m_headerFieldsParser.consume(c);
 				std::cout << c << std::flush;
@@ -123,8 +123,6 @@ CGITask::readable(FileDescriptor &fd)
 					parsed = true;
 					break;
 				}
-
-				m_bufferedOut.next(c);
 			}
 
 			if (parsed)
