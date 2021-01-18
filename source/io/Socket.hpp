@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Socket.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ecaceres <ecaceres@student.42.fr>          +#+  +:+       +#+        */
+/*   By: atetu <atetu@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/19 14:33:05 by ecaceres          #+#    #+#             */
-/*   Updated: 2020/10/19 14:33:05 by ecaceres         ###   ########.fr       */
+/*   Updated: 2021/01/18 16:56:07 by atetu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@ class Socket :
 		public FileDescriptor
 {
 	public:
-		static const int DEFAULT_BACKLOG = 50;
+		static const int DEFAULT_BACKLOG = 512;
 
 	private:
 		int m_incr;
