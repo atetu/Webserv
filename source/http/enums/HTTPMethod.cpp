@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HTTPMethod.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
+/*   By: atetu <atetu@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/27 17:32:53 by ecaceres          #+#    #+#             */
-/*   Updated: 2021/01/02 16:42:14 by alicetetu        ###   ########.fr       */
+/*   Updated: 2021/01/18 14:51:52 by atetu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,12 +17,13 @@
 #include <http/handler/methods/OptionsHandler.hpp>
 #include <http/handler/methods/PutHandler.hpp>
 #include <http/handler/methods/TraceHandler.hpp>
+#include <http/handler/methods/PostHandler.hpp>
 
 #define DEFINE_METHOD(name, hasBody, handler) ENUM_DEFINE(HTTPMethod, name, HTTPMethod(hasBody, &handler));
 
 DEFINE_METHOD(GET,/*     */false, GetHandler::instance());
 DEFINE_METHOD(HEAD,/*    */false, GetHandler::instance());
-DEFINE_METHOD(POST,/*     */true, PutHandler::instance());
+DEFINE_METHOD(POST,/*     */true, PostHandler::instance());
 DEFINE_METHOD(PUT,/*      */true, PutHandler::instance());
 DEFINE_METHOD(DELETE,/*  */false, DeleteHandler::instance());
 DEFINE_METHOD(CONNECT,/* */false, ConnectHandler::instance());

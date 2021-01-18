@@ -47,19 +47,19 @@ PostHandler::handle(HTTPClient &client, HTTPRequest &request, HTTPResponse &resp
 	bool justCreated = false;
 
 	std::string out;
-	targetFile.findExtension(targetFile.path(), out);
+	// targetFile.findExtension(targetFile.path(), out);
 
-	if (!targetFile.findMime(out, request))
-	{
-		response.status(*HTTPStatus::CONFLICT); // don't know the status 
-		return (true);
-	}
+	// if (!targetFile.findMime(out, request))
+	// {
+	// 	response.status(*HTTPStatus::OK); // don't know the status 
+	// 	return (true);
+	// }
 
 	if (targetFile.exists())
 	{
 		if (targetFile.isDirectory() || !targetFile.isFile())
 		{
-			response.status(*HTTPStatus::LOCKED);
+			response.status(*HTTPStatus::OK);
 			return (true);
 		}
 	}
