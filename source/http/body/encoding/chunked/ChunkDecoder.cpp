@@ -6,7 +6,7 @@
 /*   By: atetu <atetu@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/19 14:51:33 by alicetetu         #+#    #+#             */
-/*   Updated: 2021/01/18 14:39:53 by atetu            ###   ########.fr       */
+/*   Updated: 2021/01/19 11:57:28 by atetu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,9 +37,9 @@ ChunkDecoder::~ChunkDecoder()
 		m_sizeNb = strtol(hex_intro.c_str(), &endPtr, 16);			\
 		if (endPtr == hex_intro.c_str())							\
 			throw Exception ("Hexadecimal conversion impossible"); 	\
-		m_sizeStr = "";												\
-		 std::cout << "hex: " << hex_intro << std::endl; 			\
-		 std::cout << "nb : " << m_sizeNb << std::endl;
+		m_sizeStr = "";												
+		//  std::cout << "hex: " << hex_intro << std::endl; 			
+		//  std::cout << "nb : " << m_sizeNb << std::endl;
 
 bool
 ChunkDecoder::consume(const std::string &in, std::string &out, size_t &consumed)

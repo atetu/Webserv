@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Socket.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
+/*   By: atetu <atetu@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/19 14:33:05 by ecaceres          #+#    #+#             */
-/*   Updated: 2020/12/22 14:30:01 by alicetetu        ###   ########.fr       */
+/*   Updated: 2021/01/19 12:00:05 by atetu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,7 +45,7 @@ Socket::recv(void *buf, size_t len, int flags)
 
 	ssize_t r = ::recv(m_fd, buf, len, flags);
 
-	std::cout << m_fd << ": recv()= " << r << std::endl;
+//	std::cout << m_fd << ": recv()= " << r << std::endl;
 
 //	std::cout << "recv: " << r << std::endl;
 //	std::cout << "recv: " << std::string((char*)buf, r) << std::endl;
