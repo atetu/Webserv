@@ -76,3 +76,9 @@ HTTPVersion::format(void) const
 
 	return (stream.str());
 }
+
+bool
+HTTPVersion::isSupported(int major, int minor)
+{
+	return (major == 1 && minor == 1);
+}

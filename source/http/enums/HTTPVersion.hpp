@@ -46,6 +46,11 @@ class HTTPVersion
 		int
 		minor(void) const;
 
+	public:
+		static bool
+		isSupported(int major, int minor);
+
+	public:
 		static HTTPVersion HTTP_1_1;
 };
 

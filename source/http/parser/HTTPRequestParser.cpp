@@ -16,12 +16,12 @@
 #include <http/body/encoding/IHTTPBodyDecoder.hpp>
 #include <http/HTTPClient.hpp>
 #include <http/parser/exception/status/HTTPRequestPayloadTooLargeException.hpp>
+#include <http/parser/exception/version/UnsupportedHTTPVersion.hpp>
 #include <http/parser/HTTPRequestParser.hpp>
 #include <libs/ft.hpp>
 #include <stddef.h>
 #include <util/helper/DeleteHelper.hpp>
 #include <util/Optional.hpp>
-#include <iostream>
 
 class HTTPClient;
 
@@ -187,6 +187,9 @@ HTTPRequestParser::consume(char c)
 
 		case S_HTTP_MINOR:
 		{
+			if (!HTTPVersion::isSupported(m_minor, m_major))
+				throw UnsupportedHTTPVersion::of(m_minor, m_major);
+
 			if (c == '\r')
 				m_state = S_HTTP_END_R;
 			else if (c == '\n')

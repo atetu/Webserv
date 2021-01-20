@@ -12,8 +12,6 @@
 
 #include <buffer/impl/FileDescriptorBuffer.hpp>
 #include <buffer/impl/SocketBuffer.hpp>
-#include <config/block/LocationBlock.hpp>
-#include <config/block/ServerBlock.hpp>
 #include <http/enums/HTTPMethod.hpp>
 #include <http/enums/HTTPStatus.hpp>
 #include <http/enums/HTTPVersion.hpp>
@@ -23,11 +21,11 @@
 #include <http/parser/exception/status/HTTPRequestHeaderTooBigException.hpp>
 #include <http/parser/exception/status/HTTPRequestPayloadTooLargeException.hpp>
 #include <http/parser/exception/status/HTTPRequestURLTooLongException.hpp>
+#include <http/parser/exception/version/UnsupportedHTTPVersion.hpp>
 #include <http/task/HTTPTask.hpp>
 #include <log/Logger.hpp>
 #include <log/LoggerFactory.hpp>
 #include <sys/types.h>
-#include <unit/DataSize.hpp>
 #include <util/Enum.hpp>
 #include <util/helper/DeleteHelper.hpp>
 #include <util/Optional.hpp>
@@ -254,6 +252,10 @@ HTTPClient::readHead(void)
 			}
 
 			catched = false;
+		}
+		catch (UnsupportedHTTPVersion &exception)
+		{
+			m_response.status(*HTTPStatus::HTTP_VERSION_NOT_SUPPORTED);
 		}
 		catch (HTTPRequestHeaderTooBigException &exception)
 		{
