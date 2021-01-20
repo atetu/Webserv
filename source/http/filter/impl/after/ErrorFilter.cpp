@@ -62,8 +62,8 @@ ErrorFilter::doFilter(UNUSED HTTPClient &client, UNUSED HTTPRequest &request, HT
 		return (next());
 
 	const HTTPStatus &status = *response.status().get();
-//	if (!status.isError())
-//		return (next());
+	if (!status.isError())
+		return (next());
 
 	if (response.body() && response.body()->isSelfManaged())
 		return (next());
