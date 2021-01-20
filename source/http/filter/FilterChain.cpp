@@ -6,7 +6,7 @@
 /*   By: atetu <atetu@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/06 18:46:58 by ecaceres          #+#    #+#             */
-/*   Updated: 2021/01/13 15:24:32 by atetu            ###   ########.fr       */
+/*   Updated: 2021/01/20 14:58:47 by atetu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,7 +78,7 @@ FilterChain::nextState(State state)
 
 			break;
 		}
-
+	
 		case S_BETWEEN:
 		{
 			m_current.push_back(&CGIFilter::instance());

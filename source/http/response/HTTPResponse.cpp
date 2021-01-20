@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HTTPResponse.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
+/*   By: atetu <atetu@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/06 18:51:19 by ecaceres          #+#    #+#             */
-/*   Updated: 2021/01/10 12:31:35 by alicetetu        ###   ########.fr       */
+/*   Updated: 2021/01/19 16:42:47 by atetu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -120,6 +120,7 @@ HTTPResponse::store(BaseBuffer &buffer)
 			buffer.store(HTTP::CRLF);
 			buffer.store(headers().format());
 			buffer.store(HTTP::CRLF);
+			std::cout << buffer.storage() << std::endl;
 
 			if (!m_body)
 				return (true);

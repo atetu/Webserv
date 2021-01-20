@@ -6,7 +6,7 @@
 /*   By: atetu <atetu@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/28 14:33:42 by ecaceres          #+#    #+#             */
-/*   Updated: 2021/01/11 17:26:56 by atetu            ###   ########.fr       */
+/*   Updated: 2021/01/19 17:08:02 by atetu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -170,11 +170,11 @@ HTTPServer::untrack(HTTPClient &client)
 void
 HTTPServer::ending(HTTPClient &client)
 {
-//	untrack(client);
-//	m_endingClients.push_back(&client);
-//	NIOSelector::instance().update(client.socket(), NIOSelector::READ);
-//	std::cout << "ending " << client.socket().raw() << std::endl;
-	delete &client;
+	untrack(client);
+	m_endingClients.push_back(&client);
+	NIOSelector::instance().update(client.socket(), NIOSelector::READ);
+	std::cout << "ending " << client.socket().raw() << std::endl;
+//	delete &client;
 }
 
 HTTPServer::client_list::size_type

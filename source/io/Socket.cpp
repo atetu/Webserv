@@ -6,7 +6,7 @@
 /*   By: atetu <atetu@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/19 14:33:05 by ecaceres          #+#    #+#             */
-/*   Updated: 2021/01/19 12:00:05 by atetu            ###   ########.fr       */
+/*   Updated: 2021/01/19 16:42:52 by atetu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,9 +60,9 @@ Socket::send(const void *buf, size_t len, int flags)
 
 	ssize_t r = ::send(m_fd, buf, len, flags);
 
-	std::cout << m_fd << ": send()= " << r << std::endl;
+//	std::cout << m_fd << ": send()= " << r << std::endl;
 
-//	std::cout << "send: " << r << std::endl;
+	//std::cout << "send: " << r << std::endl;
 
 	return (r);
 }

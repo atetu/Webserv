@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ErrorFilter.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
+/*   By: atetu <atetu@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/07 00:30:02 by ecaceres          #+#    #+#             */
-/*   Updated: 2021/01/10 12:31:11 by alicetetu        ###   ########.fr       */
+/*   Updated: 2021/01/19 12:27:18 by atetu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,8 +62,8 @@ ErrorFilter::doFilter(UNUSED HTTPClient &client, UNUSED HTTPRequest &request, HT
 		return (next());
 
 	const HTTPStatus &status = *response.status().get();
-	if (!status.isError())
-		return (next());
+//	if (!status.isError())
+//		return (next());
 
 	if (response.body() && response.body()->isSelfManaged())
 		return (next());
