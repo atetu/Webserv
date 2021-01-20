@@ -36,13 +36,6 @@ class HTTPOrchestrator
 
 	private:
 		server_container m_servers;
-		fd_set m_fds;
-		int m_highestFd;
-		int m_fdCount;
-		std::map<int, HTTPServer const*> serverFds;
-		std::map<int, FileDescriptorBuffer*> fileReadFds;
-		std::map<int, HTTPClient*> clientFds;
-		std::map<int, FileDescriptorBuffer*> fileWriteFds;
 		bool m_running;
 		bool m_stopping;
 

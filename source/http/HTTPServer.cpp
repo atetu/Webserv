@@ -6,10 +6,12 @@
 /*   By: atetu <atetu@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/28 14:33:42 by ecaceres          #+#    #+#             */
-/*   Updated: 2021/01/19 17:08:02 by atetu            ###   ########.fr       */
+/*   Updated: 2021/01/11 17:26:56 by atetu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#include <config/block/RootBlock.hpp>
+#include <config/Configuration.hpp>
 #include <http/HTTPServer.hpp>
 #include <io/Socket.hpp>
 #include <log/Logger.hpp>
@@ -144,18 +146,10 @@ HTTPServer::readable(FileDescriptor &fd)
 	LOG.debug() << "Accepted: " << socketAddress.hostAddress() << " (fd=" << socket->raw() << ')' << std::endl;
 
 	HTTPClient &httpClient = *(new HTTPClient(*socket, socketAddress, *this));
-
-//	if (clientFds.size() >= (unsigned long)Configuration::instance().rootBlock().maxActiveClient().orElse(RootBlock::DEFAULT_MAX_ACTIVE_CLIENT))
-//	{
-//		httpClient.response().status(*HTTPStatus::SERVICE_UNAVAILABLE);
-//		httpClient.response().headers().retryAfter(10);
-//	}
-//
-//	LOG.info() << "accepted " << socketAddress.hostAddress() << std::endl;
-
 	m_clients.push_back(&httpClient);
 
-	NIOSelector::instance().add(httpClient.socket(), httpClient, NIOSelector::READ);
+	if (HTTPClient::INSTANCE_COUNT > Configuration::instance().rootBlock().maxActiveClient().orElse(RootBlock::DEFAULT_MAX_ACTIVE_CLIENT))
+		HTTPClient::setUnavailable(httpClient);
 
 	return (false);
 }
@@ -170,11 +164,11 @@ HTTPServer::untrack(HTTPClient &client)
 void
 HTTPServer::ending(HTTPClient &client)
 {
-	untrack(client);
-	m_endingClients.push_back(&client);
-	NIOSelector::instance().update(client.socket(), NIOSelector::READ);
-	std::cout << "ending " << client.socket().raw() << std::endl;
-//	delete &client;
+//	untrack(client);
+//	m_endingClients.push_back(&client);
+//	NIOSelector::instance().update(client.socket(), NIOSelector::READ);
+//	std::cout << "ending " << client.socket().raw() << std::endl;
+	delete &client;
 }
 
 HTTPServer::client_list::size_type

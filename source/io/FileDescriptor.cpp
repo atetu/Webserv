@@ -38,7 +38,7 @@ FileDescriptor::read(void *buf, size_t nbyte)
 
 	ssize_t r = ::read(m_fd, buf, nbyte);
 
-	//std::cout << m_fd << ": read()= " << r << std::endl;
+//	std::cout << m_fd << ": read()= " << r << std::endl;
 
 	if (!m_verified && r != -1)
 		m_verified = true;
@@ -53,7 +53,7 @@ FileDescriptor::write(const void *buf, size_t nbyte)
 
 	ssize_t r = ::write(m_fd, buf, nbyte);
 
-	//std::cout << m_fd << ": write()= " << r << std::endl;
+//	std::cout << m_fd << ": write()= " << r << std::endl;
 
 	if (!m_verified && r != -1)
 		m_verified = true;

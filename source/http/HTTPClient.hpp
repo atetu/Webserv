@@ -189,6 +189,12 @@ class HTTPClient :
 
 		void
 		keepAlive(bool keepAlive);
+
+	public:
+		static void setUnavailable(HTTPClient &client);
+
+	public:
+		static int INSTANCE_COUNT;
 };
 
 #endif /* HTTPCLIENT_HPP_ */

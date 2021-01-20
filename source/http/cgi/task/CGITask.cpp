@@ -6,7 +6,7 @@
 /*   By: atetu <atetu@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/12 16:41:55 by ecaceres          #+#    #+#             */
-/*   Updated: 2021/01/20 14:37:01 by atetu            ###   ########.fr       */
+/*   Updated: 2021/01/18 10:41:01 by atetu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -116,7 +116,7 @@ CGITask::readable(FileDescriptor &fd)
 			while (m_bufferedOut.next(c))
 			{
 				m_headerFieldsParser.consume(c);
-			//	std::cout << c << std::flush;
+//				std::cout << c << std::flush;
 
 				if (m_headerFieldsParser.state() == HTTPHeaderFieldsParser::S_END)
 				{

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   FinalFilter.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: atetu <atetu@student.42.fr>                +#+  +:+       +#+        */
+/*   By: ecaceres <ecaceres@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/07 01:19:41 by ecaceres          #+#    #+#             */
-/*   Updated: 2021/01/20 14:16:33 by atetu            ###   ########.fr       */
+/*   Updated: 2021/01/07 01:19:41 by ecaceres         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,11 +47,11 @@ FinalFilter::operator=(const FinalFilter &other)
 void
 FinalFilter::doFilter(HTTPClient &client, UNUSED HTTPRequest &request, HTTPResponse &response, FilterChain &next)
 {
-//	if (response.status().equals(HTTPStatus::BAD_REQUEST) || request.headers().get(HTTPHeaderFields::CONNECTION).equals(HTTPHeaderFields::CLOSE))
-//	{
-	client.keepAlive(true);
-	response.headers().connection(HTTPHeaderFields::KEEP_ALIVE);
-//	}
+	if (response.status().get()->isError() || request.headers().get(HTTPHeaderFields::CONNECTION).equals(HTTPHeaderFields::CLOSE))
+	{
+		client.keepAlive(false);
+		response.headers().connection(HTTPHeaderFields::CLOSE);
+	}
 
 	if (!response.body() && response.headers().get(HTTPHeaderFields::TRANSFER_ENCODING).otherwise(response.headers().get(HTTPHeaderFields::CONTENT_LENGTH)).absent())
 	{

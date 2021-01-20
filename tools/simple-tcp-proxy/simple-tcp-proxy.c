@@ -223,9 +223,11 @@ service_client(int cfd, int sfd)
 	if (x > 0) {
 	    if (FD_ISSET(cfd, &R)) {
 		n = read(cfd, cbuf+cbo, BUF_SIZE-cbo);
-		printf("READ %d `%s`\n", n, cbuf+cbo);
+//		printf("READ %d `%s`\n", n, cbuf+cbo);
+//		fflush(stdout);
 		syslog(LOG_INFO, "read %d bytes from CLIENT (%d)", n, cfd);
 		if (n > 0) {
+			write(1, cbuf+cbo, n);
 		    cbo += n;
 		} else {
 		    close(cfd);

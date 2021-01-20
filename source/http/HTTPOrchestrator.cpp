@@ -34,17 +34,9 @@ Logger &HTTPOrchestrator::LOG = LoggerFactory::get("Orchestrator");
 
 HTTPOrchestrator::HTTPOrchestrator(const server_container &servers) :
 		m_servers(servers),
-		m_fds(),
-		m_highestFd(0),
-		m_fdCount(0),
-		serverFds(),
-		fileReadFds(),
-		clientFds(),
-		fileWriteFds(),
 		m_running(false),
 		m_stopping(false)
 {
-	FD_ZERO(&m_fds);
 }
 
 HTTPOrchestrator::~HTTPOrchestrator()
