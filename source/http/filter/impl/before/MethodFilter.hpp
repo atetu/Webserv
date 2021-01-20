@@ -41,6 +41,10 @@ class MethodFilter :
 	public:
 		static bool
 		isAcceptable(const Optional<const ServerBlock*> &serverBlock, const Optional<const LocationBlock*> &locationBlock, const HTTPMethod &method);
+
+		static long
+		maxBodySizeFor(const Optional<const ServerBlock*> &serverBlock, const Optional<const LocationBlock*> &locationBlock);
+
 };
 
 #endif /* METHODFILTER_HPP_ */

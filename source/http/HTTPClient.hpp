@@ -184,9 +184,6 @@ class HTTPClient :
 		void
 		task(HTTPTask &task, bool removePrevious = true);
 
-		long long
-		isMaxBodySize(const Optional<const ServerBlock*> &serverBlock, const Optional<const LocationBlock*> &locationBlock);
-
 		void
 		keepAlive(bool keepAlive);
 

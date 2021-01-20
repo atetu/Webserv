@@ -124,9 +124,6 @@ class LocationBlock
 		bool
 		hasMethod(const std::string &name) const;
 
-		bool
-		hasMaxBodySize() const;
-
 	public:
 		static LocationBlock DEFAULT;
 };

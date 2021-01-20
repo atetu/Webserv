@@ -163,9 +163,6 @@ class ServerBlock
 
 		bool
 		hasMethod(const std::string &name) const;
-
-		bool
-		hasMaxBodySize() const;
 };
 
 #endif /* SERVERBLOCK_HPP_ */

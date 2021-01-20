@@ -152,12 +152,3 @@ LocationBlock::hasMethod(const std::string &name) const
 
 	return (std::find(methods.begin(), methods.end(), name) != methods.end());
 }
-
-bool
-LocationBlock::hasMaxBodySize() const
-{
-	if (!m_maxBodySize.present())
-		return (false);
-
-	return(true);
-}

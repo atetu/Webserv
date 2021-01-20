@@ -31,6 +31,7 @@ class RootBlock
 
 	public:
 		static const int DEFAULT_MAX_ACTIVE_CLIENT;
+		static const DataSize DEFAULT_MAX_BODY_SIZE;
 
 	private:
 		Optional<std::string> m_root;

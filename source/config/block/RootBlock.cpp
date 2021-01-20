@@ -11,9 +11,12 @@
 /* ************************************************************************** */
 
 #include <config/block/RootBlock.hpp>
+#include <exception/NullPointerException.hpp>
+#include <unit/DataSize.hpp>
 #include <util/helper/DeleteHelper.hpp>
 
 const int RootBlock::DEFAULT_MAX_ACTIVE_CLIENT = 60;
+const DataSize RootBlock::DEFAULT_MAX_BODY_SIZE = DataSize::ofMegabytes(1);
 
 RootBlock::RootBlock() :
 		m_root(),

@@ -10,6 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+#include <config/block/RootBlock.hpp>
 #include <config/block/ServerBlock.hpp>
 #include <http/enums/HTTPMethod.hpp>
 #include <http/enums/HTTPStatus.hpp>
@@ -20,6 +21,7 @@
 #include <http/parser/HTTPRequestParser.hpp>
 #include <http/request/HTTPRequest.hpp>
 #include <http/response/HTTPResponse.hpp>
+#include <unit/DataSize.hpp>
 #include <util/Enum.hpp>
 #include <util/Macros.hpp>
 
@@ -53,6 +55,9 @@ MethodFilter::doFilter(UNUSED HTTPClient &client, HTTPRequest &request, HTTPResp
 		const HTTPMethod &method = *methodPtr;
 		request.method(method);
 
+		if (method.hasBody())
+			client.parser().maxBodySize(maxBodySizeFor(request.serverBlock(), request.locationBlock()));
+
 		if (isAcceptable(request.serverBlock(), request.locationBlock(), method))
 			return (next());
 	}
@@ -60,8 +65,8 @@ MethodFilter::doFilter(UNUSED HTTPClient &client, HTTPRequest &request, HTTPResp
 	response.headers().allow(request.allowedMethods());
 	response.status(*HTTPStatus::METHOD_NOT_ALLOWED);
 	response.end();
+
 	return (next());
-//	client.in();
 }
 
 bool
@@ -73,5 +78,17 @@ MethodFilter::isAcceptable(const Optional<const ServerBlock*> &serverBlock, cons
 	if (serverBlock.present() && (*serverBlock.get()).hasMethod(method.name()))
 		return (true);
 
-	return (false /* TODO: For now */);
+	return (false);
+}
+
+long
+MethodFilter::maxBodySizeFor(const Optional<const ServerBlock*> &serverBlock, const Optional<const LocationBlock*> &locationBlock)
+{
+	if (locationBlock.present() && (*locationBlock.get()).maxBodySize().present())
+		return ((*locationBlock.get()).maxBodySize().get().toBytes());
+
+	if (serverBlock.present() && (*serverBlock.get()).maxBodySize().present())
+		return ((*serverBlock.get()).maxBodySize().get().toBytes());
+
+	return (RootBlock::DEFAULT_MAX_BODY_SIZE.toBytes());
 }

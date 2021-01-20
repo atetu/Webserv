@@ -179,17 +179,6 @@ HTTPClient::readable(FileDescriptor &fd)
 {
 	(void)fd;
 
-	if (m_in.size())
-	{
-		if (m_in.recv() <= 0)
-		{
-			delete this;
-			return (true);
-		}
-
-		return (doRead());
-	}
-
 	if (m_in.recv() <= 0)
 	{
 		delete this;
@@ -249,11 +238,6 @@ HTTPClient::readHead(void)
 
 				if (m_request.method().get()->hasBody())
 				{
-					long long maxBodySize = isMaxBodySize(m_request.serverBlock(), m_request.locationBlock());
-
-					if (maxBodySize != -1)
-						m_parser.maxBodySize(maxBodySize);
-
 					m_parser.state() = HTTPRequestParser::S_BODY;
 					m_state = S_BODY;
 					m_parser.consume(0);
@@ -352,18 +336,6 @@ HTTPClient::task(HTTPTask &task, bool removePrevious)
 		delete m_task;
 
 	m_task = &task;
-}
-
-long long
-HTTPClient::isMaxBodySize(const Optional<const ServerBlock*> &serverBlock, const Optional<const LocationBlock*> &locationBlock)
-{
-	if (locationBlock.present() && (*locationBlock.get()).hasMaxBodySize())
-		return ((*locationBlock.get()).maxBodySize().get().toBytes());
-
-	if (serverBlock.present() && (*serverBlock.get()).hasMaxBodySize())
-		return ((*serverBlock.get()).maxBodySize().get().toBytes());
-
-	return (-1);
 }
 
 void
