@@ -184,7 +184,7 @@ CommonGatewayInterface::execute(HTTPClient &client, const CGIBlock &cgiBlock, co
 		}
 	}
 
-	LOG.info() << "execve: " << cgiBlock.path().get() << std::endl;
+	LOG.debug() << "execve: " << cgiBlock.path().get() << std::endl;
 
 	const HTTPHeaderFields &headers = request.headers();
 	for (HTTPHeaderFields::mconst_iterator it = headers.begin(); it != headers.end(); it++)

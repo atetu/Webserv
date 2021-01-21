@@ -11,7 +11,6 @@
 /* ************************************************************************** */
 
 #include <http/enums/HTTPVersion.hpp>
-//#include <sys/sysmacros.h>
 #include <sstream>
 
 # ifdef _SYS_SYSMACROS_H

@@ -116,7 +116,6 @@ CGITask::readable(FileDescriptor &fd)
 			while (m_bufferedOut.next(c))
 			{
 				m_headerFieldsParser.consume(c);
-//				std::cout << c << std::flush;
 
 				if (m_headerFieldsParser.state() == HTTPHeaderFieldsParser::S_END)
 				{
@@ -163,9 +162,12 @@ CGITask::readable(FileDescriptor &fd)
 	}
 
 	if (m_bufferedOut.hasReadEverything())
+	{
 		NIOSelector::instance().remove(m_cgi.out());
+		return (true);
+	}
 
-	return (m_bufferedOut.hasReadEverything());
+	return (false);
 }
 
 bool
