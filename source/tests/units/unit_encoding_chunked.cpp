@@ -102,3 +102,11 @@ CASE("chunked", "decode3")
 	return (0);
 }
 
+CASE("chunked", "decode-broken")
+{
+	ASSERT(decode("5\r\nHelloXXXXXXXX\r\n5\r\nWorld\r\n0\r\n\r\n") == "HelloWorld");
+	ASSERT(decode("5\r\nHelloXXXXXXXX\r\n5\r\nWorld\r\n0\r\nXXXXXXXX\r\n\r\n") == "HelloWorld");
+
+	return (0);
+}
+
