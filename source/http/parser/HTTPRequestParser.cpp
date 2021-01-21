@@ -6,7 +6,7 @@
 /*   By: atetu <atetu@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/27 17:29:02 by ecaceres          #+#    #+#             */
-/*   Updated: 2021/01/18 15:13:54 by atetu            ###   ########.fr       */
+/*   Updated: 2021/01/21 13:46:51 by atetu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,6 +55,13 @@ HTTPRequestParser::consume(char c)
 	switch (m_state)
 	{
 		case S_NOT_STARTED:
+		{
+			if (c == '\r'|| c == '\n')
+				break;
+			else
+				m_state = S_METHOD;
+		}
+		
 		case S_METHOD:
 		{
 			if (c == ' ')
@@ -269,7 +276,7 @@ HTTPRequestParser::consume(char c)
 
 			m_totalSize += consumed;
 //			std::cout << "TOTAL SIZE: "<< m_client.body().size() << std::endl;
-//			std::cout << "MAX BODY SIZE: "<< m_maxBodySize << std::endl;
+			std::cout << "MAX BODY SIZE: "<< m_maxBodySize << std::endl;
 			if (m_maxBodySize != -1 && m_client.body().size() > m_maxBodySize)
 				throw HTTPRequestPayloadTooLargeException();
 
