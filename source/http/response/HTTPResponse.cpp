@@ -82,7 +82,6 @@ HTTPResponse::body(IResponseBody *body, bool deletePrevious)
 		delete m_body;
 
 	m_body = body;
-//	headers().contentLength(body->store().length());
 }
 
 IResponseBody*
@@ -120,7 +119,6 @@ HTTPResponse::store(BaseBuffer &buffer)
 			buffer.store(HTTP::CRLF);
 			buffer.store(headers().format());
 			buffer.store(HTTP::CRLF);
-			std::cout << buffer.storage() << std::endl;
 
 			if (!m_body)
 				return (true);

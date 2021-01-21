@@ -14,7 +14,7 @@
 # define ROOTBLOCK_HPP_
 
 #include <config/block/CGIBlock.hpp>
-#include <config/block/MimeBlock.hpp>
+#include <config/block/MIMEBlock.hpp>
 #include <config/block/ServerBlock.hpp>
 #include <util/Optional.hpp>
 #include <list>

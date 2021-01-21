@@ -14,7 +14,7 @@
 # define CONFIGURATION_HPP_
 
 #include <config/block/RootBlock.hpp>
-#include <http/mime/MimeRegistry.hpp>
+#include <http/mime/MIMERegistry.hpp>
 #include <json/JsonObject.hpp>
 #include <string>
 
@@ -70,12 +70,12 @@ class Configuration
 
 	private:
 		std::string m_file;
-		const MimeRegistry *m_mimeRegistry;
+		const MIMERegistry *m_mimeRegistry;
 		const RootBlock *m_rootBlock;
 
 	public:
 		Configuration(void);
-		Configuration(const std::string &file, const MimeRegistry &mimeRegistry, const RootBlock &rootBlock);
+		Configuration(const std::string &file, const MIMERegistry &mimeRegistry, const RootBlock &rootBlock);
 		Configuration(const Configuration &other);
 
 		virtual
@@ -90,7 +90,7 @@ class Configuration
 			return (m_file);
 		}
 
-		inline const MimeRegistry&
+		inline const MIMERegistry&
 		mimeRegistry(void) const
 		{
 			return (*m_mimeRegistry);

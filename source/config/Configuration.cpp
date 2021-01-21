@@ -15,13 +15,13 @@
 #include <config/block/container/CustomErrorMap.hpp>
 #include <config/block/CGIBlock.hpp>
 #include <config/block/LocationBlock.hpp>
-#include <config/block/MimeBlock.hpp>
+#include <config/block/MIMEBlock.hpp>
 #include <config/block/ServerBlock.hpp>
 #include <config/Configuration.hpp>
 #include <config/exceptions/ConfigurationBindException.hpp>
 #include <config/exceptions/ConfigurationValidateException.hpp>
 #include <exception/IllegalStateException.hpp>
-#include <http/mime/Mime.hpp>
+#include <http/mime/MIME.hpp>
 #include <json/JsonArray.hpp>
 #include <json/JsonBoolean.hpp>
 #include <json/JsonNumber.hpp>
@@ -53,7 +53,7 @@ Configuration::Configuration() :
 {
 }
 
-Configuration::Configuration(const std::string &file, const MimeRegistry &mimeRegistry, const RootBlock &rootBlock) :
+Configuration::Configuration(const std::string &file, const MIMERegistry &mimeRegistry, const RootBlock &rootBlock) :
 		m_file(file),
 		m_mimeRegistry(&mimeRegistry),
 		m_rootBlock(&rootBlock)
@@ -69,7 +69,7 @@ Configuration::Configuration(const Configuration &other) :
 
 Configuration::~Configuration()
 {
-	DeleteHelper::pointer<MimeRegistry>(m_mimeRegistry);
+	DeleteHelper::pointer<MIMERegistry>(m_mimeRegistry);
 	DeleteHelper::pointer<RootBlock>(m_rootBlock);
 }
 
@@ -110,7 +110,7 @@ Configuration::fromJsonFile(const std::string &path, bool ignoreMimeIncludesErro
 {
 	const JsonObject *jsonObject = &JsonBuilder::rootObject(path);
 	RootBlock *rootBlock = NULL;
-	MimeRegistry *mimeRegistry = NULL;
+	MIMERegistry *mimeRegistry = NULL;
 
 	try
 	{
@@ -127,7 +127,7 @@ Configuration::fromJsonFile(const std::string &path, bool ignoreMimeIncludesErro
 
 		LOG.trace() << "Filling MIME registry..." << std::endl;
 
-		mimeRegistry = new MimeRegistry();
+		mimeRegistry = new MIMERegistry();
 
 		if (rootBlock->mimeBlock().present())
 		{
@@ -161,11 +161,11 @@ Configuration::fromJsonFile(const std::string &path, bool ignoreMimeIncludesErro
 
 			if (mimeBlock.defines().present())
 			{
-				const std::list<Mime const*> &defines = mimeBlock.defines().get();
+				const std::list<MIME const*> &defines = mimeBlock.defines().get();
 
 				LOG.trace() << "From " << defines.size() << " define(s)." << std::endl;
 
-				for (std::list<Mime const*>::const_iterator it = defines.begin(); it != defines.end(); it++)
+				for (std::list<MIME const*>::const_iterator it = defines.begin(); it != defines.end(); it++)
 					mimeRegistry->add(*(*it));
 			}
 
@@ -292,7 +292,7 @@ Configuration::JsonBuilder::buildMimeBlock(const std::string &path, const JsonOb
 			std::string ipath = path + KEY_DOT KEY_MIME_DEFINE;
 			const JsonObject &object = JsonBinderHelper::jsonCast<JsonObject>(ipath, jsonObject.get(KEY_MIME_DEFINE));
 
-			mimeBlock->defines(JsonBinderHelper::buildBlocks<Mime, JsonArray>(ipath, object, Mime::builder));
+			mimeBlock->defines(JsonBinderHelper::buildBlocks<MIME, JsonArray>(ipath, object, MIME::builder));
 		}
 	}
 	catch (...)

@@ -14,4 +14,3 @@
 
 const std::string HTTP::SP = " ";
 const std::string HTTP::CRLF = "\r\n";
-

@@ -53,7 +53,7 @@ sighandler_term(int sig)
 	{
 		::signal(sig, SIG_DFL);
 		LOG.info() << "Graceful shutdown asked... (do CTRL-C again to quit immediately)" << std::endl;
-		httpOrchestrator->terminate();
+		httpOrchestrator->stop();
 	}
 }
 

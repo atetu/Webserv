@@ -13,7 +13,7 @@
 #include <dirent.h>
 #include <exception/IllegalStateException.hpp>
 #include <http/header/HTTPHeaderFields.hpp>
-#include <http/mime/MimeRegistry.hpp>
+#include <http/mime/MIMERegistry.hpp>
 #include <io/File.hpp>
 #include <io/FileDescriptor.hpp>
 #include <stdlib.h>

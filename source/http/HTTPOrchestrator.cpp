@@ -155,7 +155,7 @@ HTTPOrchestrator::start()
 }
 
 void
-HTTPOrchestrator::terminate()
+HTTPOrchestrator::stop()
 {
 	m_stopping = true;
 

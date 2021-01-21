@@ -13,21 +13,22 @@
 #ifndef MIMEREGISTRY_HPP_
 # define MIMEREGISTRY_HPP_
 
-#include <http/mime/Mime.hpp>
+#include <http/mime/MIME.hpp>
+#include <json/JsonObject.hpp>
+#include <stddef.h>
 #include <map>
 #include <string>
-#include <exception/IOException.hpp>
-#include <log/Logger.hpp>
-#include <json/JsonObject.hpp>
+
+class Logger;
 
 /**
  * MIME Registry to allow an easy mapping and reverse mapping between MIME string type notation (e.g. text/csv) and a corresponding file extension.
  * This class will especially be useful when returning a file as a response to a request.
  */
-class MimeRegistry
+class MIMERegistry
 {
 	private:
-		typedef std::map<std::string, Mime*> map;
+		typedef std::map<std::string, MIME*> map;
 		typedef map::const_iterator const_iterator;
 
 	public:
@@ -38,14 +39,14 @@ class MimeRegistry
 		map m_reverse_mapping; /* file extension -> mime */
 
 	public:
-		MimeRegistry(void);
-		MimeRegistry(const map &mapping, const map &reverse_mapping);
-		MimeRegistry(const MimeRegistry &other);
+		MIMERegistry(void);
+		MIMERegistry(const map &mapping, const map &reverse_mapping);
+		MIMERegistry(const MIMERegistry &other);
 
-		~MimeRegistry(void);
+		~MIMERegistry(void);
 
-		MimeRegistry&
-		operator =(const MimeRegistry &other);
+		MIMERegistry&
+		operator =(const MIMERegistry &other);
 
 	private:
 		/**
@@ -75,7 +76,7 @@ class MimeRegistry
 		 * @param mime MIME to add.
 		 */
 		void
-		add(const Mime &mime);
+		add(const MIME &mime);
 
 		/**
 		 * Clear all currently loaded MIME.
@@ -89,7 +90,7 @@ class MimeRegistry
 		 * @param type MIME type. (e.g. text/csv)
 		 * @return Found MIME instance. (or null if none)
 		 */
-		const Mime*
+		const MIME*
 		findByMimeType(const std::string &type) const;
 
 		/**
@@ -98,7 +99,7 @@ class MimeRegistry
 		 * @param type File extension. (without the dot `.`)
 		 * @return Found MIME instance. (or null if none)
 		 */
-		const Mime*
+		const MIME*
 		findByFileExtension(const std::string &extension) const;
 
 		/**

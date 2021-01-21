@@ -11,8 +11,8 @@
 /* ************************************************************************** */
 
 #include <http/header/HTTPHeaderFields.hpp>
-#include <http/mime/Mime.hpp>
-#include <http/mime/MimeRegistry.hpp>
+#include <http/mime/MIME.hpp>
+#include <http/mime/MIMERegistry.hpp>
 #include <util/Convert.hpp>
 #include <util/Enum.hpp>
 #include <util/Time.hpp>
@@ -150,9 +150,9 @@ HTTPHeaderFields::contentLength(size_t length)
 }
 
 HTTPHeaderFields&
-HTTPHeaderFields::contentType(const MimeRegistry &registry, const std::string &extension)
+HTTPHeaderFields::contentType(const MIMERegistry &registry, const std::string &extension)
 {
-	const Mime *mime = registry.findByFileExtension(extension);
+	const MIME *mime = registry.findByFileExtension(extension);
 
 	if (mime)
 		return (contentType(*mime));
@@ -167,13 +167,13 @@ HTTPHeaderFields::contentType(const std::string &mimeType)
 }
 
 HTTPHeaderFields&
-HTTPHeaderFields::contentType(const Mime &mime)
+HTTPHeaderFields::contentType(const MIME &mime)
 {
 	return (set(CONTENT_TYPE, mime.type()));
 }
 
 HTTPHeaderFields&
-HTTPHeaderFields::contentType(const Optional<const Mime*> &optional)
+HTTPHeaderFields::contentType(const Optional<const MIME*> &optional)
 {
 	if (optional.absent())
 		return (*this);

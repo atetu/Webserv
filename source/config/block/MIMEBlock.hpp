@@ -13,7 +13,7 @@
 #ifndef MIMEBLOCK_HPP_
 # define MIMEBLOCK_HPP_
 
-#include <http/mime/Mime.hpp>
+#include <http/mime/MIME.hpp>
 #include <util/Optional.hpp>
 #include <list>
 #include <string>
@@ -22,7 +22,7 @@ class MimeBlock
 {
 	private:
 		Optional<std::list<std::string> > m_includes;
-		Optional<std::list<Mime const*> > m_defines;
+		Optional<std::list<MIME const*> > m_defines;
 
 	private:
 		MimeBlock(const MimeBlock &other);
@@ -40,7 +40,7 @@ class MimeBlock
 		includes(const std::list<std::string> &includes);
 
 		MimeBlock&
-		defines(const std::list<Mime const*> &defines);
+		defines(const std::list<MIME const*> &defines);
 
 		const Optional<std::list<std::string> >&
 		includes() const
@@ -48,7 +48,7 @@ class MimeBlock
 			return (m_includes);
 		}
 
-		const Optional<std::list<Mime const*> >&
+		const Optional<std::list<MIME const*> >&
 		defines() const
 		{
 			return (m_defines);

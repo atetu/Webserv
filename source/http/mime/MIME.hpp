@@ -18,7 +18,7 @@
 #include <list>
 #include <string>
 
-class Mime
+class MIME
 {
 	public:
 		typedef std::string string;
@@ -30,13 +30,13 @@ class Mime
 		list m_extensions;
 
 	public:
-		Mime(void);
-		Mime(const string &type, const string &extension);
-		Mime(const string &type, const list &extensions);
-		Mime(const Mime &other);
+		MIME(void);
+		MIME(const string &type, const string &extension);
+		MIME(const string &type, const list &extensions);
+		MIME(const MIME &other);
 
-		Mime&
-		operator =(const Mime &other);
+		MIME&
+		operator =(const MIME &other);
 
 		const string&
 		type(void) const;
@@ -45,10 +45,10 @@ class Mime
 		extensions(void) const;
 
 	public:
-		static Mime*
+		static MIME*
 		builder(const std::string &path, const std::string &key, const JsonArray &jsonArray);
 
-		static std::list<Mime const*>
+		static std::list<MIME const*>
 		builder(const std::string &path, const JsonObject &jsonObject);
 };
 

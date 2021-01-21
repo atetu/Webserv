@@ -52,9 +52,8 @@ TraceHandler::handle(UNUSED HTTPClient &client,  HTTPRequest &request, HTTPRespo
 
 	std::string head = statusLine + request.headers().format("\n");
 
-	response.headers().httpMessage();
-	response.headers().contentLength(head.size());
 	response.string(head);
+	response.headers().httpMessage();
 
 	return (true);
 }
