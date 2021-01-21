@@ -61,7 +61,7 @@ MethodFilter::doFilter(UNUSED HTTPClient &client, HTTPRequest &request, HTTPResp
 		if (isAcceptable(request.serverBlock(), request.locationBlock(), method))
 			return (next());
 	}
-
+	std::cout << "Not allowed\n";
 	response.headers().allow(request.allowedMethods());
 	response.status(*HTTPStatus::METHOD_NOT_ALLOWED);
 	response.end();

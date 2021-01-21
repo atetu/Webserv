@@ -33,7 +33,7 @@ class ChunkDecoder :
 		//	S_CHUNK_END_EXPECTED,
 			S_CHUNK_END,
 			S_CHUNK_END2,
-		//	S_NULL,
+			S_NULL_END,
 		//	S_END,
 			S_OVER
 		};
@@ -56,7 +56,7 @@ class ChunkDecoder :
 		~ChunkDecoder();
 
 		bool
-		consume(const std::string &in, std::string &out, size_t &consumed);
+		consume(const std::string &in, std::string &out, size_t &consumed, bool max);
 
 		void
 		cleanup();

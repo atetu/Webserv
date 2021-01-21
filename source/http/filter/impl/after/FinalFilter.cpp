@@ -49,6 +49,7 @@ FinalFilter::doFilter(HTTPClient &client, UNUSED HTTPRequest &request, HTTPRespo
 {
 	if (response.status().get()->isError() || request.headers().get(HTTPHeaderFields::CONNECTION).equals(HTTPHeaderFields::CLOSE))
 	{
+	//	if (response.status().get() == HTTPRequest)
 		client.keepAlive(false);
 		response.headers().connection(HTTPHeaderFields::CLOSE);
 	}
