@@ -21,11 +21,9 @@ class StringUtils
 		StringUtils();
 		StringUtils(const StringUtils &other);
 
-	public:
 		virtual
 		~StringUtils();
 
-	private:
 		StringUtils&
 		operator=(const StringUtils &other);
 

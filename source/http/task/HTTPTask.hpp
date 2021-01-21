@@ -13,14 +13,15 @@
 #ifndef HTTPTASK_HPP_
 # define HTTPTASK_HPP_
 
-#include <task/Task.hpp>
-
-class HTTPTask :
-		public Task
+class HTTPTask
 {
 	public:
 		virtual
 		~HTTPTask();
+
+		/** @return Whether or not the task is still running. */
+		virtual bool
+		running() = 0;
 };
 
 #endif /* HTTPTASK_HPP_ */

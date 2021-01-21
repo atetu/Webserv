@@ -16,27 +16,6 @@
 #include <algorithm>
 #include <cctype>
 
-StringUtils::StringUtils()
-{
-}
-
-StringUtils::~StringUtils()
-{
-}
-
-StringUtils::StringUtils(const StringUtils &other)
-{
-	(void)other;
-}
-
-StringUtils&
-StringUtils::operator=(const StringUtils &other)
-{
-	(void)other;
-
-	return (*this);
-}
-
 std::string
 StringUtils::toUpperCase(const std::string &string) // TODO Find something faster, every solution on the internet are not allowed to us
 {
