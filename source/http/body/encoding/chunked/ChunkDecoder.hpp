@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ChunkDecoder.hpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: atetu <atetu@student.42.fr>                +#+  +:+       +#+        */
+/*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/19 14:47:44 by alicetetu         #+#    #+#             */
-/*   Updated: 2021/01/14 16:43:46 by atetu            ###   ########.fr       */
+/*   Updated: 2021/01/21 19:45:20 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,7 @@ class ChunkDecoder :
 		//	S_CHUNK_END_EXPECTED,
 			S_CHUNK_END,
 			S_CHUNK_END2,
-			S_NULL_END,
+		//	S_NULL_END,
 		//	S_END,
 			S_OVER
 		};

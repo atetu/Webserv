@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HTTPRequestParser.cpp                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: atetu <atetu@student.42.fr>                +#+  +:+       +#+        */
+/*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/27 17:29:02 by ecaceres          #+#    #+#             */
-/*   Updated: 2021/01/21 13:46:51 by atetu            ###   ########.fr       */
+/*   Updated: 2021/01/21 19:44:15 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,6 +65,7 @@ HTTPRequestParser::consume(char c)
 		
 		case S_METHOD:
 		{
+			m_max = false;
 			if (c == ' ')
 			{
 				if (m_state == S_NOT_STARTED)
@@ -276,7 +277,7 @@ HTTPRequestParser::consume(char c)
 			m_client.in().skip(consumed);
 
 			m_totalSize += consumed;
-			std::cout << "TOTAL SIZE: "<< m_totalSize << std::endl;
+			std::cout << "TOTAL SIZE: "<< m_client.body().size() << std::endl;
 			std::cout << "MAX BODY SIZE: "<< m_maxBodySize << std::endl;
 			if (m_maxBodySize != -1 && (long long)m_client.body().size() > m_maxBodySize)
 			{

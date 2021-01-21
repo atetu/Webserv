@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ChunkDecoder.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: atetu <atetu@student.42.fr>                +#+  +:+       +#+        */
+/*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/19 14:51:33 by alicetetu         #+#    #+#             */
-/*   Updated: 2021/01/21 13:44:30 by atetu            ###   ########.fr       */
+/*   Updated: 2021/01/21 19:45:12 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,9 +37,9 @@ ChunkDecoder::~ChunkDecoder()
 		m_sizeNb = strtol(hex_intro.c_str(), &endPtr, 16);			\
 		if (endPtr == hex_intro.c_str())							\
 			throw Exception ("Hexadecimal conversion impossible"); 	\
-		m_sizeStr = "";
-//		 std::cout << "hex: " << hex_intro << std::endl;
-//		 std::cout << "nb : " << m_sizeNb << std::endl;
+		m_sizeStr = "";												\
+		 std::cout << "hex: " << hex_intro << std::endl;			\
+		 std::cout << "nb : " << m_sizeNb << std::endl;
 
 bool
 ChunkDecoder::consume(const std::string &in, std::string &out, size_t &consumed, bool max)
@@ -88,8 +88,8 @@ ChunkDecoder::consume(const std::string &in, std::string &out, size_t &consumed,
 
 				if (m_sizeNb == 0)
 				{
-					m_state = S_NULL_END;
-				//return (true);
+					m_state = S_OVER;
+					return (true);
 				
 				}
 				else
@@ -179,33 +179,33 @@ ChunkDecoder::consume(const std::string &in, std::string &out, size_t &consumed,
 				break;
 			}	
 
-			case S_NULL_END:
-			{
-				size_t f;
-				std::cout << "NULL\n";
-				f = copy.find("\r\n");
-				if (f != std::string::npos)
-				{
-					consumed += f + 2;
-					copy.erase(0, f + 2);
-					m_state = S_OVER;
-					return (true);
-				}
-			//	else if ((f = copy.find("\r")) != std::string::npos)
-			//	{
-			//		consumed += f + 1;
-			//		copy.erase(0, f + 1);
-			//		m_state = S_NULL_END2;
-			//	}
-				else
-				{
-					return (true);
-				}
-				//if (copy.empty())
-				//	return (false);
+			// case S_NULL_END:
+			// // {
+			// 	size_t f;
+			// 	std::cout << "NULL\n";
+			// 	f = copy.find("\r\n");
+			// 	if (f != std::string::npos)
+			// 	{
+			// 		consumed += f + 2;
+			// 		copy.erase(0, f + 2);
+			// 		m_state = S_OVER;
+			// 		return (true);
+			// 	}
+			// //	else if ((f = copy.find("\r")) != std::string::npos)
+			// //	{
+			// //		consumed += f + 1;
+			// //		copy.erase(0, f + 1);
+			// //		m_state = S_NULL_END2;
+			// //	}
+			// 	else
+			// 	{
+			// 		return (true);
+			// 	}
+			// 	//if (copy.empty())
+			// 	//	return (false);
 
-				break;
-			}
+			// 	break;
+			// }
 			case S_OVER:
 			{
 				return (true);
