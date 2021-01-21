@@ -28,10 +28,9 @@
 #include <json/JsonReader.hpp>
 #include <json/JsonString.hpp>
 #include <json/JsonValue.hpp>
-#include <libs/ft.hpp>
 #include <log/Logger.hpp>
 #include <log/LoggerFactory.hpp>
-#include <stddef.h>
+#include <net/address/Inet4Address.hpp>
 #include <unit/DataSize.hpp>
 #include <util/Convert.hpp>
 #include <util/helper/DeleteHelper.hpp>
@@ -609,40 +608,13 @@ Configuration::Validator::validate(const RootBlock &rootBlock)
 		for (slist::const_iterator sit = serverBlocks.begin(); sit != serverBlocks.end(); sit++)
 		{
 			const ServerBlock &serverBlock = *(*sit);
-			
+
 			if (serverBlock.host().present())
 			{
-				std::string host = serverBlock.host().get();
-				size_t found;
-				int loop = 4;
-				while (loop--)
-				{
-					if (((found = host.find(".")) != std::string::npos) || loop == 0)
-					{
-						std::string subHost = host.substr(0, found);
-						host.erase(0, found + 1);
-//						std::cout << subHost << std::endl;
-						int res;
-						if (!subHost.empty() && subHost.size() <= 3)
-						{
-							size_t i = -1;
-							while (++i < subHost.size())
-							{
-//								std::cout << subHost[i] << std::endl;
-								if (!(ft::isdigit(subHost[i])))
-									throw ConfigurationValidateException("Host value should only be made of digits.");
-							}
-						}
-						else
-						{
-							throw ConfigurationValidateException("Host value should be made of 4 units, made up of 1 to 3 digits maximum, separated by dots.");
-						}
-						if (!((res = ft::atoi(subHost.c_str())) >= 0 && res <= 255))
-							throw ConfigurationValidateException("Host value should be made of 4 numbers, ranged between 0 and 255");
-					}
-					else
-						throw ConfigurationValidateException("Host value should be made of 4 units, made up of 1 to 3 digits maximum, separated by dots2.");
-				}
+				const std::string &host = serverBlock.host().get();
+
+				if (!Inet4Address::validate(host))
+					throw ConfigurationValidateException("Host IP is ill-formed `" + host + "`");
 			}
 
 			if (serverBlock.locations().present())
@@ -673,5 +645,5 @@ Configuration::Validator::validate(const RootBlock &rootBlock)
 		}
 	}
 	else
-		throw ConfigurationValidateException("No server slist found.");
+		throw ConfigurationValidateException("No server list found.");
 }

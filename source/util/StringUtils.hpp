@@ -45,6 +45,10 @@ class StringUtils
 		static char
 		last(const std::string &string);
 
+		static bool
+		all(const std::string &string, bool
+		(*predicate)(char));
+
 	public:
 		struct InsensitiveCompare
 		{

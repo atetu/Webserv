@@ -116,6 +116,16 @@ class Configuration
 	private:
 		class JsonBuilder
 		{
+			private:
+				JsonBuilder();
+				JsonBuilder(const JsonBuilder &other);
+
+				virtual
+				~JsonBuilder();
+
+				JsonBuilder&
+				operator=(const JsonBuilder &other);
+
 			public:
 				static const JsonObject&
 				rootObject(const std::string &filepath);
@@ -144,6 +154,16 @@ class Configuration
 
 		class Validator
 		{
+			private:
+				Validator();
+				Validator(const Validator &other);
+
+				virtual
+				~Validator();
+
+				JsonBuilder&
+				operator=(const Validator &other);
+
 			public:
 				static void
 				validate(const RootBlock &rootBlock);

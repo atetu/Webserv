@@ -27,6 +27,26 @@ CASE("net-address", "4")
 	return (0);
 }
 
+CASE("net-address", "4-validation")
+{
+	ASSERT(Inet4Address::validate("0.0.0.0"));
+	ASSERT(Inet4Address::validate("1.1.1.1"));
+	ASSERT(Inet4Address::validate("255.255.255.255"));
+	ASSERT(!Inet4Address::validate("a"));
+	ASSERT(!Inet4Address::validate("1.1.1.a"));
+	ASSERT(!Inet4Address::validate("1.1.1.1a"));
+	ASSERT(!Inet4Address::validate("1.1.1.1.1"));
+	ASSERT(!Inet4Address::validate("1.1.1"));
+	ASSERT(!Inet4Address::validate(""));
+	ASSERT(!Inet4Address::validate("a.a.a.a"));
+	ASSERT(!Inet4Address::validate("300.300.300.300"));
+	ASSERT(!Inet4Address::validate("11111.11111.11111.11111"));
+	ASSERT(!Inet4Address::validate("0.11111.0.0"));
+	ASSERT(!Inet4Address::validate("0 .0.0 .0"));
+
+	return (0);
+}
+
 CASE("net-address", "6")
 {
 	ASSERT(Inet6Address().hostAddress() == "0:0:0:0:0:0:0:0");
