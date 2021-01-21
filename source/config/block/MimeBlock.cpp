@@ -19,27 +19,9 @@ MimeBlock::MimeBlock() :
 {
 }
 
-MimeBlock::MimeBlock(const MimeBlock &other) :
-		m_includes(other.m_includes),
-		m_defines(other.m_defines)
-{
-}
-
 MimeBlock::~MimeBlock()
 {
 	DeleteHelper::pointers<Mime>(m_defines);
-}
-
-MimeBlock&
-MimeBlock::operator =(const MimeBlock &other)
-{
-	if (this != &other)
-	{
-		m_includes = other.m_includes;
-		m_defines = other.m_defines;
-	}
-
-	return (*this);
 }
 
 MimeBlock&

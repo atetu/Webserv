@@ -40,15 +40,17 @@ class RootBlock
 		Optional<clist> m_cgiBlocks;
 		Optional<long> m_maxActiveClient;
 
-	public:
-		RootBlock();
+	private:
 		RootBlock(const RootBlock &other);
-
-		virtual
-		~RootBlock();
 
 		RootBlock&
 		operator =(const RootBlock &other);
+
+	public:
+		RootBlock();
+
+		virtual
+		~RootBlock();
 
 		RootBlock&
 		root(const std::string &root);

@@ -28,38 +28,10 @@ ServerBlock::ServerBlock() :
 {
 }
 
-ServerBlock::ServerBlock(const ServerBlock &other) :
-		m_port(other.m_port),
-		m_host(other.m_host),
-		m_names(other.m_names),
-		m_maxBodySize(other.m_maxBodySize),
-		m_root(other.m_root),
-		m_locations(other.m_locations),
-		m_errors(other.m_errors)
-{
-}
-
 ServerBlock::~ServerBlock()
 {
-	DeleteHelper::pointers<LocationBlock>(m_locations);
-	DeleteHelper::pointer<AuthBlock>(m_auth);
-}
-
-ServerBlock&
-ServerBlock::operator =(const ServerBlock &other)
-{
-	if (this != &other)
-	{
-		m_port = other.m_port;
-		m_host = other.m_host;
-		m_names = other.m_names;
-		m_maxBodySize = other.m_maxBodySize;
-		m_root = other.m_root;
-		m_locations = other.m_locations;
-		m_errors = (other.m_errors);
-	}
-
-	return (*this);
+	DeleteHelper::pointers(m_locations);
+	DeleteHelper::pointer(m_auth);
 }
 
 ServerBlock&

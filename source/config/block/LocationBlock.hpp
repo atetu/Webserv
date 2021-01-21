@@ -32,16 +32,18 @@ class LocationBlock
 		Optional<AuthBlock const*> m_auth;
 		Optional<DataSize> m_maxBodySize;
 
-	public:
+	private:
 		LocationBlock(void);
-		LocationBlock(std::string path);
 		LocationBlock(const LocationBlock &other);
-
-		virtual
-		~LocationBlock();
 
 		LocationBlock&
 		operator=(const LocationBlock &other);
+
+	public:
+		LocationBlock(const std::string &path);
+
+		virtual
+		~LocationBlock();
 
 		LocationBlock&
 		methods(const std::list<std::string> &methods);
@@ -123,9 +125,6 @@ class LocationBlock
 
 		bool
 		hasMethod(const std::string &name) const;
-
-	public:
-		static LocationBlock DEFAULT;
 };
 
 #endif /* LOCATIONBLOCK_HPP_ */

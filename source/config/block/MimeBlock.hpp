@@ -24,15 +24,17 @@ class MimeBlock
 		Optional<std::list<std::string> > m_includes;
 		Optional<std::list<Mime const*> > m_defines;
 
-	public:
-		MimeBlock();
+	private:
 		MimeBlock(const MimeBlock &other);
-
-		virtual
-		~MimeBlock();
 
 		MimeBlock&
 		operator =(const MimeBlock &other);
+
+	public:
+		MimeBlock();
+
+		virtual
+		~MimeBlock();
 
 		MimeBlock&
 		includes(const std::list<std::string> &includes);
