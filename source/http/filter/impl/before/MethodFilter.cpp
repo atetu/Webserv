@@ -65,8 +65,6 @@ MethodFilter::doFilter(UNUSED HTTPClient &client, HTTPRequest &request, HTTPResp
 	response.headers().allow(request.allowedMethods());
 	response.status(*HTTPStatus::METHOD_NOT_ALLOWED);
 	response.end();
-
-	return (next());
 }
 
 bool

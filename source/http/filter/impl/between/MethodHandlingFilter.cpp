@@ -55,7 +55,9 @@ MethodHandlingFilter::doFilter(HTTPClient &client, HTTPRequest &request, HTTPRes
 
 	try
 	{
-		if (request.method().get()->handler().handle(client, request, response))
+		HTTPMethodHandler &methodHandler = request.method().get()->handler();
+
+		if (methodHandler.handle(client, request, response))
 			next();
 	}
 	catch (Exception &exception)
