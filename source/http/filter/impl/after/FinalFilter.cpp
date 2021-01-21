@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   FinalFilter.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ecaceres <ecaceres@student.42.fr>          +#+  +:+       +#+        */
+/*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/07 01:19:41 by ecaceres          #+#    #+#             */
-/*   Updated: 2021/01/07 01:19:41 by ecaceres         ###   ########.fr       */
+/*   Updated: 2021/01/21 18:35:58 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,9 +49,12 @@ FinalFilter::doFilter(HTTPClient &client, UNUSED HTTPRequest &request, HTTPRespo
 {
 	if (response.status().get()->isError() || request.headers().get(HTTPHeaderFields::CONNECTION).equals(HTTPHeaderFields::CLOSE))
 	{
-	//	if (response.status().get() == HTTPRequest)
-		client.keepAlive(false);
-		response.headers().connection(HTTPHeaderFields::CLOSE);
+		if (!(response.status().get() == HTTPStatus::PAYLOAD_TOO_LARGE))
+		{
+			std::cout << "HERE\n";
+			client.keepAlive(false);
+			response.headers().connection(HTTPHeaderFields::CLOSE);
+		}
 	}
 
 	if (!response.body() && response.headers().get(HTTPHeaderFields::TRANSFER_ENCODING).otherwise(response.headers().get(HTTPHeaderFields::CONTENT_LENGTH)).absent())
