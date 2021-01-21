@@ -7,7 +7,7 @@
 	},
 	"cgi": {
 		"cgi_test": {
-			"path": "./ubuntu_cgi_tester",
+			"path": "./cgi_tester",
 			"extensions": [
 				"bla"
 			]
@@ -30,7 +30,8 @@
 				"/put_test/": {
 					"methods": [
 						"PUT"
-					]
+					],
+					"maxBodySize": "100000000B"
 				},
 				"/post_body/": {
 					"methods": [
@@ -43,6 +44,7 @@
 						"GET",
 						"POST"
 					],
+					"maxBodySize": "100000000B",
 					"index": [
 						"youpi.bad_extension"
 					],
