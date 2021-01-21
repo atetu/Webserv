@@ -110,49 +110,10 @@ bool
 File::createNewFile(mode_t mode) const
 {
 	int fd;
+	if ((fd = ::open(m_path.c_str(), O_CREAT, mode)) == -1)
+		throw ioException();
 
-	// std::cout << "path: " <<  m_path << std::endl; // TODO split the path ind directories and sub directories
-	std::string copy = m_path;
-	std::string previousStr = "";
-	std::size_t found;
-	//found = copy.find('/');
-	while ((found = copy.find('/')) != std::string::npos)
-	{
-		// std::cout << "found: " << found << std::endl;
-		std::string newPath = copy.substr(0, found);
-		std::string remainedPath = copy.substr(found + 1, std::string::npos);
-		if (newPath == "./" || newPath == "/")
-		{
-			previousStr = newPath;
-			copy = remainedPath;
-			//	found = copy.find('/');
-		}
-		else
-		{
-			// std::cout << "new: " <<  newPath <<std::endl;
-			// std::cout << "rem: " <<  remainedPath <<std::endl;
-			File file(previousStr + "/" + newPath);
-			if (!file.exists())
-			{
-				// std::cout << "new file: " << file.path() << std::endl;
-				mkdir(file.path().c_str(), 0777);
-			}
-			previousStr = newPath;
-			copy = remainedPath;
-			//	found = copy.find('/');
-
-		}
-
-	}
-	// mkdir ("put_test/test",0777);
-	if ((fd = ::open(m_path.c_str(), O_CREAT, mode)) == -1) //TOTO create directory if needed
-	{
-		errno = 0;
-		//	std::cout << "error\n";
-		return (false); //TODO handle errors
-	}
-
-	close(fd);
+	::close(fd);
 
 	return (true);
 }
@@ -309,82 +270,6 @@ File::concatPaths(const std::string &a, const std::string &b)
 		return (a + b);
 
 	return (a + '/' + b);
-}
-
-bool
-File::findFilename(const std::string &path, std::string &out)
-{
-	if (path.empty())
-		return (false);
-
-	std::string::size_type lastSlashPos = path.rfind("/");
-
-	if (lastSlashPos != std::string::npos)
-		out = path.substr(lastSlashPos + 1);
-	else
-		out = path;
-
-	return (true);
-}
-
-bool
-File::findExtension(const std::string &path, std::string &out)
-{
-	std::string filename;
-	if (!File::findFilename(path, filename))
-		return (false);
-
-	std::string::size_type lastDotPos = filename.rfind(".");
-
-	if (lastDotPos == std::string::npos)
-		return (false);
-
-	out = filename.substr(lastDotPos + 1);
-
-	return (true);
-}
-
-bool
-File::findMime(std::string &out, HTTPRequest &request)
-{
-	const MimeRegistry &mimeRegistry = Configuration::instance().mimeRegistry();
-	std::string type = request.headers().get(HTTPHeaderFields::CONTENT_TYPE).orElse("");
-	//std::cout << "path inside mime: " << m_path << std::endl;
-	if (!type.empty())
-	{
-		const Mime *mime = mimeRegistry.findByMimeType(type);
-		if (mime == NULL)
-		{
-			//LOG.warn() << "Extension conversion not handled (1)" << std::endl;
-			return (false);
-		}
-
-		// std::string path = file.path();
-		std::size_t found = m_path.find_last_of(out);
-				
-		if (!out.empty())
-		{
-			Mime::iterator ext_it = std::find(mime->extensions().begin(), mime->extensions().end(), out);
-			if (ext_it != mime->extensions().end())
-				; // TODO Bad conditional
-			else if (ext_it == mime->extensions().end() && exists())
-			{
-			//	std::cout << "not handled\n";
-				//LOG.warn() << "Extension conversion not handled(2)" << std::endl;
-				return (false);
-			}
-			else
-			{
-			//	std::cout << "right\n";
-				m_path = m_path.substr(0, found) + "." + *(mime->extensions().begin());
-			}
-		}
-		
-		else if (!exists())
-			m_path = m_path + "." + *(mime->extensions().begin());
-	}
-//	std::cout << "path: "  << m_path << std::endl;
-	return (true);
 }
 
 File

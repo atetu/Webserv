@@ -45,7 +45,7 @@ DefaultPages::resolve(const HTTPStatus &httpStatus)
 				"			<h1>" + line + "</h1>\n"
 				"		</center>\n"
 				"		<hr>\n"
-				"		<center>" APPLICATION_NAME_AND_VERSION " (" PLATEFORM_NAME ")</center>\n"
+				"		<center>" APPLICATION_NAME_AND_VERSION " (" PLATFORM_NAME ")</center>\n"
 		"	</body>\n" /* <- Strange eclipse formatting bug */
 		"</html>\n";
 
