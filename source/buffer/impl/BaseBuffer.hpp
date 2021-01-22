@@ -86,7 +86,6 @@ class BaseBuffer :
 		inline std::string&
 		storage()
 		{
-			// std::cout << "storage size: " << m_storage.size() << std::endl;
 			return (m_storage);
 		}
 

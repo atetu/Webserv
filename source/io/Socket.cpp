@@ -6,7 +6,7 @@
 /*   By: atetu <atetu@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/19 14:33:05 by ecaceres          #+#    #+#             */
-/*   Updated: 2021/01/19 16:42:52 by atetu            ###   ########.fr       */
+/*   Updated: 2021/01/22 11:10:18 by atetu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,11 +45,6 @@ Socket::recv(void *buf, size_t len, int flags)
 
 	ssize_t r = ::recv(m_fd, buf, len, flags);
 
-//	std::cout << m_fd << ": recv()= " << r << std::endl;
-
-//	std::cout << "recv: " << r << std::endl;
-//	std::cout << "recv: " << std::string((char*)buf, r) << std::endl;
-
 	return (r);
 }
 
@@ -59,10 +54,6 @@ Socket::send(const void *buf, size_t len, int flags)
 	ensureNotClosed();
 
 	ssize_t r = ::send(m_fd, buf, len, flags);
-
-//	std::cout << m_fd << ": send()= " << r << std::endl;
-
-	//std::cout << "send: " << r << std::endl;
 
 	return (r);
 }

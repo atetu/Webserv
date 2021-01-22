@@ -6,7 +6,7 @@
 /*   By: atetu <atetu@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/28 11:33:47 by ecaceres          #+#    #+#             */
-/*   Updated: 2021/01/12 16:48:53 by atetu            ###   ########.fr       */
+/*   Updated: 2021/01/22 11:02:53 by atetu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -621,14 +621,12 @@ Configuration::Validator::validate(const RootBlock &rootBlock)
 					{
 						std::string subHost = host.substr(0, found);
 						host.erase(0, found + 1);
-//						std::cout << subHost << std::endl;
 						int res;
 						if (!subHost.empty() && subHost.size() <= 3)
 						{
 							size_t i = -1;
 							while (++i < subHost.size())
 							{
-//								std::cout << subHost[i] << std::endl;
 								if (!(ft::isdigit(subHost[i])))
 									throw ConfigurationValidateException("Host value should only be made of digits.");
 							}

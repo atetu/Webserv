@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   FinalFilter.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
+/*   By: atetu <atetu@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/07 01:19:41 by ecaceres          #+#    #+#             */
-/*   Updated: 2021/01/21 18:35:58 by alicetetu        ###   ########.fr       */
+/*   Updated: 2021/01/22 11:36:28 by atetu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,7 +51,6 @@ FinalFilter::doFilter(HTTPClient &client, UNUSED HTTPRequest &request, HTTPRespo
 	{
 		if (!(response.status().get() == HTTPStatus::PAYLOAD_TOO_LARGE))
 		{
-			std::cout << "HERE\n";
 			client.keepAlive(false);
 			response.headers().connection(HTTPHeaderFields::CLOSE);
 		}

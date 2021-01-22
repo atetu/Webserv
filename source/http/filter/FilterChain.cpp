@@ -6,7 +6,7 @@
 /*   By: atetu <atetu@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/06 18:46:58 by ecaceres          #+#    #+#             */
-/*   Updated: 2021/01/20 14:58:47 by atetu            ###   ########.fr       */
+/*   Updated: 2021/01/22 11:31:36 by atetu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,8 +47,6 @@ FilterChain::next()
 	{
 		Filter *filter = m_current.front();
 		m_current.pop_front();
-
-//		std::cout << typeid(*filter).name() << std::endl;
 
 		filter->doFilter(m_client, m_request, m_response, *this);
 	}

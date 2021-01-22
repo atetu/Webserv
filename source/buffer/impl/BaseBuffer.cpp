@@ -136,8 +136,6 @@ BaseBuffer::next(std::string &str, bool crlf)
 bool
 BaseBuffer::skip(size_t n)
 {
-//	std::cout << "buffer@" << (void*)this << ": skipping " << n << std::endl;
-
 	m_storage.erase(0, std::min(n, m_storage.length()));
 
 	return (!m_storage.empty());

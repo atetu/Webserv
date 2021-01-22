@@ -1,5 +1,5 @@
 {
-	"maxActiveClient": 60,
+	"maxActiveClient": 130,
 	"mime": {
 		"includes": [
 			"mime.json"

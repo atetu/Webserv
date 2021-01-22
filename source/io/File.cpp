@@ -6,7 +6,7 @@
 /*   By: atetu <atetu@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/21 23:36:43 by ecaceres          #+#    #+#             */
-/*   Updated: 2021/01/12 14:10:24 by atetu            ###   ########.fr       */
+/*   Updated: 2021/01/22 11:09:30 by atetu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -111,44 +111,33 @@ File::createNewFile(mode_t mode) const
 {
 	int fd;
 
-	// std::cout << "path: " <<  m_path << std::endl; // TODO split the path ind directories and sub directories
 	std::string copy = m_path;
 	std::string previousStr = "";
 	std::size_t found;
-	//found = copy.find('/');
+	
 	while ((found = copy.find('/')) != std::string::npos)
 	{
-		// std::cout << "found: " << found << std::endl;
 		std::string newPath = copy.substr(0, found);
 		std::string remainedPath = copy.substr(found + 1, std::string::npos);
 		if (newPath == "./" || newPath == "/")
 		{
 			previousStr = newPath;
 			copy = remainedPath;
-			//	found = copy.find('/');
 		}
 		else
 		{
-			// std::cout << "new: " <<  newPath <<std::endl;
-			// std::cout << "rem: " <<  remainedPath <<std::endl;
 			File file(previousStr + "/" + newPath);
 			if (!file.exists())
-			{
-				// std::cout << "new file: " << file.path() << std::endl;
 				mkdir(file.path().c_str(), 0777);
-			}
 			previousStr = newPath;
 			copy = remainedPath;
-			//	found = copy.find('/');
-
 		}
 
 	}
-	// mkdir ("put_test/test",0777);
 	if ((fd = ::open(m_path.c_str(), O_CREAT, mode)) == -1) //TOTO create directory if needed
 	{
 		errno = 0;
-		//	std::cout << "error\n";
+	
 		return (false); //TODO handle errors
 	}
 
@@ -349,17 +338,12 @@ File::findMime(std::string &out, HTTPRequest &request)
 {
 	const MimeRegistry &mimeRegistry = Configuration::instance().mimeRegistry();
 	std::string type = request.headers().get(HTTPHeaderFields::CONTENT_TYPE).orElse("");
-	//std::cout << "path inside mime: " << m_path << std::endl;
 	if (!type.empty())
 	{
 		const Mime *mime = mimeRegistry.findByMimeType(type);
 		if (mime == NULL)
-		{
-			//LOG.warn() << "Extension conversion not handled (1)" << std::endl;
 			return (false);
-		}
-
-		// std::string path = file.path();
+		
 		std::size_t found = m_path.find_last_of(out);
 				
 		if (!out.empty())
@@ -369,13 +353,10 @@ File::findMime(std::string &out, HTTPRequest &request)
 				; // TODO Bad conditional
 			else if (ext_it == mime->extensions().end() && exists())
 			{
-			//	std::cout << "not handled\n";
-				//LOG.warn() << "Extension conversion not handled(2)" << std::endl;
 				return (false);
 			}
 			else
 			{
-			//	std::cout << "right\n";
 				m_path = m_path.substr(0, found) + "." + *(mime->extensions().begin());
 			}
 		}
@@ -383,7 +364,6 @@ File::findMime(std::string &out, HTTPRequest &request)
 		else if (!exists())
 			m_path = m_path + "." + *(mime->extensions().begin());
 	}
-//	std::cout << "path: "  << m_path << std::endl;
 	return (true);
 }
 

@@ -6,7 +6,7 @@
 /*   By: atetu <atetu@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/06 18:51:19 by ecaceres          #+#    #+#             */
-/*   Updated: 2021/01/19 16:42:47 by atetu            ###   ########.fr       */
+/*   Updated: 2021/01/22 11:41:14 by atetu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,7 +82,6 @@ HTTPResponse::body(IResponseBody *body, bool deletePrevious)
 		delete m_body;
 
 	m_body = body;
-//	headers().contentLength(body->store().length());
 }
 
 IResponseBody*
@@ -120,8 +119,7 @@ HTTPResponse::store(BaseBuffer &buffer)
 			buffer.store(HTTP::CRLF);
 			buffer.store(headers().format());
 			buffer.store(HTTP::CRLF);
-			std::cout << buffer.storage() << std::endl;
-
+			
 			if (!m_body)
 				return (true);
 

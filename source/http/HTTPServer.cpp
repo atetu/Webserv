@@ -6,7 +6,7 @@
 /*   By: atetu <atetu@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/28 14:33:42 by ecaceres          #+#    #+#             */
-/*   Updated: 2021/01/11 17:26:56 by atetu            ###   ########.fr       */
+/*   Updated: 2021/01/22 11:05:12 by atetu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,15 +80,6 @@ HTTPServer::watchForTimeouts()
 			delete &client;
 		}
 	}
-//
-//	for (lst::iterator it = m_endingClients.begin(); it != m_endingClients.end();)
-//	{
-//		HTTPClient &client = *(*it);
-//		it++;
-//
-//		if (client.lastAction() + 5 < now)
-//			delete &client;
-//	}
 }
 
 Socket&
@@ -164,10 +155,6 @@ HTTPServer::untrack(HTTPClient &client)
 void
 HTTPServer::ending(HTTPClient &client)
 {
-//	untrack(client);
-//	m_endingClients.push_back(&client);
-//	NIOSelector::instance().update(client.socket(), NIOSelector::READ);
-//	std::cout << "ending " << client.socket().raw() << std::endl;
 	delete &client;
 }
 
