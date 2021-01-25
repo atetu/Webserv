@@ -8,9 +8,12 @@ A 42 project!
 		- [Options](#options)
 	- [Building](#building)
 	- [Project stucture](#project-stucture)
+	- [Tools](#tools)
+		- [Simple TCP Proxy](#simple-tcp-proxy)
+		- [slowcat](#slowcat)
+	- [Can it run Wordpress?](#can-it-run-wordpress)
 	- [Know issues](#know-issues)
 		- [Always timeout-ing socket](#always-timeout-ing-socket)
-		- [Can it run Wordpress?](#can-it-run-wordpress)
 	- [Team](#team)
 
 ## Goal
@@ -74,17 +77,25 @@ Some of the available commands are:
 | /source/unit         | Unit classes                              |
 | /source/util         | Utilities classes and helpers             |
 
+## Tools
+
+### Simple TCP Proxy
+
+Used to look at exactly what is send through a socket.
+
+### slowcat
+
+cat, but slower.
+
+## Can it run Wordpress?
+
+Yes. The docker even have one included with a MySQL ready to be used to install Wordpress on it! Do `make docker-run` and visit [http://localhost:80/wordpress](http://localhost/wordpress). (v. 5.6)
+
 ## Know issues
 
 ### Always timeout-ing socket
 
 Chrome always connect a second socket in case there is an immediate request to do. In contrary, if no such request need to be done, the socket is leaved empty without any data send and/or received. ([source](https://stackoverflow.com/a/5734486/7292958))
-
-### Can it run Wordpress?
-
-Yes. The docker even have one included with a MySQL ready to be used to install Wordpress on it! Do `make docker-run` and visit [http://localhost:80/wordpress](http://localhost/wordpress). (v. 5.6)
-
-But some of the part like `/wp-admin/customize.php` does not seems to work without adding `?wp_customize=on` to the URL.
 
 ## Team
 
