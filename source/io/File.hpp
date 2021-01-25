@@ -74,6 +74,9 @@ class File
 		isDirectory() const;
 
 		bool
+		isExecutable() const;
+
+		bool
 		createNewFile(mode_t mode = 0666) const;
 
 		FileDescriptor*
@@ -108,6 +111,10 @@ class File
 
 		std::list<File>
 		list() const;
+
+	private:
+		struct stat
+		doStat() const;
 
 	public:
 		static std::string

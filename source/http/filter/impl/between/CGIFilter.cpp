@@ -81,7 +81,7 @@ CGIFilter::doFilter(UNUSED HTTPClient &client, UNUSED HTTPRequest &request, UNUS
 	}
 
 	File cgiFile(cgiBlock.path().get());
-	if (!cgiFile.exists() || !cgiFile.isFile())
+	if (!cgiFile.exists() || !cgiFile.isFile() || !cgiFile.isExecutable())
 	{
 		client.response().status(*HTTPStatus::BAD_GATEWAY);
 		return (next());

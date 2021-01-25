@@ -85,21 +85,19 @@ File::exists() const
 bool
 File::isFile() const
 {
-	struct stat st;
-	if (::stat(m_path.c_str(), &st) == -1)
-		throw ioException();
-
-	return (S_ISREG(st.st_mode));
+	return (S_ISREG(doStat().st_mode));
 }
 
 bool
 File::isDirectory() const
 {
-	struct stat st;
-	if (::stat(m_path.c_str(), &st) == -1)
-		throw ioException();
+	return (S_ISDIR(doStat().st_mode));
+}
 
-	return (S_ISDIR(st.st_mode));
+bool
+File::isExecutable() const
+{
+	return (doStat().st_mode & S_IXUSR);
 }
 
 bool
@@ -117,21 +115,13 @@ File::createNewFile(mode_t mode) const
 size_t
 File::length() const
 {
-	struct stat st;
-	if (::stat(m_path.c_str(), &st) == -1)
-		throw ioException();
-
-	return (st.st_size);
+	return (doStat().st_size);
 }
 
 Time
 File::lastModified() const
 {
-	struct stat st;
-	if (::stat(m_path.c_str(), &st) == -1)
-		throw ioException();
-
-	return (Time(st.st_mtime));
+	return (Time(doStat().st_mtime));
 }
 
 std::string
@@ -263,6 +253,16 @@ File::concatPaths(const std::string &a, const std::string &b)
 		return (a + b);
 
 	return (a + '/' + b);
+}
+
+struct stat
+File::doStat() const
+{
+	struct stat st;
+	if (::stat(m_path.c_str(), &st) == -1)
+		throw ioException();
+
+	return (st);
 }
 
 File
