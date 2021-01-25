@@ -141,7 +141,7 @@ JsonArray::type(void) const
 }
 
 const std::string
-JsonArray::toJsonString(void) const // TODO
+JsonArray::toJsonString(void) const
 {
 	std::string out("[");
 

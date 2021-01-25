@@ -67,12 +67,14 @@ HTTPServer::watchForTimeouts()
 		return;
 
 	unsigned long now = System::currentTimeSeconds();
+	unsigned long timeout = Configuration::instance().rootBlock().timeout().orElse(RootBlock::DEFAULT_TIMEOUT);
+
 	for (lst::iterator it = m_clients.begin(); it != m_clients.end();)
 	{
 		HTTPClient &client = *(*it);
 		it++;
 
-		if (client.lastAction() + 30 /* TODO */< now)
+		if (client.lastAction() + timeout < now)
 		{
 			if (LOG.isTraceEnabled())
 				LOG.trace() << "Timeout-ed: " << client.socketAddress().hostAddress() << " (fd=" << client.socket().raw() << ")" << std::endl;

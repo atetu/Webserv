@@ -31,6 +31,7 @@ class RootBlock
 
 	public:
 		static const int DEFAULT_MAX_ACTIVE_CLIENT;
+		static const int DEFAULT_TIMEOUT;
 		static const DataSize DEFAULT_MAX_BODY_SIZE;
 
 	private:
@@ -39,6 +40,7 @@ class RootBlock
 		Optional<slist> m_serverBlocks;
 		Optional<clist> m_cgiBlocks;
 		Optional<long> m_maxActiveClient;
+		Optional<long> m_timeout;
 
 	private:
 		RootBlock(const RootBlock &other);
@@ -66,6 +68,9 @@ class RootBlock
 
 		RootBlock&
 		maxActiveClient(long maxActiveClient);
+
+		RootBlock&
+		timeout(long timeout);
 
 		inline const Optional<std::string>&
 		root(void) const
@@ -95,6 +100,12 @@ class RootBlock
 		maxActiveClient(void) const
 		{
 			return (m_maxActiveClient);
+		}
+
+		inline const Optional<long>&
+		timeout(void) const
+		{
+			return (m_timeout);
 		}
 
 		bool

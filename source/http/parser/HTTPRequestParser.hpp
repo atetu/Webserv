@@ -70,8 +70,15 @@ class HTTPRequestParser
 		long long m_totalSize;
 		bool m_max;
 
+	private:
+		HTTPRequestParser();
+		HTTPRequestParser(const HTTPRequestParser &other);
+
+		HTTPRequestParser&
+		operator=(const HTTPRequestParser &other);
+
 	public:
-		HTTPRequestParser(HTTPClient &client); // FIXME Missing coplien
+		HTTPRequestParser(HTTPClient &client);
 
 		~HTTPRequestParser();
 
@@ -89,10 +96,10 @@ class HTTPRequestParser
 
 		std::string
 		method() const;
-		
+
 		void
 		maxBodySize(long long maxBodySize);
-		
+
 		inline const HTTPRequestPathParser&
 		pathParser() const
 		{

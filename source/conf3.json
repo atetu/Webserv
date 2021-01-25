@@ -1,5 +1,5 @@
 {
-	"maxActiveClient": 100,
+	"maxActiveClient": 250,
 	"mime": {
 		"includes": [
 			"mime.json"
@@ -38,7 +38,7 @@
 	},
 	"servers": [
 		{
-			"port": 80,
+			"port": 8000,
 			"host": "0.0.0.0",
 			"name": [
 				"boxplay.io"
@@ -76,7 +76,7 @@
 						"index.php"
 					]
 				},
-				"/superform": {
+				"/superform/": {
 					"root": "/root/",
 					"cgi": "php-cgi",
 					"index": [
@@ -117,15 +117,16 @@
 					],
 					"cgi": "bash"
 				},
-				"/_tests": {
-					"root": ".",
+				"/_tests/": {
+					"root": "../dummy-files/",
 					"methods": [
 						"GET"
 					],
 					"index": [
 						"index.html",
 						"index.default.html"
-					]
+					],
+					"cgi": "bash"
 				}
 			}
 		}

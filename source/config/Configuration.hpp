@@ -21,6 +21,7 @@
 #define KEY_DOT "."
 #define KEY_ROOT "<root>"
 #define KEY_ROOT_MAX_ACTIVE_CLIENT "maxActiveClient"
+#define KEY_ROOT_TIMEOUT "timeout"
 #define KEY_ROOT_ROOT "root"
 #define KEY_ROOT_MIME "mime"
 #define KEY_ROOT_CGI "cgi"

@@ -34,6 +34,7 @@
 #include <net/address/Inet4Address.hpp>
 #include <unit/DataSize.hpp>
 #include <util/Convert.hpp>
+#include <util/FileDescriptorSet.hpp>
 #include <util/helper/DeleteHelper.hpp>
 #include <util/helper/JsonBinderHelper.hpp>
 #include <util/Optional.hpp>
@@ -203,6 +204,7 @@ Configuration::JsonBuilder::buildRootBlock(const JsonObject &jsonObject)
 			std::string path = KEY_ROOT;
 
 			BIND(jsonObject, KEY_ROOT_MAX_ACTIVE_CLIENT, JsonNumber, int, rootBlock, maxActiveClient);
+			BIND(jsonObject, KEY_ROOT_TIMEOUT, JsonNumber, int, rootBlock, timeout);
 		}
 
 		if (jsonObject.has(KEY_ROOT_ROOT))
@@ -568,7 +570,18 @@ Configuration::Validator::validate(const RootBlock &rootBlock)
 		long n = rootBlock.maxActiveClient().get();
 
 		if (n < 1)
-			throw ConfigurationValidateException("maxActiveClient is under one (<= 1)");
+			throw ConfigurationValidateException("maxActiveClient is under one (< 1)");
+
+		if (n > FileDescriptorSet::MAX * 0.8)
+			throw ConfigurationValidateException("maxActiveClient is over > 80% of the max file descriptor count in a set (which is " + Convert::toString(FileDescriptorSet::MAX) + ")");
+	}
+
+	if (rootBlock.timeout().present())
+	{
+		long n = rootBlock.timeout().get();
+
+		if (n < 1)
+			throw ConfigurationValidateException("timeout is under one (< 1)");
 	}
 
 	if (rootBlock.serverBlocks().present())

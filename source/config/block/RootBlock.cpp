@@ -16,6 +16,7 @@
 #include <util/helper/DeleteHelper.hpp>
 
 const int RootBlock::DEFAULT_MAX_ACTIVE_CLIENT = 60;
+const int RootBlock::DEFAULT_TIMEOUT = 30;
 const DataSize RootBlock::DEFAULT_MAX_BODY_SIZE = DataSize::ofMegabytes(1);
 
 RootBlock::RootBlock() :
@@ -70,6 +71,14 @@ RootBlock&
 RootBlock::maxActiveClient(long maxActiveClient)
 {
 	m_maxActiveClient.set(maxActiveClient);
+
+	return (*this);
+}
+
+RootBlock&
+RootBlock::timeout(long timeout)
+{
+	m_timeout.set(timeout);
 
 	return (*this);
 }
