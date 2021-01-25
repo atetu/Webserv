@@ -12,6 +12,7 @@
 
 #include <config/block/auth/BasicAuthBlock.hpp>
 #include <sys/signal.h>
+#include <signal.h>
 #include <sys/wait.h>
 #include <exception/IOException.hpp>
 #include <http/cgi/CommonGatewayInterface.hpp>
@@ -30,6 +31,7 @@
 #include <os/detect_platform.h>
 #include <sys/errno.h>
 #include <sys/unistd.h>
+#include <unistd.h>
 #include <util/Convert.hpp>
 #include <util/Enum.hpp>
 #include <util/helper/DeleteHelper.hpp>
@@ -233,15 +235,17 @@ CommonGatewayInterface::execute(HTTPClient &client, const CGIBlock &cgiBlock, co
 
 		throw IOException("fork", err);
 	}
-
 	if (pid == 0)
 	{
+		
 		std::string path = cgiBlock.path().get();
+		
 		if (StringUtils::first(path) != '/')
 			path = File(File::currentDirectory(), path).path();
 
-		std::string file = File(request.root(), request.url().path()).path();
-
+	//	std::string file = File(request.root(), request.url().path()).path();
+		std::string file = File(request.root(), request.resource()).path();
+	
 		::chdir(request.root().c_str());
 
 		::dup2(inPipe[0], 0);

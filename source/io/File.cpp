@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   File.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: atetu <atetu@student.42.fr>                +#+  +:+       +#+        */
+/*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/21 23:36:43 by ecaceres          #+#    #+#             */
-/*   Updated: 2021/01/22 11:09:30 by atetu            ###   ########.fr       */
+/*   Updated: 2021/01/25 18:12:15 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@
 #include <sys/fcntl.h>
 #include <sys/stat.h>
 #include <sys/unistd.h>
+#include <unistd.h>
 #include <util/FilenameUtils.hpp>
 #include <util/StringUtils.hpp>
 

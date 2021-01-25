@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   CGIFilter.cpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: atetu <atetu@student.42.fr>                +#+  +:+       +#+        */
+/*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/07 00:27:23 by ecaceres          #+#    #+#             */
-/*   Updated: 2021/01/18 10:43:28 by atetu            ###   ########.fr       */
+/*   Updated: 2021/01/25 19:31:07 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,21 +59,22 @@ CGIFilter::operator=(const CGIFilter &other)
 void
 CGIFilter::doFilter(UNUSED HTTPClient &client, UNUSED HTTPRequest &request, UNUSED HTTPResponse &response, FilterChain &next)
 {
+	std::cout << "CGI\n";
 	if (request.locationBlock().absent())
 		return (next());
-
+	std::cout << "CGI2\n";
 	const LocationBlock &locationBlock = *request.locationBlock().get();
 	if (locationBlock.cgi().absent())
 		return (next());
-
+	std::cout << "CGI3\n";
 	std::string extension;
 	if ((extension = FilenameUtils::getExtension(request.resource())).empty())
 		return (next());
-
+std::cout << "CGI4\n";
 	const CGIBlock &cgiBlock = Configuration::instance().rootBlock().getCGI(locationBlock.cgi().get());
 	if (!cgiBlock.hasExtension(extension))
 		return (next());
-
+std::cout << "CGI5\n";
 	if (!cgiBlock.handleNotFound().orElse(false) && !request.targetFile().exists())
 	{
 		client.response().status(*HTTPStatus::NOT_FOUND);
@@ -81,6 +82,7 @@ CGIFilter::doFilter(UNUSED HTTPClient &client, UNUSED HTTPRequest &request, UNUS
 	}
 
 	File cgiFile(cgiBlock.path().get());
+	std::cout << cgiBlock.path().get() << std::endl;
 	if (!cgiFile.exists() || !cgiFile.isFile() || !cgiFile.isExecutable())
 	{
 		client.response().status(*HTTPStatus::BAD_GATEWAY);
