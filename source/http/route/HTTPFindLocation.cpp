@@ -6,7 +6,7 @@
 /*   By: atetu <atetu@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/15 15:24:50 by alicetetu         #+#    #+#             */
-/*   Updated: 2021/01/22 11:29:19 by atetu            ###   ########.fr       */
+/*   Updated: 2021/01/25 16:19:57 by atetu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -258,6 +258,8 @@ HTTPFindLocation::parse(void)
 	HTTPLocationInterpretor &bestLocation = *(loc.begin());
 
 	location(bestLocation.locationBlock());
+	// std::cout << m_locationBlock.get()->path() << std::endl;
+	// std::cout << m_locationBlock.get()->root().get().data() << std::endl;
 	
 	return (*this);
 }
