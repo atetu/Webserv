@@ -11,6 +11,7 @@
 /* ************************************************************************** */
 
 #include <http/HTTP.hpp>
+#include <http/response/body/impl/CGIResponseBody.hpp>
 #include <http/response/body/impl/StringResponseBody.hpp>
 #include <http/response/HTTPResponse.hpp>
 #include <http/response/HTTPStatusLine.hpp>

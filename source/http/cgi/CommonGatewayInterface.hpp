@@ -35,6 +35,7 @@ class CommonGatewayInterface
 		pid_t m_pid;
 		FileDescriptor &m_in;
 		FileDescriptor &m_out;
+		bool m_killed;
 
 	private:
 		CommonGatewayInterface();
@@ -49,7 +50,10 @@ class CommonGatewayInterface
 		~CommonGatewayInterface();
 
 		void
-		exit();
+		kill();
+
+		void
+		wait();
 
 		bool
 		running();

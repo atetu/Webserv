@@ -35,7 +35,8 @@ class CGITask :
 		FileDescriptorBuffer &m_bufferedOut;
 		HTTPHeaderFieldsParser m_headerFieldsParser;
 		size_t wroteBodyUpTo;
-		bool m_finished;
+		bool m_running;
+		bool m_nextCalled;
 
 	private:
 		CGITask();
@@ -67,6 +68,9 @@ class CGITask :
 
 		FileDescriptorBuffer&
 		out();
+
+		bool
+		timeoutTouch();
 };
 
 #endif /* CGITASK_HPP_ */

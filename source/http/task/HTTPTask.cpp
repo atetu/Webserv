@@ -15,3 +15,9 @@
 HTTPTask::~HTTPTask()
 {
 }
+
+bool
+HTTPTask::timeoutTouch(void)
+{
+	return (false);
+}

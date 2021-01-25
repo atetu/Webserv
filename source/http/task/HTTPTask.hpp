@@ -22,6 +22,9 @@ class HTTPTask
 		/** @return Whether or not the task is still running. */
 		virtual bool
 		running() = 0;
+
+		virtual bool
+		timeoutTouch(void);
 };
 
 #endif /* HTTPTASK_HPP_ */

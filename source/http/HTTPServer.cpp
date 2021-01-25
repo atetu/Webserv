@@ -13,6 +13,7 @@
 #include <config/block/RootBlock.hpp>
 #include <config/Configuration.hpp>
 #include <http/HTTPServer.hpp>
+#include <http/task/HTTPTask.hpp>
 #include <io/Socket.hpp>
 #include <log/Logger.hpp>
 #include <log/LoggerFactory.hpp>
@@ -74,7 +75,9 @@ HTTPServer::watchForTimeouts()
 		HTTPClient &client = *(*it);
 		it++;
 
-		if (client.lastAction() + timeout < now)
+		if (client.task() && client.task()->timeoutTouch())
+			client.updateLastAction();
+		else if (client.lastAction() + timeout < now)
 		{
 			if (LOG.isTraceEnabled())
 				LOG.trace() << "Timeout-ed: " << client.socketAddress().hostAddress() << " (fd=" << client.socket().raw() << ")" << std::endl;

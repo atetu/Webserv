@@ -23,6 +23,7 @@
 #include <http/response/body/impl/CGIResponseBody.hpp>
 #include <http/response/HTTPResponse.hpp>
 #include <io/Socket.hpp>
+#include <log/Logger.hpp>
 #include <log/LoggerFactory.hpp>
 #include <sys/types.h>
 #include <util/Number.hpp>
@@ -38,7 +39,8 @@ CGITask::CGITask(HTTPClient &client, CommonGatewayInterface &cgi) :
 		m_cgi(cgi),
 		m_bufferedOut(*FileDescriptorBuffer::from(m_cgi.out(), FileDescriptorBuffer::NOTHING)),
 		wroteBodyUpTo(),
-		m_finished(false)
+		m_running(true),
+		m_nextCalled(false)
 {
 	if (m_client.request().method().get()->hasBody())
 		NIOSelector::instance().add(m_cgi.in(), *this, NIOSelector::WRITE);
@@ -50,7 +52,7 @@ CGITask::CGITask(HTTPClient &client, CommonGatewayInterface &cgi) :
 
 CGITask::~CGITask()
 {
-	m_cgi.exit();
+	m_cgi.kill();
 
 	NIOSelector::instance().remove(m_cgi.in());
 	NIOSelector::instance().remove(m_cgi.out());
@@ -62,7 +64,7 @@ CGITask::~CGITask()
 bool
 CGITask::running()
 {
-	return (!m_finished);
+	return (m_running);
 }
 
 bool
@@ -106,6 +108,15 @@ CGITask::readable(FileDescriptor &fd)
 		return (true);
 	}
 
+	if (r == 0 && m_bufferedOut.empty() && m_headerFieldsParser.state() != HTTPHeaderFieldsParser::S_END)
+	{
+		m_client.response().status(*HTTPStatus::GATEWAY_TIMEOUT);
+
+		m_nextCalled = true;
+		m_client.filterChain().next();
+		return (true);
+	}
+
 	if (m_headerFieldsParser.state() != HTTPHeaderFieldsParser::S_END)
 	{
 		char c;
@@ -142,6 +153,8 @@ CGITask::readable(FileDescriptor &fd)
 
 				m_client.response().headers().chunkedTransferEncoding();
 				m_client.response().body(new CGIResponseBody(m_client, *this));
+
+				m_nextCalled = true;
 				m_client.filterChain().next();
 
 				NIOSelector::instance().update(m_client.socket(), NIOSelector::WRITE);
@@ -154,6 +167,8 @@ CGITask::readable(FileDescriptor &fd)
 			LOG.warn() << "CGI produced an error: " << exception.message() << std::endl;
 
 			m_client.response().status(*HTTPStatus::INTERNAL_SERVER_ERROR);
+
+			m_nextCalled = true;
 			m_client.filterChain().next();
 
 			NIOSelector::instance().update(m_client.socket(), NIOSelector::WRITE);
@@ -186,4 +201,17 @@ FileDescriptorBuffer&
 CGITask::out()
 {
 	return (m_bufferedOut);
+}
+
+bool
+CGITask::timeoutTouch()
+{
+	if (m_running)
+	{
+		m_running = m_cgi.running();
+
+		return (true);
+	}
+
+	return (false);
 }

@@ -11,7 +11,8 @@
 /* ************************************************************************** */
 
 #include <config/block/auth/BasicAuthBlock.hpp>
-#include <signal.h>
+#include <sys/signal.h>
+#include <sys/wait.h>
 #include <exception/IOException.hpp>
 #include <http/cgi/CommonGatewayInterface.hpp>
 #include <http/cgi/task/CGITask.hpp>
@@ -22,6 +23,7 @@
 #include <http/HTTPServer.hpp>
 #include <http/request/HTTPRequest.hpp>
 #include <io/File.hpp>
+#include <log/Logger.hpp>
 #include <log/LoggerFactory.hpp>
 #include <net/address/InetAddress.hpp>
 #include <net/address/InetSocketAddress.hpp>
@@ -36,10 +38,10 @@
 #include <util/URL.hpp>
 #include <webserv.hpp>
 #include <cstdlib>
+#include <cstring>
 #include <iostream>
 #include <list>
 #include <map>
-#include <cstring>
 
 const std::string CommonGatewayInterface::ENV_AUTH_TYPE = "AUTH_TYPE";
 const std::string CommonGatewayInterface::ENV_CONTENT_LENGTH = "CONTENT_LENGTH";
@@ -79,7 +81,8 @@ Logger &CommonGatewayInterface::LOG = LoggerFactory::get("CGI");
 CommonGatewayInterface::CommonGatewayInterface(pid_t pid, FileDescriptor &in, FileDescriptor &out) :
 		m_pid(pid),
 		m_in(in),
-		m_out(out)
+		m_out(out),
+		m_killed(false)
 {
 }
 
@@ -87,23 +90,47 @@ CommonGatewayInterface::~CommonGatewayInterface()
 {
 	delete &m_in;
 	delete &m_out;
+
+	kill();
 }
 
 void
-CommonGatewayInterface::exit()
+CommonGatewayInterface::kill()
 {
-	::kill(m_pid, SIGKILL);
+	if (!m_killed)
+	{
+		m_killed = true;
+		::kill(m_pid, SIGKILL);
+	}
+}
+
+void
+CommonGatewayInterface::wait()
+{
+	if (!m_killed)
+		waitpid(m_pid, NULL, 0);
 }
 
 bool
 CommonGatewayInterface::running()
 {
-	if (::kill(m_pid, 0) == 0)
-		return (true);
+	int status;
+	if (::waitpid(m_pid, &status, WNOHANG) == -1)
+	{
+		errno = 0;
+		return (false);
+	}
 
-	errno = 0;
+	if (WIFEXITED(status)) /* not sure if WIFEXITED detect crash */
+		return (false);
 
-	return (false);
+	if (::kill(m_pid, 0) == -1)
+	{
+		errno = 0;
+		return (false);
+	}
+
+	return (true);
 }
 
 CGITask*
