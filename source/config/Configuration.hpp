@@ -29,7 +29,7 @@
 #define KEY_MIME_INCLUDES "includes"
 #define KEY_MIME_DEFINE "define"
 #define KEY_CGI_PATH "path"
-#define KEY_CGI_REDIRECT_ERR_TO_OUT "redirectErrToOut"
+#define KEY_CGI_HANDLE_NOT_FOUND "handleNotFound"
 #define KEY_CGI_EXTENSIONS  "extensions"
 #define KEY_CGI_ENVIRONMENT  "environment"
 #define KEY_SERVER_PORT "port"

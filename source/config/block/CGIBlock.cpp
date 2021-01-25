@@ -17,7 +17,7 @@
 CGIBlock::CGIBlock(const std::string &name) :
 		m_name(name),
 		m_path(),
-		m_redirectErrToOut(),
+		m_handleNotFound(),
 		m_extensions(),
 		m_environment()
 {
@@ -36,9 +36,9 @@ CGIBlock::path(const std::string &path)
 }
 
 CGIBlock&
-CGIBlock::redirectErrToOut(bool redirectErrToOut)
+CGIBlock::handleNotFound(bool handleNotFound)
 {
-	m_redirectErrToOut.set(redirectErrToOut);
+	m_handleNotFound.set(handleNotFound);
 
 	return (*this);
 }

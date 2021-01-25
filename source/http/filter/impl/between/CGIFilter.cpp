@@ -74,11 +74,11 @@ CGIFilter::doFilter(UNUSED HTTPClient &client, UNUSED HTTPRequest &request, UNUS
 	if (!cgiBlock.hasExtension(extension))
 		return (next());
 
-	/*if (!request.targetFile().exists())
+	if (!cgiBlock.handleNotFound().orElse(false) && !request.targetFile().exists())
 	{
 		client.response().status(*HTTPStatus::NOT_FOUND);
 		return (next());
-	}*/
+	}
 
 	File cgiFile(cgiBlock.path().get());
 	if (!cgiFile.exists() || !cgiFile.isFile())

@@ -10,7 +10,8 @@
 			"path": "./ubuntu_cgi_tester",
 			"extensions": [
 				"bla"
-			]
+			],
+			"handleNotFound": true
 		}
 	},
 	"servers": [

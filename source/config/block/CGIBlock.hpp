@@ -23,7 +23,7 @@ class CGIBlock
 	private:
 		std::string m_name;
 		Optional<std::string> m_path;
-		Optional<bool> m_redirectErrToOut;
+		Optional<bool> m_handleNotFound;
 		Optional<std::list<std::string> > m_extensions;
 		Optional<std::map<std::string, std::string> > m_environment;
 
@@ -44,7 +44,7 @@ class CGIBlock
 		path(const std::string &path);
 
 		CGIBlock&
-		redirectErrToOut(bool redirectErrToOut);
+		handleNotFound(bool handleNotFound);
 
 		CGIBlock&
 		extensions(const std::list<std::string> &extensions);
@@ -65,9 +65,9 @@ class CGIBlock
 		}
 
 		inline const Optional<bool>&
-		redirectErrToOut(void) const
+		handleNotFound(void) const
 		{
-			return (m_redirectErrToOut);
+			return (m_handleNotFound);
 		}
 
 		inline const Optional<std::list<std::string> >&

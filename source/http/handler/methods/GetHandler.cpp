@@ -24,12 +24,12 @@
 #include <stddef.h>
 #include <sys/fcntl.h>
 #include <util/helper/DeleteHelper.hpp>
+#include <util/Macros.hpp>
 #include <util/Optional.hpp>
+#include <util/StringUtils.hpp>
 #include <util/Time.hpp>
 #include <util/URL.hpp>
-#include <iostream>
 #include <list>
-#include <util/Macros.hpp>
 
 class FileDescriptorBuffer;
 
@@ -141,7 +141,7 @@ GetHandler::listing(const URL &url, const File &file)
 			name += '/';
 
 		std::string path(url.path());
-		if (path.empty() || path.at(path.size() - 1) != '/') // TODO Need rework!
+		if (path.empty() || StringUtils::last(path) != '/') // TODO Need rework!
 			path += '/';
 
 		path += name;

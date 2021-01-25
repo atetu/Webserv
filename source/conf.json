@@ -21,10 +21,11 @@
 			"path": "/bin/ls"
 		},
 		"bla": {
-			"path": "/mnt/c/Users/cacer/OneDrive/Developments/Workspace/webserv/docker/42-testers/ubuntu_cgi_tester",
+			"path": "../docker/tests/42-testers/ubuntu_cgi_tester",
 			"extensions": [
 				"bla"
-			]
+			],
+			"handleNotFound": true
 		},
 		"php-cgi": {
 			"path": "/usr/bin/php-cgi",

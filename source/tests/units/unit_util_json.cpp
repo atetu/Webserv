@@ -170,3 +170,21 @@ CASE("json", "simple array")
 
 	return (0);
 }
+
+CASE("json", "unfinished string")
+{
+	ASSERT_EXCEPT(json("\"hello"));
+
+	(void)&autoDelete(NULL);
+
+	return (0);
+}
+
+CASE("json", "empty")
+{
+	ASSERT_EXCEPT(json(""));
+
+	(void)&autoDelete(NULL);
+
+	return (0);
+}

@@ -288,7 +288,7 @@ Configuration::JsonBuilder::buildCGIBlock(const std::string &path, const std::st
 	try
 	{
 		BIND(jsonObject, KEY_CGI_PATH, JsonString, std::string, cgiBlock, path);
-		BIND(jsonObject, KEY_CGI_REDIRECT_ERR_TO_OUT, JsonBoolean, bool, cgiBlock, redirectErrToOut);
+		BIND(jsonObject, KEY_CGI_HANDLE_NOT_FOUND, JsonBoolean, bool, cgiBlock, handleNotFound);
 
 		if (jsonObject.has(KEY_CGI_EXTENSIONS))
 		{

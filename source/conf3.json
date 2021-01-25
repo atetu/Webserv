@@ -21,10 +21,11 @@
 			"path": "/bin/ls"
 		},
 		"bla": {
-			"path": "/mnt/c/Users/cacer/OneDrive/Developments/Workspace/webserv/docker/42-testers/ubuntu_cgi_tester",
+			"path": "../docker/tests/42-testers/ubuntu_cgi_tester",
 			"extensions": [
 				"bla"
-			]
+			],
+			"handleNotFound": true
 		},
 		"php-cgi": {
 			"path": "/usr/bin/php-cgi",
@@ -38,7 +39,7 @@
 	},
 	"servers": [
 		{
-			"port": 8000,
+			"port": 80,
 			"host": "0.0.0.0",
 			"name": [
 				"boxplay.io"
@@ -126,7 +127,7 @@
 						"index.html",
 						"index.default.html"
 					],
-					"cgi": "bash"
+					"cgi": "python3"
 				}
 			}
 		}
