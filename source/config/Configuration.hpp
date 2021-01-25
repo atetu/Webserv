@@ -18,9 +18,6 @@
 #include <json/JsonObject.hpp>
 #include <string>
 
-// TODO: All blocks need deep-copy, same goes for mime registry
-// Configuration should not be passed around like a normal object, but must be kept as singleton if possible
-
 #define KEY_DOT "."
 #define KEY_ROOT "<root>"
 #define KEY_ROOT_MAX_ACTIVE_CLIENT "maxActiveClient"
@@ -73,16 +70,18 @@ class Configuration
 		const MIMERegistry *m_mimeRegistry;
 		const RootBlock *m_rootBlock;
 
-	public:
+	private:
 		Configuration(void);
-		Configuration(const std::string &file, const MIMERegistry &mimeRegistry, const RootBlock &rootBlock);
 		Configuration(const Configuration &other);
-
-		virtual
-		~Configuration();
 
 		Configuration&
 		operator=(const Configuration &other);
+
+	public:
+		Configuration(const std::string &file, const MIMERegistry &mimeRegistry, const RootBlock &rootBlock);
+
+		virtual
+		~Configuration();
 
 		inline const std::string&
 		file(void) const

@@ -46,12 +46,18 @@ class HTTPStatus :
 		inline bool
 		isError() const
 		{
-			int d = m_code / 100;
+			return (HTTPStatus::isError(m_code));
+		}
+
+	public:
+		inline static bool
+		isError(int code)
+		{
+			int d = code / 100;
 
 			return (d == 4 || d == 5);
 		}
 
-	public:
 		inline static const HTTPStatus*
 		find(int code)
 		{

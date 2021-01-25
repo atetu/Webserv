@@ -21,6 +21,7 @@
 #include <config/exceptions/ConfigurationBindException.hpp>
 #include <config/exceptions/ConfigurationValidateException.hpp>
 #include <exception/IllegalStateException.hpp>
+#include <http/enums/HTTPStatus.hpp>
 #include <http/mime/MIME.hpp>
 #include <json/JsonArray.hpp>
 #include <json/JsonBoolean.hpp>
@@ -46,13 +47,6 @@
 Logger &Configuration::LOG = LoggerFactory::get("Configuration");
 Configuration *Configuration::INSTANCE = NULL;
 
-Configuration::Configuration() :
-		m_file(),
-		m_mimeRegistry(NULL),
-		m_rootBlock(NULL)
-{
-}
-
 Configuration::Configuration(const std::string &file, const MIMERegistry &mimeRegistry, const RootBlock &rootBlock) :
 		m_file(file),
 		m_mimeRegistry(&mimeRegistry),
@@ -60,30 +54,10 @@ Configuration::Configuration(const std::string &file, const MIMERegistry &mimeRe
 {
 }
 
-Configuration::Configuration(const Configuration &other) :
-		m_file(other.m_file),
-		m_mimeRegistry(other.m_mimeRegistry),
-		m_rootBlock(other.m_rootBlock)
-{
-}
-
 Configuration::~Configuration()
 {
 	DeleteHelper::pointer<MIMERegistry>(m_mimeRegistry);
 	DeleteHelper::pointer<RootBlock>(m_rootBlock);
-}
-
-Configuration&
-Configuration::operator =(const Configuration &other)
-{
-	if (this != &other)
-	{
-		m_file = other.m_file;
-		m_mimeRegistry = other.m_mimeRegistry;
-		m_rootBlock = other.m_rootBlock;
-	}
-
-	return (*this);
 }
 
 void
@@ -445,7 +419,6 @@ Configuration::JsonBuilder::buildLocationBlock(const std::string &path, const st
 		BIND(jsonObject, KEY_LOCATION_ROOT, JsonString, std::string, locationBlock, root);
 		BIND(jsonObject, KEY_LOCATION_LISTING, JsonBoolean, bool, locationBlock, listing);
 		BIND(jsonObject, KEY_LOCATION_CGI, JsonString, std::string, locationBlock, cgi);
-		//BIND(jsonObject, KEY_LOCATION_MAXBODYSIZE, JsonString, std::string, locationBlock, maxBodySize);
 
 		BIND_CUSTOM(jsonObject, KEY_LOCATION_MAXBODYSIZE, JsonString, std::string,
 		{
@@ -573,7 +546,7 @@ Configuration::JsonBuilder::buildCustomErrorMap(const std::string &path, const J
 		stream << key;
 		stream >> code;
 
-		if (code == 0 || (code / 100 != 4 && code / 100 != 5)) // TODO Move to HTTPStatus::isError()
+		if (!HTTPStatus::isError(code)) // TODO Move to HTTPStatus::isError()
 			throw ConfigurationBindException("code '" + Convert::toString(code) + "' must be an error 4xx or 5xx (" + path + ")");
 
 		map.insert(map.end(), std::make_pair(code, value));

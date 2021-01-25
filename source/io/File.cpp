@@ -12,18 +12,13 @@
 
 #include <dirent.h>
 #include <exception/IllegalStateException.hpp>
-#include <http/header/HTTPHeaderFields.hpp>
-#include <http/mime/MIMERegistry.hpp>
 #include <io/File.hpp>
 #include <io/FileDescriptor.hpp>
 #include <stdlib.h>
+#include <sys/fcntl.h>
 #include <sys/stat.h>
 #include <sys/unistd.h>
-#include <unistd.h>
-#include <util/Optional.hpp>
 #include <util/StringUtils.hpp>
-#include <algorithm>
-#include <cstddef>
 
 File::File() :
 		m_path()

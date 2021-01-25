@@ -22,7 +22,6 @@
 #include <log/LoggerFactory.hpp>
 #include <util/Macros.hpp>
 #include <util/Optional.hpp>
-#include <util/StringUtils.hpp>
 #include <list>
 #include <string>
 
