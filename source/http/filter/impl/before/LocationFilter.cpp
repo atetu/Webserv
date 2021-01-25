@@ -22,7 +22,6 @@
 #include <log/LoggerFactory.hpp>
 #include <util/Macros.hpp>
 #include <util/Optional.hpp>
-#include <util/StringUtils.hpp>
 #include <list>
 #include <string>
 
@@ -55,27 +54,26 @@ LocationFilter::doFilter(UNUSED HTTPClient &client, HTTPRequest &request, UNUSED
 	const ServerBlock &serverBlock = *request.serverBlock().get(); /* Should always have one. */
 	const Optional<std::list<const LocationBlock*> > &locations = serverBlock.locations();
 
-	if (locations.present())
+	if (locations.absent())
+		return (next());
+
+	const std::string &path = client.parser().pathParser().path();
+
+	HTTPFindLocation findLocation(path, locations.get());
+	if (findLocation.parse().location().present())
 	{
-		const std::string &path = client.parser().pathParser().path();
+		const LocationBlock &locationBlock = *findLocation.parse().location().get();
 
-		HTTPFindLocation findLocation(path, locations.get());
+		request.locationBlock(locationBlock);
 
-		if (findLocation.parse().location().present())
+		if (locationBlock.root().present())
 		{
-			const LocationBlock &locationBlock = *findLocation.parse().location().get();
+			std::string path;
 
-			request.locationBlock(locationBlock);
+			if (locationBlock.path().size() <= request.resource().size())
+				path = request.resource().substr(locationBlock.path().size(), std::string::npos);
 
-			if (locationBlock.root().present() /* && StringUtils::last(locationBlock.path()) != '/'*/) // TODO see comment
-			{
-				std::string path;
-
-				if (locationBlock.path().size() <= request.resource().size())
-					path = request.resource().substr(locationBlock.path().size(), std::string::npos);
-
-				request.resource(path);
-			}
+			request.resource(path);
 		}
 	}
 

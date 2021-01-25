@@ -13,26 +13,6 @@
 #include <libs/ft.hpp>
 #include <util/CharacterUtils.hpp>
 
-CharacterUtils::CharacterUtils()
-{
-}
-
-CharacterUtils::~CharacterUtils()
-{
-}
-
-CharacterUtils::CharacterUtils(const CharacterUtils &other)
-{
-	(void)other;
-}
-
-CharacterUtils&
-CharacterUtils::operator=(const CharacterUtils &other)
-{
-	(void)other;
-	return (*this);
-}
-
 bool
 CharacterUtils::InsensitiveCompare::operator ()(const unsigned char &c1, const unsigned char &c2) const
 {

@@ -24,8 +24,8 @@
 #include <string>
 #include <vector>
 
-class Mime;
-class MimeRegistry;
+class MIME;
+class MIMERegistry;
 class URL;
 
 class HTTPHeaderFields
@@ -91,16 +91,16 @@ class HTTPHeaderFields
 		contentLocation(const std::string &value);
 
 		HTTPHeaderFields&
-		contentType(const MimeRegistry &registry, const std::string &extension);
+		contentType(const MIMERegistry &registry, const std::string &extension);
 
 		HTTPHeaderFields&
 		contentType(const std::string &mimeType);
 
 		HTTPHeaderFields&
-		contentType(const Mime &mime);
+		contentType(const MIME &mime);
 
 		HTTPHeaderFields&
-		contentType(const Optional<const Mime*> &optional);
+		contentType(const Optional<const MIME*> &optional);
 
 		HTTPHeaderFields&
 		date(void);

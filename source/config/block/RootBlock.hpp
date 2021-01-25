@@ -14,7 +14,7 @@
 # define ROOTBLOCK_HPP_
 
 #include <config/block/CGIBlock.hpp>
-#include <config/block/MimeBlock.hpp>
+#include <config/block/MIMEBlock.hpp>
 #include <config/block/ServerBlock.hpp>
 #include <util/Optional.hpp>
 #include <list>
@@ -40,15 +40,17 @@ class RootBlock
 		Optional<clist> m_cgiBlocks;
 		Optional<long> m_maxActiveClient;
 
-	public:
-		RootBlock();
+	private:
 		RootBlock(const RootBlock &other);
-
-		virtual
-		~RootBlock();
 
 		RootBlock&
 		operator =(const RootBlock &other);
+
+	public:
+		RootBlock();
+
+		virtual
+		~RootBlock();
 
 		RootBlock&
 		root(const std::string &root);

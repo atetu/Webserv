@@ -13,11 +13,10 @@
 #ifndef BASEBUFFER_HPP_
 # define BASEBUFFER_HPP_
 
-#include <stddef.h>
 #include <buffer/IReadableBuffer.hpp>
 #include <buffer/IWritableBuffer.hpp>
+#include <stddef.h>
 #include <string>
-#include <iostream>
 
 class BaseBuffer :
 		public IWritableBuffer,
@@ -94,9 +93,6 @@ class BaseBuffer :
 		{
 			return (m_storage);
 		}
-
-		void
-		first(char &c);
 };
 
 #endif /* BASEBUFFER_HPP_ */

@@ -25,11 +25,9 @@
 #include <iostream>
 
 static const int g_true = 1;
-static int incre = 0;
 
 Socket::Socket(int fd) :
-		FileDescriptor(fd),
-		m_incr(++incre)
+		FileDescriptor(fd)
 {
 	m_verified = true;
 }
@@ -45,6 +43,10 @@ Socket::recv(void *buf, size_t len, int flags)
 
 	ssize_t r = ::recv(m_fd, buf, len, flags);
 
+#ifdef IO_SOCKET_DEBUG_RECV
+	std::cout << m_fd << ": recv()= " << r << std::endl;
+#endif
+
 	return (r);
 }
 
@@ -54,6 +56,10 @@ Socket::send(const void *buf, size_t len, int flags)
 	ensureNotClosed();
 
 	ssize_t r = ::send(m_fd, buf, len, flags);
+
+#ifdef IO_SOCKET_DEBUG_SEND
+	std::cout << m_fd << ": send()= " << r << std::endl;
+#endif
 
 	return (r);
 }
@@ -141,7 +147,7 @@ Socket::accept(InetSocketAddress *socketAddress) const
 	}
 	catch (...)
 	{
-		DeleteHelper::pointer<InetSocketAddress>(socketAddress);
+		DeleteHelper::pointer(socketAddress);
 
 		throw;
 	}

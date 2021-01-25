@@ -21,11 +21,9 @@ class JsonUtils
 		JsonUtils();
 		JsonUtils(const JsonUtils &other);
 
-	public:
 		virtual
 		~JsonUtils();
 
-	private:
 		JsonUtils&
 		operator=(const JsonUtils &other);
 

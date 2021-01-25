@@ -22,15 +22,15 @@ class IBuffer
 {
 	public:
 		virtual
-		~IBuffer(void)
-		{
-		}
+		~IBuffer(void);
 
+		/** @return Buffer storage. */
 		virtual std::string&
-		storage() = 0;
+		storage(void) = 0;
 
+		/** @return Buffer constant storage. */
 		virtual const std::string&
-		storage() const = 0;
+		storage(void) const = 0;
 };
 
 #endif /* IBUFFER_HPP_ */

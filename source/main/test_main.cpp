@@ -111,12 +111,12 @@ test_main(int argc, char **argv, char **envp)
 		{
 			const TestCase &testCase = *it2;
 
-			LOG.info() << "  CASE " << ++index << "/" << cases.size() << ": " << it2->name();
+			std::ostream &out = LOG.info() << "  CASE " << ++index << "/" << cases.size() << ": " << it2->name();
 
 			if (printLocation)
-				std::cout << " (at " << it2->location() << ")";
+				out << " (at " << it2->location() << ")";
 
-			std::cout << std::endl;
+			out << std::endl;
 
 			if ((*(testCase.function()))(argc, argv, envp))
 			{

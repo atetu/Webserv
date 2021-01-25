@@ -1,18 +1,17 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Task.cpp                                           :+:      :+:    :+:   */
+/*   IWritableBuffer.cpp                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ecaceres <ecaceres@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/01/10 19:31:57 by ecaceres          #+#    #+#             */
-/*   Updated: 2021/01/10 19:31:57 by ecaceres         ###   ########.fr       */
+/*   Created: 2021/01/21 13:39:39 by ecaceres          #+#    #+#             */
+/*   Updated: 2021/01/21 13:39:39 by ecaceres         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <task/Task.hpp>
+#include <buffer/IWritableBuffer.hpp>
 
-Task::~Task()
+IWritableBuffer::~IWritableBuffer()
 {
 }
-

@@ -25,16 +25,18 @@ class BearerAuthBlock :
 	private:
 		std::string m_token;
 
-	public:
+	private:
 		BearerAuthBlock();
-		BearerAuthBlock(const std::string &token);
 		BearerAuthBlock(const BearerAuthBlock &other);
-
-		virtual
-		~BearerAuthBlock();
 
 		BearerAuthBlock&
 		operator=(const BearerAuthBlock &other);
+
+	public:
+		BearerAuthBlock(const std::string &token);
+
+		virtual
+		~BearerAuthBlock();
 
 		bool
 		authorize(const std::string &credentials) const;

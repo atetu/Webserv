@@ -16,21 +16,8 @@ AuthBlock::AuthBlock()
 {
 }
 
-AuthBlock::AuthBlock(const AuthBlock &other)
-{
-	(void)other;
-}
-
 AuthBlock::~AuthBlock()
 {
-}
-
-AuthBlock&
-AuthBlock::operator=(const AuthBlock &other)
-{
-	(void)other;
-
-	return (*this);
 }
 
 AuthBlock&

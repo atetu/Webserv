@@ -15,8 +15,8 @@
 #include <http/enums/HTTPStatus.hpp>
 #include <http/handler/methods/GetHandler.hpp>
 #include <http/header/HTTPHeaderFields.hpp>
-#include <http/mime/Mime.hpp>
-#include <http/mime/MimeRegistry.hpp>
+#include <http/mime/MIME.hpp>
+#include <http/mime/MIMERegistry.hpp>
 #include <http/request/HTTPRequest.hpp>
 #include <http/response/body/impl/FileResponseBody.hpp>
 #include <http/response/HTTPResponse.hpp>
@@ -69,11 +69,11 @@ GetHandler::handle(UNUSED HTTPClient &client, HTTPRequest &request, HTTPResponse
 	{
 		size_t contentLength = targetFile.length();
 		Time lastModified = targetFile.lastModified();
-		Optional<const Mime*> contentType;
+		Optional<const MIME*> contentType;
 
 		std::string extension;
 		if (request.url().extension(extension))
-			contentType = Optional<const Mime*>::ofNullable(Configuration::instance().mimeRegistry().findByFileExtension(extension));
+			contentType = Optional<const MIME*>::ofNullable(Configuration::instance().mimeRegistry().findByFileExtension(extension));
 
 		FileDescriptor *fd = NULL;
 		FileDescriptorBuffer *fdBuffer = NULL;

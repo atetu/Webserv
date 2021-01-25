@@ -10,33 +10,11 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+#include <libs/ft.hpp>
 #include <util/CharacterUtils.hpp>
 #include <util/StringUtils.hpp>
 #include <algorithm>
 #include <cctype>
-#include <libs/ft.hpp>
-
-
-StringUtils::StringUtils()
-{
-}
-
-StringUtils::~StringUtils()
-{
-}
-
-StringUtils::StringUtils(const StringUtils &other)
-{
-	(void)other;
-}
-
-StringUtils&
-StringUtils::operator=(const StringUtils &other)
-{
-	(void)other;
-
-	return (*this);
-}
 
 std::string
 StringUtils::toUpperCase(const std::string &string) // TODO Find something faster, every solution on the internet are not allowed to us
@@ -95,4 +73,18 @@ bool
 StringUtils::InsensitiveCompare::operator ()(const std::string &s1, const std::string &s2) const
 {
 	return (std::lexicographical_compare(s1.begin(), s1.end(), s2.begin(), s2.end(), CharacterUtils::InsensitiveCompare()));
+}
+
+bool
+StringUtils::all(const std::string &string, bool
+(*predicate)(char))
+{
+	if (!predicate)
+		return (true);
+
+	for (std::string::size_type index = 0; index < string.size(); index++)
+		if (!(*(predicate))(string[index]))
+			return (false);
+
+	return (true);
 }

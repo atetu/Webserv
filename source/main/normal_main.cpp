@@ -46,14 +46,17 @@ const Option OPT_NO_COLOR('n', "no-color", "don't use color in the console");
 static Logger &LOG = LoggerFactory::get("main");
 static HTTPOrchestrator *httpOrchestrator = NULL;
 
+static bool gracefulShutdown = false;
+
 void
 sighandler_term(int sig)
 {
 	if (httpOrchestrator)
 	{
+		gracefulShutdown = true;
 		::signal(sig, SIG_DFL);
 		LOG.info() << "Graceful shutdown asked... (do CTRL-C again to quit immediately)" << std::endl;
-		httpOrchestrator->terminate();
+		httpOrchestrator->stop();
 	}
 }
 
@@ -187,6 +190,9 @@ normal_main(int argc, char **argv, char **envp)
 		{
 			httpOrchestrator = HTTPOrchestrator::create();
 			httpOrchestrator->start();
+
+			if (gracefulShutdown)
+				LOG.info() << "Shutdown successfully!" << std::endl;
 		}
 		catch (Exception &exception)
 		{

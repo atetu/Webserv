@@ -13,6 +13,10 @@
 #include <libs/ft.hpp>
 #include <net/address/Inet4Address.hpp>
 #include <util/Convert.hpp>
+#include <util/StringUtils.hpp>
+#include <iostream>
+
+class Number;
 
 Inet4Address::Inet4Address() :
 		m_address()
@@ -76,4 +80,30 @@ Inet4Address
 Inet4Address::parse(unsigned int x)
 {
 	return (Inet4Address((byte*)&x));
+}
+
+bool
+Inet4Address::validate(const std::string &text)
+{
+	std::string input = text;
+
+	for (int i = 1 /* just for the look */; i <= 4; i++)
+	{
+		bool expectDot = i != 4;
+		std::string::size_type found = input.find('.');
+
+		if ((found != std::string::npos && !expectDot) || (found == std::string::npos && expectDot))
+			return (false);
+
+		std::string sub = input.substr(0, found);
+		if (sub.size() == 0 || sub.size() > 3 || !StringUtils::all(sub, ft::isdigit) || ft::atoi(sub.c_str()) > 255)
+			return (false);
+
+		if (found == std::string::npos)
+			input.clear();
+		else
+			input.erase(0, found + 1);
+	}
+
+	return (input.empty());
 }

@@ -16,37 +16,14 @@
 const std::string BearerAuthBlock::TYPE = "bearer";
 const std::string BearerAuthBlock::PRETTY_TYPE = "Bearer";
 
-BearerAuthBlock::BearerAuthBlock() :
-		AuthBlock(),
-		m_token()
-{
-}
-
 BearerAuthBlock::BearerAuthBlock(const std::string &token) :
 		AuthBlock(),
 		m_token(token)
 {
 }
 
-BearerAuthBlock::BearerAuthBlock(const BearerAuthBlock &other) :
-		AuthBlock(other),
-		m_token(other.m_token)
-{
-}
-
 BearerAuthBlock::~BearerAuthBlock()
 {
-}
-
-BearerAuthBlock&
-BearerAuthBlock::operator=(const BearerAuthBlock &other)
-{
-	AuthBlock::operator =(other);
-
-	if (this != &other)
-		m_token = other.m_token;
-
-	return (*this);
 }
 
 bool

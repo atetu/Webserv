@@ -15,15 +15,15 @@
 
 #ifdef __linux__
 # define IS_LINUX 1
-# define PLATEFORM_NAME "linux"
+# define PLATFORM_NAME "linux"
 #elif __APPLE__
 # define IS_MACOS 1
-# define PLATEFORM_NAME "apple"
+# define PLATFORM_NAME "apple"
 #elif __CYGWIN__
 # define IS_CYGWIN 1
-# define PLATEFORM_NAME "cygwin"
+# define PLATFORM_NAME "cygwin"
 #else
-# error Unknown plateform
+# error Unknown PLATFORM
 #endif
 
 #if defined(IS_LINUX) or defined(IS_MACOS)
@@ -33,10 +33,6 @@
 #ifdef IS_CYGWIN
 # define IS_WINDOWS 1
 #endif
-
-/*
- * Filling missing
- */
 
 #ifndef IS_LINUX
 # define IS_LINUX 0
@@ -52,6 +48,12 @@
 
 #ifndef IS_WINDOWS
 # define IS_WINDOWS 0
+#endif
+
+#if IS_LINUX || IS_MACOS
+# define IS_UNIX 1
+#else
+# define IS_UNIX 0
 #endif
 
 #endif /* DETECT_PLATFORM_H_ */

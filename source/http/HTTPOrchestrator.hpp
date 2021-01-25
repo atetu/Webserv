@@ -13,16 +13,11 @@
 #ifndef HTTPORCHESTRATOR_HPP_
 # define HTTPORCHESTRATOR_HPP_
 
-#include <http/HTTPClient.hpp>
 #include <http/HTTPServer.hpp>
-#include <sys/select.h>
-#include <buffer/impl/FileDescriptorBuffer.hpp>
 #include <list>
-#include <map>
 
 class Configuration;
 class Environment;
-
 class Logger;
 
 class HTTPOrchestrator
@@ -63,7 +58,7 @@ class HTTPOrchestrator
 		start();
 
 		void
-		terminate();
+		stop();
 
 	public:
 		static HTTPOrchestrator*

@@ -11,11 +11,10 @@
 /* ************************************************************************** */
 
 #include <http/enums/HTTPStatus.hpp>
+#include <http/filter/FilterChain.hpp>
 #include <http/handler/methods/task/PutTask.hpp>
 #include <http/HTTPClient.hpp>
 #include <http/response/HTTPResponse.hpp>
-#include <http/response/body/IResponseBody.hpp>
-#include <http/response/body/impl/StringResponseBody.hpp>
 #include <util/Singleton.hpp>
 #include <string>
 

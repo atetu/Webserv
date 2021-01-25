@@ -19,9 +19,6 @@
 #include <sys/types.h>
 #include <list>
 #include <string>
-#include <http/request/HTTPRequest.hpp>
-#include <http/mime/Mime.hpp>
-#include <config/Configuration.hpp>
 
 class Time;
 
@@ -115,15 +112,6 @@ class File
 	public:
 		static std::string
 		concatPaths(const std::string &a, const std::string &b);
-
-		static bool
-		findFilename(const std::string &path, std::string &out);
-
-		static bool
-		findExtension(const std::string &path, std::string &out);
-
-		bool
-		findMime(std::string &out, HTTPRequest &request);
 
 	public:
 		static File

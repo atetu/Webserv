@@ -40,15 +40,17 @@ class ServerBlock
 		Optional<std::list<std::string> > m_indexFiles;
 		Optional<AuthBlock const*> m_auth;
 
-	public:
-		ServerBlock();
+	private:
 		ServerBlock(const ServerBlock &other);
-
-		virtual
-		~ServerBlock();
 
 		ServerBlock&
 		operator=(const ServerBlock &other);
+
+	public:
+		ServerBlock();
+
+		virtual
+		~ServerBlock();
 
 		ServerBlock&
 		port(int port);

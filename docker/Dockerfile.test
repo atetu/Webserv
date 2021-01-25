@@ -1,6 +1,6 @@
 FROM webserv-base
 
-COPY docker/42-testers/ /app/source
+COPY docker/tests/42-testers/ /app/source
 
 WORKDIR /app/source
 

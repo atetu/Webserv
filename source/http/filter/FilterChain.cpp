@@ -21,11 +21,14 @@
 #include <http/filter/impl/before/ServerFilter.hpp>
 #include <http/filter/impl/between/CGIFilter.hpp>
 #include <http/filter/impl/between/MethodHandlingFilter.hpp>
-#include <http/response/HTTPResponse.hpp>
-#include <util/Optional.hpp>
 #include <util/Singleton.hpp>
+
+#ifdef HTTP_DEBUG_FILTERCHAIN
+#include <io/Socket.hpp>
+#include <http/HTTPClient.hpp>
 #include <iostream>
 #include <typeinfo>
+#endif
 
 FilterChain::FilterChain(HTTPClient &client, HTTPRequest &request, HTTPResponse &response) :
 		m_client(client),
@@ -47,6 +50,10 @@ FilterChain::next()
 	{
 		Filter *filter = m_current.front();
 		m_current.pop_front();
+
+#ifdef HTTP_DEBUG_FILTERCHAIN
+		std::cout << m_client.socket().raw() << ": next()= " << typeid(*filter).name() << std::endl;
+#endif
 
 		filter->doFilter(m_client, m_request, m_response, *this);
 	}
@@ -76,13 +83,13 @@ FilterChain::nextState(State state)
 
 			break;
 		}
-	
+
 		case S_BETWEEN:
 		{
 			m_current.push_back(&CGIFilter::instance());
 			m_current.push_back(&MethodHandlingFilter::instance());
 
-			m_current.push_back(&ErrorFilter::instance()); /* Same as S_AFTER .*/
+			m_current.push_back(&ErrorFilter::instance()); /* Same as S_AFTER. */
 			m_current.push_back(&HeadFilter::instance());
 			m_current.push_back(&FinalFilter::instance());
 

@@ -11,43 +11,20 @@
 /* ************************************************************************** */
 
 #include <config/block/CGIBlock.hpp>
-#include <sys/stat.h>
-#include <errno.h>
+#include <io/File.hpp>
 #include <algorithm>
 
-CGIBlock::CGIBlock() :
-		m_name(),
-		m_path()
-{
-}
-
-CGIBlock::CGIBlock(std::string name) :
+CGIBlock::CGIBlock(const std::string &name) :
 		m_name(name),
-		m_path()
+		m_path(),
+		m_redirectErrToOut(),
+		m_extensions(),
+		m_environment()
 {
 }
 
 CGIBlock::~CGIBlock()
 {
-}
-
-CGIBlock::CGIBlock(const CGIBlock &other) :
-		m_name(other.m_name),
-		m_path(other.m_path)
-{
-}
-
-CGIBlock&
-CGIBlock::operator=(const CGIBlock &other)
-{
-	if (this != &other)
-	{
-		m_name = other.m_name;
-		m_path = other.m_path;
-	}
-
-	return (*this);
-
 }
 
 CGIBlock&
@@ -83,17 +60,10 @@ CGIBlock::environment(const std::map<std::string, std::string> &environment)
 }
 
 bool
-CGIBlock::exists(void) const
+CGIBlock::exists() const
 {
 	if (m_path.present())
-	{
-		struct stat st;
-		bool exists = ::stat(m_path.get().c_str(), &st) == 0;
-
-		errno = 0;
-
-		return (exists);
-	}
+		return (File(m_path.get()).exists());
 
 	return (false);
 }

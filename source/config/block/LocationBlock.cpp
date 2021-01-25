@@ -14,22 +14,7 @@
 #include <util/helper/DeleteHelper.hpp>
 #include <algorithm>
 
-LocationBlock LocationBlock::DEFAULT;
-
-LocationBlock::LocationBlock(void) :
-		m_path(),
-		m_methods(),
-		m_alias(),
-		m_root(),
-		m_listing(),
-		m_index(),
-		m_cgi(),
-		m_auth(),
-		m_maxBodySize(-1)
-{
-}
-
-LocationBlock::LocationBlock(std::string path) :
+LocationBlock::LocationBlock(const std::string &path) :
 		m_path(path),
 		m_methods(),
 		m_alias(),
@@ -42,40 +27,9 @@ LocationBlock::LocationBlock(std::string path) :
 {
 }
 
-LocationBlock::LocationBlock(const LocationBlock &other) :
-		m_path(other.m_path),
-		m_methods(other.m_methods),
-		m_alias(other.m_alias),
-		m_root(other.m_root),
-		m_listing(other.m_listing),
-		m_index(other.m_index),
-		m_cgi(other.m_cgi),
-		m_auth(other.m_auth),
-		m_maxBodySize()
-{
-}
-
 LocationBlock::~LocationBlock()
 {
 	DeleteHelper::pointer<AuthBlock>(m_auth);
-}
-
-LocationBlock&
-LocationBlock::operator =(const LocationBlock &other)
-{
-	if (this != &other)
-	{
-		m_path = other.m_path;
-		m_methods = other.m_methods;
-		m_alias = other.m_alias;
-		m_root = other.m_root;
-		m_listing = other.m_listing;
-		m_index = other.m_index;
-		m_cgi = other.m_cgi;
-		m_auth = other.m_auth;
-	}
-
-	return (*this);
 }
 
 LocationBlock&
@@ -148,7 +102,5 @@ LocationBlock::hasMethod(const std::string &name) const
 	if (!m_methods.present())
 		return (false);
 
-	const std::list<std::string> &methods = m_methods.get();
-
-	return (std::find(methods.begin(), methods.end(), name) != methods.end());
+	return (std::find(m_methods.get().begin(), m_methods.get().end(), name) != m_methods.get().end());
 }

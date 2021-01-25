@@ -26,16 +26,18 @@ class BasicAuthBlock :
 		std::string m_user;
 		Optional<std::string> m_password;
 
-	public:
+	private:
 		BasicAuthBlock();
-		BasicAuthBlock(const std::string &user);
 		BasicAuthBlock(const BasicAuthBlock &other);
-
-		virtual
-		~BasicAuthBlock();
 
 		BasicAuthBlock&
 		operator=(const BasicAuthBlock &other);
+
+	public:
+		BasicAuthBlock(const std::string &user);
+
+		virtual
+		~BasicAuthBlock();
 
 		BasicAuthBlock&
 		password(const std::string &password);
