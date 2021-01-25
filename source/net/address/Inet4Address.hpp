@@ -48,6 +48,9 @@ class Inet4Address :
 	public:
 		static Inet4Address
 		parse(unsigned int x);
+
+		static bool
+		validate(const std::string &text);
 };
 
 #endif /* INET4ADDRESS_HPP_ */

@@ -69,7 +69,6 @@ ServerFilter::findBlock(HTTPClient &client)
 	const list &serverBlocks = client.httpServer().serverBlocks();
 
 	Optional<std::string> hostOptional = client.parser().headerFields().get(HTTPHeaderFields::HOST);
-
 	if (hostOptional.present())
 	{
 		const std::string &host = hostOptional.get();

@@ -21,11 +21,9 @@ class StringUtils
 		StringUtils();
 		StringUtils(const StringUtils &other);
 
-	public:
 		virtual
 		~StringUtils();
 
-	private:
 		StringUtils&
 		operator=(const StringUtils &other);
 
@@ -44,6 +42,10 @@ class StringUtils
 
 		static char
 		last(const std::string &string);
+
+		static bool
+		all(const std::string &string, bool
+		(*predicate)(char));
 
 	public:
 		struct InsensitiveCompare

@@ -1,34 +1,17 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Collections.cpp                                    :+:      :+:    :+:   */
+/*   IBuffer.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ecaceres <ecaceres@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/01/06 22:04:14 by ecaceres          #+#    #+#             */
-/*   Updated: 2021/01/06 22:04:14 by ecaceres         ###   ########.fr       */
+/*   Created: 2021/01/21 13:35:05 by ecaceres          #+#    #+#             */
+/*   Updated: 2021/01/21 13:35:05 by ecaceres         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <util/Collections.hpp>
+#include <buffer/IBuffer.hpp>
 
-Collections::Collections(void)
+IBuffer::~IBuffer()
 {
-}
-
-Collections::Collections(const Collections &other)
-{
-	(void)other;
-}
-
-Collections::~Collections(void)
-{
-}
-
-Collections
-Collections::operator =(const Collections &other)
-{
-	(void)other;
-
-	return (*this);
 }

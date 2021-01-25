@@ -16,6 +16,7 @@
 #include <util/helper/DeleteHelper.hpp>
 
 const int RootBlock::DEFAULT_MAX_ACTIVE_CLIENT = 60;
+const int RootBlock::DEFAULT_TIMEOUT = 30;
 const DataSize RootBlock::DEFAULT_MAX_BODY_SIZE = DataSize::ofMegabytes(1);
 
 RootBlock::RootBlock() :
@@ -27,35 +28,11 @@ RootBlock::RootBlock() :
 {
 }
 
-RootBlock::RootBlock(const RootBlock &other) :
-		m_root(other.m_root),
-		m_mimeBlock(other.m_mimeBlock),
-		m_serverBlocks(other.m_serverBlocks),
-		m_cgiBlocks(other.m_cgiBlocks),
-		m_maxActiveClient(other.m_maxActiveClient)
-{
-}
-
 RootBlock::~RootBlock()
 {
 	DeleteHelper::pointers<ServerBlock>(m_serverBlocks);
 	DeleteHelper::pointers<CGIBlock>(m_cgiBlocks);
 	DeleteHelper::pointer<MimeBlock>(m_mimeBlock);
-}
-
-RootBlock&
-RootBlock::operator =(const RootBlock &other)
-{
-	if (this != &other)
-	{ // TODO Need deep-copy
-		m_root = other.m_root;
-		m_mimeBlock = other.m_mimeBlock;
-		m_serverBlocks = other.m_serverBlocks;
-		m_cgiBlocks = other.m_cgiBlocks;
-		m_maxActiveClient = other.m_maxActiveClient;
-	}
-
-	return (*this);
 }
 
 RootBlock&
@@ -94,6 +71,14 @@ RootBlock&
 RootBlock::maxActiveClient(long maxActiveClient)
 {
 	m_maxActiveClient.set(maxActiveClient);
+
+	return (*this);
+}
+
+RootBlock&
+RootBlock::timeout(long timeout)
+{
+	m_timeout.set(timeout);
 
 	return (*this);
 }

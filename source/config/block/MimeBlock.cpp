@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <config/block/MimeBlock.hpp>
+#include <config/block/MIMEBlock.hpp>
 #include <util/helper/DeleteHelper.hpp>
 
 MimeBlock::MimeBlock() :
@@ -19,27 +19,9 @@ MimeBlock::MimeBlock() :
 {
 }
 
-MimeBlock::MimeBlock(const MimeBlock &other) :
-		m_includes(other.m_includes),
-		m_defines(other.m_defines)
-{
-}
-
 MimeBlock::~MimeBlock()
 {
-	DeleteHelper::pointers<Mime>(m_defines);
-}
-
-MimeBlock&
-MimeBlock::operator =(const MimeBlock &other)
-{
-	if (this != &other)
-	{
-		m_includes = other.m_includes;
-		m_defines = other.m_defines;
-	}
-
-	return (*this);
+	DeleteHelper::pointers<MIME>(m_defines);
 }
 
 MimeBlock&
@@ -51,7 +33,7 @@ MimeBlock::includes(const std::list<std::string> &includes)
 }
 
 MimeBlock&
-MimeBlock::defines(const std::list<Mime const*> &defines)
+MimeBlock::defines(const std::list<MIME const*> &defines)
 {
 	m_defines.set(defines);
 

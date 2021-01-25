@@ -2,7 +2,7 @@ FT_TESTER_DIR=YoupiBanane
 
 cp -r $FT_TESTER_DIR /tmp/$FT_TESTER_DIR
 
-valgrind --track-fds=yes --leak-check=full ./webserv -f conf2.json -l TRACE &
+valgrind --track-fds=yes --leak-check=full ./webserv -f conf2.json &
 jobpid=$!
 
 ./ubuntu_tester http://localhost:80

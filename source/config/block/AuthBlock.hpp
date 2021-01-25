@@ -23,15 +23,17 @@ class AuthBlock
 	private:
 		Optional<std::string> m_realm;
 
-	public:
-		AuthBlock();
+	private:
 		AuthBlock(const AuthBlock &other);
-
-		virtual
-		~AuthBlock();
 
 		AuthBlock&
 		operator=(const AuthBlock &other);
+
+	public:
+		AuthBlock();
+
+		virtual
+		~AuthBlock();
 
 		AuthBlock&
 		realm(const std::string &realm);

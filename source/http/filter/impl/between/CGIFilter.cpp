@@ -27,6 +27,7 @@
 #include <log/Logger.hpp>
 #include <log/LoggerFactory.hpp>
 #include <util/Environment.hpp>
+#include <util/FilenameUtils.hpp>
 #include <util/Macros.hpp>
 #include <util/Optional.hpp>
 #include <iostream>
@@ -66,7 +67,7 @@ CGIFilter::doFilter(UNUSED HTTPClient &client, UNUSED HTTPRequest &request, UNUS
 		return (next());
 
 	std::string extension;
-	if (!File::findExtension(request.resource(), extension))
+	if ((extension = FilenameUtils::getExtension(request.resource())).empty())
 		return (next());
 
 	const CGIBlock &cgiBlock = Configuration::instance().rootBlock().getCGI(locationBlock.cgi().get());

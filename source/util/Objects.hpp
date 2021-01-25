@@ -22,11 +22,9 @@ class Objects
 		Objects();
 		Objects(const Objects &other);
 
-	public:
 		virtual
 		~Objects();
 
-	private:
 		Objects&
 		operator=(const Objects &other);
 

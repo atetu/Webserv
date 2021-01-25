@@ -27,16 +27,18 @@ class CGIBlock
 		Optional<std::list<std::string> > m_extensions;
 		Optional<std::map<std::string, std::string> > m_environment;
 
-	public:
+	private:
 		CGIBlock();
-		CGIBlock(std::string name);
 		CGIBlock(const CGIBlock &other);
-
-		virtual
-		~CGIBlock();
 
 		CGIBlock&
 		operator=(const CGIBlock &other);
+
+	public:
+		CGIBlock(const std::string &name);
+
+		virtual
+		~CGIBlock();
 
 		CGIBlock&
 		path(const std::string &path);

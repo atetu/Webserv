@@ -14,13 +14,15 @@
 # define FILEDESCRIPTORSET_HPP_
 
 #include <sys/select.h>
-#include <iterator>
 
 class FileDescriptorSet
 {
 	private:
 		fd_set m_storage;
 		int m_size;
+
+	public:
+		static const int MAX;
 
 	public:
 		FileDescriptorSet();

@@ -15,25 +15,26 @@
 #include <config/block/container/CustomErrorMap.hpp>
 #include <config/block/CGIBlock.hpp>
 #include <config/block/LocationBlock.hpp>
-#include <config/block/MimeBlock.hpp>
+#include <config/block/MIMEBlock.hpp>
 #include <config/block/ServerBlock.hpp>
 #include <config/Configuration.hpp>
 #include <config/exceptions/ConfigurationBindException.hpp>
 #include <config/exceptions/ConfigurationValidateException.hpp>
 #include <exception/IllegalStateException.hpp>
-#include <http/mime/Mime.hpp>
+#include <http/enums/HTTPStatus.hpp>
+#include <http/mime/MIME.hpp>
 #include <json/JsonArray.hpp>
 #include <json/JsonBoolean.hpp>
 #include <json/JsonNumber.hpp>
 #include <json/JsonReader.hpp>
 #include <json/JsonString.hpp>
 #include <json/JsonValue.hpp>
-#include <libs/ft.hpp>
 #include <log/Logger.hpp>
 #include <log/LoggerFactory.hpp>
-#include <stddef.h>
+#include <net/address/Inet4Address.hpp>
 #include <unit/DataSize.hpp>
 #include <util/Convert.hpp>
+#include <util/FileDescriptorSet.hpp>
 #include <util/helper/DeleteHelper.hpp>
 #include <util/helper/JsonBinderHelper.hpp>
 #include <util/Optional.hpp>
@@ -47,44 +48,17 @@
 Logger &Configuration::LOG = LoggerFactory::get("Configuration");
 Configuration *Configuration::INSTANCE = NULL;
 
-Configuration::Configuration() :
-		m_file(),
-		m_mimeRegistry(NULL),
-		m_rootBlock(NULL)
-{
-}
-
-Configuration::Configuration(const std::string &file, const MimeRegistry &mimeRegistry, const RootBlock &rootBlock) :
+Configuration::Configuration(const std::string &file, const MIMERegistry &mimeRegistry, const RootBlock &rootBlock) :
 		m_file(file),
 		m_mimeRegistry(&mimeRegistry),
 		m_rootBlock(&rootBlock)
 {
 }
 
-Configuration::Configuration(const Configuration &other) :
-		m_file(other.m_file),
-		m_mimeRegistry(other.m_mimeRegistry),
-		m_rootBlock(other.m_rootBlock)
-{
-}
-
 Configuration::~Configuration()
 {
-	DeleteHelper::pointer<MimeRegistry>(m_mimeRegistry);
+	DeleteHelper::pointer<MIMERegistry>(m_mimeRegistry);
 	DeleteHelper::pointer<RootBlock>(m_rootBlock);
-}
-
-Configuration&
-Configuration::operator =(const Configuration &other)
-{
-	if (this != &other)
-	{
-		m_file = other.m_file;
-		m_mimeRegistry = other.m_mimeRegistry;
-		m_rootBlock = other.m_rootBlock;
-	}
-
-	return (*this);
 }
 
 void
@@ -111,7 +85,7 @@ Configuration::fromJsonFile(const std::string &path, bool ignoreMimeIncludesErro
 {
 	const JsonObject *jsonObject = &JsonBuilder::rootObject(path);
 	RootBlock *rootBlock = NULL;
-	MimeRegistry *mimeRegistry = NULL;
+	MIMERegistry *mimeRegistry = NULL;
 
 	try
 	{
@@ -128,7 +102,7 @@ Configuration::fromJsonFile(const std::string &path, bool ignoreMimeIncludesErro
 
 		LOG.trace() << "Filling MIME registry..." << std::endl;
 
-		mimeRegistry = new MimeRegistry();
+		mimeRegistry = new MIMERegistry();
 
 		if (rootBlock->mimeBlock().present())
 		{
@@ -162,11 +136,11 @@ Configuration::fromJsonFile(const std::string &path, bool ignoreMimeIncludesErro
 
 			if (mimeBlock.defines().present())
 			{
-				const std::list<Mime const*> &defines = mimeBlock.defines().get();
+				const std::list<MIME const*> &defines = mimeBlock.defines().get();
 
 				LOG.trace() << "From " << defines.size() << " define(s)." << std::endl;
 
-				for (std::list<Mime const*>::const_iterator it = defines.begin(); it != defines.end(); it++)
+				for (std::list<MIME const*>::const_iterator it = defines.begin(); it != defines.end(); it++)
 					mimeRegistry->add(*(*it));
 			}
 
@@ -230,6 +204,7 @@ Configuration::JsonBuilder::buildRootBlock(const JsonObject &jsonObject)
 			std::string path = KEY_ROOT;
 
 			BIND(jsonObject, KEY_ROOT_MAX_ACTIVE_CLIENT, JsonNumber, int, rootBlock, maxActiveClient);
+			BIND(jsonObject, KEY_ROOT_TIMEOUT, JsonNumber, int, rootBlock, timeout);
 		}
 
 		if (jsonObject.has(KEY_ROOT_ROOT))
@@ -293,7 +268,7 @@ Configuration::JsonBuilder::buildMimeBlock(const std::string &path, const JsonOb
 			std::string ipath = path + KEY_DOT KEY_MIME_DEFINE;
 			const JsonObject &object = JsonBinderHelper::jsonCast<JsonObject>(ipath, jsonObject.get(KEY_MIME_DEFINE));
 
-			mimeBlock->defines(JsonBinderHelper::buildBlocks<Mime, JsonArray>(ipath, object, Mime::builder));
+			mimeBlock->defines(JsonBinderHelper::buildBlocks<MIME, JsonArray>(ipath, object, MIME::builder));
 		}
 	}
 	catch (...)
@@ -446,7 +421,6 @@ Configuration::JsonBuilder::buildLocationBlock(const std::string &path, const st
 		BIND(jsonObject, KEY_LOCATION_ROOT, JsonString, std::string, locationBlock, root);
 		BIND(jsonObject, KEY_LOCATION_LISTING, JsonBoolean, bool, locationBlock, listing);
 		BIND(jsonObject, KEY_LOCATION_CGI, JsonString, std::string, locationBlock, cgi);
-		//BIND(jsonObject, KEY_LOCATION_MAXBODYSIZE, JsonString, std::string, locationBlock, maxBodySize);
 
 		BIND_CUSTOM(jsonObject, KEY_LOCATION_MAXBODYSIZE, JsonString, std::string,
 		{
@@ -574,7 +548,7 @@ Configuration::JsonBuilder::buildCustomErrorMap(const std::string &path, const J
 		stream << key;
 		stream >> code;
 
-		if (code == 0 || (code / 100 != 4 && code / 100 != 5)) // TODO Move to HTTPStatus::isError()
+		if (!HTTPStatus::isError(code))
 			throw ConfigurationBindException("code '" + Convert::toString(code) + "' must be an error 4xx or 5xx (" + path + ")");
 
 		map.insert(map.end(), std::make_pair(code, value));
@@ -596,7 +570,18 @@ Configuration::Validator::validate(const RootBlock &rootBlock)
 		long n = rootBlock.maxActiveClient().get();
 
 		if (n < 1)
-			throw ConfigurationValidateException("maxActiveClient is under one (<= 1)");
+			throw ConfigurationValidateException("maxActiveClient is under one (< 1)");
+
+		if (n > FileDescriptorSet::MAX * 0.8)
+			throw ConfigurationValidateException("maxActiveClient is over > 80% of the max file descriptor count in a set (which is " + Convert::toString(FileDescriptorSet::MAX) + ")");
+	}
+
+	if (rootBlock.timeout().present())
+	{
+		long n = rootBlock.timeout().get();
+
+		if (n < 1)
+			throw ConfigurationValidateException("timeout is under one (< 1)");
 	}
 
 	if (rootBlock.serverBlocks().present())
@@ -609,38 +594,13 @@ Configuration::Validator::validate(const RootBlock &rootBlock)
 		for (slist::const_iterator sit = serverBlocks.begin(); sit != serverBlocks.end(); sit++)
 		{
 			const ServerBlock &serverBlock = *(*sit);
-			
+
 			if (serverBlock.host().present())
 			{
-				std::string host = serverBlock.host().get();
-				size_t found;
-				int loop = 4;
-				while (loop--)
-				{
-					if (((found = host.find(".")) != std::string::npos) || loop == 0)
-					{
-						std::string subHost = host.substr(0, found);
-						host.erase(0, found + 1);
-						int res;
-						if (!subHost.empty() && subHost.size() <= 3)
-						{
-							size_t i = -1;
-							while (++i < subHost.size())
-							{
-								if (!(ft::isdigit(subHost[i])))
-									throw ConfigurationValidateException("Host value should only be made of digits.");
-							}
-						}
-						else
-						{
-							throw ConfigurationValidateException("Host value should be made of 4 units, made up of 1 to 3 digits maximum, separated by dots.");
-						}
-						if (!((res = ft::atoi(subHost.c_str())) >= 0 && res <= 255))
-							throw ConfigurationValidateException("Host value should be made of 4 numbers, ranged between 0 and 255");
-					}
-					else
-						throw ConfigurationValidateException("Host value should be made of 4 units, made up of 1 to 3 digits maximum, separated by dots2.");
-				}
+				const std::string &host = serverBlock.host().get();
+
+				if (!Inet4Address::validate(host))
+					throw ConfigurationValidateException("Host IP is ill-formed `" + host + "`");
 			}
 
 			if (serverBlock.locations().present())
@@ -671,5 +631,5 @@ Configuration::Validator::validate(const RootBlock &rootBlock)
 		}
 	}
 	else
-		throw ConfigurationValidateException("No server slist found.");
+		throw ConfigurationValidateException("No server list found.");
 }

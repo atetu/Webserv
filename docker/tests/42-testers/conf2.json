@@ -7,7 +7,7 @@
 	},
 	"cgi": {
 		"cgi_test": {
-			"path": "./cgi_tester",
+			"path": "./ubuntu_cgi_tester",
 			"extensions": [
 				"bla"
 			]

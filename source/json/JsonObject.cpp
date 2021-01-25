@@ -42,12 +42,9 @@ JsonObject::operator =(const JsonObject &other)
 {
 	if (this != &other)
 	{
-		const_iterator it = other.m_value.begin();
-		const_iterator ite = other.m_value.end();
-
 		clear();
 
-		for (; it != ite; it++)
+		for (const_iterator it = other.begin(); it != other.end(); it++)
 			m_value.insert(m_value.end(), std::make_pair(it->first, it->second->clone()));
 	}
 

@@ -27,9 +27,6 @@ class Socket :
 		static const int DEFAULT_BACKLOG = 1000;
 
 	private:
-		int m_incr;
-
-	private:
 		Socket(void);
 		Socket(int fd);
 		Socket(const Socket &other);

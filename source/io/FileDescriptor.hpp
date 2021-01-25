@@ -23,8 +23,8 @@ class FileDescriptor :
 {
 	protected:
 		int m_fd;
-		bool m_verified;
-		bool m_closed;
+		bool m_verified :1;
+		bool m_closed :1;
 
 	private:
 		FileDescriptor(void);

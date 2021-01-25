@@ -119,7 +119,7 @@ HTTPResponse::store(BaseBuffer &buffer)
 			buffer.store(HTTP::CRLF);
 			buffer.store(headers().format());
 			buffer.store(HTTP::CRLF);
-			
+
 			if (!m_body)
 				return (true);
 

@@ -14,16 +14,14 @@
 # define CONFIGURATION_HPP_
 
 #include <config/block/RootBlock.hpp>
-#include <http/mime/MimeRegistry.hpp>
+#include <http/mime/MIMERegistry.hpp>
 #include <json/JsonObject.hpp>
 #include <string>
-
-// TODO: All blocks need deep-copy, same goes for mime registry
-// Configuration should not be passed around like a normal object, but must be kept as singleton if possible
 
 #define KEY_DOT "."
 #define KEY_ROOT "<root>"
 #define KEY_ROOT_MAX_ACTIVE_CLIENT "maxActiveClient"
+#define KEY_ROOT_TIMEOUT "timeout"
 #define KEY_ROOT_ROOT "root"
 #define KEY_ROOT_MIME "mime"
 #define KEY_ROOT_CGI "cgi"
@@ -70,19 +68,21 @@ class Configuration
 
 	private:
 		std::string m_file;
-		const MimeRegistry *m_mimeRegistry;
+		const MIMERegistry *m_mimeRegistry;
 		const RootBlock *m_rootBlock;
 
-	public:
+	private:
 		Configuration(void);
-		Configuration(const std::string &file, const MimeRegistry &mimeRegistry, const RootBlock &rootBlock);
 		Configuration(const Configuration &other);
-
-		virtual
-		~Configuration();
 
 		Configuration&
 		operator=(const Configuration &other);
+
+	public:
+		Configuration(const std::string &file, const MIMERegistry &mimeRegistry, const RootBlock &rootBlock);
+
+		virtual
+		~Configuration();
 
 		inline const std::string&
 		file(void) const
@@ -90,7 +90,7 @@ class Configuration
 			return (m_file);
 		}
 
-		inline const MimeRegistry&
+		inline const MIMERegistry&
 		mimeRegistry(void) const
 		{
 			return (*m_mimeRegistry);
@@ -116,6 +116,16 @@ class Configuration
 	private:
 		class JsonBuilder
 		{
+			private:
+				JsonBuilder();
+				JsonBuilder(const JsonBuilder &other);
+
+				virtual
+				~JsonBuilder();
+
+				JsonBuilder&
+				operator=(const JsonBuilder &other);
+
 			public:
 				static const JsonObject&
 				rootObject(const std::string &filepath);
@@ -144,6 +154,16 @@ class Configuration
 
 		class Validator
 		{
+			private:
+				Validator();
+				Validator(const Validator &other);
+
+				virtual
+				~Validator();
+
+				JsonBuilder&
+				operator=(const Validator &other);
+
 			public:
 				static void
 				validate(const RootBlock &rootBlock);

@@ -10,13 +10,13 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <stddef.h>
 #include <options/OptionParser.hpp>
+#include <stddef.h>
 #include <algorithm>
 #include <iomanip>
+#include <iterator>
 #include <sstream>
 #include <string>
-#include <vector>
 
 OptionParser::OptionParser(list options) :
 		m_options(options)
@@ -93,7 +93,7 @@ OptionParser::parse(int argc, char **argv) throw (OptionParserException)
 }
 
 std::string
-OptionParser::help(const std::string &program, const std::string &description, const std::vector<std::string> &authors) const // TODO Need to be moved
+OptionParser::help(const std::string &program, const std::string &description, const std::vector<std::string> &authors) const
 {
 	size_t longestLong = 0;
 
@@ -127,9 +127,7 @@ OptionParser::help(const std::string &program, const std::string &description, c
 		stream << "Authors:" << std::endl;
 
 		for (std::vector<std::string>::const_iterator it = authors.begin(); it != authors.end(); it++)
-		{
 			stream << "  " << *it << std::endl;
-		}
 	}
 
 	return (stream.str());

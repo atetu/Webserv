@@ -19,12 +19,11 @@ class System
 		System();
 		System(const System &other);
 
-		System&
-		operator =(const System &other);
-
-	public:
 		virtual
 		~System();
+
+		System&
+		operator =(const System &other);
 
 	public:
 		static unsigned long

@@ -27,57 +27,24 @@ class JsonLocation
 		number m_index;
 
 	public:
-		JsonLocation() :
-				m_line(-1),
-				m_column(-1),
-				m_index(-1)
-		{
-		}
+		JsonLocation(void);
+		JsonLocation(number line, number column, number index);
+		JsonLocation(const JsonLocation &other);
 
-		JsonLocation(number line, number column, number index) :
-				m_line(line),
-				m_column(column),
-				m_index(index)
-		{
-		}
-
-		JsonLocation(const JsonLocation &other) :
-				m_line(other.m_line),
-				m_column(other.m_column),
-				m_index(other.m_index)
-		{
-		}
+		virtual
+		~JsonLocation(void);
 
 		JsonLocation&
-		operator =(const JsonLocation &other)
-		{
-			if (this != &other)
-			{
-				m_line = other.m_line;
-				m_column = other.m_column;
-				m_index = other.m_index;
-			}
-
-			return (*this);
-		}
+		operator =(const JsonLocation &other);
 
 		number
-		line() const
-		{
-			return (m_line);
-		}
+		line(void) const;
 
 		number
-		column() const
-		{
-			return (m_column);
-		}
+		column(void) const;
 
 		number
-		index() const
-		{
-			return (m_index);
-		}
+		index(void) const;
 
 	public:
 		static JsonLocation UNKNOWN;

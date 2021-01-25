@@ -6,7 +6,7 @@
 /*   By: atetu <atetu@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/06 19:10:43 by ecaceres          #+#    #+#             */
-/*   Updated: 2021/01/25 16:19:49 by atetu            ###   ########.fr       */
+/*   Updated: 2021/01/25 16:23:24 by atetu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,6 @@
 #include <log/LoggerFactory.hpp>
 #include <util/Macros.hpp>
 #include <util/Optional.hpp>
-#include <util/StringUtils.hpp>
 #include <list>
 #include <string>
 
@@ -55,17 +54,17 @@ LocationFilter::doFilter(UNUSED HTTPClient &client, HTTPRequest &request, UNUSED
 	const ServerBlock &serverBlock = *request.serverBlock().get(); /* Should always have one. */
 	const Optional<std::list<const LocationBlock*> > &locations = serverBlock.locations();
 
-	if (locations.present())
+	if (locations.absent())
+		return (next());
+
+	const std::string &path = client.parser().pathParser().path();
+
+	HTTPFindLocation findLocation(path, locations.get());
+	if (findLocation.parse().location().present())
 	{
-		const std::string &path = client.parser().pathParser().path();
+		const LocationBlock &locationBlock = *findLocation.parse().location().get();
 
-		HTTPFindLocation findLocation(path, locations.get());
-
-		if (findLocation.parse().location().present())
-		{
-			const LocationBlock &locationBlock = *findLocation.parse().location().get();
-
-			request.locationBlock(locationBlock);
+		request.locationBlock(locationBlock);
 
 			if (locationBlock.root().present() /* && StringUtils::last(locationBlock.path()) != '/'*/) // TODO see comment
 			{

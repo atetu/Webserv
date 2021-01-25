@@ -22,7 +22,7 @@
 #include <json/JsonString.hpp>
 
 #define REGISTER_JSON_TYPE_TRAITS(cls, jsonType) \
-   const char* JsonTypeTraits<cls>::name = #cls; \
+	const char* JsonTypeTraits<cls>::name = #cls; \
 	const JsonValue::Type JsonTypeTraits<cls>::type = jsonType; \
 	const char* JsonTypeTraits<cls>::typeString = JsonValue::typeStringStorage()[jsonType].c_str();
 

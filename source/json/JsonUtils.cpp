@@ -13,27 +13,6 @@
 #include <json/JsonUtils.hpp>
 #include <sstream>
 
-JsonUtils::JsonUtils()
-{
-}
-
-JsonUtils::~JsonUtils()
-{
-}
-
-JsonUtils::JsonUtils(const JsonUtils &other)
-{
-	(void)other;
-}
-
-JsonUtils&
-JsonUtils::operator=(const JsonUtils &other)
-{
-	(void)other;
-
-	return (*this);
-}
-
 std::string
 JsonUtils::escapeString(const std::string &str)
 {

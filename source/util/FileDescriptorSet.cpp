@@ -11,7 +11,8 @@
 /* ************************************************************************** */
 
 #include <util/FileDescriptorSet.hpp>
-#include <iostream>
+
+const int FileDescriptorSet::MAX = FD_SETSIZE;
 
 FileDescriptorSet::FileDescriptorSet() :
 		m_storage(),

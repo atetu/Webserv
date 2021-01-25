@@ -19,13 +19,6 @@
 const std::string BasicAuthBlock::TYPE = "basic";
 const std::string BasicAuthBlock::PRETTY_TYPE = "Basic";
 
-BasicAuthBlock::BasicAuthBlock() :
-		AuthBlock(),
-		m_user(),
-		m_password()
-{
-}
-
 BasicAuthBlock::BasicAuthBlock(const std::string &user) :
 		AuthBlock(),
 		m_user(user),
@@ -33,29 +26,8 @@ BasicAuthBlock::BasicAuthBlock(const std::string &user) :
 {
 }
 
-BasicAuthBlock::BasicAuthBlock(const BasicAuthBlock &other) :
-		AuthBlock(other),
-		m_user(other.m_user),
-		m_password(other.m_password)
-{
-}
-
 BasicAuthBlock::~BasicAuthBlock()
 {
-}
-
-BasicAuthBlock&
-BasicAuthBlock::operator=(const BasicAuthBlock &other)
-{
-	AuthBlock::operator =(other);
-
-	if (this != &other)
-	{
-		m_user = other.m_user;
-		m_password = other.m_password;
-	}
-
-	return (*this);
 }
 
 BasicAuthBlock&
