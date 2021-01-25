@@ -6,7 +6,7 @@
 /*   By: atetu <atetu@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/06 19:10:43 by ecaceres          #+#    #+#             */
-/*   Updated: 2021/01/25 16:23:24 by atetu            ###   ########.fr       */
+/*   Updated: 2021/01/25 16:24:32 by atetu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,7 +82,5 @@ LocationFilter::doFilter(UNUSED HTTPClient &client, HTTPRequest &request, UNUSED
 				request.resource(path);
 			}
 		}
-	}
-
 	return (next());
 }
