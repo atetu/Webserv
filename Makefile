@@ -76,7 +76,7 @@ docker-run: docker-build-run
 	@$(DOCKER) run --rm -it -p 80:80 webserv-run $(ARGS)
 
 docker-test: docker-build-test
-	@$(DOCKER) run --rm -it -p 80:80 webserv-test $(ARGS)
+	@$(DOCKER) run --rm -it -p 80:8042 webserv-test $(ARGS)
 
 siege: docker-build-siege
 	@$(DOCKER) run --rm -it -t siege -d1 -c50 -b -i $(SIEGE_URL)$(SIEGE_FILE)

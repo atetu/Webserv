@@ -24,6 +24,7 @@ RUN service mysql start; \
 	mysql -u root -e "FLUSH PRIVILEGES;";
 	
 RUN apt-get install -y dos2unix
+RUN sed -i 's/;cgi.fix_pathinfo=1/cgi.fix_pathinfo=0/g' /etc/php/7.2/cgi/php.ini
 
 RUN mkdir /app
 
