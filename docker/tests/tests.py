@@ -75,16 +75,16 @@ class TestPostMethod(WebservTestCase):
 
 class TestPutMethod(WebservTestCase):
 
-    def test_simple_file(self):
+    def test_simple_file_put(self):
         self.assertPostStatusCode("/test__simple_file_put.txt", 201, "Filed created and post".encode("ascii"))
         self.assertPutStatusCode("/test__simple_file_put.txt", 200, "Filed changed".encode("ascii"))
         self.assertGet("/test__simple_file_put.txt", "Filed changed")
     
-    def test_simple_file_but_double_changes(self):
-		self.assertPostStatusCode("/test__simple_file_put_2.txt", 201, "Filed created and post".encode("ascii"))
-		self.assertPutStatusCode("/test__simple_file_put_2.txt", 200, "Filed changed".encode("ascii"))
-		self.assertPutStatusCode("/test__simple_file_put_2.txt", 200, "Filed changed 2 times".encode("ascii"))
-		self.assertGet("/test__simple_file_put_2.txt", "Filed changed 2 times")
+    def test_simple_file_but_double_changes_put(self):
+        self.assertPostStatusCode("/test__simple_file_put_2.txt", 201, "Filed created and post".encode("ascii"))
+        self.assertPutStatusCode("/test__simple_file_put_2.txt", 200, "Filed changed".encode("ascii"))
+        self.assertPutStatusCode("/test__simple_file_put_2.txt", 200, "Filed changed 2 times".encode("ascii"))
+        self.assertGet("/test__simple_file_put_2.txt", "Filed changed 2 times")
 
 class TestDeleteMethod(WebservTestCase):
 	
