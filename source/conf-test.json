@@ -124,14 +124,16 @@
 				"/_tests/x.sh": {
 					"root": ".",
 					"methods": [
-						"GET"
+						"GET",
+						"HEAD"
 					],
 					"cgi": "bash"
 				},
 				"/_tests": {
 					"root": ".",
 					"methods": [
-						"GET"
+						"GET",
+						"OPTIONS"
 					],
 					"index": [
 						"index.html",
