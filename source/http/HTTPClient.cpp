@@ -310,7 +310,7 @@ HTTPClient::readBody(void)
 		}
 		catch (Exception &exception)
 		{
-			m_response.status(*HTTPStatus::UNPROCESSABLE_ENTITY); /* TODO Need more specific message based on the problem. */
+			m_response.status(*HTTPStatus::BAD_REQUEST); /* TODO Need more specific message based on the problem. */
 			m_filterChain.doChainingOf(FilterChain::S_AFTER);
 			m_state = S_END;
 		}

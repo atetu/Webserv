@@ -18,6 +18,7 @@
 #include <sys/fcntl.h>
 #include <sys/stat.h>
 #include <sys/unistd.h>
+#include <util/FilenameUtils.hpp>
 #include <util/StringUtils.hpp>
 
 File::File() :
@@ -136,10 +137,7 @@ File::lastModified() const
 std::string
 File::name() const
 {
-	std::string::size_type n = m_path.rfind('/');
-	std::string::size_type pos = n == std::string::npos ? 0 : n + 1; // TODO Need fix
-
-	return (m_path.substr(pos, m_path.length() - pos));
+	return (FilenameUtils::getName(m_path));
 }
 
 FileDescriptor*

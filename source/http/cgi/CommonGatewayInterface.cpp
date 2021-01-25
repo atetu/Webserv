@@ -157,7 +157,7 @@ CommonGatewayInterface::execute(HTTPClient &client, const CGIBlock &cgiBlock, co
 	env.setProperty(ENV_SERVER_PROTOCOL, request.version().format());
 	env.setProperty(ENV_SERVER_SOFTWARE, APPLICATION_NAME_AND_VERSION);
 	env.setProperty(ENV_PATH_INFO, request.url().path());
-	env.setProperty(ENV_PATH_TRANSLATED, "/mnt/c/Users/cacer/OneDrive/Developments/Workspace/webserv/source/YoupiBanane/youpi.bla"); // TODO Change
+	env.setProperty(ENV_PATH_TRANSLATED, scriptAbsoluteFile.path());
 	env.setProperty(ENV_QUERY_STRING, request.url().queryString());
 
 	if (request.method().get()->hasBody())
@@ -170,7 +170,7 @@ CommonGatewayInterface::execute(HTTPClient &client, const CGIBlock &cgiBlock, co
 	}
 
 	Optional<const AuthBlock*> authBlockOpt = request.authBlock();
-	if (authBlockOpt.present()) // TODO Need to be changed to authorization objects
+	if (authBlockOpt.present())
 	{
 		const AuthBlock &authBlock = *authBlockOpt.get();
 

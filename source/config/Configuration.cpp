@@ -546,7 +546,7 @@ Configuration::JsonBuilder::buildCustomErrorMap(const std::string &path, const J
 		stream << key;
 		stream >> code;
 
-		if (!HTTPStatus::isError(code)) // TODO Move to HTTPStatus::isError()
+		if (!HTTPStatus::isError(code))
 			throw ConfigurationBindException("code '" + Convert::toString(code) + "' must be an error 4xx or 5xx (" + path + ")");
 
 		map.insert(map.end(), std::make_pair(code, value));
