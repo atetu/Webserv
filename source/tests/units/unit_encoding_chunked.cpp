@@ -28,7 +28,7 @@ encode(const char *str)
 static std::string
 decode(const char *str)
 {
-	return (ChunkDecoder(false).decode(str));
+	return (ChunkDecoder(false).decode(str, false));
 }
 
 static std::string
@@ -38,8 +38,8 @@ decode2(const char *str, const char *str2)
 
 	size_t consumed = 0;
 	std::string out;
-	decoder.consume(str, out, consumed);
-	decoder.consume(str2, out, consumed);
+	decoder.consume(str, out, consumed, false);
+	decoder.consume(str2, out, consumed, false);
 
 	return (out);
 }
@@ -54,14 +54,14 @@ decode3(std::string str, std::string str2, std::string str3)
 
 	size_t consumed = 0;
 	std::string out;
-	decoder.consume(str, out, consumed);
+	decoder.consume(str, out, consumed, false);
 	if (consumed)
 		str.erase(0, consumed);
 	str2 = str +str2;
-	decoder.consume(str2, out, consumed);
+	decoder.consume(str2, out, consumed, false);
 	str2.erase(0, consumed);
 	str3 = str2 +str3;
-	decoder.consume(str3, out, consumed);
+	decoder.consume(str3, out, consumed, false);
 	
 	return (out);
 }

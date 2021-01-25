@@ -6,7 +6,7 @@
 /*   By: atetu <atetu@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/15 15:24:50 by alicetetu         #+#    #+#             */
-/*   Updated: 2021/01/12 17:27:16 by atetu            ###   ########.fr       */
+/*   Updated: 2021/01/22 11:29:19 by atetu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -129,7 +129,7 @@ HTTPFindLocation::parse(void)
 	while (it != ite)
 	{
 		HTTPLocationInterpretor interpretor((*it)->path(), *it);
-	//	std::cout << "0\n";
+
 		char c;
 		start = 0;
 		endIndicator = 0;
@@ -141,23 +141,18 @@ HTTPFindLocation::parse(void)
 		while (interpretor.next(c))
 			interpretor.consume(c);
 
-	//	std::cout << "middle: " << interpretor .middleElement() << std::endl;
 		if (!(interpretor.middleElement().empty()))
 		{
-	//		std::cout << "middle el \n";
 			interpretor.middleList(interpretor.middleElement());
 		}
 		
 		if (interpretor.lastChar() != '*' && !interpretor.middleList().empty())
 		{
 			std::string it_middleListEnd = interpretor.middleList().back();
-			std::cout << it_middleListEnd << "\n";
 			interpretor.setEnd(it_middleListEnd);
-		//	std::cout << "1\n";
 			interpretor.erase();
-		//	std::cout << "todo bien\n";
 		}
-	//	std::cout << "1\n";
+
 		if (!(interpretor.exact().empty()))
 		{
 			if (interpretor.exact().compare(m_clientPath) == 0 || interpretor.exact().compare(m_clientPath + "/") == 0)
@@ -165,10 +160,10 @@ HTTPFindLocation::parse(void)
 
 			NEXT_LOOP(it);
 		}
-		//std::cout << "first:" <<  interpretor.firstChar() << std::endl;
+	
 		if (interpretor.firstChar() != '*')
 		{
-	//		std::cout << "ici\n";
+	
 			if (!(interpretor.start().empty()))
 		{
 			if (m_clientPath.compare(0, interpretor.start().size(), interpretor.start()) == 0 || (m_clientPath + "/").compare(0, interpretor.start().size(), interpretor.start()) == 0)
@@ -180,31 +175,21 @@ HTTPFindLocation::parse(void)
 				NEXT_LOOP(it);
 		}
 
-			// if (!(interpretor.start().empty()))
-			// {
-			// 	start = 1;
-			// 	pos = interpretor.start().size();
-			// }
-			// else
-			// 	NEXT_LOOP(it);
+			
 		}
 		else
 		{
-			// std::cout << "exact end true\n";
 			exactEnd = true;
-			// std::cout << "excat : " << exactEnd << std ::endl;
 		}
 				
 		if (!(interpretor.middleList().empty()))
 		{
-			// std::cout << "middle not empty \n";
 			std::list<std::string>::iterator it_list = interpretor.middleList().begin();
 			std::list<std::string>::iterator ite_list = interpretor.middleList().end();
 			while (it_list != ite_list)
 			{
 				if ((new_pos = m_clientPath.find(*it_list)))
 				{
-	//				std::cout << "found\n";
 					if (new_pos >= pos)
 						pos = new_pos + (*it_list).size() + 1;
 					else
@@ -222,7 +207,6 @@ HTTPFindLocation::parse(void)
 			}
 			if (not_found_middle)
 			{
-				// std::cout << "not found\n";
 				NEXT_LOOP(it);
 			}
 
@@ -230,34 +214,23 @@ HTTPFindLocation::parse(void)
 		}
 		if (!(interpretor.end().empty()))
 		{
-			// std::cout << " end not empty\n";
-			// std::cout << "excat : " << exactEnd << std ::endl;
 			std::string end = interpretor.end();
 
 			int size = end.size();
 			int index = m_clientPath.size() - size;
-			// std::cout << "inde: " << index << std::endl;
-			// std::cout << "size : "  << size << std::endl;
-			//  std::cout << "end: " << end << std::endl;
-			//  std::cout << "client: " << m_clientPath << std::endl;
+		
 			if (index >= 0 && (m_clientPath.compare(index, size, end) == 0 || (m_clientPath + "/").compare(index, size, end) == 0))
 			{
-		//		std::cout << "end 1\n" << std::endl;
 				endIndicator = 1;
 			}
 			else
 				NEXT_LOOP(it);
-//			std::cout << "excat : " << exactEnd << std ::endl;
 		}
-//std::cout << "excat end : " << exactEnd << std ::endl;
 
 		if (start || middle || endIndicator)
 		{
-	//		std::cout << "excat end 2 : " << exactEnd << std ::endl;
 			if (exactEnd)
 			{
-				// std::cout << "push back exact end\n";
-				// std::cout << "INTRPRETOR :" << interpretor.locationBlock()->path() << std ::endl;
 				exactEndList.push_back(interpretor);
 			}
 			else
@@ -269,7 +242,6 @@ HTTPFindLocation::parse(void)
 	std::list<HTTPLocationInterpretor> &listToCheck = possibleLocationList;
 	if (!exactEndList.empty())
 	{
-	//	std::cout << "exacteEndList not empty\n";
 		listToCheck.clear();
 		listToCheck = exactEndList;
 	}
@@ -278,7 +250,7 @@ HTTPFindLocation::parse(void)
 
 	std::list<HTTPLocationInterpretor> loc;
 	loc.push_back(*it_listToCheck);
-	//std::cout << "first path : " << (*it_listToCheck).locationBlock()->path() << std::endl;
+	
 	FIND_BEST(listToCheck, it_listToCheck, ite_listToCheck, loc, start);
 	FIND_BEST_MIDDLE(listToCheck, it_listToCheck, ite_listToCheck, loc, middleList);
 	FIND_BEST(listToCheck, it_listToCheck, ite_listToCheck, loc, end);
@@ -286,11 +258,6 @@ HTTPFindLocation::parse(void)
 	HTTPLocationInterpretor &bestLocation = *(loc.begin());
 
 	location(bestLocation.locationBlock());
-	// if (m_locationBlock.present())
-	// {
-	// 	std::cout << "location: " << m_locationBlock.get()->path() << std::endl;
-	// 	std::cout << "Methods :" << *(m_locationBlock.get()->methods().get().begin()) << std::endl;
-	// }
-	// std::cout << "location end\n";
+	
 	return (*this);
 }

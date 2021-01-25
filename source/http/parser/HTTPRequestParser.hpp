@@ -68,6 +68,7 @@ class HTTPRequestParser
 		IHTTPBodyDecoder *m_bodyDecoder;
 		long long m_maxBodySize;
 		long long m_totalSize;
+		bool m_max;
 
 	public:
 		HTTPRequestParser(HTTPClient &client); // FIXME Missing coplien

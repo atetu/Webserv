@@ -38,10 +38,13 @@ FileDescriptor::read(void *buf, size_t nbyte)
 
 	ssize_t r = ::read(m_fd, buf, nbyte);
 
+<<<<<<< HEAD
 #ifdef IO_FILEDESCRIPTOR_DEBUG_READ
 	std::cout << m_fd << ": read()= " << r << std::endl;
 #endif
 
+=======
+>>>>>>> refs/remotes/origin/master
 	if (!m_verified && r != -1)
 		m_verified = true;
 
@@ -55,10 +58,13 @@ FileDescriptor::write(const void *buf, size_t nbyte)
 
 	ssize_t r = ::write(m_fd, buf, nbyte);
 
+<<<<<<< HEAD
 #ifdef IO_FILEDESCRIPTOR_DEBUG_WRITE
 	std::cout << m_fd << ": write()= " << r << std::endl;
 #endif
 
+=======
+>>>>>>> refs/remotes/origin/master
 	if (!m_verified && r != -1)
 		m_verified = true;
 

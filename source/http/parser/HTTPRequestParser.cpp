@@ -6,7 +6,7 @@
 /*   By: atetu <atetu@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/27 17:29:02 by ecaceres          #+#    #+#             */
-/*   Updated: 2021/01/21 13:46:51 by atetu            ###   ########.fr       */
+/*   Updated: 2021/01/22 11:32:29 by atetu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,8 @@ HTTPRequestParser::HTTPRequestParser(HTTPClient &client) :
 		m_client(client),
 		m_bodyDecoder(),
 		m_maxBodySize(-1),
-		m_totalSize(0)
+		m_totalSize(0),
+		m_max(false)
 {
 	m_method.reserve(16);
 }
@@ -51,7 +52,6 @@ HTTPRequestParser::~HTTPRequestParser()
 void
 HTTPRequestParser::consume(char c)
 {
-//	std::cout << c;
 	switch (m_state)
 	{
 		case S_NOT_STARTED:
@@ -64,6 +64,7 @@ HTTPRequestParser::consume(char c)
 		
 		case S_METHOD:
 		{
+			m_max = false;
 			if (c == ' ')
 			{
 				if (m_state == S_NOT_STARTED)
@@ -94,7 +95,6 @@ HTTPRequestParser::consume(char c)
 					throw Exception("No slash");
 
 				m_state = S_PATH;
-				// m_path += '/'; /* Added in the constructor of the URL object. */
 			}
 
 			break;
@@ -237,8 +237,8 @@ HTTPRequestParser::consume(char c)
 			if (c == '\n')
 				m_state = S_END;
 			else
-				m_state = S_END; /* Body */ // TODO
-
+				m_state = S_END;
+				
 			break;
 		}
 
@@ -270,20 +270,21 @@ HTTPRequestParser::consume(char c)
 		case S_BODY_DECODE:
 		{
 			size_t consumed = 0;
-			bool finished = m_bodyDecoder->consume(m_client.in().storage(), m_client.body(), consumed);
-		//	std::cout << "consumed: " << consumed<< ", in size: " << m_client.in().storage().length() << ", body size: " << m_client.body().size() << ", first in body: " << (int)m_client.in().storage().c_str()[0] << ", finished: " << finished << std::endl;
+			bool finished = m_bodyDecoder->consume(m_client.in().storage(), m_client.body(), consumed, m_max);
+		
 			m_client.in().skip(consumed);
-
 			m_totalSize += consumed;
-//			std::cout << "TOTAL SIZE: "<< m_client.body().size() << std::endl;
-			std::cout << "MAX BODY SIZE: "<< m_maxBodySize << std::endl;
-			if (m_maxBodySize != -1 && m_client.body().size() > m_maxBodySize)
-				throw HTTPRequestPayloadTooLargeException();
-
+			
+			if (m_maxBodySize != -1 && (long long)m_client.body().size() > m_maxBodySize)
+			{
+				m_max = true; 
+				if (finished)
+					throw HTTPRequestPayloadTooLargeException();
+			}
+		
 			if (finished)
 				m_state = S_END;
 
-			//std::cout << "finished: " << finished << std::endl;
 			break;
 		}
 
@@ -291,10 +292,8 @@ HTTPRequestParser::consume(char c)
 			break;
 
 	}
-
-//	std::cout << m_state << " -- " << c << std::endl;
-//	std::cout << c << std::flush;
 }
+
 void
 HTTPRequestParser::reset()
 {

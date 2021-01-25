@@ -6,7 +6,7 @@
 /*   By: atetu <atetu@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/21 23:36:43 by ecaceres          #+#    #+#             */
-/*   Updated: 2021/01/12 14:10:24 by atetu            ###   ########.fr       */
+/*   Updated: 2021/01/22 11:09:30 by atetu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -113,7 +113,41 @@ File::createNewFile(mode_t mode) const
 	if ((fd = ::open(m_path.c_str(), O_CREAT, mode)) == -1)
 		throw ioException();
 
+<<<<<<< HEAD
 	::close(fd);
+=======
+	std::string copy = m_path;
+	std::string previousStr = "";
+	std::size_t found;
+	
+	while ((found = copy.find('/')) != std::string::npos)
+	{
+		std::string newPath = copy.substr(0, found);
+		std::string remainedPath = copy.substr(found + 1, std::string::npos);
+		if (newPath == "./" || newPath == "/")
+		{
+			previousStr = newPath;
+			copy = remainedPath;
+		}
+		else
+		{
+			File file(previousStr + "/" + newPath);
+			if (!file.exists())
+				mkdir(file.path().c_str(), 0777);
+			previousStr = newPath;
+			copy = remainedPath;
+		}
+
+	}
+	if ((fd = ::open(m_path.c_str(), O_CREAT, mode)) == -1) //TOTO create directory if needed
+	{
+		errno = 0;
+	
+		return (false); //TODO handle errors
+	}
+
+	close(fd);
+>>>>>>> refs/remotes/origin/master
 
 	return (true);
 }
@@ -272,6 +306,76 @@ File::concatPaths(const std::string &a, const std::string &b)
 	return (a + '/' + b);
 }
 
+<<<<<<< HEAD
+=======
+bool
+File::findFilename(const std::string &path, std::string &out)
+{
+	if (path.empty())
+		return (false);
+
+	std::string::size_type lastSlashPos = path.rfind("/");
+
+	if (lastSlashPos != std::string::npos)
+		out = path.substr(lastSlashPos + 1);
+	else
+		out = path;
+
+	return (true);
+}
+
+bool
+File::findExtension(const std::string &path, std::string &out)
+{
+	std::string filename;
+	if (!File::findFilename(path, filename))
+		return (false);
+
+	std::string::size_type lastDotPos = filename.rfind(".");
+
+	if (lastDotPos == std::string::npos)
+		return (false);
+
+	out = filename.substr(lastDotPos + 1);
+
+	return (true);
+}
+
+bool
+File::findMime(std::string &out, HTTPRequest &request)
+{
+	const MimeRegistry &mimeRegistry = Configuration::instance().mimeRegistry();
+	std::string type = request.headers().get(HTTPHeaderFields::CONTENT_TYPE).orElse("");
+	if (!type.empty())
+	{
+		const Mime *mime = mimeRegistry.findByMimeType(type);
+		if (mime == NULL)
+			return (false);
+		
+		std::size_t found = m_path.find_last_of(out);
+				
+		if (!out.empty())
+		{
+			Mime::iterator ext_it = std::find(mime->extensions().begin(), mime->extensions().end(), out);
+			if (ext_it != mime->extensions().end())
+				; // TODO Bad conditional
+			else if (ext_it == mime->extensions().end() && exists())
+			{
+				return (false);
+			}
+			else
+			{
+				m_path = m_path.substr(0, found) + "." + *(mime->extensions().begin());
+			}
+		}
+		
+		else if (!exists())
+			m_path = m_path + "." + *(mime->extensions().begin());
+	}
+	return (true);
+}
+
+>>>>>>> refs/remotes/origin/master
 File
 File::currentDirectory()
 {

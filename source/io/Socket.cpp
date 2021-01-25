@@ -6,7 +6,7 @@
 /*   By: atetu <atetu@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/19 14:33:05 by ecaceres          #+#    #+#             */
-/*   Updated: 2021/01/19 16:42:52 by atetu            ###   ########.fr       */
+/*   Updated: 2021/01/22 11:10:18 by atetu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,10 +43,13 @@ Socket::recv(void *buf, size_t len, int flags)
 
 	ssize_t r = ::recv(m_fd, buf, len, flags);
 
+<<<<<<< HEAD
 #ifdef IO_SOCKET_DEBUG_RECV
 	std::cout << m_fd << ": recv()= " << r << std::endl;
 #endif
 
+=======
+>>>>>>> refs/remotes/origin/master
 	return (r);
 }
 
@@ -57,10 +60,13 @@ Socket::send(const void *buf, size_t len, int flags)
 
 	ssize_t r = ::send(m_fd, buf, len, flags);
 
+<<<<<<< HEAD
 #ifdef IO_SOCKET_DEBUG_SEND
 	std::cout << m_fd << ": send()= " << r << std::endl;
 #endif
 
+=======
+>>>>>>> refs/remotes/origin/master
 	return (r);
 }
 

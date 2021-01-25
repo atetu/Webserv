@@ -6,7 +6,7 @@
 /*   By: atetu <atetu@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/19 14:47:44 by alicetetu         #+#    #+#             */
-/*   Updated: 2021/01/14 16:43:46 by atetu            ###   ########.fr       */
+/*   Updated: 2021/01/22 11:44:58 by atetu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,15 +26,9 @@ class ChunkDecoder :
 		{
 			S_NOT_STARTED = 0,
 			S_SIZE,
-		//	S_EXTENSION,
-		//	S_SIZE_END,
-		//	S_SIZE_END2,
 			S_CHUNK,
-		//	S_CHUNK_END_EXPECTED,
 			S_CHUNK_END,
 			S_CHUNK_END2,
-		//	S_NULL,
-		//	S_END,
 			S_OVER
 		};
 
@@ -56,7 +50,7 @@ class ChunkDecoder :
 		~ChunkDecoder();
 
 		bool
-		consume(const std::string &in, std::string &out, size_t &consumed);
+		consume(const std::string &in, std::string &out, size_t &consumed, bool max);
 
 		void
 		cleanup();
