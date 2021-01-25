@@ -12,13 +12,22 @@
 	},
 	"cgi": {
 		"python3": {
-			"path": "/usr/bin/python3"
+			"path": "/usr/bin/python3",
+			"extensions": [
+				"py"
+			]
 		},
 		"bash": {
-			"path": "/bin/bash"
+			"path": "/bin/bash",
+			"extensions": [
+				"sh"
+			]
 		},
 		"bash0": {
-			"path": "/bin/ls"
+			"path": "/bin/ls",
+			"extensions": [
+				"sh"
+			]
 		},
 		"bla": {
 			"path": "../docker/tests/42-testers/ubuntu_cgi_tester",
@@ -108,11 +117,11 @@
 					"cgi": "python3"
 				},
 				"/_tests/x.php": {
-					"root": ".",
+					"root": "../dummy-files/",
 					"cgi": "php-cgi"
 				},
 				"/_tests/x.sh": {
-					"root": ".",
+					"root": "../dummy-files/",
 					"methods": [
 						"GET"
 					],
