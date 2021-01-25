@@ -60,7 +60,9 @@
 						"GET",
 						"POST",
 						"PUT",
-						"DELETE"
+						"DELETE",
+						"TRACE",
+						"OPTIONS"
 					],
 					"index": [
 						"index.html"

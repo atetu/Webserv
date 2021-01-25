@@ -49,9 +49,9 @@ TraceHandler::handle(UNUSED HTTPClient &client,  HTTPRequest &request, HTTPRespo
 	std::string path = request.url().format();
 	std::string version = "HTTP/1.1";
 	std::string statusLine = method + ' ' + path + ' ' + version + '\n';
-
 	std::string head = statusLine + request.headers().format("\n");
 
+	response.status(*HTTPStatus::OK);
 	response.headers().httpMessage();
 	response.headers().contentLength(head.size());
 	response.string(head);
