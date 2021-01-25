@@ -226,3 +226,4 @@ $RECYCLE.BIN/
 *.gcno
 *.gcda
 callgrind.out.*
+/.test
