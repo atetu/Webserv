@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   FinalFilter.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ecaceres <ecaceres@student.42.fr>          +#+  +:+       +#+        */
+/*   By: atetu <atetu@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/07 01:19:41 by ecaceres          #+#    #+#             */
-/*   Updated: 2021/01/07 01:19:41 by ecaceres         ###   ########.fr       */
+/*   Updated: 2021/01/22 11:36:28 by atetu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,8 +49,11 @@ FinalFilter::doFilter(HTTPClient &client, UNUSED HTTPRequest &request, HTTPRespo
 {
 	if (response.status().get()->isError() || request.headers().get(HTTPHeaderFields::CONNECTION).equals(HTTPHeaderFields::CLOSE))
 	{
-		client.keepAlive(false);
-		response.headers().connection(HTTPHeaderFields::CLOSE);
+		if (!(response.status().get() == HTTPStatus::PAYLOAD_TOO_LARGE))
+		{
+			client.keepAlive(false);
+			response.headers().connection(HTTPHeaderFields::CLOSE);
+		}
 	}
 
 	if (!response.body() && response.headers().get(HTTPHeaderFields::TRANSFER_ENCODING).otherwise(response.headers().get(HTTPHeaderFields::CONTENT_LENGTH)).absent())

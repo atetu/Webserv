@@ -6,7 +6,7 @@
 /*   By: atetu <atetu@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/19 14:51:33 by alicetetu         #+#    #+#             */
-/*   Updated: 2021/01/21 13:44:30 by atetu            ###   ########.fr       */
+/*   Updated: 2021/01/22 11:36:10 by atetu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,11 +38,9 @@ ChunkDecoder::~ChunkDecoder()
 		if (endPtr == hex_intro.c_str())							\
 			throw Exception ("Hexadecimal conversion impossible"); 	\
 		m_sizeStr = "";
-//		 std::cout << "hex: " << hex_intro << std::endl;
-//		 std::cout << "nb : " << m_sizeNb << std::endl;
 
 bool
-ChunkDecoder::consume(const std::string &in, std::string &out, size_t &consumed)
+ChunkDecoder::consume(const std::string &in, std::string &out, size_t &consumed, bool max)
 {
 	std::string copy = in;
 	
@@ -55,7 +53,6 @@ ChunkDecoder::consume(const std::string &in, std::string &out, size_t &consumed)
 			case S_NOT_STARTED:
 			case S_SIZE:
 			{
-//				std::cout << copy << std::endl;
 				size_t found;
 				found = copy.find("\r\n");
 				
@@ -77,12 +74,10 @@ ChunkDecoder::consume(const std::string &in, std::string &out, size_t &consumed)
 					SIZE_CONVERSION();
 				
 					m_sizeStr = "";
-//					std::cout << "NB: "<< m_sizeNb << std::endl;
 					copy.erase(0, found + 2);
 				}
 				else
 				{
-//					std::cout << "consumed: "<< consumed << std::endl;
 					return (false);
 				}
 
@@ -112,7 +107,8 @@ ChunkDecoder::consume(const std::string &in, std::string &out, size_t &consumed)
 				else
 				{
 					m_parsedChunk = copy.substr(0, m_sizeNb);
-					out += m_parsedChunk;
+					if (!max)
+						out += m_parsedChunk;
 					consumed += m_sizeNb;
 					m_parsedChunk = "";
 					
@@ -177,7 +173,7 @@ ChunkDecoder::consume(const std::string &in, std::string &out, size_t &consumed)
 					
 				break;
 			}	
-		
+
 			case S_OVER:
 			{
 				return (true);

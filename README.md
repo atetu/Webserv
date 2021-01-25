@@ -90,3 +90,4 @@ But some of the part like `/wp-admin/customize.php` does not seems to work witho
 
 - [Alice TÊTU](https://profile.intra.42.fr/users/atetu)
 - [Enzo CACERES](https://profile.intra.42.fr/users/ecaceres)
+- [Romain SANCHEZ](https://profile.intra.42.fr/users/rosanche)

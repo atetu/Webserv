@@ -39,7 +39,7 @@ class IdentityDecoder :
 		~IdentityDecoder();
 
 		bool
-		consume(const std::string &in, std::string &out, size_t &consumed);
+		consume(const std::string &in, std::string &out, size_t &consumed, bool max);
 
 		void
 		cleanup();

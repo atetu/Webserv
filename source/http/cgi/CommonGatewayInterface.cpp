@@ -223,11 +223,6 @@ CommonGatewayInterface::execute(HTTPClient &client, const CGIBlock &cgiBlock, co
 		::close(inPipe[1]);
 		::close(outPipe[0]);
 
-//		if (cgiBlock.redirectErrToOut().orElse(true)) // TODO Need debug
-//			::dup2(1, 2);
-
-		//LOG.trace() << "execve: " << path << std::endl;
-
 		char *const argv[] = {
 			const_cast<char*>(path.c_str()), /* Dangerous, but kernel allocate it anyway... */
 			const_cast<char*>(file.c_str()),

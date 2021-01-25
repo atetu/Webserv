@@ -90,6 +90,7 @@ normal_main(int argc, char **argv, char **envp)
 			std::vector<std::string> authors = ContainerBuilder<std::string>()
 			/**/.add("Enzo CACERES <ecaceres@student.42.fr>")
 			/**/.add("Alice TETU <alicetetu@student.42.fr>")
+			/**/.add("Romain SANCHEZ <rosanche@student.42.fr>")
 			/**/.build();
 
 			std::cout << parser.help(program, "A small web server", authors) << std::endl;

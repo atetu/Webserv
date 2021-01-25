@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   unit_encoding_chunked.cpp                          :+:      :+:    :+:   */
+/*   unit_encoding_identity.cpp                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ecaceres <ecaceres@student.42.fr>          +#+  +:+       +#+        */
+/*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/26 00:58:35 by ecaceres          #+#    #+#             */
-/*   Updated: 2020/12/26 00:58:35 by ecaceres         ###   ########.fr       */
+/*   Updated: 2021/01/21 18:33:06 by alicetetu        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@ encode(const char *str)
 static std::string
 decode(const char *str)
 {
-	return (IdentityDecoder(false, ft::strlen(str)).decode(str));
+	return (IdentityDecoder(false, ft::strlen(str)).decode(str, false));
 }
 
 static std::string
@@ -36,8 +36,8 @@ decode2(const char *str, const char *str2)
 
 	size_t consumed = 0;
 	std::string out;
-	decoder.consume(str, out, consumed);
-	decoder.consume(str2, out, consumed);
+	decoder.consume(str, out, consumed, false);
+	decoder.consume(str2, out, consumed, false);
 
 	return (out);
 }

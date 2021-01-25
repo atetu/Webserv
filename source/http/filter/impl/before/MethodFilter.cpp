@@ -6,7 +6,7 @@
 /*   By: atetu <atetu@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/06 19:16:46 by ecaceres          #+#    #+#             */
-/*   Updated: 2021/01/20 14:56:41 by atetu            ###   ########.fr       */
+/*   Updated: 2021/01/22 11:37:02 by atetu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,7 +61,6 @@ MethodFilter::doFilter(UNUSED HTTPClient &client, HTTPRequest &request, HTTPResp
 		if (isAcceptable(request.serverBlock(), request.locationBlock(), method))
 			return (next());
 	}
-
 	response.headers().allow(request.allowedMethods());
 	response.status(*HTTPStatus::METHOD_NOT_ALLOWED);
 	response.end();
