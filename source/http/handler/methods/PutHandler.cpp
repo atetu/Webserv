@@ -46,8 +46,6 @@ PutHandler::handle(HTTPClient &client, HTTPRequest &request, HTTPResponse &respo
 
 	bool justCreated = false;
 	
-	std::string out;
-
 	if (targetFile.exists())
 	{
 		if (targetFile.isDirectory() || !targetFile.isFile())
@@ -70,7 +68,7 @@ PutHandler::handle(HTTPClient &client, HTTPRequest &request, HTTPResponse &respo
 		}
 	}
 	
-	FileDescriptor &fd = *targetFile.open(O_CREAT | O_WRONLY | O_TRUNC, 0664);
+	FileDescriptor &fd = *targetFile.open(O_WRONLY | O_TRUNC);
 
 	client.task(*(new PutTask(client, fd, justCreated)));
 

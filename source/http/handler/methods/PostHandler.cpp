@@ -50,7 +50,7 @@ PostHandler::handle(HTTPClient &client, HTTPRequest &request, HTTPResponse &resp
 	
 	if (targetFile.exists())
 	{
-		if (targetFile.isDirectory() || !targetFile.isFile())
+		if (targetFile.isDirectory() || !targetFile.isFile()) // TODO This is not supposed to work like that, but 42 tester....
 		{
 			response.status(*HTTPStatus::OK);
 			return (true);
@@ -61,7 +61,7 @@ PostHandler::handle(HTTPClient &client, HTTPRequest &request, HTTPResponse &resp
 		try
 		{
 			targetFile.createNewFile(0777);
-			response.headers().contentLocation(targetFile.path());
+			response.headers().contentLocation(targetFile.path()); // TODO Wrong value returned
 			justCreated = true;
 		}
 		catch (Exception &exception)
@@ -71,7 +71,10 @@ PostHandler::handle(HTTPClient &client, HTTPRequest &request, HTTPResponse &resp
 		}
 	}
 
-	FileDescriptor &fd = *targetFile.open(O_CREAT | O_WRONLY | O_APPEND, 0664);
+	FileDescriptor &fd = *targetFile.open(O_WRONLY | O_APPEND);
+
+	if (!justCreated)
+		fd.seekToEnd();
 
 	client.task(*(new PutTask(client, fd, justCreated)));
 

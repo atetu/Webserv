@@ -59,13 +59,13 @@ class TestGetMethod(WebservTestCase):
 class TestPostMethod(WebservTestCase):
 	
 	def test_simple(self):
-		self.assertPostStatusCode("/test__simple_file.txt", 201, "Hello World".encode("ascii"))
-		self.assertGet("/test__simple_file.txt", "Hello World")
+		self.assertPostStatusCode("/test__simple_file_post.txt", 201, "Hello World".encode("ascii"))
+		self.assertGet("/test__simple_file_post.txt", "Hello World")
 	
 	def test_double(self):
-		self.assertPostStatusCode("/test__simple_file_2.txt", 201, "Hello".encode("ascii"))
-		self.assertPostStatusCode("/test__simple_file_2.txt", 200, "World".encode("ascii"))
-		self.assertGet("/test__simple_file_2.txt", "HelloWorld")
+		self.assertPostStatusCode("/test__simple_file_post_2.txt", 201, "Hello".encode("ascii"))
+		self.assertPostStatusCode("/test__simple_file_post_2.txt", 200, "World".encode("ascii"))
+		self.assertGet("/test__simple_file_post_2.txt", "HelloWorld")
 
 	def test_not_allowed(self):
 		self.assertPostStatusCode("/_tests/x.sh", 405, "Hello".encode("ascii"))
@@ -134,13 +134,18 @@ if __name__ == '__main__':
 
 	def remove_if_exists(path):
 		if os.path.exists(path):
+			print("deleting:", path)
 			os.remove(path)
 	
 	remove_if_exists("test__simple_file.txt")
 	remove_if_exists("test__simple_file_2.txt")
+	remove_if_exists("test__simple_file_post.txt")
+	remove_if_exists("test__simple_file_post_2.txt")
 	remove_if_exists("test__simple_file_put.txt")
 	remove_if_exists("test__simple_file_put_2.txt")
 	remove_if_exists("test__will_be_deleted.txt")
 	remove_if_exists("test__cannot_be_deleted_because_not_exists.txt")
+	
+	print("\n\nrunning tests:")
 	
 	unittest.main()

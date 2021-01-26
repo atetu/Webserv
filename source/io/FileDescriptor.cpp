@@ -65,6 +65,20 @@ FileDescriptor::write(const void *buf, size_t nbyte)
 	return (r);
 }
 
+off_t
+FileDescriptor::lseek(off_t offset, int whence)
+{
+	ensureNotClosed();
+
+	return (::lseek(m_fd, offset, whence));
+}
+
+off_t
+FileDescriptor::seekToEnd()
+{
+	return (lseek(lseek(0, SEEK_END), SEEK_SET));
+}
+
 void
 FileDescriptor::close()
 {

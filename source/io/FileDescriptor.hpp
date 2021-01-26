@@ -53,6 +53,12 @@ class FileDescriptor :
 		ssize_t
 		write(const void *buf, size_t nbyte);
 
+		off_t
+		lseek(off_t offset, int whence);
+
+		off_t
+		seekToEnd();
+
 		void
 		close();
 
