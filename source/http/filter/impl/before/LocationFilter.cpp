@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   LocationFilter.cpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
+/*   By: atetu <atetu@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/06 19:10:43 by ecaceres          #+#    #+#             */
-/*   Updated: 2021/01/25 19:23:57 by alicetetu        ###   ########.fr       */
+/*   Updated: 2021/01/26 12:06:27 by atetu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,7 +69,7 @@ LocationFilter::doFilter(UNUSED HTTPClient &client, HTTPRequest &request, UNUSED
 			if (locationBlock.root().present() /* && StringUtils::last(locationBlock.path()) != '/'*/) // TODO see comment
 			{
 				std::string path;
-				if (locationBlock.path().c_str()[locationBlock.path().size() -1] == '/')
+				if (locationBlock.path().c_str()[locationBlock.path().size() - 1] == '/')
 				{
 					if (locationBlock.path().size() <= request.resource().size())
 						path = request.resource().substr(locationBlock.path().size(), std::string::npos);
@@ -81,9 +81,13 @@ LocationFilter::doFilter(UNUSED HTTPClient &client, HTTPRequest &request, UNUSED
 				}
 				else
 				{
-					path = locationBlock.path();
+					size_t found = locationBlock.path().find_last_of('/');
+					if (found != std::string::npos)
+						path = locationBlock.path().substr(found, std::string::npos);
+					else
+						path = locationBlock.path();
 				}
-				std::cout << path<< std::endl;
+				// std::cout << path<< std::endl;
 				request.resource(path);
 			}
 		}

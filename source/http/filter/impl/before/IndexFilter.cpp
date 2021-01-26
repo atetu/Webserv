@@ -6,7 +6,7 @@
 /*   By: atetu <atetu@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/06 23:46:45 by ecaceres          #+#    #+#             */
-/*   Updated: 2021/01/22 11:45:35 by atetu            ###   ########.fr       */
+/*   Updated: 2021/01/25 16:49:05 by atetu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,6 +73,7 @@ IndexFilter::doFilter(UNUSED HTTPClient &client, HTTPRequest &request, UNUSED HT
 
 		if (anIndex.exists() && anIndex.isFile())
 		{
+			std::cout << "index\n";
 			request.resource(File(request.resource(), *it).path());
 			break;
 		}
