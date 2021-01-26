@@ -2,10 +2,19 @@ FT_TESTER_DIR=YoupiBanane
 
 cp -r $FT_TESTER_DIR /tmp/$FT_TESTER_DIR
 
-valgrind --track-fds=yes --leak-check=full ./webserv -f conf_42_tester.json &
-jobpid=$!
+if [[ "$RUN_WITH_VALGRIND" = "true" ]]
+then
+	valgrind --track-fds=yes --leak-check=full ./webserv -f conf_42_tester.json &
+	jobpid=$!
+else
+	./webserv -f conf_42_tester.json &
+	jobpid=$!
+fi
 
-./ubuntu_tester http://localhost:8042
+chmod +x ./ubuntu_tester
+chmod +x ./ubuntu_cgi_tester
+
+./ubuntu_tester http://localhost:80
 out=$?
 
 printf "\n\n\n-- sending an interrupt --\n"

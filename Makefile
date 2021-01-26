@@ -13,6 +13,7 @@
 USE_FSANITIZE			= false
 RUN_TESTS				= 0
 DO_MAKE_RE				= 0
+RUN_WITH_VALGRIND		= 0
 SIEGE_URL				= host.docker.internal
 SIEGE_FILE				= /wordpress/
 ARGS					=
@@ -82,7 +83,7 @@ docker-run: docker-build-run
 	@$(DOCKER) run --rm -it -p 80:80 webserv-run $(ARGS)
 
 docker-test: docker-build-test
-	@$(DOCKER) run --rm -it -p 80:8042 webserv-test $(ARGS)
+	@$(DOCKER) run --rm -it -p 80:80 -e RUN_WITH_VALGRIND=$(RUN_WITH_VALGRIND) webserv-test $(ARGS)
 
 siege: docker-build-siege
 	@$(DOCKER) run --rm -it -t siege -d1 -c50 -b -i $(SIEGE_URL)$(SIEGE_FILE)
