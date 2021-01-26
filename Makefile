@@ -65,7 +65,25 @@ run-with-valgrind: all
 
 test: RUN_TESTS=1
 test: all
-	@$(PROJECT_MAKE) ARGS="$(ARGS)" VALGRIND_ARGS="$(VALGRIND_ARGS)" run
+	@$(PROJECT_MAKE) ARGS="$(ARGS)" run
+
+test-configs: RUN_TESTS=0
+test-configs: all
+	@ \
+	previous=""; \
+	for f in $(SOURCE_DIR)/tests/configs/invalid-*.json; do \
+		name=$$(basename $$f .json | sed -e "s/^invalid-//"); \
+		key=$$(echo $$name | awk -F --- '{ print $$1 }'); \
+		error=$$(echo $$name | awk -F --- '{ print $$2 }'); \
+		if test "$$previous" = "$$key"; then \
+			key=""; \
+		else \
+			printf "%$$(tput cols)s" | tr " " "-"; \
+			previous=$$key; \
+		fi; \
+		printf "%s \033[30G %s \033[60G" "$$key" "$$error"; \
+		! ./$(SOURCE_DIR)/webserv -c -f $$f; \
+	done
 
 docker-build-siege:
 	@$(DOCKER) build -t siege -f docker/siege/Dockerfile .

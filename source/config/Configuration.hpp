@@ -45,7 +45,6 @@
 #define KEY_SERVER_INDEX_FILES "index"
 #define KEY_SERVER_AUTH "auth"
 #define KEY_LOCATION_METHODS "methods"
-#define KEY_LOCATION_ALIAS "alias"
 #define KEY_LOCATION_ROOT "root"
 #define KEY_LOCATION_LISTING "listing"
 #define KEY_LOCATION_INDEX_FILES "index"
@@ -167,6 +166,12 @@ class Configuration
 			public:
 				static void
 				validate(const RootBlock &rootBlock);
+
+				static void
+				validate(const RootBlock &rootBlock, const ServerBlock &serverBlock);
+
+				static void
+				validate(const RootBlock &rootBlock, const ServerBlock &serverBlock, const LocationBlock &locationBlock);
 		};
 };
 

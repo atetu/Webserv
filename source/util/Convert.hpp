@@ -24,22 +24,11 @@ class Convert
 	public:
 		template<typename T>
 			inline static std::string
-			toString(const T &t, typename enable_if<!is_pointer<T>::value>::type* = 0)
+			toString(const T &t)
 			{
 				std::stringstream stream;
 
 				stream << t;
-
-				return (stream.str());
-			}
-
-		template<typename T>
-			inline static std::string
-			toString(const T &t, typename enable_if<is_pointer<T>::value>::type* = 0)
-			{
-				std::stringstream stream;
-
-				stream << *t; /* Reimpl to avoid deep pointer. */
 
 				return (stream.str());
 			}
@@ -100,21 +89,7 @@ template<>
 
 template<>
 	inline std::string
-	Convert::toString<std::string>(const std::string &t, void*)
-	{
-		return (t);
-	}
-
-template<>
-	inline std::string
 	Convert::toString<Object>(const Object &t, int)
-	{
-		return (t.toString());
-	}
-
-template<>
-	inline std::string
-	Convert::toString<Object>(const Object &t, void*)
 	{
 		return (t.toString());
 	}

@@ -40,7 +40,7 @@ FileResponseBody::readable(FileDescriptor &fd)
 {
 	(void)fd;
 
-	m_fdBuffer.read();
+	m_fdBuffer.read(); // TODO Need check
 
 	return (isDone());
 }

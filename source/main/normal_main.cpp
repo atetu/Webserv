@@ -146,36 +146,51 @@ normal_main(int argc, char **argv, char **envp)
 
 	Environment::set(envp);
 
-	try
+	if (checkOnly)
 	{
-		LOG.debug() << "Loading configuration... (path: " << configFile << ")" << std::endl;
+		try
+		{
+			delete Configuration::fromJsonFile(configFile, ignoreMimeIncludesError);
+		}
+		catch (Exception &exception)
+		{
+			std::cout << "configuration error: " << exception.message() << std::endl;
+			return (1);
+		}
+	}
+	else
+	{
+		try
+		{
+			LOG.debug() << "Loading configuration... (path: " << configFile << ")" << std::endl;
 
-		Configuration::setInstance(Configuration::fromJsonFile(configFile, ignoreMimeIncludesError));
-	}
-	catch (IOException &exception)
-	{
-		LOG.fatal() << "Failed to read file: " << exception.message() << std::endl;
-		return (1);
-	}
-	catch (JsonException &exception)
-	{
-		LOG.fatal() << "Failed to parse JSON: " << exception.message() << std::endl;
-		return (1);
-	}
-	catch (ConfigurationBindException &exception)
-	{
-		LOG.fatal() << "Failed bind configuration: " << exception.message() << std::endl;
-		return (1);
-	}
-	catch (ConfigurationValidateException &exception)
-	{
-		LOG.fatal() << "Failed validate configuration: " << exception.message() << std::endl;
-		return (1);
-	}
-	catch (Exception &exception)
-	{
-		LOG.fatal() << "Failed create configuration: " << exception.message() << std::endl;
-		return (1);
+			Configuration::setInstance(Configuration::fromJsonFile(configFile, ignoreMimeIncludesError));
+		}
+		catch (IOException &exception)
+		{
+			LOG.fatal() << "Failed to read file: " << exception.message() << std::endl;
+			return (1);
+		}
+		catch (JsonException &exception)
+		{
+			LOG.fatal() << "Failed to parse JSON: " << exception.message() << std::endl;
+			return (1);
+		}
+		catch (ConfigurationBindException &exception)
+		{
+			LOG.fatal() << "Failed bind configuration: " << exception.message() << std::endl;
+			return (1);
+		}
+		catch (ConfigurationValidateException &exception)
+		{
+			LOG.fatal() << "Failed validate configuration: " << exception.message() << std::endl;
+			return (1);
+		}
+		catch (Exception &exception)
+		{
+			LOG.fatal() << "Failed create configuration: " << exception.message() << std::endl;
+			return (1);
+		}
 	}
 
 	if (!checkOnly)

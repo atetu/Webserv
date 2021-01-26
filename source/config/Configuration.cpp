@@ -37,10 +37,13 @@
 #include <util/FileDescriptorSet.hpp>
 #include <util/helper/DeleteHelper.hpp>
 #include <util/helper/JsonBinderHelper.hpp>
+#include <util/Number.hpp>
 #include <util/Optional.hpp>
+#include <algorithm>
 #include <cctype>
 #include <iostream>
 #include <iterator>
+#include <limits>
 #include <list>
 #include <map>
 #include <utility>
@@ -417,7 +420,6 @@ Configuration::JsonBuilder::buildLocationBlock(const std::string &path, const st
 
 	try
 	{
-		BIND(jsonObject, KEY_LOCATION_ALIAS, JsonString, std::string, locationBlock, alias);
 		BIND(jsonObject, KEY_LOCATION_ROOT, JsonString, std::string, locationBlock, root);
 		BIND(jsonObject, KEY_LOCATION_LISTING, JsonBoolean, bool, locationBlock, listing);
 		BIND(jsonObject, KEY_LOCATION_CGI, JsonString, std::string, locationBlock, cgi);
@@ -536,17 +538,13 @@ Configuration::JsonBuilder::buildCustomErrorMap(const std::string &path, const J
 		long code;
 		const std::string key = it->first;
 
-		for (std::string::const_iterator kit = key.begin(); kit != key.end(); kit++)
-		{
-			if (!std::isdigit(*kit))
-				throw ConfigurationBindException("key '" + key + "' must only contains numbers (" + path + ")");
+		try {
+			code = Number::parse<short>(key);
+		} catch (Exception &exception) {
+			throw ConfigurationBindException("code `" + key + "` is not a valid number (" + path + "): " + exception.message());
 		}
 
 		const JsonString &value = JsonBinderHelper::jsonCast<JsonString>(path + KEY_DOT + key, it->second);
-
-		std::stringstream stream;
-		stream << key;
-		stream >> code;
 
 		if (!HTTPStatus::isError(code))
 			throw ConfigurationBindException("code '" + Convert::toString(code) + "' must be an error 4xx or 5xx (" + path + ")");
@@ -557,13 +555,10 @@ Configuration::JsonBuilder::buildCustomErrorMap(const std::string &path, const J
 	return (CustomErrorMap(map));
 }
 
-#include <limits.h>
-
 void
 Configuration::Validator::validate(const RootBlock &rootBlock)
 {
 	typedef std::list<const ServerBlock*> slist;
-	typedef std::list<const LocationBlock*> llist;
 
 	if (rootBlock.maxActiveClient().present())
 	{
@@ -589,47 +584,112 @@ Configuration::Validator::validate(const RootBlock &rootBlock)
 		const slist &serverBlocks = rootBlock.serverBlocks().get();
 
 		if (serverBlocks.empty())
-			throw ConfigurationValidateException("Server list is empty.");
+			throw ConfigurationValidateException("server list is empty");
+
+		std::map<std::string, std::map<short, std::list<std::string> > > hostToPortToNamesMap;
+		std::map<std::string, std::map<short, bool> > hostToPortToDefaultMap;
 
 		for (slist::const_iterator sit = serverBlocks.begin(); sit != serverBlocks.end(); sit++)
 		{
 			const ServerBlock &serverBlock = *(*sit);
 
-			if (serverBlock.host().present())
-			{
-				const std::string &host = serverBlock.host().get();
+			validate(rootBlock, serverBlock);
 
-				if (!Inet4Address::validate(host))
-					throw ConfigurationValidateException("Host IP is ill-formed `" + host + "`");
+			const std::string &host = serverBlock.host().orElse(ServerBlock::DEFAULT_HOST);
+			const int port = serverBlock.port().orElse(ServerBlock::DEFAULT_PORT);
+
+			bool &presentDefault = hostToPortToDefaultMap[host][port];
+			if (serverBlock.isDefault().equals(true))
+			{
+				if (presentDefault)
+					throw ConfigurationValidateException("multiple default server for " + host + ":" + Convert::toString(port));
+
+				presentDefault = true;
 			}
 
-			if (serverBlock.locations().present())
+			std::list<std::string> &presentNames = hostToPortToNamesMap[host][port];
+			if (serverBlock.names().present())
 			{
-				const llist &locationBlocks = serverBlock.locations().get();
+				const std::list<std::string> names = serverBlock.names().get();
 
-				for (llist::const_iterator lit = locationBlocks.begin(); lit != locationBlocks.end(); lit++)
+				for (std::list<std::string>::const_iterator nit = names.begin(); nit != names.end(); nit++)
 				{
-					const LocationBlock &locationBlock = *(*lit);
+					const std::string &name = *nit;
 
-					if (locationBlock.cgi().present())
-					{
-						const std::string &cgi = locationBlock.cgi().get();
-
-						if (!rootBlock.hasCGI(cgi))
-							throw ConfigurationValidateException("Undefined CGI with name: " + cgi);
-
-						const CGIBlock &cgiBlock = rootBlock.getCGI(cgi);
-
-						if (!cgiBlock.path().present())
-							throw ConfigurationValidateException("Used CGI '" + cgiBlock.name() + "' does not have a defined path.");
-
-						if (!cgiBlock.exists())
-							LOG.warn() << "CGI: " << cgiBlock.name() << ": " << cgiBlock.path().get() << ": stat() failed. (file does not exists?)" << std::endl;
-					}
+					if (std::find(presentNames.begin(), presentNames.end(), name) == presentNames.end())
+						presentNames.push_back(name);
+					else
+						throw ConfigurationValidateException("server name `" + name + "` is duplicated for " + host + ":" + Convert::toString(port));
 				}
 			}
 		}
 	}
 	else
-		throw ConfigurationValidateException("No server list found.");
+		throw ConfigurationValidateException("no server list");
+}
+
+void
+Configuration::Validator::validate(const RootBlock &rootBlock, const ServerBlock &serverBlock)
+{
+	typedef std::list<const LocationBlock*> llist;
+
+	if (serverBlock.host().present())
+	{
+		const std::string &host = serverBlock.host().get();
+
+		if (!Inet4Address::validate(host))
+			throw ConfigurationValidateException("host IP is ill-formed `" + host + "`");
+	}
+
+	if (serverBlock.port().present())
+	{
+		const int port = serverBlock.port().get();
+
+		if (port <= 0 || port >= std::numeric_limits<short>::max())
+			throw ConfigurationValidateException("port " + Convert::toString(port) + " is out of bound");
+	}
+
+	if (!serverBlock.isDefault().equals(true))
+	{
+		if (serverBlock.names().absent())
+			throw ConfigurationValidateException("non-default server is missing names");
+
+		const std::list<std::string> &names = serverBlock.names().get();
+		if (names.empty())
+			throw ConfigurationValidateException("non-default server is unnamed (names is empty)");
+	}
+
+	if (serverBlock.locations().present())
+	{
+		const llist &locationBlocks = serverBlock.locations().get();
+
+		for (llist::const_iterator lit = locationBlocks.begin(); lit != locationBlocks.end(); lit++)
+		{
+			const LocationBlock &locationBlock = *(*lit);
+
+			validate(rootBlock, serverBlock, locationBlock);
+		}
+	}
+}
+
+void
+Configuration::Validator::validate(const RootBlock &rootBlock, const ServerBlock &serverBlock, const LocationBlock &locationBlock)
+{
+	if (locationBlock.cgi().present())
+	{
+		const std::string &cgi = locationBlock.cgi().get();
+
+		if (!rootBlock.hasCGI(cgi))
+			throw ConfigurationValidateException("undefined CGI with name: " + cgi);
+
+		const CGIBlock &cgiBlock = rootBlock.getCGI(cgi);
+
+		if (!cgiBlock.path().present())
+			throw ConfigurationValidateException("used CGI '" + cgiBlock.name() + "' does not have a defined path.");
+
+		if (!cgiBlock.exists())
+			LOG.warn() << "cgi: " << cgiBlock.name() << ": " << cgiBlock.path().get() << ": stat() failed. (file does not exists?)" << std::endl;
+	}
+
+	(void)serverBlock;
 }

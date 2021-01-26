@@ -37,14 +37,14 @@ class ConfigurationBindException :
 			static inline ConfigurationBindException
 			uncastable(const std::string &path, const JsonValue &jsonValue)
 			{
-				return (ConfigurationBindException("Cannot cast " + jsonValue.typeString() + " to " + JsonTypeTraits<T>::typeString + " (" + path + ")"));
+				return (ConfigurationBindException("cannot cast " + jsonValue.typeString() + " to " + JsonTypeTraits<T>::typeString + " (" + path + ")"));
 			}
 
 		template<typename T1, typename T2>
 			static inline ConfigurationBindException
 			uncastable2(const std::string &path, const JsonValue &jsonValue)
 			{
-				return (ConfigurationBindException("Cannot cast " + jsonValue.typeString() + " to " + JsonTypeTraits<T1>::typeString + " or " + JsonTypeTraits<T2>::typeString + " (" + path + ")"));
+				return (ConfigurationBindException("cannot cast " + jsonValue.typeString() + " to " + JsonTypeTraits<T1>::typeString + " or " + JsonTypeTraits<T2>::typeString + " (" + path + ")"));
 			}
 
 };

@@ -17,7 +17,6 @@
 LocationBlock::LocationBlock(const std::string &path) :
 		m_path(path),
 		m_methods(),
-		m_alias(),
 		m_root(),
 		m_listing(),
 		m_index(),
@@ -36,14 +35,6 @@ LocationBlock&
 LocationBlock::methods(const std::list<std::string> &methods)
 {
 	m_methods.set(methods);
-
-	return (*this);
-}
-
-LocationBlock&
-LocationBlock::alias(const std::string &alias)
-{
-	m_alias.set(alias);
 
 	return (*this);
 }

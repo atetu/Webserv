@@ -24,7 +24,6 @@ class LocationBlock
 	private:
 		std::string m_path;
 		Optional<std::list<std::string> > m_methods;
-		Optional<std::string> m_alias;
 		Optional<std::string> m_root;
 		Optional<bool> m_listing;
 		Optional<std::list<std::string> > m_index;
@@ -47,9 +46,6 @@ class LocationBlock
 
 		LocationBlock&
 		methods(const std::list<std::string> &methods);
-
-		LocationBlock&
-		alias(const std::string &alias);
 
 		LocationBlock&
 		root(const std::string &root);
@@ -79,12 +75,6 @@ class LocationBlock
 		methods(void) const
 		{
 			return (m_methods);
-		}
-
-		inline const Optional<std::string>&
-		alias(void) const
-		{
-			return (m_alias);
 		}
 
 		inline const Optional<std::string>&

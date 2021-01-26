@@ -14,8 +14,8 @@
 # define NUMBER_HPP_
 
 #include <exception/IllegalArgumentException.hpp>
+#include <libs/ft.hpp>
 #include <util/Convert.hpp>
-#include <util/StringUtils.hpp>
 #include <iterator>
 #include <limits>
 #include <string>
@@ -45,9 +45,7 @@ class Number
 				if (alphabet.length() <= 1)
 					throw IllegalArgumentException("alphabet's length <= 1");
 
-				std::string upper = StringUtils::toUpperCase(text);
-
-				std::string::iterator it = upper.begin();
+				std::string::const_iterator it = text.begin();
 
 				int negativity = 1;
 				if (*it == '-')
@@ -57,13 +55,14 @@ class Number
 				}
 
 				long long out = 0;
-				for (; it != upper.end(); it++)
+				for (; it != text.end(); it++)
 				{
 					char c = *it;
+					char u = ft::toupper(c);
 
-					std::string::size_type pos = alphabet.find(c);
+					std::string::size_type pos = alphabet.find(u);
 					if (pos == std::string::npos)
-						throw IllegalArgumentException(std::string("char ") + c + " is not in the alphabet: " + alphabet);
+						throw IllegalArgumentException(std::string("char `") + c + "` is not in the alphabet: `" + alphabet + '`');
 
 					out *= alphabet.size();
 					out += pos;
@@ -75,10 +74,10 @@ class Number
 				T max = std::numeric_limits<T>::max();
 
 				if (out < min)
-					throw IllegalArgumentException(Convert::toString(out) + " < " + Convert::toString(min));
+					throw IllegalArgumentException(Convert::toString(out) + " < " + Convert::toString(min) + " (type's minimum)");
 
 				if (out > max)
-					throw IllegalArgumentException(Convert::toString(out) + " > " + Convert::toString(max));
+					throw IllegalArgumentException(Convert::toString(out) + " > " + Convert::toString(max) + " (type's maximum)");
 
 				return (T(out));
 			}
