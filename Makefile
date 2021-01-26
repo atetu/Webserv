@@ -12,6 +12,7 @@
 
 USE_FSANITIZE			= false
 RUN_TESTS				= 0
+DO_MAKE_RE				= 0
 SIEGE_URL				= host.docker.internal
 SIEGE_FILE				= /wordpress/
 ARGS					=
@@ -75,7 +76,7 @@ docker-build-run: all docker-build-base
 	@$(DOCKER) build -t webserv-run -f docker/Dockerfile.run .
 
 docker-build-test: all docker-build-base
-	@$(DOCKER) build -t webserv-test -f docker/Dockerfile.test .
+	@$(DOCKER) build --build-arg DO_MAKE_RE=$(DO_MAKE_RE) -t webserv-test -f docker/Dockerfile.test .
 
 docker-run: docker-build-run
 	@$(DOCKER) run --rm -it -p 80:80 webserv-run $(ARGS)
