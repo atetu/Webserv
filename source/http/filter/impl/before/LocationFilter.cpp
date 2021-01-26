@@ -87,7 +87,7 @@ LocationFilter::doFilter(UNUSED HTTPClient &client, HTTPRequest &request, UNUSED
 					else
 						path = locationBlock.path();
 				}
-				// std::cout << path<< std::endl;
+
 				request.resource(path);
 			}
 		}

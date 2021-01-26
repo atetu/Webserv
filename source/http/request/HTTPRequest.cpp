@@ -135,7 +135,6 @@ HTTPRequest::resource() const
 void
 HTTPRequest::resource(const std::string &resource)
 {
-	// std::cout << "ressource: "<< resource << std::endl;
 	m_resource = resource;
 }
 

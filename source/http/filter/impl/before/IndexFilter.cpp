@@ -73,7 +73,6 @@ IndexFilter::doFilter(UNUSED HTTPClient &client, HTTPRequest &request, UNUSED HT
 
 		if (anIndex.exists() && anIndex.isFile())
 		{
-			std::cout << "index\n";
 			request.resource(File(request.resource(), *it).path());
 			break;
 		}

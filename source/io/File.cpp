@@ -21,6 +21,7 @@
 #include <unistd.h>
 #include <util/FilenameUtils.hpp>
 #include <util/StringUtils.hpp>
+#include <iostream>
 
 File::File() :
 		m_path()
@@ -105,10 +106,38 @@ bool
 File::createNewFile(mode_t mode) const
 {
 	int fd;
-	if ((fd = ::open(m_path.c_str(), O_CREAT, mode)) == -1)
-		throw ioException();
 
-	::close(fd);
+	std::string copy = m_path;
+	std::string previousStr = "";
+	std::size_t found;
+	std::cout << "create\n";
+	while ((found = copy.find('/')) != std::string::npos)
+	{
+		std::string newPath = copy.substr(0, found);
+		std::string remainedPath = copy.substr(found + 1, std::string::npos);
+		if (newPath == "./" || newPath == "/")
+		{
+			previousStr = newPath;
+			copy = remainedPath;
+		}
+		else
+		{
+			File file(previousStr + "/" + newPath);
+			if (!file.exists())
+				mkdir(file.path().c_str(), 0777);
+			previousStr = newPath;
+			copy = remainedPath;
+		}
+
+	}
+	if ((fd = ::open(m_path.c_str(), O_CREAT, mode)) == -1) //TOTO create directory if needed
+	{
+		errno = 0;
+	
+		return (false); //TODO handle errors
+	}
+
+	close(fd);
 
 	return (true);
 }

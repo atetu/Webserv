@@ -258,8 +258,6 @@ HTTPFindLocation::parse(void)
 	HTTPLocationInterpretor &bestLocation = *(loc.begin());
 
 	location(bestLocation.locationBlock());
-	// std::cout << m_locationBlock.get()->path() << std::endl;
-	// std::cout << m_locationBlock.get()->root().get().data() << std::endl;
 	
 	return (*this);
 }

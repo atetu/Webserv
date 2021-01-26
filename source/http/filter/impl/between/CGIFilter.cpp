@@ -59,37 +59,30 @@ CGIFilter::operator=(const CGIFilter &other)
 void
 CGIFilter::doFilter(UNUSED HTTPClient &client, UNUSED HTTPRequest &request, UNUSED HTTPResponse &response, FilterChain &next)
 {
-	// std::cout << "CGI\n";
 	if (request.locationBlock().absent())
 		return (next());
-	// std::cout << "CGI2\n";
+
 	const LocationBlock &locationBlock = *request.locationBlock().get();
 	if (locationBlock.cgi().absent())
 		return (next());
-	// std::cout << "CGI3\n";
+	
 	std::string extension;
 	if ((extension = FilenameUtils::getExtension(request.resource())).empty())
 		return (next());
-// std::cout << "CGI4\n" << extension << std::endl;
-// std::cout << "---------" << std::endl;
 
 	const CGIBlock &cgiBlock = Configuration::instance().rootBlock().getCGI(locationBlock.cgi().get());
-// std::cout << cgiBlock.extensions().get().size() << std::endl;
-// std::cout << Convert::join(cgiBlock.extensions().get()) << std::endl;
-// std::cout << "---------" << std::endl;
+
 	if (!cgiBlock.hasExtension(extension))
 		return (next());
-// std::cout << "CGI5\n";
+
 	if (!cgiBlock.handleNotFound().orElse(false) && !request.targetFile().exists())
 	{
-		// std::cout << "CGI5 - not found: " << request.targetFile().path() << std::endl;
 		client.response().status(*HTTPStatus::NOT_FOUND);
 		return (next());
 	}
 
-	// std::cout << "CGI6\n";
 	File cgiFile(cgiBlock.path().get());
-	// std::cout << cgiBlock.path().get() << std::endl;
+	
 	if (!cgiFile.exists() || !cgiFile.isFile() || !cgiFile.isExecutable())
 	{
 		client.response().status(*HTTPStatus::BAD_GATEWAY);
