@@ -52,6 +52,11 @@ run: RUN_TESTS=0
 run: all
 	@$(PROJECT_MAKE) ARGS="$(ARGS)" run
 
+run-here: RUN_TESTS=0
+run-here: ARGS=-f source/conf4.json
+run-here: all
+	@./$(SOURCE_DIR)/webserv $(ARGS)
+
 run-with-valgrind: RUN_TESTS=0
 run-with-valgrind: all
 	@$(PROJECT_MAKE) ARGS="$(ARGS)" VALGRIND_ARGS="$(VALGRIND_ARGS)" run-with-valgrind
