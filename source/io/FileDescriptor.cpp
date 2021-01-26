@@ -76,7 +76,17 @@ FileDescriptor::lseek(off_t offset, int whence)
 off_t
 FileDescriptor::seekToEnd()
 {
-	return (lseek(lseek(0, SEEK_END), SEEK_SET));
+	off_t position = lseek(0, SEEK_END);
+
+	if (position == off_t(-1))
+		throw IOException("lseek(end)", errno);
+
+	off_t r = lseek(position, SEEK_SET);
+
+	if (r == off_t(-1))
+		throw IOException("lseek(set)", errno);
+
+	return (r);
 }
 
 void
