@@ -36,7 +36,7 @@
 #include <iostream>
 
 Logger &HTTPClient::LOG = LoggerFactory::get("HTTP Client");
-int HTTPClient::INSTANCE_COUNT = 0;
+int HTTPClient::INSTANCE_COUNT = 0; // TODO Too lazy to do something better
 
 HTTPClient::HTTPClient(Socket &socket, InetSocketAddress socketAddress, HTTPServer &server) :
 		m_socket(socket),
