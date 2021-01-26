@@ -7,7 +7,7 @@
 	},
 	"cgi": {
 		"cgi_test": {
-			"path": "./ubuntu_cgi_tester",
+			"path": "./cgi_tester",
 			"extensions": [
 				"bla"
 			],
@@ -16,7 +16,7 @@
 	},
 	"servers": [
 		{
-			"port": 8042,
+			"port": 80,
 			"host": "0.0.0.0",
 			"default": true,
 			"root": ".",

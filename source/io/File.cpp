@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   File.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: alicetetu <alicetetu@student.42.fr>        +#+  +:+       +#+        */
+/*   By: atetu <atetu@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/12/21 23:36:43 by ecaceres          #+#    #+#             */
-/*   Updated: 2021/01/25 18:12:15 by alicetetu        ###   ########.fr       */
+/*   Updated: 2021/01/26 17:05:49 by atetu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -110,7 +110,7 @@ File::createNewFile(mode_t mode) const
 	std::string copy = m_path;
 	std::string previousStr = "";
 	std::size_t found;
-	std::cout << "create\n";
+	
 	while ((found = copy.find('/')) != std::string::npos)
 	{
 		std::string newPath = copy.substr(0, found);
