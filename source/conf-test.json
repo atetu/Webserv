@@ -147,6 +147,35 @@
 					"cgi": "python3"
 				}
 			}
+		},
+		{
+			"port": 80,
+			"name": [
+				"second.com",
+				"second2.com"
+			],
+			"locations": {
+				"/": {
+					"methods": [
+						"HEAD"
+					],
+					"listing": true
+				}
+			}
+		},
+		{
+			"port": 81,
+			"name": [
+				"third.com"
+			],
+			"locations": {
+				"/": {
+					"methods": [
+						"GET"
+					],
+					"listing": true
+				}
+			}
 		}
 	]
 }

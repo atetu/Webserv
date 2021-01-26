@@ -6,40 +6,47 @@ import requests
 BASE_URL = "http://127.0.0.1:80"
 
 
-class WebservTestCase(unittest.TestCase):
+def _make_url(url):
+	if url.startswith("http"):
+		return url
+	
+	return BASE_URL + url
 
-	def assertGetStatusCode(self, url, status_code):
-		response = requests.get(BASE_URL + url)
+
+class WebservTestCase(unittest.TestCase):
+	
+	def assertGetStatusCode(self, url, status_code, **kwargs):
+		response = requests.get(_make_url(url), **kwargs)
 		
 		self.assertTrue(response.status_code == status_code, "GET {} expected {} but got {}".format(url, status_code, response.status_code))
 
-	def assertGet(self, url, content):
-		response = requests.get(BASE_URL + url)
+	def assertGet(self, url, content, **kwargs):
+		response = requests.get(_make_url(url), **kwargs)
 		
 		self.assertTrue(response.text == content, "GET {} expected {} but got {}".format(url, content, response.text))
 
-	def assertPostStatusCode(self, url, status_code, body):
-		response = requests.post(BASE_URL + url, data=body)
+	def assertPostStatusCode(self, url, status_code, body, **kwargs):
+		response = requests.post(_make_url(url), data=body, **kwargs)
 		
 		self.assertTrue(response.status_code == status_code, "POST {} expected {} but got {}".format(url, status_code, response.status_code))
 	
-	def assertDeleteStatusCode(self, url, status_code):
-		response = requests.delete(BASE_URL + url)
+	def assertDeleteStatusCode(self, url, status_code, **kwargs):
+		response = requests.delete(_make_url(url), **kwargs)
 		
 		self.assertTrue(response.status_code == status_code, "DELETE {} expected {} but got {}".format(url, status_code, response.status_code))
 		
-	def assertPutStatusCode(self, url, status_code, body):
-		response = requests.put(BASE_URL + url, data=body)
+	def assertPutStatusCode(self, url, status_code, body, **kwargs):
+		response = requests.put(_make_url(url), data=body, **kwargs)
 		
 		self.assertTrue(response.status_code == status_code, "PUT {} expected {} but got {}".format(url, status_code, response.status_code))
 
-	def assertOptionStatusCode(self, url, status_code):
-		response = requests.options(BASE_URL + url)
+	def assertOptionStatusCode(self, url, status_code, **kwargs):
+		response = requests.options(_make_url(url), **kwargs)
 		
 		self.assertTrue(response.status_code == status_code, "OPTIONS {} expected {} but got {}".format(url, status_code, response.status_code))
 
-	def assertHeadStatusCode(self, url, status_code):
-		response = requests.head(BASE_URL + url)
+	def assertHeadStatusCode(self, url, status_code, **kwargs):
+		response = requests.head(_make_url(url), **kwargs)
 		
 		self.assertTrue(response.status_code == status_code, "HEAD {} expected {} but got {}".format(url, status_code, response.status_code))
 
@@ -128,6 +135,20 @@ class TestPathsMethod(WebservTestCase):
 	
 	def test_wordpress(self):
 		self.assertGetStatusCode("/wordpress/", 200)
+
+
+class TestMultipleServerMethod(WebservTestCase):
+	
+	def test_same_port_diff_host(self):
+		self.assertGetStatusCode("/", 405, headers={ "host": "second.com" })
+		self.assertGetStatusCode("/", 405, headers={ "host": "second2.com" })
+		self.assertHeadStatusCode("/", 200, headers={ "host": "second.com" })
+		self.assertHeadStatusCode("/", 200, headers={ "host": "second2.com" })
+		self.assertGetStatusCode("/", 200, headers={ "host": "i-do-not-exists.com" })
+	
+	def test_diff_host(self):
+		self.assertGetStatusCode("http://127.0.0.1:81", 404, headers={ "host": "second.com" })
+		self.assertGetStatusCode("http://127.0.0.1:81", 200, headers={ "host": "third.com" })
 
 
 if __name__ == '__main__':
