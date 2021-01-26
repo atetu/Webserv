@@ -36,7 +36,7 @@ OBJECTS					= $(SOURCES:.cpp=.o)
 COMPILER				= clang++
 
 FRAMEWORKS				= 
-FLAGS					= -std=c++98 -Wall -Wextra -g3 -O0 #-Werror 
+FLAGS					= -std=c++98 -Wall -Wextra -Werror -g3 -O0
 TARGET_REQUIRED_FLAGS	= -I.
 
 MAKE_PREFIX				= "$(COLOR_LIGHT_MAGENTA)[$(COLOR_LIGHT_GREEN) make: $(TARGET) $(COLOR_LIGHT_MAGENTA)]"
