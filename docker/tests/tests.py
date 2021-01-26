@@ -49,6 +49,7 @@ class WebservTestCase(unittest.TestCase):
 		
 		self.assertTrue(response.status_code == status_code, "HEAD {} expected {} but got {}".format(url, status_code, response.status_code))
 
+
 class TestGetMethod(WebservTestCase):
 	
 	def test_simple(self):
@@ -71,8 +72,10 @@ class TestPostMethod(WebservTestCase):
 		self.assertPostStatusCode("/test__simple_file_2.txt", 201, "Hello World".encode("ascii"))
 		self.assertPostStatusCode("/test__simple_file_2.txt", 200, "Hello World".encode("ascii"))
 		self.assertGet("/test__simple_file_2.txt", "Hello World")
+
 	def test_simple_file_post_sh(self):
 		self.assertPostStatusCode("/_tests/x.sh", 405, "Not autorised".encode("ascii"))
+
 
 class TestPutMethod(WebservTestCase):
 
@@ -85,6 +88,7 @@ class TestPutMethod(WebservTestCase):
 		self.assertPutStatusCode("/test__simple_file_put_2.txt", 200, "Filed changed 2 times".encode("ascii"))
 		self.assertGet("/test__simple_file_put_2.txt", "Filed changed 2 times")
 
+
 class TestDeleteMethod(WebservTestCase):
 	
 	def test_simple_file_delete(self):
@@ -94,23 +98,49 @@ class TestDeleteMethod(WebservTestCase):
 	def test_not_found(self):
 		self.assertDeleteStatusCode("/test__cannot_be_deleted_because_not_exists.txt", 204)
 
+
 class TestOptionsMethod(WebservTestCase):
 	
 	def test_simple_file_options_base(self):
 		self.assertOptionStatusCode("/", 200)
+
 	def test_simple_file_options_tests(self):
 		self.assertOptionStatusCode("/_tests", 200)
+
 	def test_simple_file_options_path(self):
 		self.assertOptionStatusCode("/wrong_path", 200)
+
 
 class TestHeadMethod(WebservTestCase):
 	
 	def test_simple_file_head_base(self):
 		self.assertHeadStatusCode("/", 200)
+
 	def test_simple_file_head_path(self):
 		self.assertHeadStatusCode("/wrong_path", 404)
+
 	def test_simple_file_head_tests(self):
 		self.assertHeadStatusCode("/_tests", 404)
+
+
+class TestPathsMethod(WebservTestCase):
+	
+	def test_directory(self):
+		self.assertGetStatusCode("/_tests", 200)
+		self.assertGetStatusCode("/_tests/", 200)
+	
+	def test_sh(self):
+		self.assertGetStatusCode("/_tests/x.sh", 200)
+	
+	def test_py(self):
+		self.assertGetStatusCode("/_tests/x.py", 200)
+		self.assertGetStatusCode("/_tests/x2.py", 200)
+	
+	def test_php(self):
+		self.assertGetStatusCode("/_tests/x.php", 200)
+	
+	def test_wordpress(self):
+		self.assertGetStatusCode("/wordpress/", 200)
 
 
 if __name__ == '__main__':

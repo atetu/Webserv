@@ -143,6 +143,8 @@ HTTPHeaderFieldsParser::consume(char c)
 			return;
 	}
 
+//	std::cout << m_state;
+
 	if (m_limited && ++m_consumed >= MAX_SIZE.toBytes())
 		throw HTTPRequestHeaderTooBigException();
 }

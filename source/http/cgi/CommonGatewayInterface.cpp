@@ -237,15 +237,13 @@ CommonGatewayInterface::execute(HTTPClient &client, const CGIBlock &cgiBlock, co
 	}
 	if (pid == 0)
 	{
-		
 		std::string path = cgiBlock.path().get();
 		
 		if (StringUtils::first(path) != '/')
 			path = File(File::currentDirectory(), path).path();
 
-	//	std::string file = File(request.root(), request.url().path()).path();
-		std::string file = File(request.root(), request.resource()).path();
-	
+		std::string file = StringUtils::first(request.resource()) == '/' ? request.resource().substr(1) : request.resource();
+
 		::chdir(request.root().c_str());
 
 		::dup2(inPipe[0], 0);

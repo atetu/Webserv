@@ -2,7 +2,7 @@
 	"maxActiveClient": 250,
 	"mime": {
 		"includes": [
-			"mime.json"
+			"source/mime.json"
 		],
 		"define": {
 			"application/octet-stream": [
@@ -24,7 +24,7 @@
 			]
 		},
 		"bla": {
-			"path": "../docker/tests/42-testers/ubuntu_cgi_tester",
+			"path": "docker/tests/42-testers/ubuntu_cgi_tester",
 			"extensions": [
 				"bla"
 			],
@@ -53,7 +53,7 @@
 				"500": "500.html",
 				"404": "not-found.html"
 			},
-			"root": "../",
+			"root": "",
 			"methods": [
 				"GET",
 				"HEAD"
@@ -97,32 +97,32 @@
 					"cgi": "bla"
 				},
 				"/x.py": {
-					"root": "../dummy-files/",
+					"root": "dummy-files/",
 					"methods": [
 						"GET"
 					],
 					"cgi": "python3"
 				},
 				"/x2.py": {
-					"root": "../dummy-files/",
+					"root": "dummy-files/",
 					"methods": [
 						"GET"
 					],
 					"cgi": "python3"
 				},
 				"/_tests/x.php": {
-					"root": "../dummy-files/",
+					"root": "dummy-files/",
 					"cgi": "php-cgi"
 				},
 				"/_tests/x.sh": {
-					"root": "../dummy-files/",
+					"root": "dummy-files/",
 					"methods": [
 						"GET"
 					],
 					"cgi": "bash"
 				},
 				"/_tests/": {
-					"root": "../dummy-files/",
+					"root": "dummy-files/",
 					"methods": [
 						"GET"
 					],
