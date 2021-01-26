@@ -75,13 +75,19 @@ test-configs: all
 		name=$$(basename $$f .json | sed -e "s/^invalid-//"); \
 		key=$$(echo $$name | awk -F --- '{ print $$1 }'); \
 		error=$$(echo $$name | awk -F --- '{ print $$2 }'); \
-		if test "$$previous" = "$$key"; then \
-			key=""; \
+		\
+		if ! test -z "$$TERM"; then \
+			if test "$$previous" = "$$key"; then \
+				key=""; \
+			else \
+				printf "%$$(tput cols)s" | tr " " "-"; \
+				previous=$$key; \
+			fi; \
+			printf "%s \033[30G %s \033[60G" "$$key" "$$error"; \
 		else \
-			printf "%$$(tput cols)s" | tr " " "-"; \
-			previous=$$key; \
+			printf "%s %s -- " "$$key" "$$error"; \
 		fi; \
-		printf "%s \033[30G %s \033[60G" "$$key" "$$error"; \
+		\
 		! ./$(SOURCE_DIR)/webserv -c -f $$f; \
 	done
 
