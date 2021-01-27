@@ -277,7 +277,7 @@ HTTPRequestParser::consume(char c)
 			m_client.in().skip(consumed);
 			m_totalSize += consumed;
 
-			if (m_maxBodySize != -1 && (long long)m_client.body().size() > m_maxBodySize)
+			if (m_maxBodySize != -1 && (long long)m_client.body().size() > m_maxBodySize) // TODO This kept everything in RAM...
 			{
 				m_max = true;
 				if (finished)

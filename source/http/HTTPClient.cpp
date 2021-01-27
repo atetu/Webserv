@@ -231,7 +231,7 @@ HTTPClient::readHead(void)
 				m_request = HTTPRequest(m_parser.version(), m_parser.url(), m_parser.headerFields());
 				m_filterChain.doChainingOf(FilterChain::S_BEFORE);
 
-				if (m_response.ended())
+				if (m_request.method().absent() && m_response.ended())
 				{
 					m_filterChain.doChainingOf(FilterChain::S_AFTER);
 					m_state = S_END;
@@ -278,7 +278,6 @@ HTTPClient::readHead(void)
 
 		if (catched)
 		{
-			LOG.debug() << "doing after" << std::endl;
 			NIOSelector::instance().update(m_socket, NIOSelector::NONE);
 			m_filterChain.doChainingOf(FilterChain::S_AFTER);
 			m_state = S_END;
@@ -301,6 +300,13 @@ HTTPClient::readBody(void)
 
 			if (m_parser.state() == HTTPRequestParser::S_END)
 			{
+				if (m_response.ended())
+				{
+					m_filterChain.doChainingOf(FilterChain::S_AFTER);
+					m_state = S_END;
+					return (true);
+				}
+
 				NIOSelector::instance().update(m_socket, NIOSelector::NONE);
 				m_filterChain.doChainingOf(FilterChain::S_BETWEEN);
 				m_state = S_END;
