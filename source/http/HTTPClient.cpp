@@ -196,6 +196,8 @@ HTTPClient::doRead(void)
 		case S_NOT_STARTED:
 			m_state = S_HEADER;
 
+			// fall through
+
 		case S_HEADER:
 			return (readHead());
 

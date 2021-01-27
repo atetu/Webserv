@@ -114,6 +114,8 @@ HTTPResponse::store(BaseBuffer &buffer)
 		case S_NONE:
 			m_state = S_HEADERS;
 
+			// fall through
+
 		case S_HEADERS:
 		{
 			

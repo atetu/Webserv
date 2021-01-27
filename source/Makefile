@@ -33,7 +33,7 @@ LIBRARIES_BIN			=
 
 OBJECTS					= $(SOURCES:.cpp=.o)
 
-COMPILER				= g++
+COMPILER				= clang++
 
 FRAMEWORKS				= 
 FLAGS					= -std=c++98 -Wall -Wextra -Werror -g3 -O0
