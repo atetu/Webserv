@@ -28,9 +28,6 @@ class IResponseBody
 
 		virtual bool
 		isSelfManaged() const;
-
-		virtual bool
-		error();
 };
 
 #endif /* IRESPONSEBODY_HPP_ */

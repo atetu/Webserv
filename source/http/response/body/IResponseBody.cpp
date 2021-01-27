@@ -23,9 +23,3 @@ IResponseBody::isSelfManaged() const
 {
 	return (false);
 }
-
-bool
-IResponseBody::error()
-{
-	return(false);
-}

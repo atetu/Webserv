@@ -34,9 +34,6 @@ class StringResponseBody :
 
 		bool
 		store(BaseBuffer &buffer);
-
-		bool
-		error();
 };
 
 #endif /* STRINGRESPONSEBODY_HPP_ */

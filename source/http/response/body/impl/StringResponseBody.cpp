@@ -47,9 +47,3 @@ StringResponseBody::store(BaseBuffer &buffer)
 
 	return (true);
 }
-
-bool
-StringResponseBody::error()
-{
-	return(false);
-}

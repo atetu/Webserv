@@ -134,10 +134,6 @@ HTTPResponse::store(BaseBuffer &buffer)
 
 		case S_BODY:
 		{
-			if (m_body->error())
-			{
-				m_state = S_FLUSH;
-			}
 			if (m_body->store(buffer))
 				m_state = S_FLUSH;
 

@@ -46,9 +46,6 @@ class CGIResponseBody :
 
 		bool
 		store(BaseBuffer &buffer);
-
-		bool
-		error();
 };
 
 #endif /* CGIRESPONSEBODY_HPP_ */

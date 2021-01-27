@@ -54,9 +54,3 @@ CGIResponseBody::store(BaseBuffer &buffer)
 	return (false);
 	
 }
-
-bool
-CGIResponseBody::error()
-{
-	return(false);
-}
