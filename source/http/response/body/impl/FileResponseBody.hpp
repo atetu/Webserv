@@ -6,7 +6,7 @@
 /*   By: atetu <atetu@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/07 17:14:47 by ecaceres          #+#    #+#             */
-/*   Updated: 2021/01/27 09:51:59 by atetu            ###   ########.fr       */
+/*   Updated: 2021/01/27 12:21:39 by atetu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,8 @@ class FileResponseBody :
 {
 	private:
 		FileDescriptorBuffer &m_fdBuffer;
-		bool m_error;
+		size_t m_contentLength;
+		size_t m_stored;
 
 	private:
 		FileResponseBody();
@@ -36,7 +37,7 @@ class FileResponseBody :
 		operator=(const FileResponseBody &other);
 
 	public:
-		FileResponseBody(FileDescriptorBuffer &fdBuffer);
+		FileResponseBody(FileDescriptorBuffer &fdBuffer, size_t contentLength);
 
 		virtual
 		~FileResponseBody();
@@ -49,9 +50,6 @@ class FileResponseBody :
 
 		bool
 		isDone();
-		
-		bool
-		error();
 };
 
 #endif /* FILERESPONSEBODY_HPP_ */

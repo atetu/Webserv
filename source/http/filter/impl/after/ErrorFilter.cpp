@@ -6,7 +6,7 @@
 /*   By: atetu <atetu@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/07 00:30:02 by ecaceres          #+#    #+#             */
-/*   Updated: 2021/01/19 12:27:18 by atetu            ###   ########.fr       */
+/*   Updated: 2021/01/27 13:38:57 by atetu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,8 @@
 #include <util/Optional.hpp>
 #include <iostream>
 #include <string>
+#include <sys/stat.h>
+
 
 Logger &ErrorFilter::LOG = LoggerFactory::get("Error Filter");
 
@@ -87,7 +89,13 @@ ErrorFilter::doFilter(UNUSED HTTPClient &client, UNUSED HTTPRequest &request, HT
 					fd = errorFile.open(O_RDONLY);
 					fdBuffer = FileDescriptorBuffer::from(*fd, FileDescriptorBuffer::CLOSE | FileDescriptorBuffer::DELETE);
 
-					response.body(new FileResponseBody(*fdBuffer));
+
+					struct stat stt;
+					if (::stat(errorFile.path().c_str(), &stt) == -1)
+						throw IOException(errorFile.path(), errno);
+					size_t len = (size_t)stt.st_size;
+					
+					response.body(new FileResponseBody(*fdBuffer, len));
 
 					success = true;
 				}

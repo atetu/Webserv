@@ -6,7 +6,7 @@
 /*   By: atetu <atetu@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/06 18:51:19 by ecaceres          #+#    #+#             */
-/*   Updated: 2021/01/27 10:53:14 by atetu            ###   ########.fr       */
+/*   Updated: 2021/01/27 12:22:27 by atetu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -106,16 +106,8 @@ HTTPResponse::ended()
 bool
 HTTPResponse::store(BaseBuffer &buffer)
 {
-	 if (m_body && m_body->error())
-	{
-		this->status(*HTTPStatus::INTERNAL_SERVER_ERROR);
-		m_ended = true;
-	}
-	
 	if (!m_ended)
 		return (false);
-	
-	
 
 	switch (m_state)
 	{

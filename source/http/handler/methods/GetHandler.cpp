@@ -30,6 +30,7 @@
 #include <util/Time.hpp>
 #include <util/URL.hpp>
 #include <list>
+#include <util/Number.hpp>
 
 class FileDescriptorBuffer;
 
@@ -82,8 +83,8 @@ GetHandler::handle(UNUSED HTTPClient &client, HTTPRequest &request, HTTPResponse
 		{
 			fd = targetFile.open(O_RDONLY);
 			fdBuffer = FileDescriptorBuffer::from(*fd, FileDescriptorBuffer::CLOSE | FileDescriptorBuffer::DELETE);
-			
-			response.body(new FileResponseBody(*fdBuffer));
+
+			response.body(new FileResponseBody(*fdBuffer, contentLength));
 			response.headers().contentLength(contentLength);
 			response.headers().contentType(contentType);
 			response.headers().lastModified(lastModified);
