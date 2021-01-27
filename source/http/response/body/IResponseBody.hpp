@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   IResponseBody.hpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ecaceres <ecaceres@student.42.fr>          +#+  +:+       +#+        */
+/*   By: atetu <atetu@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/07 17:08:17 by ecaceres          #+#    #+#             */
-/*   Updated: 2021/01/07 17:08:17 by ecaceres         ###   ########.fr       */
+/*   Updated: 2021/01/27 10:22:23 by atetu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,9 @@ class IResponseBody
 
 		virtual bool
 		isSelfManaged() const;
+
+		virtual bool
+		error();
 };
 
 #endif /* IRESPONSEBODY_HPP_ */

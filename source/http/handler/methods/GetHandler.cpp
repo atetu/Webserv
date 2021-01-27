@@ -82,7 +82,7 @@ GetHandler::handle(UNUSED HTTPClient &client, HTTPRequest &request, HTTPResponse
 		{
 			fd = targetFile.open(O_RDONLY);
 			fdBuffer = FileDescriptorBuffer::from(*fd, FileDescriptorBuffer::CLOSE | FileDescriptorBuffer::DELETE);
-
+			
 			response.body(new FileResponseBody(*fdBuffer));
 			response.headers().contentLength(contentLength);
 			response.headers().contentType(contentType);

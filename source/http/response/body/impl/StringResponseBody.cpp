@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   StringResponseBody.cpp                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ecaceres <ecaceres@student.42.fr>          +#+  +:+       +#+        */
+/*   By: atetu <atetu@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/07 17:10:52 by ecaceres          #+#    #+#             */
-/*   Updated: 2021/01/07 17:10:52 by ecaceres         ###   ########.fr       */
+/*   Updated: 2021/01/27 10:29:58 by atetu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,4 +46,10 @@ StringResponseBody::store(BaseBuffer &buffer)
 	buffer.store(m_content);
 
 	return (true);
+}
+
+bool
+StringResponseBody::error()
+{
+	return(false);
 }

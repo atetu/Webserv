@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   FileResponseBody.hpp                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ecaceres <ecaceres@student.42.fr>          +#+  +:+       +#+        */
+/*   By: atetu <atetu@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/07 17:14:47 by ecaceres          #+#    #+#             */
-/*   Updated: 2021/01/07 17:14:47 by ecaceres         ###   ########.fr       */
+/*   Updated: 2021/01/27 09:51:59 by atetu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,7 @@ class FileResponseBody :
 {
 	private:
 		FileDescriptorBuffer &m_fdBuffer;
+		bool m_error;
 
 	private:
 		FileResponseBody();
@@ -48,6 +49,9 @@ class FileResponseBody :
 
 		bool
 		isDone();
+		
+		bool
+		error();
 };
 
 #endif /* FILERESPONSEBODY_HPP_ */

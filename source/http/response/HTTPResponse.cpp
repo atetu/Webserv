@@ -6,7 +6,7 @@
 /*   By: atetu <atetu@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/06 18:51:19 by ecaceres          #+#    #+#             */
-/*   Updated: 2021/01/22 11:41:14 by atetu            ###   ########.fr       */
+/*   Updated: 2021/01/27 10:53:14 by atetu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -106,8 +106,16 @@ HTTPResponse::ended()
 bool
 HTTPResponse::store(BaseBuffer &buffer)
 {
+	 if (m_body && m_body->error())
+	{
+		this->status(*HTTPStatus::INTERNAL_SERVER_ERROR);
+		m_ended = true;
+	}
+	
 	if (!m_ended)
 		return (false);
+	
+	
 
 	switch (m_state)
 	{
@@ -116,6 +124,7 @@ HTTPResponse::store(BaseBuffer &buffer)
 
 		case S_HEADERS:
 		{
+			
 			buffer.store(HTTPStatusLine(*status().get()).format());
 			buffer.store(HTTP::CRLF);
 			buffer.store(headers().format());
@@ -131,6 +140,10 @@ HTTPResponse::store(BaseBuffer &buffer)
 
 		case S_BODY:
 		{
+			if (m_body->error())
+			{
+				m_state = S_FLUSH;
+			}
 			if (m_body->store(buffer))
 				m_state = S_FLUSH;
 
