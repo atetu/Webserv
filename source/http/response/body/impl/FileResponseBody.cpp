@@ -6,7 +6,7 @@
 /*   By: atetu <atetu@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/07 17:14:47 by ecaceres          #+#    #+#             */
-/*   Updated: 2021/01/27 12:21:55 by atetu            ###   ########.fr       */
+/*   Updated: 2021/01/27 14:19:44 by atetu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,15 +43,17 @@ FileResponseBody::readable(FileDescriptor &fd)
 {
 	(void)fd;
 
-	ssize_t r = m_fdBuffer.read(); // TODO Need check
-	m_stored += r;
-	if (r == -1)
+	ssize_t r = m_fdBuffer.read();
+	if (r != -1)
+		m_stored += r;
+	else
 	{	
 		size_t diff = m_contentLength - m_stored;
 		if (diff)
 			m_stored += m_fdBuffer.storeZeros(diff);
 	}	
-	return (isDone());
+	
+	return (r <= 0 || isDone());
 }
 
 bool

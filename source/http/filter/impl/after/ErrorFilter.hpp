@@ -6,7 +6,7 @@
 /*   By: atetu <atetu@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/07 00:30:02 by ecaceres          #+#    #+#             */
-/*   Updated: 2021/01/27 13:35:46 by atetu            ###   ########.fr       */
+/*   Updated: 2021/01/27 14:17:59 by atetu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,21 +38,6 @@ class ErrorFilter :
 
 		void
 		doFilter(HTTPClient &client, HTTPRequest &request, HTTPResponse &response, FilterChain &next);
-
-		// private:
-		// 	template<typename T>
-		// 		inline static IOException
-		// 		resetErrnoAndReturn(const T &t)
-		// 		{
-		// 			errno = 0;
-		// 			return (t);
-		// 		}
-
-		// 	inline IOException
-		// 	ioException() const
-		// 	{
-		// 		return (resetErrnoAndReturn(IOException(, errno)));
-		// 	}
 };
 
 #endif /* ERRORFILTER_HPP_ */

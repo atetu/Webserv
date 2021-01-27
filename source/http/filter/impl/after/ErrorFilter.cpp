@@ -6,7 +6,7 @@
 /*   By: atetu <atetu@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/07 00:30:02 by ecaceres          #+#    #+#             */
-/*   Updated: 2021/01/27 13:38:57 by atetu            ###   ########.fr       */
+/*   Updated: 2021/01/27 14:20:50 by atetu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,14 +86,9 @@ ErrorFilter::doFilter(UNUSED HTTPClient &client, UNUSED HTTPRequest &request, HT
 				FileDescriptorBuffer *fdBuffer = NULL;
 				try
 				{
+					size_t len = errorFile.length();
 					fd = errorFile.open(O_RDONLY);
 					fdBuffer = FileDescriptorBuffer::from(*fd, FileDescriptorBuffer::CLOSE | FileDescriptorBuffer::DELETE);
-
-
-					struct stat stt;
-					if (::stat(errorFile.path().c_str(), &stt) == -1)
-						throw IOException(errorFile.path(), errno);
-					size_t len = (size_t)stt.st_size;
 					
 					response.body(new FileResponseBody(*fdBuffer, len));
 
