@@ -6,7 +6,7 @@
 /*   By: atetu <atetu@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/10/28 11:33:47 by ecaceres          #+#    #+#             */
-/*   Updated: 2021/01/22 11:02:53 by atetu            ###   ########.fr       */
+/*   Updated: 2021/01/27 14:10:53 by atetu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -330,7 +330,7 @@ Configuration::JsonBuilder::buildServerBlock(const std::string &path, const Json
 		BIND(jsonObject, KEY_SERVER_DEFAULT, JsonBoolean, bool, serverBlock, isDefault);
 		BIND(jsonObject, KEY_SERVER_ROOT, JsonString, std::string, serverBlock, root);
 		BIND(jsonObject, KEY_SERVER_LISTING, JsonBoolean, bool, serverBlock, listing);
-
+		
 		if (jsonObject.has(KEY_SERVER_NAME))
 		{
 			std::list<std::string> names;
@@ -655,8 +655,11 @@ Configuration::Validator::validate(const RootBlock &rootBlock, const ServerBlock
 			throw ConfigurationValidateException("non-default server is missing names");
 
 		const std::list<std::string> &names = serverBlock.names().get();
+		
 		if (names.empty())
+		{
 			throw ConfigurationValidateException("non-default server is unnamed (names is empty)");
+		}
 	}
 
 	if (serverBlock.locations().present())
