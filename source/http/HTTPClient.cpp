@@ -152,13 +152,15 @@ HTTPClient::writable(FileDescriptor &fd)
 
 	bool finished = m_response.store(m_out);
 
-	ssize_t r = 0;
-	if ((r = m_out.send()) > 0)
-		updateLastAction();
+	size_t sizeBefore = m_out.size();
+    ssize_t r = 0;
+    if ((r = m_out.send()) > 0)
+        updateLastAction();
 
-	if (r == -1)
-		delete this;
-	else if (finished && m_out.empty())
+    if ((sizeBefore != 0 && r == 0) || r == -1)
+        delete this;
+    else if (finished && m_out.empty())
+
 	{
 		if (m_keepAlive)
 		{
